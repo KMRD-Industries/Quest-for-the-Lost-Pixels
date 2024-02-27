@@ -1,0 +1,7 @@
+CompileFlags:
+  Add: [-std=c++23, -stdlib=libc++]
+
+Diagnostics:
+  ClangTidy:
+    Add: [bugprone*, cppcoreguidelines*, modernize*, performance*, portability*]
+    Remove: [modernize-use-trailing-return-type]
