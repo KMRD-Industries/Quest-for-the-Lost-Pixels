@@ -1,8 +1,7 @@
 #include "SystemManager.h"
+#include "System.h"
 
 #include <ranges>
-
-#include "System.h"
 
 void SystemManager::entityDestroyed(const Entity entity)
 {

@@ -31,7 +31,7 @@ public:
     {
         const std::string componentName{typeid(T).name()};
 
-        assert(!m_componentTypes.contains(componentName) && "Component not registered before use.");
+        assert(m_componentTypes.contains(componentName) && "Component not registered before use.");
 
         return m_componentTypes.at(componentName);
     }

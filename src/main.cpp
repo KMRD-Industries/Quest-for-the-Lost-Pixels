@@ -1,3 +1,5 @@
+#include "Coordinator.h"
+
 #include <imgui-SFML.h>
 #include <imgui.h>
 
@@ -6,13 +8,32 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
+#include "RenderSystem.h"
+#include "RenderComponent.h"
+
+Coordinator gCoordinator;
+
 int main() {
+    gCoordinator.init();
+
+    gCoordinator.registerComponent<RenderComponent>();
+
+    auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
+    {
+	Signature signature;
+	signature.set(gCoordinator.getComponentType<RenderComponent>());
+	gCoordinator.setSystemSignature<RenderSystem>(signature);
+    }
+
+    std::vector<Entity> entities(MAX_ENTITIES - 1);
+
+    entities[0] = gCoordinator.createEntity();
+    gCoordinator.addComponent(entities[0], RenderComponent{new sf::CircleShape{100.f}});
     sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
     window.setFramerateLimit(60);
     auto _ = ImGui::SFML::Init(window);
 
     sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
 
     sf::Clock deltaClock;
     while (window.isOpen()) {
@@ -34,7 +55,7 @@ int main() {
         ImGui::ShowDemoWindow();
 
         window.clear();
-        window.draw(shape);
+        renderSystem->draw(window);
         ImGui::SFML::Render(window);
         window.display();
     }
