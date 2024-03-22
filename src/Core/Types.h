@@ -1,6 +1,6 @@
 #pragma once
 #include <bitset>
-
+#include <cstdint>
 // ECS
 using Entity = std::uint32_t;
 using ComponentType = std::uint8_t;

@@ -8,20 +8,20 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 include(FetchContent)
 
 FetchContent_Declare(SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 2.6.x)
+        GIT_REPOSITORY https://github.com/SFML/SFML.git
+        GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
 FetchContent_Declare(ImGui
-    GIT_REPOSITORY https://github.com/ocornut/imgui
-    GIT_TAG v1.90.4)
+        GIT_REPOSITORY https://github.com/ocornut/imgui
+        GIT_TAG v1.90.4)
 FetchContent_MakeAvailable(ImGui)
 FetchContent_GetProperties(ImGui SOURCE_DIR IMGUI_DIR)
 
 set(IMGUI_SFML_FIND_SFML OFF)
 FetchContent_Declare(ImGui-SFML
-    GIT_REPOSITORY https://github.com/SFML/imgui-sfml
-    GIT_TAG 2.6.x)
+        GIT_REPOSITORY https://github.com/SFML/imgui-sfml
+        GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(ImGui-SFML)
 
 add_subdirectory(src)
