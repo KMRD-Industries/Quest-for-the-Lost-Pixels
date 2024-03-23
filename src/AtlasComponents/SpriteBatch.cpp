@@ -96,7 +96,7 @@ void moony::SpriteBatch::draw(sf::RenderTarget& target, sf::RenderStates states)
     for(const Batch* batch : m_batches)
     {
         states.texture = batch->m_texture;
-        target.draw(batch->m_vertices.data(), batch->m_count * 4, sf::PrimitiveType::Quads, states);
+        target.draw(batch->m_vertices.data(), batch->m_count * 4, sf::PrimitiveType::Lines, states);
     }
 }
 

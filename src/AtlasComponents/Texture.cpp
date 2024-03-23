@@ -4,7 +4,7 @@
 
 #include "Texture.h"
 
-moony::Texture::Texture(const sf::Texture* texture, sf::IntRect rect){
+moony::Texture::Texture(const sf::Texture* texture, const sf::IntRect rect){
     m_texture = texture;
     m_rect = rect;
 }

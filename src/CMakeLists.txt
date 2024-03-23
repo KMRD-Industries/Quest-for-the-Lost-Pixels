@@ -50,7 +50,10 @@ include_directories( ./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CUR
 add_executable(sf ${SOURCES} ${SYSTEMS} ${CORE} ${COMPONENTS} ${ATLAS_COMPONENTS})
 target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML ${ZLIB_LIBRARY_DIR}/libz.so)
 
-add_compile_definitions(USE_ZLIB)
+if(!WIN32)
+	add_compile_definitions(USE_ZLIB)
+endif()
+
 target_compile_features(sf PRIVATE cxx_std_23)
 
 if(WIN32)

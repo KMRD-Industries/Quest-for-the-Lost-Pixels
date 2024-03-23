@@ -3,6 +3,6 @@
 -- Found UDev: /usr/lib/libudev.so
 --    include: /usr/include
 -- Found ImGui v1.90.4 in /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src
--- Configuring done (1.4s)
+-- Configuring done (1.2s)
 -- Generating done (0.0s)
 -- Build files have been written to: /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug

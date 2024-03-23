@@ -1958,7 +1958,7 @@ build _deps/imgui-sfml-build/install/strip: phony _deps/imgui-sfml-build/CMakeFi
 build cmake_object_order_depends_target_sf: phony || cmake_object_order_depends_target_ImGui-SFML cmake_object_order_depends_target_sfml-graphics cmake_object_order_depends_target_sfml-system cmake_object_order_depends_target_sfml-window
 
 build src/CMakeFiles/sf.dir/main.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/main.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/main.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
@@ -1966,7 +1966,7 @@ build src/CMakeFiles/sf.dir/main.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/d
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir
 
 build src/CMakeFiles/sf.dir/Systems/RenderSystem.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Systems/RenderSystem.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/Systems/RenderSystem.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
@@ -1974,7 +1974,7 @@ build src/CMakeFiles/sf.dir/Systems/RenderSystem.cpp.o: CXX_COMPILER__sf_unscann
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Systems
 
 build src/CMakeFiles/sf.dir/Core/ComponentManager.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Core/ComponentManager.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/Core/ComponentManager.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
@@ -1982,7 +1982,7 @@ build src/CMakeFiles/sf.dir/Core/ComponentManager.cpp.o: CXX_COMPILER__sf_unscan
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Core
 
 build src/CMakeFiles/sf.dir/Core/EntityManager.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Core/EntityManager.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/Core/EntityManager.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
@@ -1990,7 +1990,7 @@ build src/CMakeFiles/sf.dir/Core/EntityManager.cpp.o: CXX_COMPILER__sf_unscanned
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Core
 
 build src/CMakeFiles/sf.dir/Core/SystemManager.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Core/SystemManager.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/Core/SystemManager.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
@@ -1998,7 +1998,7 @@ build src/CMakeFiles/sf.dir/Core/SystemManager.cpp.o: CXX_COMPILER__sf_unscanned
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Core
 
 build src/CMakeFiles/sf.dir/Core/Coordinator.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Core/Coordinator.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/Core/Coordinator.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
@@ -2006,7 +2006,7 @@ build src/CMakeFiles/sf.dir/Core/Coordinator.cpp.o: CXX_COMPILER__sf_unscanned_D
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Core
 
 build src/CMakeFiles/sf.dir/AtlasComponents/Sprite.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/AtlasComponents/Sprite.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/AtlasComponents/Sprite.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
@@ -2014,7 +2014,7 @@ build src/CMakeFiles/sf.dir/AtlasComponents/Sprite.cpp.o: CXX_COMPILER__sf_unsca
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/AtlasComponents
 
 build src/CMakeFiles/sf.dir/AtlasComponents/SpriteBatch.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/AtlasComponents/SpriteBatch.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/AtlasComponents/SpriteBatch.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
@@ -2022,7 +2022,7 @@ build src/CMakeFiles/sf.dir/AtlasComponents/SpriteBatch.cpp.o: CXX_COMPILER__sf_
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/AtlasComponents
 
 build src/CMakeFiles/sf.dir/AtlasComponents/Texture.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/AtlasComponents/Texture.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/AtlasComponents/Texture.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
@@ -2030,7 +2030,7 @@ build src/CMakeFiles/sf.dir/AtlasComponents/Texture.cpp.o: CXX_COMPILER__sf_unsc
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/AtlasComponents
 
 build src/CMakeFiles/sf.dir/AtlasComponents/TextureAtlas.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/AtlasComponents/TextureAtlas.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
   DEP_FILE = src/CMakeFiles/sf.dir/AtlasComponents/TextureAtlas.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
   INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src

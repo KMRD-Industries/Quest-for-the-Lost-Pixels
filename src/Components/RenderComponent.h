@@ -2,7 +2,6 @@
 
 #include "SFML/Graphics/Shape.hpp"
 
-struct RenderComponent
-{
-    sf::Shape* shape;
+struct RenderComponent{
+    sf::Drawable* shape;
 };

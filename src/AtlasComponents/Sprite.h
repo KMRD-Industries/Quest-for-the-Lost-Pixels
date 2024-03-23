@@ -7,7 +7,7 @@
 #include "Texture.h"
 
 namespace moony{
-    struct Sprite final : sf::Transformable{
+    struct Sprite : sf::Transformable{
 	Sprite();
 	Sprite(const Texture&, int, sf::Color = sf::Color::White);
 

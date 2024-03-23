@@ -4,7 +4,7 @@
 95	132	1710953507390256905	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/GlResource.cpp.o	ea0028bae1582bfb
 666	1213	1710953508470256946	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/VideoMode.cpp.o	281ee91a67e6a9e0
 3	58	1710953507316923568	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/Thread.cpp.o	5f37951df5565fe8
-5	1397	1711138724299394611	src/CMakeFiles/sf.dir/Core/SystemManager.cpp.o	98e506be7b78ac24
+8	2247	1711207280866357138	src/CMakeFiles/sf.dir/Core/SystemManager.cpp.o	906a5e0c2e2f9d1
 3243	3570	1710953510826923703	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/ConvexShape.cpp.o	1662a8abc8a75401
 2555	3915	1710953511170257049	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/Shader.cpp.o	d63f83b992d7d026
 3570	4243	1710953511500257063	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/VertexBuffer.cpp.o	ae0a741c7eea930d
@@ -14,7 +14,7 @@
 862	1688	1710953508943590298	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/WindowBase.cpp.o	e07d0f3196ed6e01
 2089	2241	1710953509500256986	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/RenderStates.cpp.o	158828d1edaf5c07
 3507	4395	1710953511653590401	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/Text.cpp.o	380b6b11fca4f6eb
-5	1236	1711138724139394618	src/CMakeFiles/sf.dir/Core/ComponentManager.cpp.o	89060b0e460cc8f4
+7	1795	1711207280413023825	src/CMakeFiles/sf.dir/Core/ComponentManager.cpp.o	449e9e9b7a699606
 1203	1332	1710953508590256951	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Unix/KeySymToUnicodeMapping.cpp.o	cc9610294c5341bf
 3	60	1710953507316923568	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/ThreadLocal.cpp.o	5f0988454048513b
 6005	6069	1710953513323590465	_deps/imgui-sfml-build/libImGui-SFML.a	6d9c3a829dbe34d1
@@ -22,11 +22,11 @@
 1263	1918	1710953509176923640	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Unix/VideoModeImpl.cpp.o	2a22594de203abcc
 4	56	1710953507313590236	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/Time.cpp.o	7df25870423e2659
 95	1182	1710953508436923612	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/GlContext.cpp.o	fa8340ef3bedb5ab
-6	1490	1711138724392727941	src/CMakeFiles/sf.dir/AtlasComponents/SpriteBatch.cpp.o	19075e895a240197
+9	2267	1711207280886357137	src/CMakeFiles/sf.dir/AtlasComponents/SpriteBatch.cpp.o	8a268e1bd09b9f8e
 1858	2038	1710953509293590311	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/Color.cpp.o	396b9fd130698787
 1230	1933	1710953509190256974	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Unix/Display.cpp.o	61b7c82279c9c467
 34	93	1710953507350256904	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/MemoryInputStream.cpp.o	613ac37580200747
-6	888	1711138723792727967	src/CMakeFiles/sf.dir/AtlasComponents/Texture.cpp.o	c0f0a3d9d1115e7b
+10	1545	1711207280163023836	src/CMakeFiles/sf.dir/AtlasComponents/Texture.cpp.o	fa3a3257631663d2
 5	797	1711012962150237251	CMakeFiles/sf.dir/src/TextureAtlas.cpp.o	eb6d26914dd3aa24
 1901	3555	1710953510810257036	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/Font.cpp.o	c5a5bfb1c9f71c2b
 1183	1230	1710953508486923613	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Unix/KeySymToKeyMapping.cpp.o	b7089eae044a0af6
@@ -39,7 +39,7 @@
 1163	2169	1710953509426923649	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Unix/KeyboardImpl.cpp.o	469e23ab2f280d27
 1333	1906	1710953509163590306	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Unix/VulkanImplX11.cpp.o	dd0f0d1f7ead0ae7
 2071	3910	1710953511166923716	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/ImageLoader.cpp.o	c94c86dbeceb4f7d
-2	1099	1711141301122106421	build.ninja	5bd0cff640ef800a
+2	1224	1711207291139690013	build.ninja	5bd0cff640ef800a
 3834	5223	1710953512480257099	_deps/imgui-sfml-build/CMakeFiles/ImGui-SFML.dir/__/imgui-src/imgui_tables.cpp.o	86becbbe84ef242b
 3734	4887	1710953512143590421	_deps/imgui-sfml-build/CMakeFiles/ImGui-SFML.dir/imgui-SFML.cpp.o	6674190e2e9579a6
 3	1046	1710953508300256940	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/String.cpp.o	4586856eca6c0660
@@ -51,8 +51,8 @@
 58	622	1710953507880256924	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/Unix/ThreadImpl.cpp.o	bacc750aca967429
 3150	3649	1710953510906923706	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/CircleShape.cpp.o	bc056db4f0a28838
 158	802	1710953508056923597	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/JoystickManager.cpp.o	a06d073258c74d82
-5	1615	1711138724519394601	src/CMakeFiles/sf.dir/Systems/RenderSystem.cpp.o	cfad3ccaa47ab141
-6	868	1711138723772727969	src/CMakeFiles/sf.dir/AtlasComponents/Sprite.cpp.o	42973a6d0111b20e
+7	2525	1711207281143023793	src/CMakeFiles/sf.dir/Systems/RenderSystem.cpp.o	46f9b79c1c5be57d
+8	1642	1711207280259690498	src/CMakeFiles/sf.dir/AtlasComponents/Sprite.cpp.o	af73b42baf721008
 2	551	1710953507806923587	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/Err.cpp.o	51a21e9362c4a26b
 60	95	1710953507353590237	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/Unix/ThreadLocalImpl.cpp.o	f37595ec87b008c5
 5	460	1711012961813570571	CMakeFiles/sf.dir/src/Texture.cpp.o	3a894129d5438626
@@ -64,7 +64,7 @@
 1933	3106	1710953510363590352	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/GLExtensions.cpp.o	2fe953fce67f939a
 3556	3956	1710953511213590385	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/VertexArray.cpp.o	6d6eb7908f1af6b9
 1684	2680	1710953509936923669	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Unix/GlxContext.cpp.o	51af29bb9c6a399b
-5	1883	1711139142312709297	src/CMakeFiles/sf.dir/main.cpp.o	328c40a6857f474
+7	3272	1711207281889690426	src/CMakeFiles/sf.dir/main.cpp.o	8e058324b467b56d
 1906	2089	1710953509346923646	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/Glsl.cpp.o	259df91d19ce3861
 5	481	1711012961833570572	CMakeFiles/sf.dir/src/Sprite.cpp.o	ee6b12a369e59b03
 2682	3584	1710953510840257037	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/Texture.cpp.o	11cee2005a6c4ca3
@@ -72,10 +72,10 @@
 5	891	1711012962243570588	CMakeFiles/sf.dir/src/SpriteBatch.cpp.o	1ea7cb64603c0224
 4586	4674	1710953511926923745	_deps/sfml-build/lib/libsfml-graphics-s-d.a	431013d0ad99647c
 3916	4312	1710953511570257065	_deps/imgui-sfml-build/CMakeFiles/ImGui-SFML.dir/__/imgui-src/misc/cpp/imgui_stdlib.cpp.o	958883eb6937a651
-5	739	1711138723642727974	src/CMakeFiles/sf.dir/Core/EntityManager.cpp.o	4abf1909b36e1668
+7	1324	1711207279943023846	src/CMakeFiles/sf.dir/Core/EntityManager.cpp.o	b9d04c862d072907
 2460	3218	1710953510476923690	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/RenderWindow.cpp.o	2418a94a40a2acf5
 165	862	1710953508120256933	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Keyboard.cpp.o	8c7e44df13c3c82
-1883	2119	1711139142546042620	/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/sf	357deda85f01a63a
+3272	3548	1711207282163023748	/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/sf	357deda85f01a63a
 3108	3150	1710953510403590353	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/Vertex.cpp.o	f243646b0688f1fe
 3	33	1710953507290256901	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/Sleep.cpp.o	42f38fe278187839
 2878	3243	1710953510500257024	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/Transformable.cpp.o	e983575618800d81
@@ -84,7 +84,7 @@
 2169	2878	1710953510133590343	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/RenderTexture.cpp.o	fed1ab8e6649d66
 2854	3265	1710953510520257025	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/Transform.cpp.o	972de9448b910b41
 3585	3640	1710953510896923706	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/RenderTextureImpl.cpp.o	c6a5a9cc9bda01e6
-6	1562	1711138724466061271	src/CMakeFiles/sf.dir/AtlasComponents/TextureAtlas.cpp.o	dded4720699328d4
+10	2459	1711207281076357129	src/CMakeFiles/sf.dir/AtlasComponents/TextureAtlas.cpp.o	649a4946880c30af
 34	521	1710953507773590253	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/FileInputStream.cpp.o	4cc1faefd117574c
 1135	1815	1710953509073590303	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Unix/InputImpl.cpp.o	3a44df227682c441
 551	635	1710953507893590257	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Touch.cpp.o	3301187f9cb4f048
@@ -92,7 +92,7 @@
 1046	1135	1710953508386923610	_deps/sfml-build/lib/libsfml-system-s-d.a	eed5c64404d43506
 635	1163	1710953508420256944	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/SensorManager.cpp.o	202a48104271164
 1815	1857	1710953509113590304	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/BlendMode.cpp.o	aba3e7f03d7eb2cc
-5	1372	1711138724272727946	src/CMakeFiles/sf.dir/Core/Coordinator.cpp.o	c6ebb5f673b92d50
+8	2177	1711207280793023808	src/CMakeFiles/sf.dir/Core/Coordinator.cpp.o	d26f1d750cf2f8b
 3775	6005	1710953513260257129	_deps/imgui-sfml-build/CMakeFiles/ImGui-SFML.dir/__/imgui-src/imgui.cpp.o	9e4e0318690d0f7f
 3649	3774	1710953511033590377	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/RenderTextureImplDefault.cpp.o	cbb0ce0ea393decf
 622	666	1710953507923590258	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Sensor.cpp.o	7b625b3ac96959d6
@@ -104,3 +104,4 @@
 1688	2555	1710953509813590331	_deps/sfml-build/src/SFML/Window/CMakeFiles/sfml-window.dir/Unix/JoystickImpl.cpp.o	e51a59aab5048d54
 45	94	1710953507350256904	_deps/sfml-build/src/SFML/System/CMakeFiles/sfml-system.dir/Unix/MutexImpl.cpp.o	a13578f7cf23f8f9
 1918	2460	1710953509716923661	_deps/sfml-build/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/GLCheck.cpp.o	9705128156275178
+2	1153	1711207291139690013	build.ninja	5bd0cff640ef800a
