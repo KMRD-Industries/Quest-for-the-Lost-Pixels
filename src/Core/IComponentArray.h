@@ -4,6 +4,6 @@
 class IComponentArray
 {
 public:
-	virtual ~IComponentArray() = default;
-	virtual void entityDestroyed(const Entity entity) = 0;
+    virtual ~IComponentArray() = default;
+    virtual void entityDestroyed(const Entity entity) = 0;
 };

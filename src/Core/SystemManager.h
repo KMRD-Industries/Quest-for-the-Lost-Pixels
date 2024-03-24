@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Types.h"
 #include "System.h"
+#include "Types.h"
 
+#include <cassert>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <cassert>
 
 class SystemManager
 {

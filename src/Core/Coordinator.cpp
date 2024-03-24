@@ -7,10 +7,7 @@ void Coordinator::init()
     m_systemManager = std::make_unique<SystemManager>();
 }
 
-Entity Coordinator::createEntity() const
-{
-    return m_entityManager->createEntity();
-}
+Entity Coordinator::createEntity() const { return m_entityManager->createEntity(); }
 
 void Coordinator::destroyEntity(const Entity entity) const
 {

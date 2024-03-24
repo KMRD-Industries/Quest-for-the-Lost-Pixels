@@ -4,7 +4,7 @@
 
 EntityManager::EntityManager()
 {
-    for(Entity entity{}; entity < MAX_ENTITIES; ++entity)
+    for (Entity entity{}; entity < MAX_ENTITIES; ++entity)
     {
         m_availableEntities.push(entity);
     }
