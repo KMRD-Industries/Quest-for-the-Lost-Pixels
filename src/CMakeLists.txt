@@ -1,4 +1,4 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(SOURCES
 	main.cpp
@@ -14,6 +14,8 @@ set(CORE
 	Core/SystemManager.cpp
 	Core/SystemManager.h
 	Core/Types.h
+	Core/Coordinator.h
+	Core/Coordinator.cpp
 )
 set(COMPONENTS
 	Components/RenderComponent.h
@@ -26,9 +28,9 @@ source_group("Core" FILES ${CORE})
 source_group("Components" FILES ${COMPONENTS})
 source_group("Systems" FILES ${SYSTEMS})
 
-include_directories( ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(sf ${SOURCES} ${CORE})
+add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS})
 target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML)
 target_compile_features(sf PRIVATE cxx_std_23)
 
