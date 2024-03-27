@@ -1,5 +1,4 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(ZLIB_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/zlib-1.3.1/)
 
 set(SOURCES
 		main.cpp
@@ -30,10 +29,6 @@ set(SYSTEMS
 )
 
 set(ATLAS_COMPONENTS
-		AtlasComponents/Sprite.cpp
-		AtlasComponents/Sprite.h
-		AtlasComponents/SpriteBatch.cpp
-		AtlasComponents/SpriteBatch.h
 		AtlasComponents/Texture.cpp
 		AtlasComponents/Texture.h
 		AtlasComponents/TextureAtlas.cpp
@@ -48,13 +43,11 @@ source_group("AtlasComponents" FILES ${ATLAS_COMPONENTS})
 include_directories( ./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(sf ${SOURCES} ${SYSTEMS} ${CORE} ${COMPONENTS} ${ATLAS_COMPONENTS})
-target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML ${ZLIB_LIBRARY_DIR}/libz.so)
-
-if(!WIN32)
-	add_compile_definitions(USE_ZLIB)
-endif()
-
+target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML zlib )
 target_compile_features(sf PRIVATE cxx_std_23)
+
+# Force using zlib
+add_compile_definitions(USE_ZLIB)
 
 if(WIN32)
 	# Copy OpenAL DLL

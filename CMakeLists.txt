@@ -12,6 +12,12 @@ FetchContent_Declare(SFML
         GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
+FetchContent_Declare(ZLIB
+        https://github.com/madler/zlib.git
+        GIT_TAG v1.3.1)
+FetchContent_MakeAvailable(ZLIB)
+FetchContent_GetProperties(ZLIB SOURCE_DIR ZLIB_DIR)
+
 FetchContent_Declare(ImGui
         GIT_REPOSITORY https://github.com/ocornut/imgui
         GIT_TAG v1.90.4)

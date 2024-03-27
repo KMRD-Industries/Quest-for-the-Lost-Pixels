@@ -1774,6 +1774,537 @@ build _deps/sfml-build/src/SFML/Audio/install/strip: phony _deps/sfml-build/src/
 # =============================================================================
 
 # =============================================================================
+# Object build statements for SHARED_LIBRARY target zlib
+
+
+#############################################
+# Order-only phony target for zlib
+
+build cmake_object_order_depends_target_zlib: phony || _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/adler32.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/adler32.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/adler32.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/compress.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/compress.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/compress.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/crc32.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/crc32.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/crc32.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/deflate.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/deflate.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/deflate.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/gzclose.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/gzclose.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/gzclose.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/gzlib.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/gzlib.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/gzlib.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/gzread.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/gzread.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/gzread.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/gzwrite.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/gzwrite.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/gzwrite.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/inflate.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/inflate.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/inflate.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/infback.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/infback.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/infback.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/inftrees.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/inftrees.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/inftrees.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/inffast.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/inffast.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/inffast.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/trees.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/trees.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/trees.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/uncompr.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/uncompr.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/uncompr.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+build _deps/zlib-build/CMakeFiles/zlib.dir/zutil.c.o: C_COMPILER__zlib_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/zutil.c || cmake_object_order_depends_target_zlib
+  DEFINES = -DZLIB_DLL -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlib.dir/zutil.c.o.d
+  FLAGS = -g -fPIC -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+
+
+# =============================================================================
+# Link build statements for SHARED_LIBRARY target zlib
+
+
+#############################################
+# Link the shared library _deps/zlib-build/libz.so.1.3.1
+
+build _deps/zlib-build/libz.so.1.3.1: C_SHARED_LIBRARY_LINKER__zlib_Debug _deps/zlib-build/CMakeFiles/zlib.dir/adler32.c.o _deps/zlib-build/CMakeFiles/zlib.dir/compress.c.o _deps/zlib-build/CMakeFiles/zlib.dir/crc32.c.o _deps/zlib-build/CMakeFiles/zlib.dir/deflate.c.o _deps/zlib-build/CMakeFiles/zlib.dir/gzclose.c.o _deps/zlib-build/CMakeFiles/zlib.dir/gzlib.c.o _deps/zlib-build/CMakeFiles/zlib.dir/gzread.c.o _deps/zlib-build/CMakeFiles/zlib.dir/gzwrite.c.o _deps/zlib-build/CMakeFiles/zlib.dir/inflate.c.o _deps/zlib-build/CMakeFiles/zlib.dir/infback.c.o _deps/zlib-build/CMakeFiles/zlib.dir/inftrees.c.o _deps/zlib-build/CMakeFiles/zlib.dir/inffast.c.o _deps/zlib-build/CMakeFiles/zlib.dir/trees.c.o _deps/zlib-build/CMakeFiles/zlib.dir/uncompr.c.o _deps/zlib-build/CMakeFiles/zlib.dir/zutil.c.o
+  LANGUAGE_COMPILE_FLAGS = -g
+  LINK_FLAGS = -Wl,--version-script,"/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/zlib.map"
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlib.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  SONAME = libz.so.1
+  SONAME_FLAG = -Wl,-soname,
+  TARGET_FILE = _deps/zlib-build/libz.so.1.3.1
+  TARGET_IMPLIB = _deps/zlib-build/
+  TARGET_PDB = z.so.dbg
+
+
+#############################################
+# Create library symlink _deps/zlib-build/libz.so
+
+build _deps/zlib-build/libz.so.1 _deps/zlib-build/libz.so: CMAKE_SYMLINK_LIBRARY _deps/zlib-build/libz.so.1.3.1
+  POST_BUILD = :
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target zlibstatic
+
+
+#############################################
+# Order-only phony target for zlibstatic
+
+build cmake_object_order_depends_target_zlibstatic: phony || _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/adler32.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/adler32.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/adler32.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/compress.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/compress.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/compress.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/crc32.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/crc32.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/crc32.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/deflate.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/deflate.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/deflate.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzclose.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/gzclose.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzclose.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzlib.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/gzlib.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzlib.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzread.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/gzread.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzread.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzwrite.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/gzwrite.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzwrite.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/inflate.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/inflate.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/inflate.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/infback.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/infback.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/infback.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/inftrees.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/inftrees.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/inftrees.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/inffast.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/inffast.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/inffast.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/trees.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/trees.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/trees.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/uncompr.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/uncompr.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/uncompr.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+build _deps/zlib-build/CMakeFiles/zlibstatic.dir/zutil.c.o: C_COMPILER__zlibstatic_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/zutil.c || cmake_object_order_depends_target_zlibstatic
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/zlibstatic.dir/zutil.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target zlibstatic
+
+
+#############################################
+# Link the static library _deps/zlib-build/libz.a
+
+build _deps/zlib-build/libz.a: C_STATIC_LIBRARY_LINKER__zlibstatic_Debug _deps/zlib-build/CMakeFiles/zlibstatic.dir/adler32.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/compress.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/crc32.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/deflate.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzclose.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzlib.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzread.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/gzwrite.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/inflate.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/infback.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/inftrees.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/inffast.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/trees.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/uncompr.c.o _deps/zlib-build/CMakeFiles/zlibstatic.dir/zutil.c.o
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/zlibstatic.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = _deps/zlib-build/libz.a
+  TARGET_PDB = z.a.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target example
+
+
+#############################################
+# Order-only phony target for example
+
+build cmake_object_order_depends_target_example: phony || cmake_object_order_depends_target_zlib
+
+build _deps/zlib-build/CMakeFiles/example.dir/test/example.c.o: C_COMPILER__example_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/test/example.c || cmake_object_order_depends_target_example
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/example.dir/test/example.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/example.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/example.dir/test
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target example
+
+
+#############################################
+# Link the executable /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example
+
+build /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example: C_EXECUTABLE_LINKER__example_Debug _deps/zlib-build/CMakeFiles/example.dir/test/example.c.o | _deps/zlib-build/libz.so.1.3.1 || _deps/zlib-build/libz.so _deps/zlib-build/libz.so
+  FLAGS = -g
+  LINK_LIBRARIES = -Wl,-rpath,/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build  _deps/zlib-build/libz.so.1.3.1
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/example.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example
+  TARGET_PDB = example.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target minigzip
+
+
+#############################################
+# Order-only phony target for minigzip
+
+build cmake_object_order_depends_target_minigzip: phony || cmake_object_order_depends_target_zlib
+
+build _deps/zlib-build/CMakeFiles/minigzip.dir/test/minigzip.c.o: C_COMPILER__minigzip_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/test/minigzip.c || cmake_object_order_depends_target_minigzip
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/minigzip.dir/test/minigzip.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/minigzip.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/minigzip.dir/test
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target minigzip
+
+
+#############################################
+# Link the executable /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip
+
+build /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip: C_EXECUTABLE_LINKER__minigzip_Debug _deps/zlib-build/CMakeFiles/minigzip.dir/test/minigzip.c.o | _deps/zlib-build/libz.so.1.3.1 || _deps/zlib-build/libz.so _deps/zlib-build/libz.so
+  FLAGS = -g
+  LINK_LIBRARIES = -Wl,-rpath,/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build  _deps/zlib-build/libz.so.1.3.1
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/minigzip.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip
+  TARGET_PDB = minigzip.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target example64
+
+
+#############################################
+# Order-only phony target for example64
+
+build cmake_object_order_depends_target_example64: phony || cmake_object_order_depends_target_zlib
+
+build _deps/zlib-build/CMakeFiles/example64.dir/test/example.c.o: C_COMPILER__example64_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/test/example.c || cmake_object_order_depends_target_example64
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/example64.dir/test/example.c.o.d
+  FLAGS = -g -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/example64.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/example64.dir/test
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target example64
+
+
+#############################################
+# Link the executable /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example64
+
+build /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example64: C_EXECUTABLE_LINKER__example64_Debug _deps/zlib-build/CMakeFiles/example64.dir/test/example.c.o | _deps/zlib-build/libz.so.1.3.1 || _deps/zlib-build/libz.so _deps/zlib-build/libz.so
+  FLAGS = -g
+  LINK_LIBRARIES = -Wl,-rpath,/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build  _deps/zlib-build/libz.so.1.3.1
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/example64.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example64
+  TARGET_PDB = example64.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target minigzip64
+
+
+#############################################
+# Order-only phony target for minigzip64
+
+build cmake_object_order_depends_target_minigzip64: phony || cmake_object_order_depends_target_zlib
+
+build _deps/zlib-build/CMakeFiles/minigzip64.dir/test/minigzip.c.o: C_COMPILER__minigzip64_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src/test/minigzip.c || cmake_object_order_depends_target_minigzip64
+  DEFINES = -D_LARGEFILE64_SOURCE=1
+  DEP_FILE = _deps/zlib-build/CMakeFiles/minigzip64.dir/test/minigzip.c.o.d
+  FLAGS = -g -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/minigzip64.dir
+  OBJECT_FILE_DIR = _deps/zlib-build/CMakeFiles/minigzip64.dir/test
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target minigzip64
+
+
+#############################################
+# Link the executable /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip64
+
+build /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip64: C_EXECUTABLE_LINKER__minigzip64_Debug _deps/zlib-build/CMakeFiles/minigzip64.dir/test/minigzip.c.o | _deps/zlib-build/libz.so.1.3.1 || _deps/zlib-build/libz.so _deps/zlib-build/libz.so
+  FLAGS = -g
+  LINK_LIBRARIES = -Wl,-rpath,/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build  _deps/zlib-build/libz.so.1.3.1
+  OBJECT_DIR = _deps/zlib-build/CMakeFiles/minigzip64.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip64
+  TARGET_PDB = minigzip64.dbg
+
+
+#############################################
+# Utility command for package
+
+build _deps/zlib-build/CMakeFiles/package.util: CUSTOM_COMMAND _deps/zlib-build/all
+  COMMAND = cd /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug && /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/bin/cpack --config ./CPackConfig.cmake
+  DESC = Run CPack packaging tool...
+  pool = console
+  restat = 1
+
+build _deps/zlib-build/package: phony _deps/zlib-build/CMakeFiles/package.util
+
+
+#############################################
+# Utility command for package_source
+
+build _deps/zlib-build/CMakeFiles/package_source.util: CUSTOM_COMMAND
+  COMMAND = cd /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug && /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/bin/cpack --config ./CPackSourceConfig.cmake /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/CPackSourceConfig.cmake
+  DESC = Run CPack packaging tool for source...
+  pool = console
+  restat = 1
+
+build _deps/zlib-build/package_source: phony _deps/zlib-build/CMakeFiles/package_source.util
+
+
+#############################################
+# Utility command for edit_cache
+
+build _deps/zlib-build/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build && /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build _deps/zlib-build/edit_cache: phony _deps/zlib-build/CMakeFiles/edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build _deps/zlib-build/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build && /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/bin/cmake --regenerate-during-build -S/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels -B/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build _deps/zlib-build/rebuild_cache: phony _deps/zlib-build/CMakeFiles/rebuild_cache.util
+
+
+#############################################
+# Utility command for list_install_components
+
+build _deps/zlib-build/list_install_components: phony
+
+
+#############################################
+# Utility command for install
+
+build _deps/zlib-build/CMakeFiles/install.util: CUSTOM_COMMAND _deps/zlib-build/all
+  COMMAND = cd /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build && /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/bin/cmake -P cmake_install.cmake
+  DESC = Install the project...
+  pool = console
+  restat = 1
+
+build _deps/zlib-build/install: phony _deps/zlib-build/CMakeFiles/install.util
+
+
+#############################################
+# Utility command for install/local
+
+build _deps/zlib-build/CMakeFiles/install/local.util: CUSTOM_COMMAND _deps/zlib-build/all
+  COMMAND = cd /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build && /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+  DESC = Installing only the local directory...
+  pool = console
+  restat = 1
+
+build _deps/zlib-build/install/local: phony _deps/zlib-build/CMakeFiles/install/local.util
+
+
+#############################################
+# Utility command for install/strip
+
+build _deps/zlib-build/CMakeFiles/install/strip.util: CUSTOM_COMMAND _deps/zlib-build/all
+  COMMAND = cd /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build && /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+  DESC = Installing the project stripped...
+  pool = console
+  restat = 1
+
+build _deps/zlib-build/install/strip: phony _deps/zlib-build/CMakeFiles/install/strip.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
 # Object build statements for STATIC_LIBRARY target ImGui-SFML
 
 
@@ -1955,85 +2486,69 @@ build _deps/imgui-sfml-build/install/strip: phony _deps/imgui-sfml-build/CMakeFi
 #############################################
 # Order-only phony target for sf
 
-build cmake_object_order_depends_target_sf: phony || cmake_object_order_depends_target_ImGui-SFML cmake_object_order_depends_target_sfml-graphics cmake_object_order_depends_target_sfml-system cmake_object_order_depends_target_sfml-window
+build cmake_object_order_depends_target_sf: phony || cmake_object_order_depends_target_ImGui-SFML cmake_object_order_depends_target_sfml-graphics cmake_object_order_depends_target_sfml-system cmake_object_order_depends_target_sfml-window cmake_object_order_depends_target_zlib
 
 build src/CMakeFiles/sf.dir/main.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/main.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
   DEP_FILE = src/CMakeFiles/sf.dir/main.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
   OBJECT_DIR = src/CMakeFiles/sf.dir
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir
 
 build src/CMakeFiles/sf.dir/Systems/RenderSystem.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Systems/RenderSystem.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
   DEP_FILE = src/CMakeFiles/sf.dir/Systems/RenderSystem.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
   OBJECT_DIR = src/CMakeFiles/sf.dir
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Systems
 
 build src/CMakeFiles/sf.dir/Core/ComponentManager.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Core/ComponentManager.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
   DEP_FILE = src/CMakeFiles/sf.dir/Core/ComponentManager.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
   OBJECT_DIR = src/CMakeFiles/sf.dir
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Core
 
 build src/CMakeFiles/sf.dir/Core/EntityManager.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Core/EntityManager.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
   DEP_FILE = src/CMakeFiles/sf.dir/Core/EntityManager.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
   OBJECT_DIR = src/CMakeFiles/sf.dir
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Core
 
 build src/CMakeFiles/sf.dir/Core/SystemManager.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Core/SystemManager.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
   DEP_FILE = src/CMakeFiles/sf.dir/Core/SystemManager.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
   OBJECT_DIR = src/CMakeFiles/sf.dir
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Core
 
 build src/CMakeFiles/sf.dir/Core/Coordinator.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/Core/Coordinator.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
   DEP_FILE = src/CMakeFiles/sf.dir/Core/Coordinator.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
   OBJECT_DIR = src/CMakeFiles/sf.dir
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/Core
 
-build src/CMakeFiles/sf.dir/AtlasComponents/Sprite.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/AtlasComponents/Sprite.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
-  DEP_FILE = src/CMakeFiles/sf.dir/AtlasComponents/Sprite.cpp.o.d
-  FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
-  OBJECT_DIR = src/CMakeFiles/sf.dir
-  OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/AtlasComponents
-
-build src/CMakeFiles/sf.dir/AtlasComponents/SpriteBatch.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/AtlasComponents/SpriteBatch.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
-  DEP_FILE = src/CMakeFiles/sf.dir/AtlasComponents/SpriteBatch.cpp.o.d
-  FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
-  OBJECT_DIR = src/CMakeFiles/sf.dir
-  OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/AtlasComponents
-
 build src/CMakeFiles/sf.dir/AtlasComponents/Texture.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/AtlasComponents/Texture.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
   DEP_FILE = src/CMakeFiles/sf.dir/AtlasComponents/Texture.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
   OBJECT_DIR = src/CMakeFiles/sf.dir
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/AtlasComponents
 
 build src/CMakeFiles/sf.dir/AtlasComponents/TextureAtlas.cpp.o: CXX_COMPILER__sf_unscanned_Debug /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/AtlasComponents/TextureAtlas.cpp || cmake_object_order_depends_target_sf
-  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC
+  DEFINES = -DIMGUI_USER_CONFIG=\"imconfig-SFML.h\" -DSFML_STATIC -DUSE_ZLIB
   DEP_FILE = src/CMakeFiles/sf.dir/AtlasComponents/TextureAtlas.cpp.o.d
   FLAGS = -g -std=c++23 -fdiagnostics-color=always
-  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src
+  INCLUDES = -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./AtlasComponents -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Core -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Components -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/./Systems -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/sfml-src/include -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-src -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build -I/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
   OBJECT_DIR = src/CMakeFiles/sf.dir
   OBJECT_FILE_DIR = src/CMakeFiles/sf.dir/AtlasComponents
 
@@ -2045,9 +2560,9 @@ build src/CMakeFiles/sf.dir/AtlasComponents/TextureAtlas.cpp.o: CXX_COMPILER__sf
 #############################################
 # Link the executable /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/sf
 
-build /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/sf: CXX_EXECUTABLE_LINKER__sf_Debug src/CMakeFiles/sf.dir/main.cpp.o src/CMakeFiles/sf.dir/Systems/RenderSystem.cpp.o src/CMakeFiles/sf.dir/Core/ComponentManager.cpp.o src/CMakeFiles/sf.dir/Core/EntityManager.cpp.o src/CMakeFiles/sf.dir/Core/SystemManager.cpp.o src/CMakeFiles/sf.dir/Core/Coordinator.cpp.o src/CMakeFiles/sf.dir/AtlasComponents/Sprite.cpp.o src/CMakeFiles/sf.dir/AtlasComponents/SpriteBatch.cpp.o src/CMakeFiles/sf.dir/AtlasComponents/Texture.cpp.o src/CMakeFiles/sf.dir/AtlasComponents/TextureAtlas.cpp.o | _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/imgui-sfml-build/libImGui-SFML.a /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/zlib-1.3.1//libz.so _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/sfml-build/lib/libsfml-window-s-d.a /usr/lib/libX11.so /usr/lib/libXrandr.so /usr/lib/libXcursor.so _deps/sfml-build/lib/libsfml-system-s-d.a /usr/lib/libGL.so /usr/lib/libudev.so /usr/lib/libfreetype.so /usr/lib/libGL.so || _deps/imgui-sfml-build/libImGui-SFML.a _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/sfml-build/lib/libsfml-system-s-d.a _deps/sfml-build/lib/libsfml-window-s-d.a
+build /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/sf: CXX_EXECUTABLE_LINKER__sf_Debug src/CMakeFiles/sf.dir/main.cpp.o src/CMakeFiles/sf.dir/Systems/RenderSystem.cpp.o src/CMakeFiles/sf.dir/Core/ComponentManager.cpp.o src/CMakeFiles/sf.dir/Core/EntityManager.cpp.o src/CMakeFiles/sf.dir/Core/SystemManager.cpp.o src/CMakeFiles/sf.dir/Core/Coordinator.cpp.o src/CMakeFiles/sf.dir/AtlasComponents/Texture.cpp.o src/CMakeFiles/sf.dir/AtlasComponents/TextureAtlas.cpp.o | _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/imgui-sfml-build/libImGui-SFML.a _deps/zlib-build/libz.so.1.3.1 _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/sfml-build/lib/libsfml-window-s-d.a /usr/lib/libX11.so /usr/lib/libXrandr.so /usr/lib/libXcursor.so _deps/sfml-build/lib/libsfml-system-s-d.a /usr/lib/libGL.so /usr/lib/libudev.so /usr/lib/libfreetype.so /usr/lib/libGL.so || _deps/imgui-sfml-build/libImGui-SFML.a _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/sfml-build/lib/libsfml-system-s-d.a _deps/sfml-build/lib/libsfml-window-s-d.a _deps/zlib-build/libz.so _deps/zlib-build/libz.so
   FLAGS = -g
-  LINK_LIBRARIES = -Wl,-rpath,/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/zlib-1.3.1:  _deps/sfml-build/lib/libsfml-graphics-s-d.a  _deps/imgui-sfml-build/libImGui-SFML.a  /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/zlib-1.3.1//libz.so  _deps/sfml-build/lib/libsfml-graphics-s-d.a  _deps/sfml-build/lib/libsfml-window-s-d.a  /usr/lib/libX11.so  /usr/lib/libXrandr.so  /usr/lib/libXcursor.so  _deps/sfml-build/lib/libsfml-system-s-d.a  -lpthread  -lrt  /usr/lib/libGL.so  /usr/lib/libudev.so  -ldl  /usr/lib/libfreetype.so  /usr/lib/libGL.so
+  LINK_LIBRARIES = -Wl,-rpath,/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build:  _deps/sfml-build/lib/libsfml-graphics-s-d.a  _deps/imgui-sfml-build/libImGui-SFML.a  _deps/zlib-build/libz.so.1.3.1  _deps/sfml-build/lib/libsfml-graphics-s-d.a  _deps/sfml-build/lib/libsfml-window-s-d.a  /usr/lib/libX11.so  /usr/lib/libXrandr.so  /usr/lib/libXcursor.so  _deps/sfml-build/lib/libsfml-system-s-d.a  -lpthread  -lrt  /usr/lib/libGL.so  /usr/lib/libudev.so  -ldl  /usr/lib/libfreetype.so  /usr/lib/libGL.so
   OBJECT_DIR = src/CMakeFiles/sf.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -2148,6 +2663,10 @@ build src/install/strip: phony src/CMakeFiles/install/strip.util
 
 build ImGui-SFML: phony _deps/imgui-sfml-build/libImGui-SFML.a
 
+build example: phony /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example
+
+build example64: phony /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example64
+
 build libImGui-SFML.a: phony _deps/imgui-sfml-build/libImGui-SFML.a
 
 build libsfml-audio-s-d.a: phony _deps/sfml-build/lib/libsfml-audio-s-d.a
@@ -2159,6 +2678,14 @@ build libsfml-network-s-d.a: phony _deps/sfml-build/lib/libsfml-network-s-d.a
 build libsfml-system-s-d.a: phony _deps/sfml-build/lib/libsfml-system-s-d.a
 
 build libsfml-window-s-d.a: phony _deps/sfml-build/lib/libsfml-window-s-d.a
+
+build libz.a: phony _deps/zlib-build/libz.a
+
+build libz.so: phony _deps/zlib-build/libz.so
+
+build minigzip: phony /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip
+
+build minigzip64: phony /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip64
 
 build sf: phony /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/sf
 
@@ -2172,6 +2699,10 @@ build sfml-system: phony _deps/sfml-build/lib/libsfml-system-s-d.a
 
 build sfml-window: phony _deps/sfml-build/lib/libsfml-window-s-d.a
 
+build zlib: phony _deps/zlib-build/libz.so
+
+build zlibstatic: phony _deps/zlib-build/libz.a
+
 # =============================================================================
 # Folder targets.
 
@@ -2180,7 +2711,7 @@ build sfml-window: phony _deps/sfml-build/lib/libsfml-window-s-d.a
 #############################################
 # Folder: /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug
 
-build all: phony _deps/sfml-build/all _deps/imgui-sfml-build/all src/all
+build all: phony _deps/sfml-build/all _deps/zlib-build/all _deps/imgui-sfml-build/all src/all
 
 # =============================================================================
 
@@ -2241,6 +2772,13 @@ build _deps/sfml-build/src/SFML/Window/all: phony _deps/sfml-build/lib/libsfml-w
 # =============================================================================
 
 #############################################
+# Folder: /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build
+
+build _deps/zlib-build/all: phony _deps/zlib-build/libz.so _deps/zlib-build/libz.a /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/example64 /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/minigzip64
+
+# =============================================================================
+
+#############################################
 # Folder: /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/src
 
 build src/all: phony /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/sf
@@ -2252,14 +2790,14 @@ build src/all: phony /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/bin/sf
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakePackageConfigHelpers.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeParseArguments.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CPack.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CPackComponent.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckFunctionExists.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckLibraryExists.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-C.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/ExternalProject/shared_internal_commands.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FetchContent.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FetchContent/CMakeLists.cmake.in /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindFontconfig.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindFreetype.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindGit.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindOpenAL.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindOpenGL.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageMessage.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPkgConfig.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindX11.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/GNUInstallDirs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-C.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/UnixPaths.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/WriteBasicConfigVersionFile.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Templates/CPackConfig.cmake.in /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/CMakeLists.txt /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.28.1/CMakeCCompiler.cmake CMakeFiles/3.28.1/CMakeCXXCompiler.cmake CMakeFiles/3.28.1/CMakeSystem.cmake _deps/imgui-sfml-src/CMakeLists.txt _deps/imgui-sfml-src/cmake/FindImGui.cmake _deps/sfml-src/CMakeLists.txt _deps/sfml-src/cmake/CompilerOptionsOverride.cmake _deps/sfml-src/cmake/CompilerWarnings.cmake _deps/sfml-src/cmake/Config.cmake _deps/sfml-src/cmake/Macros.cmake _deps/sfml-src/cmake/Modules/FindFLAC.cmake _deps/sfml-src/cmake/Modules/FindFreetype.cmake _deps/sfml-src/cmake/Modules/FindUDev.cmake _deps/sfml-src/cmake/Modules/FindVORBIS.cmake _deps/sfml-src/cmake/SFMLConfig.cmake.in _deps/sfml-src/cmake/SFMLConfigDependencies.cmake.in _deps/sfml-src/src/SFML/Audio/CMakeLists.txt _deps/sfml-src/src/SFML/CMakeLists.txt _deps/sfml-src/src/SFML/Graphics/CMakeLists.txt _deps/sfml-src/src/SFML/Network/CMakeLists.txt _deps/sfml-src/src/SFML/System/CMakeLists.txt _deps/sfml-src/src/SFML/Window/CMakeLists.txt _deps/sfml-src/tools/pkg-config/sfml-all.pc.in _deps/sfml-src/tools/pkg-config/sfml-audio.pc.in _deps/sfml-src/tools/pkg-config/sfml-graphics.pc.in _deps/sfml-src/tools/pkg-config/sfml-network.pc.in _deps/sfml-src/tools/pkg-config/sfml-system.pc.in _deps/sfml-src/tools/pkg-config/sfml-window.pc.in
+build build.ninja: RERUN_CMAKE | /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakePackageConfigHelpers.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeParseArguments.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CPack.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CPackComponent.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckFunctionExists.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckIncludeFile.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckLibraryExists.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckTypeSize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-C.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/ExternalProject/shared_internal_commands.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FetchContent.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FetchContent/CMakeLists.cmake.in /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindFontconfig.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindFreetype.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindGit.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindOpenAL.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindOpenGL.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageMessage.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPkgConfig.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindX11.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/GNUInstallDirs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-C.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/UnixPaths.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/WriteBasicConfigVersionFile.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Templates/CPackConfig.cmake.in /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/CMakeLists.txt /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.28.1/CMakeCCompiler.cmake CMakeFiles/3.28.1/CMakeCXXCompiler.cmake CMakeFiles/3.28.1/CMakeSystem.cmake _deps/imgui-sfml-src/CMakeLists.txt _deps/imgui-sfml-src/cmake/FindImGui.cmake _deps/sfml-src/CMakeLists.txt _deps/sfml-src/cmake/CompilerOptionsOverride.cmake _deps/sfml-src/cmake/CompilerWarnings.cmake _deps/sfml-src/cmake/Config.cmake _deps/sfml-src/cmake/Macros.cmake _deps/sfml-src/cmake/Modules/FindFLAC.cmake _deps/sfml-src/cmake/Modules/FindFreetype.cmake _deps/sfml-src/cmake/Modules/FindUDev.cmake _deps/sfml-src/cmake/Modules/FindVORBIS.cmake _deps/sfml-src/cmake/SFMLConfig.cmake.in _deps/sfml-src/cmake/SFMLConfigDependencies.cmake.in _deps/sfml-src/src/SFML/Audio/CMakeLists.txt _deps/sfml-src/src/SFML/CMakeLists.txt _deps/sfml-src/src/SFML/Graphics/CMakeLists.txt _deps/sfml-src/src/SFML/Network/CMakeLists.txt _deps/sfml-src/src/SFML/System/CMakeLists.txt _deps/sfml-src/src/SFML/Window/CMakeLists.txt _deps/sfml-src/tools/pkg-config/sfml-all.pc.in _deps/sfml-src/tools/pkg-config/sfml-audio.pc.in _deps/sfml-src/tools/pkg-config/sfml-graphics.pc.in _deps/sfml-src/tools/pkg-config/sfml-network.pc.in _deps/sfml-src/tools/pkg-config/sfml-system.pc.in _deps/sfml-src/tools/pkg-config/sfml-window.pc.in _deps/zlib-src/CMakeLists.txt _deps/zlib-src/zconf.h.cmakein _deps/zlib-src/zlib.pc.cmakein
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakePackageConfigHelpers.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeParseArguments.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CPack.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CPackComponent.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckFunctionExists.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckLibraryExists.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-C.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/ExternalProject/shared_internal_commands.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FetchContent.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FetchContent/CMakeLists.cmake.in /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindFontconfig.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindFreetype.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindGit.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindOpenAL.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindOpenGL.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageMessage.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPkgConfig.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindX11.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/GNUInstallDirs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-C.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/UnixPaths.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/WriteBasicConfigVersionFile.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Templates/CPackConfig.cmake.in /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/CMakeLists.txt /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.28.1/CMakeCCompiler.cmake CMakeFiles/3.28.1/CMakeCXXCompiler.cmake CMakeFiles/3.28.1/CMakeSystem.cmake _deps/imgui-sfml-src/CMakeLists.txt _deps/imgui-sfml-src/cmake/FindImGui.cmake _deps/sfml-src/CMakeLists.txt _deps/sfml-src/cmake/CompilerOptionsOverride.cmake _deps/sfml-src/cmake/CompilerWarnings.cmake _deps/sfml-src/cmake/Config.cmake _deps/sfml-src/cmake/Macros.cmake _deps/sfml-src/cmake/Modules/FindFLAC.cmake _deps/sfml-src/cmake/Modules/FindFreetype.cmake _deps/sfml-src/cmake/Modules/FindUDev.cmake _deps/sfml-src/cmake/Modules/FindVORBIS.cmake _deps/sfml-src/cmake/SFMLConfig.cmake.in _deps/sfml-src/cmake/SFMLConfigDependencies.cmake.in _deps/sfml-src/src/SFML/Audio/CMakeLists.txt _deps/sfml-src/src/SFML/CMakeLists.txt _deps/sfml-src/src/SFML/Graphics/CMakeLists.txt _deps/sfml-src/src/SFML/Network/CMakeLists.txt _deps/sfml-src/src/SFML/System/CMakeLists.txt _deps/sfml-src/src/SFML/Window/CMakeLists.txt _deps/sfml-src/tools/pkg-config/sfml-all.pc.in _deps/sfml-src/tools/pkg-config/sfml-audio.pc.in _deps/sfml-src/tools/pkg-config/sfml-graphics.pc.in _deps/sfml-src/tools/pkg-config/sfml-network.pc.in _deps/sfml-src/tools/pkg-config/sfml-system.pc.in _deps/sfml-src/tools/pkg-config/sfml-window.pc.in: phony
+build /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakePackageConfigHelpers.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeParseArguments.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CPack.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CPackComponent.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckFunctionExists.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckIncludeFile.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckLibraryExists.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/CheckTypeSize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-C.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Compiler/GNU.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/ExternalProject/shared_internal_commands.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FetchContent.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FetchContent/CMakeLists.cmake.in /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindFontconfig.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindFreetype.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindGit.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindOpenAL.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindOpenGL.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPackageMessage.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindPkgConfig.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/FindX11.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/GNUInstallDirs.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-C.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/Linux.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/Platform/UnixPaths.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Modules/WriteBasicConfigVersionFile.cmake /home/dominiq/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.28/Templates/CPackConfig.cmake.in /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/CMakeLists.txt /home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.28.1/CMakeCCompiler.cmake CMakeFiles/3.28.1/CMakeCXXCompiler.cmake CMakeFiles/3.28.1/CMakeSystem.cmake _deps/imgui-sfml-src/CMakeLists.txt _deps/imgui-sfml-src/cmake/FindImGui.cmake _deps/sfml-src/CMakeLists.txt _deps/sfml-src/cmake/CompilerOptionsOverride.cmake _deps/sfml-src/cmake/CompilerWarnings.cmake _deps/sfml-src/cmake/Config.cmake _deps/sfml-src/cmake/Macros.cmake _deps/sfml-src/cmake/Modules/FindFLAC.cmake _deps/sfml-src/cmake/Modules/FindFreetype.cmake _deps/sfml-src/cmake/Modules/FindUDev.cmake _deps/sfml-src/cmake/Modules/FindVORBIS.cmake _deps/sfml-src/cmake/SFMLConfig.cmake.in _deps/sfml-src/cmake/SFMLConfigDependencies.cmake.in _deps/sfml-src/src/SFML/Audio/CMakeLists.txt _deps/sfml-src/src/SFML/CMakeLists.txt _deps/sfml-src/src/SFML/Graphics/CMakeLists.txt _deps/sfml-src/src/SFML/Network/CMakeLists.txt _deps/sfml-src/src/SFML/System/CMakeLists.txt _deps/sfml-src/src/SFML/Window/CMakeLists.txt _deps/sfml-src/tools/pkg-config/sfml-all.pc.in _deps/sfml-src/tools/pkg-config/sfml-audio.pc.in _deps/sfml-src/tools/pkg-config/sfml-graphics.pc.in _deps/sfml-src/tools/pkg-config/sfml-network.pc.in _deps/sfml-src/tools/pkg-config/sfml-system.pc.in _deps/sfml-src/tools/pkg-config/sfml-window.pc.in _deps/zlib-src/CMakeLists.txt _deps/zlib-src/zconf.h.cmakein _deps/zlib-src/zlib.pc.cmakein: phony
 
 
 #############################################

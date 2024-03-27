@@ -6,11 +6,11 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <iostream>
 
 #include "Coordinator.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
-#include "SpriteBatch.h"
 #include "TextureAtlas.h"
 
 Coordinator gCoordinator;
@@ -43,17 +43,9 @@ int main() {
     sf::Clock clock;
 
     moony::TextureAtlas texture_atlas;
-    moony::SpriteBatch sprite_batch;
-    std::vector<moony::Sprite> sprites;
+
 
     if(!texture_atlas.loadFromFile("./../resources/Maps/Maps.mtpf")){
-        std::cout << "Could not load from atlas!";
-        return -1;
-    }
-
-    moony::TextureAtlas player_atlas;
-
-    if(!player_atlas.loadFromFile("./../resources/Player/player.mtpf")){
         std::cout << "Could not load from atlas!";
         return -1;
     }
@@ -62,9 +54,10 @@ int main() {
 
     entities[1] = gCoordinator.createEntity();
     moony::Texture test = texture_atlas.findSubTexture("room01.png");
-    auto new_sprite = sf::Sprite(*test.m_texture);
+    auto new_sprite = sf::Sprite(*test.m_texture, test.m_rect);
     new_sprite.setScale(3., 3.);
     gCoordinator.addComponent(entities[1], RenderComponent{ &new_sprite } );
+
 
     sf::Clock deltaClock;
     while (window.isOpen()) {

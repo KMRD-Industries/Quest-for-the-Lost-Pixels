@@ -49,6 +49,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
+  include("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
   include("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/imgui-sfml-build/cmake_install.cmake")
 endif()
 
@@ -69,7 +74,7 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/sf")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/sf"
-         OLD_RPATH "/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/zlib-1.3.1:"
+         OLD_RPATH "/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build:"
          NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/sf")

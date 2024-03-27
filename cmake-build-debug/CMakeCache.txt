@@ -351,6 +351,10 @@ FETCHCONTENT_SOURCE_DIR_IMGUI-SFML:PATH=
 // for SFML
 FETCHCONTENT_SOURCE_DIR_SFML:PATH=
 
+//When not empty, overrides where to find pre-populated content
+// for ZLIB
+FETCHCONTENT_SOURCE_DIR_ZLIB:PATH=
+
 //Enables UPDATE_DISCONNECTED behavior for all content population
 FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
 
@@ -362,6 +366,9 @@ FETCHCONTENT_UPDATES_DISCONNECTED_IMGUI-SFML:BOOL=OFF
 
 //Enables UPDATE_DISCONNECTED behavior just for population of SFML
 FETCHCONTENT_UPDATES_DISCONNECTED_SFML:BOOL=OFF
+
+//Enables UPDATE_DISCONNECTED behavior just for population of ZLIB
+FETCHCONTENT_UPDATES_DISCONNECTED_ZLIB:BOOL=OFF
 
 //Path to a file.
 FLAC_INCLUDE_DIR:PATH=/usr/include
@@ -413,6 +420,21 @@ IMGUI_SFML_IMGUI_DEMO:BOOL=ON
 
 //Use default imconfig-SFML.h
 IMGUI_SFML_USE_DEFAULT_CONFIG:BOOL=ON
+
+//Installation directory for executables
+INSTALL_BIN_DIR:PATH=/usr/local/bin
+
+//Installation directory for headers
+INSTALL_INC_DIR:PATH=/usr/local/include
+
+//Installation directory for libraries
+INSTALL_LIB_DIR:PATH=/usr/local/lib
+
+//Installation directory for manual pages
+INSTALL_MAN_DIR:PATH=/usr/local/share/man
+
+//Installation directory for pkgconfig (.pc) files
+INSTALL_PKGCONFIG_DIR:PATH=/usr/local/share/pkgconfig
 
 //Path to a file.
 OGG_INCLUDE_DIR:PATH=/usr/include
@@ -942,6 +964,9 @@ X11_xkbfile_INCLUDE_PATH:PATH=/usr/include
 //Path to a library.
 X11_xkbfile_LIB:FILEPATH=/usr/lib/libxkbfile.so
 
+//Enable Zlib Examples
+ZLIB_BUILD_EXAMPLES:BOOL=ON
+
 //The directory containing a CMake configuration file for freetype.
 freetype_DIR:PATH=freetype_DIR-NOTFOUND
 
@@ -983,6 +1008,15 @@ sfml-system_LIB_DEPENDS:STATIC=general;pthread;general;rt;
 
 //Dependencies for the target
 sfml-window_LIB_DEPENDS:STATIC=general;sfml-system;general;dl;
+
+//Value Computed by CMake
+zlib_BINARY_DIR:STATIC=/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-build
+
+//Value Computed by CMake
+zlib_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+zlib_SOURCE_DIR:STATIC=/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/cmake-build-debug/_deps/zlib-src
 
 
 ########################
@@ -1127,7 +1161,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=10
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -1234,6 +1268,18 @@ Fontconfig_INCLUDE_DIR-ADVANCED:INTERNAL=1
 Fontconfig_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
+//Have function fseeko
+HAVE_FSEEKO:INTERNAL=1
+//Result of TRY_COMPILE
+HAVE_OFF64_T:INTERNAL=TRUE
+//Have include stddef.h
+HAVE_STDDEF_H:INTERNAL=1
+//Have include stdint.h
+HAVE_STDINT_H:INTERNAL=1
+//Have include sys/types.h
+HAVE_SYS_TYPES_H:INTERNAL=1
+//CHECK_TYPE_SIZE: sizeof(off64_t)
+OFF64_T:INTERNAL=8
 //ADVANCED property for variable: OGG_INCLUDE_DIR
 OGG_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OGG_LIBRARY
@@ -1587,6 +1633,8 @@ X11_xkbcommon_X11_LIB-ADVANCED:INTERNAL=1
 X11_xkbfile_INCLUDE_PATH-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: X11_xkbfile_LIB
 X11_xkbfile_LIB-ADVANCED:INTERNAL=1
+//Have include unistd.h
+Z_HAVE_UNISTD_H:INTERNAL=1
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 //CMAKE_INSTALL_PREFIX during last run
