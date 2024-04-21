@@ -47,7 +47,7 @@ int main()
 
     /*Map Generator Preview Start*/
     sf::Font font;
-    font.loadFromFile("../Arial.ttf");
+    font.loadFromFile("../../../../assets/fonts/arial.ttf");
     int h = 5;
     int w = 6;
     DungeonGenerator generator(h, w);
