@@ -20,6 +20,10 @@ set(CORE
 set(COMPONENTS
 	Components/RenderComponent.h
 )
+set(MAP
+	Map/DungeonGenerator.cpp
+	Map/DungeonGenerator.h
+)
 set(SYSTEMS
 	Systems/RenderSystem.cpp
 	Systems/RenderSystem.h
@@ -27,10 +31,11 @@ set(SYSTEMS
 source_group("Core" FILES ${CORE})
 source_group("Components" FILES ${COMPONENTS})
 source_group("Systems" FILES ${SYSTEMS})
+source_group("Map" FILES ${MAP})
 
-include_directories(./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./Core ./Components ./Systems ./Map ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS})
+add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS})
 target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML)
 target_compile_features(sf PRIVATE cxx_std_23)
 
