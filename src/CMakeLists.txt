@@ -19,10 +19,14 @@ set(CORE
 )
 set(COMPONENTS
 	Components/RenderComponent.h
+	Components/TransformComponent.h
+	Components/PlayerComponent.h
 )
 set(SYSTEMS
 	Systems/RenderSystem.cpp
-	Systems/RenderSystem.h
+	Systems/RenderSystem.h	
+	Systems/PlayerMovementSystem.cpp
+	Systems/PlayerMovementSystem.h
 )
 source_group("Core" FILES ${CORE})
 source_group("Components" FILES ${COMPONENTS})
@@ -30,7 +34,7 @@ source_group("Systems" FILES ${SYSTEMS})
 
 include_directories(./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS})
+add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${COMPONENTS})
 target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML)
 target_compile_features(sf PRIVATE cxx_std_23)
 
