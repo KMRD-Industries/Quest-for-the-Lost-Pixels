@@ -19,6 +19,7 @@
 #include "DungeonGenerator.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
+#include "Paths.h"
 
 Coordinator gCoordinator;
 
@@ -47,7 +48,8 @@ int main()
 
     /*Map Generator Preview Start*/
     sf::Font font;
-    font.loadFromFile("../../../../assets/fonts/arial.ttf");
+    const std::string assetPath = ASSET_PATH;
+    font.loadFromFile(assetPath + "/fonts/arial.ttf");
     int h = 5;
     int w = 6;
     DungeonGenerator generator(h, w);
