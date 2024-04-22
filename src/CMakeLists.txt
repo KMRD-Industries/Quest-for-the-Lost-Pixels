@@ -41,7 +41,7 @@ add_definitions( -D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${COMPONENTS} ${UTILS})
-target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML)
+target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML glm::glm)
 target_compile_features(sf PRIVATE cxx_std_23)
 
 if(WIN32)

@@ -1,13 +1,10 @@
-#include "Coordinator.h"
-
-#include <imgui-SFML.h>
-#include <imgui.h>
-
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-#include "glm/glm.hpp"
+#include <imgui-SFML.h>
+#include <imgui.h>
 
+#include "Coordinator.h"
 #include "Paths.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"

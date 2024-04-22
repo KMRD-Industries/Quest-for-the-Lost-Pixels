@@ -6,5 +6,5 @@
 class PlayerMovementSystem : public System
 {
 public:
-    void onMove(const glm::vec2& dir);
+    void onMove(const glm::vec2& dir) const;
 };
