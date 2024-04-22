@@ -5,6 +5,7 @@
 #include <imgui.h>
 
 #include "Coordinator.h"
+#include "InputHandler.h"
 #include "Paths.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
@@ -62,28 +63,29 @@ int main()
     while (window.isOpen())
     {
         sf::Event event{};
+        InputHandler::getInstance()->update();
         while (window.pollEvent(event))
         {
             ImGui::SFML::ProcessEvent(event);
 
+            if (event.type == sf::Event::KeyPressed)
+            {
+                const auto keyCode = event.key.code;
+                InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+            }
+            else if (event.type == sf::Event::KeyReleased)
+            {
+                const auto keyCode = event.key.code;
+                InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+            }
             if (event.type == sf::Event::Closed)
             {
                 window.close();
             }
         }
-        glm::vec2 dir{};
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) // Move Up
-            dir.y -= 1;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) // Move Down
-            dir.y += 1;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) // Move Right
-            dir.x += 1;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) // Move Left
-            dir.x -= 1;
-        if (dir.x != 0 || dir.y != 0)
-        {
-            playerMovementSystem->onMove(dir);
-        }
+
+        playerMovementSystem->update();
+
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
