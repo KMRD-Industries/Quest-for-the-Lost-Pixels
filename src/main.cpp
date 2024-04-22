@@ -8,6 +8,7 @@
 #include <SFML/Window/Event.hpp>
 #include "glm/glm.hpp"
 
+#include "Paths.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
@@ -46,7 +47,8 @@ int main()
     // Server Player
     entities[1] = gCoordinator.createEntity();
     sf::Texture texture;
-    texture.loadFromFile("../../../../assets/knight/knight.png");
+    std::string PathToAssets{ASSET_PATH};
+    texture.loadFromFile(PathToAssets + "/knight/knight.png");
     gCoordinator.addComponent(entities[0], RenderComponent{.sprite = sf::Sprite(texture)});
     gCoordinator.addComponent(entities[0], TransformComponent{.position = sf::Vector2f(0.f, 0.f)});
     gCoordinator.addComponent(entities[0], PlayerComponent{});
