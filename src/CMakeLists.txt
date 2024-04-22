@@ -21,6 +21,8 @@ set(CORE
 	Core/Types.h
 	Core/Coordinator.h
 	Core/Coordinator.cpp
+	Core/InputHandler.h
+	Core/InputHandler.cpp
 )
 set(COMPONENTS
 	Components/RenderComponent.h
