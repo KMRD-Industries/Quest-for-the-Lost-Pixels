@@ -1,72 +1,76 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
-#include <mwaitxintrin.h>
 
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/System/Clock.hpp>
-#include <SFML/Window/Event.hpp>
+#include <SFML/Graphics.hpp>
 #include <iostream>
 
 #include "Coordinator.h"
+#include "MapComponent.h"
+#include "MapSystem.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
+#include "Room.h"
 #include "TextureAtlas.h"
+#include "TransformComponent.h"
 
 Coordinator gCoordinator;
 
 int main() {
     gCoordinator.init();
     gCoordinator.registerComponent<RenderComponent>();
+    gCoordinator.registerComponent<MapComponent>();
+    gCoordinator.registerComponent<TransformComponent>();
+    gCoordinator.registerComponent<TransformMapComponent>();
 
-    auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();{
+
+    auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
+    {
         Signature signature;
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 
-    std::vector<Entity> entities(MAX_ENTITIES - 1);
-
-    sf::Clock frame_clock;
-    sf::Time frame_limit = sf::seconds(1.0f / 60.0f);
-    sf::Time frame_sum;
-    sf::Time frame_time;
-    int frame_count;
-
-    entities[0] = gCoordinator.createEntity();
-
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
-    window.setFramerateLimit(60);
-    auto _ = ImGui::SFML::Init(window);
-
-    sf::CircleShape shape(100.f);
-    sf::Clock clock;
-
-    moony::TextureAtlas texture_atlas;
-
-
-    if(!texture_atlas.loadFromFile("./../resources/Maps/Maps.mtpf")){
-        std::cout << "Could not load from atlas!";
-        return -1;
+    auto mapSystem = gCoordinator.getRegisterSystem<MapSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TransformMapComponent>());
+        signature.set(gCoordinator.getComponentType<MapComponent>());
+        gCoordinator.setSystemSignature<MapSystem>(signature);
     }
 
-    std::vector<std::string> tex_names = texture_atlas.getSubTextureNames();
+    std::vector<Entity> entities(MAX_ENTITIES - 1);
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
+    ImGui::SFML::Init(window);
+    window.setFramerateLimit(60);
 
-    entities[1] = gCoordinator.createEntity();
-    moony::Texture test = texture_atlas.findSubTexture("room01.png");
-    auto new_sprite = sf::Sprite(*test.m_texture, test.m_rect);
-    new_sprite.setScale(3., 3.);
-    gCoordinator.addComponent(entities[1], RenderComponent{ &new_sprite } );
+    Room r;
+    std::string s("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/Maps/map_01.json");
+    r.load(s);
 
+    int i = 0;
+
+    for (Layer layer : r.getLayers()){
+        for (const auto& tilePtr : layer.getTiles()) {
+            Tile tile = *tilePtr;
+            if(tile.getId() == -1)
+                continue;
+
+            entities[i] = gCoordinator.createEntity();
+            gCoordinator.addComponent(entities[i], MapComponent{.id = tile.getId()} );
+            gCoordinator.addComponent(entities[i], TransformMapComponent{tile.getPosition(), tile.getRotation(), tile.getScale()});
+
+            i++;
+        }
+    }
+
+    auto layers = r.getLayers();
+    std::cout << layers.size();
 
     sf::Clock deltaClock;
     while (window.isOpen()) {
-
-        frame_time = frame_clock.restart();
-
-        sf::Event event{};
+        sf::Event event;
         while (window.pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(window ,event);
+            ImGui::SFML::ProcessEvent(event);
 
             if (event.type == sf::Event::Closed) {
                 window.close();
@@ -75,24 +79,22 @@ int main() {
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        ImGui::Begin("Hello, world!");
-        ImGui::Button("Look at this pretty button");
-        ImGui::End();
-        ImGui::ShowDemoWindow();
+        // Clear the window before drawing
+        window.clear();
 
-        frame_sum += frame_time;
-        frame_count = 0;
+        // Draw the map tiles
 
-        while(frame_sum > frame_limit && frame_count < 10) {
-            frame_sum -= frame_limit;
-            frame_count++;
-        }
-        ImGui::SFML::Render(window);
-        window.clear(sf::Color::Black);
+
+        // Draw other entities or systems here if needed
         renderSystem->draw(window);
+        mapSystem->draw(window);
+        // mapSystem->drawTile(window, 1, sf::Vector2f(1, 2));
+
+        // Render ImGui
+        ImGui::SFML::Render(window);
+
+        // Display the rendered frame
         window.display();
     }
 
-    ImGui::SFML::Shutdown();
-    return 0;
 }

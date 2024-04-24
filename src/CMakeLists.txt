@@ -33,6 +33,18 @@ set(ATLAS_COMPONENTS
 		AtlasComponents/Texture.h
 		AtlasComponents/TextureAtlas.cpp
 		AtlasComponents/TextureAtlas.h
+		AtlasComponents/Room.cpp
+        AtlasComponents/Room.h
+		AtlasComponents/Tile.cpp
+		AtlasComponents/Tile.h
+		AtlasComponents/Layer.cpp
+		AtlasComponents/Layer.h
+		AtlasComponents/Helpers.cpp
+		Systems/MapSystem.cpp
+		Systems/MapSystem.h
+		Components/TransformComponent.h
+		Components/MapComponent.h
+		Components/PositionComponent.h
 )
 
 source_group("Core" FILES ${CORE})
@@ -43,7 +55,7 @@ source_group("AtlasComponents" FILES ${ATLAS_COMPONENTS})
 include_directories( ./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(sf ${SOURCES} ${SYSTEMS} ${CORE} ${COMPONENTS} ${ATLAS_COMPONENTS})
-target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML zlib )
+target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML zlib)
 target_compile_features(sf PRIVATE cxx_std_23)
 
 # Force using zlib

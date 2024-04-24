@@ -24,6 +24,11 @@ FetchContent_Declare(ImGui
 FetchContent_MakeAvailable(ImGui)
 FetchContent_GetProperties(ImGui SOURCE_DIR IMGUI_DIR)
 
+FetchContent_Declare(nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json
+        GIT_TAG v3.11.3)
+FetchContent_MakeAvailable(nlohmann_json)
+
 set(IMGUI_SFML_FIND_SFML OFF)
 FetchContent_Declare(ImGui-SFML
         GIT_REPOSITORY https://github.com/SFML/imgui-sfml

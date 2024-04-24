@@ -1,0 +1,32 @@
+//
+// Created by dominiq on 4/22/24.
+//
+
+#ifndef SF_TRANSFORMCOMPONENT_H
+#define SF_TRANSFORMCOMPONENT_H
+
+#endif  // SF_TRANSFORMCOMPONENT_H
+
+
+#pragma once
+#include <SFML/System/Vector2.hpp>
+
+struct TransformComponent {
+    sf::Vector2f position;
+};
+
+struct TransformMapComponent {
+    sf::Vector2f position;
+    float rotation;
+    float scale;
+
+    TransformMapComponent()
+        : position(0.f, 0.f), rotation(0.f), scale(1.f)
+    {
+    }
+
+    TransformMapComponent(sf::Vector2f position, float rotation, float scale)
+    : position(position), rotation(rotation), scale(scale)
+    {
+    }
+};

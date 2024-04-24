@@ -16,28 +16,23 @@
 
 #include "Texture.h"
 
+class TextureAtlas {
+public:
+        int loadFromFile(const std::string& file_path);
+        [[nodiscard]] std::vector<uint32_t> getSubTextureIds();
+        TextureAtlas()= default;
+        [[nodiscard]] Texture findSubTexture(uint32_t id) const;
 
-namespace moony
-{
-	// The TextureAtlas class holds all the Moony Texture objects inside Atlas objects which can be 
-	// referenced by the name of the original file they were loaded as. Only one of these objects should be necessary.
-	class TextureAtlas{
-	public:
-		bool loadFromFile(const std::string& file_path);
-		Texture findSubTexture(const std::string& name);
-		[[nodiscard]] std::vector<std::string> getSubTextureNames() const;
+       private:
+        struct Atlas{
+            explicit Atlas(const int gid) :first_gid(gid), m_texture(new sf::Texture) {};
+            int first_gid;
+            std::shared_ptr<sf::Texture> m_texture;
+            std::unordered_map<uint32_t, sf::IntRect> m_texture_table;
+        };
 
-	private:
-		struct Atlas{
-			Atlas() : m_texture(new sf::Texture) {};
-			std::unique_ptr<sf::Texture> m_texture;
-			std::unordered_map<std::string, sf::IntRect> m_texture_table;
-		};
+        std::vector<Atlas> m_atlas_list;
+};
 
-		std::vector<Atlas> m_atlas_list;
-	};
-
-
-}
 
 #endif
