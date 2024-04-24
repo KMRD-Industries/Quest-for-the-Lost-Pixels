@@ -22,7 +22,6 @@ int main() {
     gCoordinator.registerComponent<TransformComponent>();
     gCoordinator.registerComponent<TransformMapComponent>();
 
-
     auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
     {
         Signature signature;
