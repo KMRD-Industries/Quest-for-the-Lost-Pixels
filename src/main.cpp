@@ -9,8 +9,8 @@
 #include "MapSystem.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
-#include "Room.h"
-#include "TextureAtlas.h"
+#include "RoomComponent.h"
+#include "TileComponent.h"
 #include "TransformComponent.h"
 
 Coordinator gCoordinator;
@@ -18,8 +18,9 @@ Coordinator gCoordinator;
 int main() {
     gCoordinator.init();
     gCoordinator.registerComponent<RenderComponent>();
-    gCoordinator.registerComponent<MapComponent>();
+    gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<TransformComponent>();
+    gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<TransformMapComponent>();
 
     auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
@@ -33,7 +34,7 @@ int main() {
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<TransformMapComponent>());
-        signature.set(gCoordinator.getComponentType<MapComponent>());
+        signature.set(gCoordinator.getComponentType<TileComponent>());
         gCoordinator.setSystemSignature<MapSystem>(signature);
     }
 
@@ -42,28 +43,14 @@ int main() {
     ImGui::SFML::Init(window);
     window.setFramerateLimit(60);
 
-    Room r;
-    std::string s("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/Maps/map_01.json");
-    r.load(s);
-
-    int i = 0;
-
-    for (Layer layer : r.getLayers()){
-        for (const auto& tilePtr : layer.getTiles()) {
-            Tile tile = *tilePtr;
-            if(tile.getId() == -1)
-                continue;
-
-            entities[i] = gCoordinator.createEntity();
-            gCoordinator.addComponent(entities[i], MapComponent{.id = tile.getId()} );
-            gCoordinator.addComponent(entities[i], TransformMapComponent{tile.getPosition(), tile.getRotation(), tile.getScale()});
-
-            i++;
-        }
+    for(int i = 1000; i < 2000; i++){
+        entities[i] = gCoordinator.createEntity();
+        gCoordinator.addComponent(entities[i], TileComponent{});
+        gCoordinator.addComponent(entities[i], TransformMapComponent{});
     }
 
-    auto layers = r.getLayers();
-    std::cout << layers.size();
+    std::string s("../resources/Maps/map_01.json");
+    mapSystem->loadMap(s);
 
     sf::Clock deltaClock;
     while (window.isOpen()) {
@@ -74,6 +61,23 @@ int main() {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
+
+            if (event.type == sf::Event::KeyPressed) {
+                // Check which key is pressed and set the corresponding index in buttonPressed to true
+                if (event.key.code == sf::Keyboard::Key::Num1) {
+                    s = ("../resources/Maps/map_01.json");
+                    mapSystem->loadMap(s);
+                } else if (event.key.code == sf::Keyboard::Key::Num2) {
+                    s = ("../resources/Maps/map_02.json");
+                    mapSystem->loadMap(s);
+                } else if (event.key.code == sf::Keyboard::Key::Num3) {
+                    s = ("../resources/Maps/map_03.json");
+                    mapSystem->loadMap(s);
+                } else if (event.key.code == sf::Keyboard::Key::Num4) {
+                    s = ("../resources/Maps/map_04.json");
+                    mapSystem->loadMap(s);
+                }
+            }
         }
 
         ImGui::SFML::Update(window, deltaClock.restart());
@@ -82,12 +86,10 @@ int main() {
         window.clear();
 
         // Draw the map tiles
-
+        mapSystem->draw(window);
 
         // Draw other entities or systems here if needed
         renderSystem->draw(window);
-        mapSystem->draw(window);
-        // mapSystem->drawTile(window, 1, sf::Vector2f(1, 2));
 
         // Render ImGui
         ImGui::SFML::Render(window);

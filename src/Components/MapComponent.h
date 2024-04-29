@@ -1,14 +1,13 @@
+    //
+// Created by dominiq on 4/26/24.
 //
-// Created by dominiq on 4/22/24.
-//
+#include <string>
 
 #ifndef SF_MAPCOMPONENT_H
 #define SF_MAPCOMPONENT_H
-#pragma once
-#include <SFML/System/Vector2.hpp>
-#include "Layer.h"
+
+#endif  // SF_MAPCOMPONENT_H
 
 struct MapComponent {
-    uint32_t id;
+    std::string path;
 };
-#endif  // SF_MAPCOMPONENT_H

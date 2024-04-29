@@ -33,18 +33,15 @@ set(ATLAS_COMPONENTS
 		AtlasComponents/Texture.h
 		AtlasComponents/TextureAtlas.cpp
 		AtlasComponents/TextureAtlas.h
-		AtlasComponents/Room.cpp
-        AtlasComponents/Room.h
-		AtlasComponents/Tile.cpp
-		AtlasComponents/Tile.h
-		AtlasComponents/Layer.cpp
-		AtlasComponents/Layer.h
-		AtlasComponents/Helpers.cpp
+		Utils/Helpers.cpp
 		Systems/MapSystem.cpp
 		Systems/MapSystem.h
 		Components/TransformComponent.h
-		Components/MapComponent.h
+		Components/TileComponent.h
 		Components/PositionComponent.h
+		Components/MapComponent.h
+		Components/LayerComponent.h
+		Components/RoomComponent.h
 )
 
 source_group("Core" FILES ${CORE})

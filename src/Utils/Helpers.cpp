@@ -7,6 +7,9 @@
 #include <string>
 #include <sstream>
 
+#ifndef HELPERS_CPP
+#define HELPERS_CPP
+
 static inline std::string base64_decode(std::string const& encoded_string){
     static const std::string base64_chars =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -89,3 +92,24 @@ static inline  std::vector<uint32_t> processDataString(std::string dataString, s
 
     return IDs;
 };
+
+static std::string extractFileName(const std::string& filePath, const std::string& begin, const std::string& end) {
+    // Find the position of the last '/'
+    size_t lastSlashPos = filePath.find_last_of(begin);
+    if (lastSlashPos == std::string::npos) {
+        // If '/' is not found, return an empty string or handle error accordingly
+        return "";
+    }
+
+    // Find the position of ".tsx"
+    size_t tsxPos = filePath.find(end, lastSlashPos);
+    if (tsxPos == std::string::npos) {
+        // If ".tsx" is not found, return an empty string or handle error accordingly
+        return "";
+    }
+
+    // Extract the substring between lastSlashPos and tsxPos
+    return filePath.substr(lastSlashPos + 1, tsxPos - lastSlashPos - 1);
+}
+
+#endif

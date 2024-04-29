@@ -9,6 +9,7 @@
 
 int TextureAtlas::loadFromFile(const std::string& file_path) {
     sf::Image image;
+
     if (!image.loadFromFile(file_path)){
         std::cout << "Failed to load from atlas." << std::endl;
         return 0;
@@ -17,39 +18,32 @@ int TextureAtlas::loadFromFile(const std::string& file_path) {
     unsigned int width = image.getSize().x;
     unsigned int height = image.getSize().y;
 
-    uint32_t gid = 0;
-
-    if(!m_atlas_list.empty())
-        gid = m_atlas_list.back().first_gid + m_atlas_list.size() + 1;
+    uint32_t gid = (!m_atlas_list.empty()) ? m_atlas_list.back().first_gid + m_atlas_list.back().m_texture_table.size() : 0;
+    std::string tileset_name = extractFileName(file_path, "/", ".");
 
     m_atlas_list.emplace_back(gid);
+    m_atlas_map[tileset_name] = gid;
 
     gid = m_atlas_list.back().first_gid;
+
     sf::Texture tex;
     tex.loadFromImage(image);
     m_atlas_list.back().m_texture = std::make_unique<sf::Texture>(tex);
 
-    for (unsigned int y = 0; y < height; y += 16) {
-        for (unsigned int x = 0; x < width; x += 16){
-            // Create a texture for the current tile
-            sf::Texture texture;
-            sf::IntRect texture_rect = sf::IntRect(x, y, 16, 16);
-            texture.loadFromImage(image, texture_rect);
-
-            // Create a sprite for the current tile
-            sf::Sprite sprite(texture);
-            m_atlas_list.back().m_texture_table[gid++] = texture_rect;
+    for (int y = 0; y < height; y += 16) {
+        for (int x = 0; x < width; x += 16){
+            m_atlas_list.back().m_texture_table[gid] =  sf::IntRect(x, y, 16, 16);
+            gid++;
         }
     }
 
     return 1;
 }
 
-Texture TextureAtlas::findSubTexture(uint32_t id) const {
-    for (const auto& atlas : m_atlas_list) { // Marking atlas as const
-        if (atlas.m_texture_table.contains(id)) {
-            // Instead of returning a temporary Texture object, construct it using std::make_shared
-            return Texture(atlas.m_texture, atlas.m_texture_table.at(id));
+Texture TextureAtlas::findSubTexture(uint32_t tile_id) const {
+    for (const auto& atlas : m_atlas_list) {
+        if (atlas.m_texture_table.contains(tile_id)) {
+            return Texture(atlas.m_texture, atlas.m_texture_table.at(tile_id));
         }
     }
     // If no subtexture with the given id is found, return an empty Texture
@@ -66,4 +60,12 @@ std::vector<uint32_t> TextureAtlas::getSubTextureIds(){
 	    ids.push_back(string);
 
     return ids;
+}
+
+// Return First Tile ID in tileset
+uint32_t TextureAtlas::getFirstGidOfSet(const std::string& name) {
+    if(this->m_atlas_map.contains(name))
+        return this->m_atlas_map.at(name);
+
+    return 0;
 }

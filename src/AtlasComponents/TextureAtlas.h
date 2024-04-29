@@ -13,8 +13,8 @@
 	#include <zlib.h>
 #endif
 
-
 #include "Texture.h"
+#include "Utils/Helpers.cpp"
 
 class TextureAtlas {
 public:
@@ -22,6 +22,7 @@ public:
         [[nodiscard]] std::vector<uint32_t> getSubTextureIds();
         TextureAtlas()= default;
         [[nodiscard]] Texture findSubTexture(uint32_t id) const;
+        uint32_t getFirstGidOfSet(const std::string&);
 
        private:
         struct Atlas{
@@ -32,6 +33,7 @@ public:
         };
 
         std::vector<Atlas> m_atlas_list;
+        std::unordered_map<std::string, uint32_t> m_atlas_map;
 };
 
 

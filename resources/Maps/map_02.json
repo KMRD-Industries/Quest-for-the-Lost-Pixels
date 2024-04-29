@@ -43,11 +43,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/..\/Raw_assets\/TilesAtlas\/CosmicLilacTiles.tsx"
-        }, 
-        {
-         "firstgid":105,
-         "source":"..\/..\/..\/Raw_assets\/TilesAtlas\/decorative.tsx"
+         "source":"..\/..\/..\/Raw_assets\/TilesAtlas\/CosmicLilac.tsx"
         }],
  "tilewidth":16,
  "type":"map",
