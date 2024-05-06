@@ -1,3 +1,5 @@
+#pragma once
+
 #include "RenderSystem.h"
 #include "Coordinator.h"
 #include "RenderComponent.h"

@@ -1,6 +1,4 @@
-//
-// Created by dominiq on 3/30/24.
-//
+#pragma once
 
 #include <cstdint>
 #include <functional>

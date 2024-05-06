@@ -1,15 +1,11 @@
 #include <imgui-SFML.h>
-#include <imgui.h>
-
 #include <SFML/Graphics.hpp>
-#include <iostream>
 
 #include "Coordinator.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
-#include "RoomComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
@@ -43,7 +39,7 @@ int main() {
     ImGui::SFML::Init(window);
     window.setFramerateLimit(60);
 
-    for(int i = 1000; i < 2000; i++){
+    for(int i = 1000; i < 1500; i++){
         entities[i] = gCoordinator.createEntity();
         gCoordinator.addComponent(entities[i], TileComponent{});
         gCoordinator.addComponent(entities[i], TransformMapComponent{});

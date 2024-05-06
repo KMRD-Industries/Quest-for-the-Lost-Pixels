@@ -1,11 +1,6 @@
-//
-// Created by dominiq on 4/27/24.
-//
+#pragma once
 
 #include <string>
-#ifndef SF_LAYERCOMPONENT_H
-#define SF_LAYERCOMPONENT_H
-#endif  // SF_LAYERCOMPONENT_H
 
 struct LayerComponent {
     int id = 0;

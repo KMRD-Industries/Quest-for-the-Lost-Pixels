@@ -1,13 +1,7 @@
-//
-// Created by dominiq on 4/27/24.
-//
+#pragma once
 
 #include <optional>
 #include <string>
-#ifndef SF_ROOMCOMPONENT_H
-#define SF_ROOMCOMPONENT_H
-
-#endif  // SF_ROOMCOMPONENT_H
 
 enum class Orientation{
     Orthogonal,

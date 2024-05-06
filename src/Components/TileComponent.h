@@ -1,10 +1,5 @@
-//
-// Created by dominiq on 4/22/24.
-//
-
-#ifndef SF_TILECOMPONENT_H
-#define SF_TILECOMPONENT_H
 #pragma once
+
 #include <SFML/System/Vector2.hpp>
 
 struct TileComponent {
@@ -19,4 +14,3 @@ struct TileComponent {
     TileComponent() = default;
 
 };
-#endif  // SF_TILECOMPONENT_H

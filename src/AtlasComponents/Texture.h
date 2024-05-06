@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef TEXTURE_H
-#define TEXTURE_H
-
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <string>
@@ -15,7 +12,3 @@ struct Texture :sf::Texture {
     std::shared_ptr<sf::Texture> m_texture;
         sf::IntRect m_rect;
 };
-
-
-
-#endif

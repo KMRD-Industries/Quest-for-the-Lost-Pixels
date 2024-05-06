@@ -1,10 +1,4 @@
-//
-// Created by dominiq on 4/22/24.
-//
 #pragma once
-
-#ifndef SF_MAPSYSTEM_H
-#define SF_MAPSYSTEM_H
 
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "System.h"
@@ -33,5 +27,3 @@ class MapSystem: public System{
         static std::string findKeyLessThan(
             const std::unordered_map<std::string, uint32_t>& atlas_sets, uint32_t i);
 };
-
-#endif  // SF_MAPSYSTEM_H

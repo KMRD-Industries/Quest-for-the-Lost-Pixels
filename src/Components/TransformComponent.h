@@ -1,14 +1,5 @@
-//
-// Created by dominiq on 4/22/24.
-//
-
-#ifndef SF_TRANSFORMCOMPONENT_H
-#define SF_TRANSFORMCOMPONENT_H
-
-#endif  // SF_TRANSFORMCOMPONENT_H
-
-
 #pragma once
+
 #include <SFML/System/Vector2.hpp>
 
 struct TransformComponent {

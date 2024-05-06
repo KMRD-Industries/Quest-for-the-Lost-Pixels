@@ -1,6 +1,6 @@
+#pragma once
+
 #include "MapSystem.h"
-
-
 #include <algorithm>
 #include <fstream>
 #include <iostream>

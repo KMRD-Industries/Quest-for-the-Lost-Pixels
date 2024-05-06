@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef TEXTUREATLAS_H
-#define TEXTUREATLAS_H
-
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -35,6 +32,3 @@ public:
         std::vector<Atlas> m_atlas_list;
         std::unordered_map<std::string, uint32_t> m_atlas_map;
 };
-
-
-#endif

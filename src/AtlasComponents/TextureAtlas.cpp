@@ -1,6 +1,4 @@
-//
-// Created by dominiq on 3/20/24.
-//
+#pragma once
 
 #include "TextureAtlas.h"
 
