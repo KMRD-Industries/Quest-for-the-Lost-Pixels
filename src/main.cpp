@@ -78,12 +78,6 @@ int main() {
     ImGui::SFML::Init(window);
     window.setFramerateLimit(60);
 
-    sf::Clock frame_clock;
-    sf::Time frame_limit = sf::seconds(1.0f / 60.0f);
-    sf::Time frame_sum;
-    sf::Time frame_time;
-    int frame_count;
-
     for(int i = 1000; i < 1500; i++){
         entities[i] = gCoordinator.createEntity();
         gCoordinator.addComponent(entities[i], TileComponent{});
@@ -97,7 +91,6 @@ int main() {
     sf::Clock deltaClock;
     while (window.isOpen())
     {
-        frame_time = frame_clock.restart();
 
         sf::Event event{};
         while (window.pollEvent(event))
@@ -108,16 +101,20 @@ int main() {
             {
                 window.close();
             }
-
         }
 
-        frame_sum += frame_time;
-        frame_count = 0;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+            s = ("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/Maps/map_01.json");
+            mapSystem->loadMap(s);
+        }
 
-        while(frame_sum > frame_limit && frame_count < 10)
-        {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
+            s = ("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/Maps/map_02.json");
+            mapSystem->loadMap(s);
+        }
 
-            glm::vec2 dir{};
+        glm::vec2 dir{};
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) // Move Up
             dir.y -= 1;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) // Move Down
@@ -126,12 +123,8 @@ int main() {
             dir.x += 1;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) // Move Left
             dir.x -= 1;
-        if (dir.x != 0 || dir.y != 0)
-        {
+        if (dir.x != 0 || dir.y != 0){
             playerMovementSystem->onMove(dir);
-        }
-        frame_sum -= frame_limit;
-        frame_count++;
         }
 
         ImGui::SFML::Update(window, deltaClock.restart());

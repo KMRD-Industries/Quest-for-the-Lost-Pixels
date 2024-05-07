@@ -11,10 +11,15 @@ class MapSystem: public System{
     sf::Sprite createTile(uint32_t, sf::Vector2f, const float&, const sf::Vector2f&) const;
     void loadMap(std::string&);
 
-
     MapSystem(){
         texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/CosmicLilacTiles.json");
         texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/AnimSlimes.json");
+        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/Decorative.json");
+        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/Jungle.json");
+        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/DungeonWalls.json");
+        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/EnchantedForestAnimation.json");
+        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/Graveyard.json");
+        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/RetroAdventure.json");
     }
 
    private:

@@ -13,29 +13,32 @@
 extern Coordinator gCoordinator;
 
 void MapSystem::draw(sf::RenderWindow& window) const {
-    // 4 - Max layer number: TODO: define maximum number of layers
-    for(int i = 0; i < 4; i++){
+
+    for(int i = 0; i < 4; i++) {
+        // 4 - Max layer number:
         // Draw entities in layer order
-        for (const auto& entity : m_entities){
+        for (const auto& entity : m_entities)
+        {
             auto& mapComponent = gCoordinator.getComponent<TileComponent>(entity);
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
 
-            if(!animationComponent.frames.empty()){
+            if (mapComponent.id == 0) continue;
+            if (mapComponent.layer != i) continue;
 
+            if (!animationComponent.frames.empty()){
+
+                // load next animation frame
                 animationComponent.ignoreframes++;
-                if(animationComponent.ignoreframes % 15 == 0)
+                if (animationComponent.ignoreframes % 20 == 0)
                     animationComponent.actual = (animationComponent.actual + 1) % animationComponent.frames.size();
 
                 mapComponent.id = animationComponent.frames[animationComponent.actual];
             }
 
-            if(mapComponent.id >= 1 && mapComponent.layer == i) {
-                sf::Sprite newSprite = createTile(
-                    mapComponent.id, transformComponent.position,
-                    transformComponent.rotation, transformComponent.scale);
-                window.draw(newSprite);
-            }
+            if(mapComponent.layer == i)
+            window.draw(createTile(mapComponent.id, transformComponent.position, transformComponent.rotation,
+                                   transformComponent.scale));
         }
     }
 }
@@ -55,13 +58,15 @@ sf::Sprite MapSystem::createTile(uint32_t id, sf::Vector2f position, const float
 }
 
 void MapSystem::loadMap(std::string& path) {
-
     // Reset Map Entities to default
+
     for (const auto& entity : m_entities){
         auto& mapComponent = gCoordinator.getComponent<TileComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
 
         mapComponent.id = 0;
+        animationComponent.frames.clear();
         transformComponent.scale = sf::Vector2f(1.f, 1.f);
         transformComponent.rotation = 0.f;
     }
