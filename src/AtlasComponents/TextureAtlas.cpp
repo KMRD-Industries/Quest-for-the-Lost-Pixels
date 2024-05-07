@@ -1,40 +1,74 @@
 #pragma once
 
 #include "TextureAtlas.h"
+#include "nlohmann/json.hpp"
 
 #include <fstream>
 #include <iostream>
 
 int TextureAtlas::loadFromFile(const std::string& file_path) {
-    sf::Image image;
+    std::ifstream jsonFile(file_path);
 
-    if (!image.loadFromFile(file_path)){
-        std::cout << "Failed to load from atlas." << std::endl;
+    if (!jsonFile.is_open()) {
+        std::cout << "Failed to load TileSet." << std::endl;
         return 0;
     }
 
-    unsigned int width = image.getSize().x;
-    unsigned int height = image.getSize().y;
+    nlohmann::json parsedFile = nlohmann::json::parse(jsonFile);
+    std::string image_path = parsedFile["image"];
 
-    uint32_t gid = (!m_atlas_list.empty()) ? m_atlas_list.back().first_gid + m_atlas_list.back().m_texture_table.size() : 0;
+    sf::Image image;
+
+    if (!image.loadFromFile("../../resources/TileSets/" + image_path)){
+        std::cout << "Failed to load image." << std::endl;
+        return 0;
+    }
+
+    unsigned int width = parsedFile["imagewidth"];
+    unsigned int height = parsedFile["imageheight"];
+
+    int tileWidth = parsedFile["tilewidth"];
+    int tileHeight = parsedFile["tileheight"];
+
+    uint32_t gid = (!m_atlas_list.empty()) ? m_atlas_list.back().first_gid + m_atlas_list.back().m_texture_table.size() : 1;
     std::string tileset_name = extractFileName(file_path, "/", ".");
 
     m_atlas_list.emplace_back(gid);
     m_atlas_map[tileset_name] = gid;
 
+    uint32_t fist_gid_copy = gid;
     gid = m_atlas_list.back().first_gid;
 
     sf::Texture tex;
     tex.loadFromImage(image);
     m_atlas_list.back().m_texture = std::make_unique<sf::Texture>(tex);
 
-    for (int y = 0; y < height; y += 16) {
-        for (int x = 0; x < width; x += 16){
-            m_atlas_list.back().m_texture_table[gid] =  sf::IntRect(x, y, 16, 16);
+    for (int y = 0; y < height; y += tileHeight) {
+        for (int x = 0; x < width; x += tileWidth){
+            m_atlas_list.back().m_texture_table[gid] =  sf::IntRect(x, y, tileHeight, tileHeight);
             gid++;
         }
     }
 
+    auto it = parsedFile.find("tiles");
+    if (it != parsedFile.end()) {
+        auto& tilesArray = parsedFile["tiles"];
+        for (auto& tile : tilesArray) {
+            auto& animationArray = tile["animation"];
+            std::vector<uint32_t> frames;
+
+            for (auto& frame : animationArray) {
+                uint32_t tileid = frame["tileid"];
+                uint32_t adjusted_id = tileid + fist_gid_copy + 1;
+
+                frames.push_back(adjusted_id);
+            }
+
+            if (!frames.empty()) {
+                this->map_animations[frames.at(0)] = frames;
+            }
+        }
+    }
     return 1;
 }
 
@@ -65,5 +99,5 @@ uint32_t TextureAtlas::getFirstGidOfSet(const std::string& name) {
     if(this->m_atlas_map.contains(name))
         return this->m_atlas_map.at(name);
 
-    return 0;
+    return 1;
 }

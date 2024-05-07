@@ -4,20 +4,20 @@
 
 struct TransformComponent {
     sf::Vector2f position;
-};
-
-struct TransformMapComponent {
-    sf::Vector2f position;
     float rotation;
     sf::Vector2f scale;
 
-    TransformMapComponent()
+    TransformComponent()
         : position(0.f, 0.f), rotation(0.f), scale(sf::Vector2f(1.f, 1.f))
     {
     }
 
-    TransformMapComponent(sf::Vector2f position, float rotation, sf::Vector2f scale)
-    : position(position), rotation(rotation), scale(scale)
+    TransformComponent(sf::Vector2f position, float rotation, sf::Vector2f scale)
+        : position(position), rotation(rotation), scale(scale)
     {
     }
 };
+
+//struct TransformMapComponent {
+//
+//};

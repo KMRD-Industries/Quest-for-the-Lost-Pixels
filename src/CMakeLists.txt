@@ -50,6 +50,8 @@ set(ATLAS_COMPONENTS
 		Components/MapComponent.h
 		Components/LayerComponent.h
 		Components/RoomComponent.h
+		Utils/Paths.h
+		Components/AnimationComponent.h
 )
 
 source_group("Core" FILES ${CORE})

@@ -20,6 +20,7 @@ public:
         TextureAtlas()= default;
         [[nodiscard]] Texture findSubTexture(uint32_t id) const;
         uint32_t getFirstGidOfSet(const std::string&);
+        std::unordered_map<uint32_t, std::vector<uint32_t>> map_animations;
 
        private:
         struct Atlas{
@@ -31,4 +32,5 @@ public:
 
         std::vector<Atlas> m_atlas_list;
         std::unordered_map<std::string, uint32_t> m_atlas_map;
+
 };

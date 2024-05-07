@@ -8,7 +8,7 @@
 #include <memory>
 
 class Coordinator {
-public:
+public:Coordinator();
     void init();
     Entity createEntity() const;
     void destroyEntity(const Entity entity) const;

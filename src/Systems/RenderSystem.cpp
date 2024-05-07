@@ -2,6 +2,7 @@
 #include "Coordinator.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/RenderWindow.hpp"
+#include "TransformComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -11,6 +12,7 @@ void RenderSystem::draw(sf::RenderWindow& window) const
     {
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        renderComponent.sprite.setScale(transformComponent.scale);
         renderComponent.sprite.setPosition(transformComponent.position);
         window.draw(renderComponent.sprite);
     }

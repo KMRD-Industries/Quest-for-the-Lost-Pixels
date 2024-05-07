@@ -13,11 +13,8 @@ class MapSystem: public System{
 
 
     MapSystem(){
-        texture_atlas.loadFromFile("../resources/FirstFloorAtlas/CosmicLilac.png");
-        texture_atlas.loadFromFile("../resources/FirstFloorAtlas/Decorative.png");
-        texture_atlas.loadFromFile("../resources/FirstFloorAtlas/DungeonWalls.png");
-        texture_atlas.loadFromFile("../resources/FirstFloorAtlas/Graveyard.png");
-
+        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/CosmicLilacTiles.json");
+        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/AnimSlimes.json");
     }
 
    private:

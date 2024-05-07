@@ -1,11 +1,10 @@
-#pragma once
-
 #include "MapSystem.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+#include "AnimationComponent.h"
 #include "Coordinator.h"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "TileComponent.h"
@@ -19,7 +18,17 @@ void MapSystem::draw(sf::RenderWindow& window) const {
         // Draw entities in layer order
         for (const auto& entity : m_entities){
             auto& mapComponent = gCoordinator.getComponent<TileComponent>(entity);
-            auto& transformComponent = gCoordinator.getComponent<TransformMapComponent>(entity);
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
+
+            if(!animationComponent.frames.empty()){
+
+                animationComponent.ignoreframes++;
+                if(animationComponent.ignoreframes % 15 == 0)
+                    animationComponent.actual = (animationComponent.actual + 1) % animationComponent.frames.size();
+
+                mapComponent.id = animationComponent.frames[animationComponent.actual];
+            }
 
             if(mapComponent.id >= 1 && mapComponent.layer == i) {
                 sf::Sprite newSprite = createTile(
@@ -50,7 +59,7 @@ void MapSystem::loadMap(std::string& path) {
     // Reset Map Entities to default
     for (const auto& entity : m_entities){
         auto& mapComponent = gCoordinator.getComponent<TileComponent>(entity);
-        auto& transformComponent = gCoordinator.getComponent<TransformMapComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         mapComponent.id = 0;
         transformComponent.scale = sf::Vector2f(1.f, 1.f);
@@ -100,15 +109,21 @@ void MapSystem::loadMap(std::string& path) {
             int xPosition = index % (static_cast<int>(width));
             int yPosition = index / (static_cast<int>(width));
 
-            if(tileID > 1){
+            if(tileID >= 1){
                 auto& tileComponent = gCoordinator.getComponent<TileComponent>(*startIterator);
-                auto& transformMapComponent = gCoordinator.getComponent<TransformMapComponent>(*startIterator);
+                auto& transformMapComponent = gCoordinator.getComponent<TransformComponent>(*startIterator);
+                auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(*startIterator);
 
                 std::string tileset_name = findKeyLessThan(atlas_sets, tileID);
-                tileID = std::abs(long(this->texture_atlas.getFirstGidOfSet(tileset_name))) + (tileID - atlas_sets[tileset_name]) + 1;
+                tileID = std::abs(long(this->texture_atlas.getFirstGidOfSet(tileset_name))) + (tileID - atlas_sets[tileset_name])  + 1;
 
                 tileComponent.id = tileID;
                 tileComponent.layer = layer;
+
+                if(this->texture_atlas.map_animations.contains(tileID)){
+                    animationComponent.frames = this->texture_atlas.map_animations[tileID];
+                }
+
                 transformMapComponent.position = sf::Vector2f(static_cast<float>(xPosition), static_cast<float>(yPosition)) * 16.f * 3.f;
                 doFlips(flipFlags, transformMapComponent.rotation, transformMapComponent.scale);
 
