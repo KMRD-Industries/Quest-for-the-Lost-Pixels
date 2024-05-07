@@ -2,8 +2,9 @@
 
 #include "System.h"
 
-namespace sf {
-class RenderWindow;
+namespace sf
+{
+    class RenderWindow;
 }
 
 class RenderSystem : public System

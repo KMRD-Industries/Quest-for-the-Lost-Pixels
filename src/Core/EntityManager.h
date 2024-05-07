@@ -1,16 +1,18 @@
 #pragma once
 
-#include "Types.h"
-#include <queue>
 #include <array>
+#include <queue>
+#include "Types.h"
 
-class EntityManager {
+class EntityManager
+{
 public:
     EntityManager();
     Entity createEntity();
     void destroyEntity(const Entity entity);
-    void setSignature(const Entity entity,const Signature& signature);
+    void setSignature(const Entity entity, const Signature& signature);
     Signature getSignature(const Entity entity) const;
+
 private:
     std::queue<Entity> m_availableEntities{};
     std::array<Signature, MAX_ENTITIES> m_signatures{};

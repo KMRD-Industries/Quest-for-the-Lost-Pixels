@@ -1,31 +1,39 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
 
 set(SOURCES
 		main.cpp
 )
-
+set(UTILS
+	Utils/Paths.h
+)
 set(CORE
-		Core/ComponentArray.h
-		Core/ComponentManager.cpp
-		Core/ComponentManager.h
-		Core/EntityManager.cpp
-		Core/EntityManager.h
-		Core/IComponentArray.h
-		Core/System.h
-		Core/SystemManager.cpp
-		Core/SystemManager.h
-		Core/Types.h
-		Core/Coordinator.cpp
-		Core/ComponentArray.h
+	Core/ComponentArray.h
+	Core/ComponentManager.cpp
+	Core/ComponentManager.h
+	Core/EntityManager.cpp
+	Core/EntityManager.h
+	Core/IComponentArray.h
+	Core/System.h
+	Core/SystemManager.cpp
+	Core/SystemManager.h
+	Core/Types.h
+	Core/Coordinator.h
+	Core/Coordinator.cpp
 )
 
 set(COMPONENTS
-		Components/RenderComponent.h
+	Components/RenderComponent.h
+	Components/TransformComponent.h
+	Components/PlayerComponent.h
 )
 
 set(SYSTEMS
-		Systems/RenderSystem.cpp
-		Systems/RenderSystem.h
+	Systems/RenderSystem.cpp
+	Systems/RenderSystem.h
+	Systems/PlayerMovementSystem.cpp
+	Systems/PlayerMovementSystem.h
 )
 
 set(ATLAS_COMPONENTS
@@ -49,10 +57,12 @@ source_group("Components" FILES ${COMPONENTS})
 source_group("Systems" FILES ${SYSTEMS})
 source_group("AtlasComponents" FILES ${ATLAS_COMPONENTS})
 
+add_definitions( -D_ASSET_PATH=\"${ASSET_DIR}\")
+include_directories(./Core ./Components ./Systems ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories( ./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(sf ${SOURCES} ${SYSTEMS} ${CORE} ${COMPONENTS} ${ATLAS_COMPONENTS})
-target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML zlib)
+add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
+target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML zlib glm::glm)
 target_compile_features(sf PRIVATE cxx_std_23)
 
 # Force using zlib
