@@ -17,7 +17,3 @@ struct TransformComponent {
     {
     }
 };
-
-//struct TransformMapComponent {
-//
-//};

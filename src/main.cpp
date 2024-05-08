@@ -32,8 +32,6 @@ int main() {
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
 
-    //    gCoordinator.registerComponent<TransformMapComponent>();
-
     auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
     {
         Signature signature;
@@ -61,6 +59,7 @@ int main() {
     }
 
     std::vector<Entity> entities(MAX_ENTITIES - 1);
+
     // Local Player
     entities[0] = gCoordinator.createEntity();
     entities[1] = gCoordinator.createEntity();

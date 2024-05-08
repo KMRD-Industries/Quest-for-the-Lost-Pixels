@@ -14,7 +14,7 @@ extern Coordinator gCoordinator;
 
 void MapSystem::draw(sf::RenderWindow& window) const {
 
-    for(int i = 0; i < 4; i++) {
+//    for(int i = 0; i < 4; i++) {
         // 4 - Max layer number:
         // Draw entities in layer order
         for (const auto& entity : m_entities)
@@ -24,10 +24,9 @@ void MapSystem::draw(sf::RenderWindow& window) const {
             auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
 
             if (mapComponent.id == 0) continue;
-            if (mapComponent.layer != i) continue;
 
+            // Calculate next frame of animation
             if (!animationComponent.frames.empty()){
-
                 // load next animation frame
                 animationComponent.ignoreframes++;
                 if (animationComponent.ignoreframes % 20 == 0)
@@ -36,14 +35,13 @@ void MapSystem::draw(sf::RenderWindow& window) const {
                 mapComponent.id = animationComponent.frames[animationComponent.actual];
             }
 
-            if(mapComponent.layer == i)
-            window.draw(createTile(mapComponent.id, transformComponent.position, transformComponent.rotation,
-                                   transformComponent.scale));
+//            if(mapComponent.layer == i)
+            window.draw(createTile(mapComponent.id, transformComponent.position, transformComponent.rotation, transformComponent.scale));
         }
-    }
+//    }
 }
 
-sf::Sprite MapSystem::createTile(uint32_t id, sf::Vector2f position, const float& rotation, const sf::Vector2f& scale) const {
+sf::Sprite MapSystem::createTile(uint32_t id, const sf::Vector2f& position, const float& rotation, const sf::Vector2f& scale) const {
     const auto& texture = texture_atlas.findSubTexture(id - 1);
     sf::Sprite new_sprite(*texture.m_texture, texture.m_rect);
 

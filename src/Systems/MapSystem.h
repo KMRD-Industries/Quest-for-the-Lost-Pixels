@@ -8,7 +8,7 @@
 class MapSystem: public System{
    public:
     void draw(sf::RenderWindow& window) const;
-    sf::Sprite createTile(uint32_t, sf::Vector2f, const float&, const sf::Vector2f&) const;
+    sf::Sprite createTile(uint32_t, const sf::Vector2f&, const float&, const sf::Vector2f&) const;
     void loadMap(std::string&);
 
     MapSystem(){

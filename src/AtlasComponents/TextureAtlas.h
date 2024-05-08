@@ -21,6 +21,7 @@ public:
         [[nodiscard]] Texture findSubTexture(uint32_t id) const;
         uint32_t getFirstGidOfSet(const std::string&);
         std::unordered_map<uint32_t, std::vector<uint32_t>> map_animations;
+        uint32_t getFirstUnusedGid();
 
        private:
         struct Atlas{

@@ -6,6 +6,11 @@
 #include <fstream>
 #include <iostream>
 
+/**
+ * This is to load TileSet from json file to atlas.
+ * @param file_path path to TileSet
+ * @return
+ */
 int TextureAtlas::loadFromFile(const std::string& file_path) {
     std::ifstream jsonFile(file_path);
 
@@ -19,6 +24,7 @@ int TextureAtlas::loadFromFile(const std::string& file_path) {
 
     sf::Image image;
 
+    // TODO FIX IT
     if (!image.loadFromFile("../../resources/TileSets/" + image_path)){
         std::cout << "Failed to load image." << std::endl;
         return 0;
@@ -26,13 +32,13 @@ int TextureAtlas::loadFromFile(const std::string& file_path) {
 
     unsigned int width = parsedFile["imagewidth"];
     unsigned int height = parsedFile["imageheight"];
-
     int tileWidth = parsedFile["tilewidth"];
     int tileHeight = parsedFile["tileheight"];
 
-    uint32_t gid = (!m_atlas_list.empty()) ? m_atlas_list.back().first_gid + m_atlas_list.back().m_texture_table.size() : 1;
+    uint32_t gid = getFirstUnusedGid();
     std::string tileset_name = extractFileName(file_path, "/", ".");
 
+    // Add new Atlas struct with FIRST unused tile id
     m_atlas_list.emplace_back(gid);
     m_atlas_map[tileset_name] = gid;
 
@@ -45,11 +51,11 @@ int TextureAtlas::loadFromFile(const std::string& file_path) {
 
     for (int y = 0; y < height; y += tileHeight) {
         for (int x = 0; x < width; x += tileWidth){
-            m_atlas_list.back().m_texture_table[gid] =  sf::IntRect(x, y, tileHeight, tileHeight);
-            gid++;
+            m_atlas_list.back().m_texture_table[gid++] =  sf::IntRect(x, y, tileHeight, tileHeight);
         }
     }
 
+    // Animation (MAP ONLY)
     auto it = parsedFile.find("tiles");
     if (it != parsedFile.end()) {
         auto& tilesArray = parsedFile["tiles"];
@@ -101,3 +107,9 @@ uint32_t TextureAtlas::getFirstGidOfSet(const std::string& name) {
 
     return 1;
 }
+
+uint32_t TextureAtlas::getFirstUnusedGid() {
+    return (!m_atlas_list.empty()) ? m_atlas_list.back().first_gid + m_atlas_list.back().m_texture_table.size() : 1;
+}
+
+

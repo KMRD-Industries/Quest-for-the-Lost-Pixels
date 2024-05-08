@@ -27,6 +27,11 @@ set(COMPONENTS
 	Components/RenderComponent.h
 	Components/TransformComponent.h
 	Components/PlayerComponent.h
+	Components/TransformComponent.h
+	Components/TileComponent.h
+	Components/PositionComponent.h
+	Components/MapComponent.h
+	Components/AnimationComponent.h
 )
 
 set(SYSTEMS
@@ -34,30 +39,28 @@ set(SYSTEMS
 	Systems/RenderSystem.h
 	Systems/PlayerMovementSystem.cpp
 	Systems/PlayerMovementSystem.h
+	Systems/MapSystem.cpp
+	Systems/MapSystem.h
 )
 
 set(ATLAS_COMPONENTS
-		AtlasComponents/Texture.cpp
-		AtlasComponents/Texture.h
-		AtlasComponents/TextureAtlas.cpp
-		AtlasComponents/TextureAtlas.h
-		Utils/Helpers.cpp
-		Systems/MapSystem.cpp
-		Systems/MapSystem.h
-		Components/TransformComponent.h
-		Components/TileComponent.h
-		Components/PositionComponent.h
-		Components/MapComponent.h
-		Components/LayerComponent.h
-		Components/RoomComponent.h
-		Utils/Paths.h
-		Components/AnimationComponent.h
+	AtlasComponents/Texture.cpp
+	AtlasComponents/Texture.h
+	AtlasComponents/TextureAtlas.cpp
+	AtlasComponents/TextureAtlas.h
+)
+
+set(UTILS
+	Utils/Paths.h
+	Utils/Helpers.cpp
 )
 
 source_group("Core" FILES ${CORE})
 source_group("Components" FILES ${COMPONENTS})
 source_group("Systems" FILES ${SYSTEMS})
 source_group("AtlasComponents" FILES ${ATLAS_COMPONENTS})
+source_group("Utils" FILES ${UTILS})
+
 
 add_definitions( -D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
