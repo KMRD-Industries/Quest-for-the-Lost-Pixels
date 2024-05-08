@@ -84,7 +84,7 @@ int main() {
         gCoordinator.addComponent(entities[i], AnimationComponent{});
     }
 
-    std::string s("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/Maps/map_01.json");
+    std::string s("../../resources/Maps/map_01.json");
     mapSystem->loadMap(s);
 
     sf::Clock deltaClock;
@@ -103,12 +103,12 @@ int main() {
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
-            s = ("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/Maps/map_01.json");
+            s = ("../../resources/Maps/map_01.json");
             mapSystem->loadMap(s);
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
-            s = ("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/Maps/map_02.json");
+            s = ("../../resources/Maps/map_02.json");
             mapSystem->loadMap(s);
         }
 
