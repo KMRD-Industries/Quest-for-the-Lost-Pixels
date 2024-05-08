@@ -104,6 +104,7 @@ void MapSystem::loadMap(std::string& path) {
         width = static_cast<unsigned long>(data["width"]);
         height = static_cast<unsigned long>(data["height"]);
 
+
         for (uint32_t i : processDataString(data["data"],width * height,0)) {
 
             uint32_t flipFlags =  (i & mask) >> 28;

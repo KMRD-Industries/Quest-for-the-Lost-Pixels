@@ -5,9 +5,7 @@ set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
 set(SOURCES
 		main.cpp
 )
-set(UTILS
-	Utils/Paths.h
-)
+
 set(CORE
 	Core/ComponentArray.h
 	Core/ComponentManager.cpp
@@ -67,11 +65,11 @@ include_directories(./Core ./Components ./Systems ./Utils ${CMAKE_CURRENT_SOURCE
 include_directories( ./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
-target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML zlib glm::glm)
+target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm)
 target_compile_features(sf PRIVATE cxx_std_23)
 
 # Force using zlib
-add_compile_definitions(USE_ZLIB)
+#add_compile_definitions(USE_ZLIB)
 
 if(WIN32)
 	# Copy OpenAL DLL

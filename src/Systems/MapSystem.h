@@ -12,18 +12,19 @@ class MapSystem: public System{
     void loadMap(std::string&);
 
     MapSystem(){
-        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/CosmicLilacTiles.json");
-        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/AnimSlimes.json");
-        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/Decorative.json");
-        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/Jungle.json");
-        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/DungeonWalls.json");
-        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/EnchantedForestAnimation.json");
-        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/Graveyard.json");
-        texture_atlas.loadFromFile("/home/dominiq/Desktop/KMDR/Quest-for-the-Lost-Pixels/resources/TileSets/RetroAdventure.json");
+        texture_atlas.loadFromFile("../../resources/TileSets/CosmicLilacTiles.json");
+        texture_atlas.loadFromFile("../../resources/TileSets/AnimSlimes.json");
+        texture_atlas.loadFromFile("../../resources/TileSets/Decorative.json");
+        texture_atlas.loadFromFile("../../resources/TileSets/Jungle.json");
+        texture_atlas.loadFromFile("../../resources/TileSets/DungeonWalls.json");
+        texture_atlas.loadFromFile("../../resources/TileSets/EnchantedForestAnimation.json");
+        texture_atlas.loadFromFile("../../resources/TileSets/Graveyard.json");
+        texture_atlas.loadFromFile("../../resources/TileSets/RetroAdventure.json");
     }
 
    private:
         TextureAtlas texture_atlas;
+        sf::Vector2f size;
         static void doFlips(std::uint8_t, float& rotation, sf::Vector2f& scale);
 
         static std::string findKeyLessThan(
