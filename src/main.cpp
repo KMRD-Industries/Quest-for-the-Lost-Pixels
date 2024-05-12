@@ -32,14 +32,12 @@ int main()
     gCoordinator.registerComponent<TransformComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
 
-
     auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<AnimationComponent>());
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
-        signature.set(gCoordinator.getComponentType<TileComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 
@@ -81,8 +79,6 @@ int main()
     gCoordinator.addComponent(entities[0], RenderComponent{.sprite = sf::Sprite(texture)});
     gCoordinator.addComponent(entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(3.f, 3.f)));
     gCoordinator.addComponent(entities[0], PlayerComponent{});
-    gCoordinator.addComponent(entities[0], AnimationComponent{});
-    gCoordinator.addComponent(entities[0], TileComponent{});
 
 
     gCoordinator.addComponent(entities[1], RenderComponent{.sprite = sf::Sprite(texture)});

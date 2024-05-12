@@ -50,22 +50,6 @@ void MapSystem::draw(sf::RenderWindow& window) const
     }
 }
 
-sf::Sprite MapSystem::createTile(uint32_t id, const sf::Vector2f& position, const float& rotation,
-                                 const sf::Vector2f& scale) const
-{
-    const auto& texture = texture_atlas.findSubTexture(id - 1);
-    sf::Sprite new_sprite(*texture.m_texture, texture.m_rect);
-
-    new_sprite.setOrigin(new_sprite.getLocalBounds().width / 2, new_sprite.getLocalBounds().height / 2);
-    float scalar = 3.f;
-
-    new_sprite.setScale(scale * scalar);
-    new_sprite.setRotation(new_sprite.getRotation() + rotation);
-    new_sprite.setPosition(position.x, position.y);
-
-    return new_sprite;
-}
-
 void MapSystem::loadMap(std::string& path)
 {
     // Reset Map Entities to default
@@ -74,11 +58,10 @@ void MapSystem::loadMap(std::string& path)
     {
         auto& mapComponent = gCoordinator.getComponent<TileComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
 
-        //        mapComponent.id = 0;
-        //        transformComponent.scale = sf::Vector2f(1.f, 1.f);
-        //        transformComponent.rotation = 0.f;
+        mapComponent.id = 0;
+        transformComponent.scale = sf::Vector2f(1.f, 1.f);
+        transformComponent.rotation = 0.f;
     }
 
     std::ifstream jsonFile(path);
