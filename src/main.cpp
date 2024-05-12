@@ -1,8 +1,6 @@
 /*For Generator Preview Start*/
 #define GLM_ENABLE_EXPERIMENTAL
 #include <SFML/Graphics.hpp>
-#include <cstdlib>
-#include <iostream>
 #include <unordered_map>
 #include "DungeonGenerator.h"
 /*For Generator Preview End*/
@@ -17,9 +15,9 @@
 #include <SFML/Window/Event.hpp>
 
 #include "DungeonGenerator.h"
+#include "Paths.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
-#include "Paths.h"
 
 Coordinator gCoordinator;
 
@@ -49,7 +47,7 @@ int main()
     /*Map Generator Preview Start*/
     sf::Font font;
     const std::string assetPath = ASSET_PATH;
-    font.loadFromFile(assetPath + "/fonts/arial.ttf");
+    font.loadFromFile(assetPath + "/fonts/orion.ttf");
     int h = 5;
     int w = 6;
     DungeonGenerator generator(h, w);

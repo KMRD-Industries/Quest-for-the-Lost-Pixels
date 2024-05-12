@@ -1,14 +1,13 @@
-#define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/hash.hpp"
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/hash.hpp"
+
 #include <chrono>
-#include <deque>
 #include <optional>
 #include <random>
 #include <unordered_map>
 #include <unordered_set>
-#include "glm/glm.hpp"
 
 class DungeonGenerator
 {
@@ -58,7 +57,7 @@ private:
     void validateMainPath(const PathConfig& pathConfig) const;
     void findPlaceForKey(const glm::ivec2& lock);
 
-    uint32_t m_height, m_width;
+    int m_height, m_width;
     PathsNodes m_paths;
     NodesPath m_nodeToPath;
     PathNames m_pathNames;
