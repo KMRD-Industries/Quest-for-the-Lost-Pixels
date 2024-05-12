@@ -2,7 +2,6 @@
 
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "System.h"
-#include "TextureAtlas.h"
 #include "Utils/Helpers.h"
 
 class MapSystem : public System

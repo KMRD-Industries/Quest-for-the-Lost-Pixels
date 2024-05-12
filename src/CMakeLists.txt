@@ -46,8 +46,6 @@ set(SYSTEMS
 set(ATLAS_COMPONENTS
         AtlasComponents/Texture.cpp
         AtlasComponents/Texture.h
-        AtlasComponents/TextureAtlas.cpp
-        AtlasComponents/TextureAtlas.h
 )
 
 set(UTILS
