@@ -35,7 +35,6 @@ int main()
     auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
     {
         Signature signature;
-        signature.set(gCoordinator.getComponentType<AnimationComponent>());
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
@@ -69,34 +68,32 @@ int main()
 
     std::vector<Entity> entities(MAX_ENTITIES - 1);
 
-    // Local Player
+    // Local player
     entities[0] = gCoordinator.createEntity();
     entities[1] = gCoordinator.createEntity();
     sf::Texture texture;
     std::string PathToAssets{ASSET_PATH};
     texture.loadFromFile(PathToAssets + "/knight/knight.png");
 
-    gCoordinator.addComponent(entities[0], RenderComponent{.sprite = sf::Sprite(texture)});
-    gCoordinator.addComponent(entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(3.f, 3.f)));
+    gCoordinator.addComponent(entities[0], RenderComponent{.sprite = sf::Sprite(texture), .layer = 4});
+    gCoordinator.addComponent(entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(entities[0], AnimationComponent{});
     gCoordinator.addComponent(entities[0], PlayerComponent{});
 
-
     gCoordinator.addComponent(entities[1], RenderComponent{.sprite = sf::Sprite(texture)});
-    gCoordinator.addComponent(entities[1], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(3.f, 3.f)));
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
+    gCoordinator.addComponent(entities[1], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    sf::RenderWindow window(sf::VideoMode(16 * 26 * 3, 720), "ImGui + SFML = <3");
 
-    textureSystem->loadFromFile("../../resources/TileSets/CosmicLilacTiles.json");
-    textureSystem->loadFromFile("../../resources/TileSets/AnimSlimes.json");
-    textureSystem->loadFromFile("../../resources/TileSets/Decorative.json");
-    textureSystem->loadFromFile("../../resources/TileSets/DungeonWalls.json");
-    textureSystem->loadFromFile("../../resources/TileSets/Jungle.json");
-    textureSystem->loadFromFile("../../resources/TileSets/RetroAdventure.json");
-    textureSystem->loadFromFile("../../resources/TileSets/Graveyard.json");
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/CosmicLilacTiles.json");
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/Decorative.json");
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/DungeonWalls.json");
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/Jungle.json");
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/Graveyard.json");
 
     int _ = ImGui::SFML::Init(window);
     window.setFramerateLimit(60);
 
-    for (int i = 1000; i < 1017; i++)
+    for (int i = 1000; i < 1500; i++)
     {
         entities[i] = gCoordinator.createEntity();
         gCoordinator.addComponent(entities[i], RenderComponent{});
@@ -106,7 +103,7 @@ int main()
     }
 
 
-    std::string s("../../resources/Maps/map_03.json");
+    std::string s(std::string(ASSET_PATH) + "/maps/map_01.json");
     mapSystem->loadMap(s);
 
     sf::Clock deltaClock;
@@ -125,13 +122,25 @@ int main()
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
         {
-            s = ("../../resources/Maps/map_01.json");
+            std::string s(std::string(ASSET_PATH) + "/maps/map_01.json");
             mapSystem->loadMap(s);
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
         {
-            s = ("../../resources/Maps/map_02.json");
+            std::string s(std::string(ASSET_PATH) + "/maps/map_02.json");
+            mapSystem->loadMap(s);
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+        {
+            std::string s(std::string(ASSET_PATH) + "/maps/map_03.json");
+            mapSystem->loadMap(s);
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
+        {
+            std::string s(std::string(ASSET_PATH) + "/maps/map_04.json");
             mapSystem->loadMap(s);
         }
 

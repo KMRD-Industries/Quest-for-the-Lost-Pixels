@@ -11,10 +11,12 @@
  * @param file_path path to TileSet
  * @return
  */
-int TextureAtlas::loadFromFile(const std::string& file_path) {
+int TextureAtlas::loadFromFile(const std::string& file_path)
+{
     std::ifstream jsonFile(file_path);
 
-    if (!jsonFile.is_open()) {
+    if (!jsonFile.is_open())
+    {
         std::cout << "Failed to load TileSet." << std::endl;
         return 0;
     }
@@ -25,7 +27,8 @@ int TextureAtlas::loadFromFile(const std::string& file_path) {
     sf::Image image;
 
     // TODO FIX IT
-    if (!image.loadFromFile("../../resources/TileSets/" + image_path)){
+    if (!image.loadFromFile("../../resources/tileSets/" + image_path))
+    {
         std::cout << "Failed to load image." << std::endl;
         return 0;
     }
@@ -49,28 +52,34 @@ int TextureAtlas::loadFromFile(const std::string& file_path) {
     tex.loadFromImage(image);
     m_atlas_list.back().m_texture = std::make_unique<sf::Texture>(tex);
 
-    for (int y = 0; y < height; y += tileHeight) {
-        for (int x = 0; x < width; x += tileWidth){
-            m_atlas_list.back().m_texture_table[gid++] =  sf::IntRect(x, y, tileHeight, tileHeight);
+    for (int y = 0; y < height; y += tileHeight)
+    {
+        for (int x = 0; x < width; x += tileWidth)
+        {
+            m_atlas_list.back().m_texture_table[gid++] = sf::IntRect(x, y, tileHeight, tileHeight);
         }
     }
 
     // Animation (MAP ONLY)
     auto it = parsedFile.find("tiles");
-    if (it != parsedFile.end()) {
+    if (it != parsedFile.end())
+    {
         auto& tilesArray = parsedFile["tiles"];
-        for (auto& tile : tilesArray) {
+        for (auto& tile : tilesArray)
+        {
             auto& animationArray = tile["animation"];
             std::vector<uint32_t> frames;
 
-            for (auto& frame : animationArray) {
+            for (auto& frame : animationArray)
+            {
                 uint32_t tileid = frame["tileid"];
                 uint32_t adjusted_id = tileid + fist_gid_copy + 1;
 
                 frames.push_back(adjusted_id);
             }
 
-            if (!frames.empty()) {
+            if (!frames.empty())
+            {
                 this->map_animations[frames.at(0)] = frames;
             }
         }
@@ -78,9 +87,12 @@ int TextureAtlas::loadFromFile(const std::string& file_path) {
     return 1;
 }
 
-Texture TextureAtlas::findSubTexture(uint32_t tile_id) const {
-    for (const auto& atlas : m_atlas_list) {
-        if (atlas.m_texture_table.contains(tile_id)) {
+Texture TextureAtlas::findSubTexture(uint32_t tile_id) const
+{
+    for (const auto& atlas : m_atlas_list)
+    {
+        if (atlas.m_texture_table.contains(tile_id))
+        {
             return Texture(atlas.m_texture, atlas.m_texture_table.at(tile_id));
         }
     }
@@ -90,26 +102,25 @@ Texture TextureAtlas::findSubTexture(uint32_t tile_id) const {
 
 // This function gets a list of all the separate image names that are in the TextureAtlas.
 // Returns a std::vector<std::string> full of filenames corresponding to images in the TextureAtlas.
-std::vector<uint32_t> TextureAtlas::getSubTextureIds(){
+std::vector<uint32_t> TextureAtlas::getSubTextureIds()
+{
     std::vector<uint32_t> ids;
 
-    for(const auto& atlas : m_atlas_list)
-	for(const auto& [string, rect] : atlas.m_texture_table)
-	    ids.push_back(string);
+    for (const auto& atlas : m_atlas_list)
+        for (const auto& [string, rect] : atlas.m_texture_table) ids.push_back(string);
 
     return ids;
 }
 
 // Return First Tile ID in tileset
-uint32_t TextureAtlas::getFirstGidOfSet(const std::string& name) {
-    if(this->m_atlas_map.contains(name))
-        return this->m_atlas_map.at(name);
+uint32_t TextureAtlas::getFirstGidOfSet(const std::string& name)
+{
+    if (this->m_atlas_map.contains(name)) return this->m_atlas_map.at(name);
 
     return 1;
 }
 
-uint32_t TextureAtlas::getFirstUnusedGid() {
+uint32_t TextureAtlas::getFirstUnusedGid()
+{
     return (!m_atlas_list.empty()) ? m_atlas_list.back().first_gid + m_atlas_list.back().m_texture_table.size() : 1;
 }
-
-

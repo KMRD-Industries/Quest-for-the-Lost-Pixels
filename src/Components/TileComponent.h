@@ -4,7 +4,7 @@
 
 struct TileComponent
 {
-    uint32_t id = 0;
+    long id = 0;
     std::string tileset;
     int layer = 0;
 

@@ -15,11 +15,11 @@ void RenderSystem::draw(sf::RenderWindow& window) const
     {
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-        if (renderComponent.layer > 0)
+        if (renderComponent.layer)
         {
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
-            
+
             renderComponent.sprite.setScale(transformComponent.scale * 3.f);
             renderComponent.sprite.setPosition(transformComponent.position);
             renderComponent.sprite.setRotation(transformComponent.rotation);

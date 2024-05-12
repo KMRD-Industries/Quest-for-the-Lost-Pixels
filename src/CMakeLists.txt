@@ -52,7 +52,7 @@ set(ATLAS_COMPONENTS
 
 set(UTILS
         Utils/Paths.h
-        Utils/Helpers.cpp
+        Utils/Helpers.h
         Systems/TextureSystem.cpp
 )
 

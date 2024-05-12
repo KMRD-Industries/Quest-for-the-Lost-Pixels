@@ -60,6 +60,7 @@ void MapSystem::loadMap(std::string& path)
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         mapComponent.id = 0;
+        mapComponent.layer = 0;
         transformComponent.scale = sf::Vector2f(1.f, 1.f);
         transformComponent.rotation = 0.f;
     }
@@ -71,13 +72,13 @@ void MapSystem::loadMap(std::string& path)
         return;
     }
 
-    std::unordered_map<std::string, uint32_t> atlas_sets;
+    std::unordered_map<std::string, long> atlas_sets;
     nlohmann::json parsedFile = nlohmann::json::parse(jsonFile);
 
     for (auto tileset : parsedFile["tilesets"])
     {
         std::string name = extractFileName(tileset["source"], "/", ".");
-        uint32_t first_gid = tileset["firstgid"];
+        long first_gid = tileset["firstgid"];
 
         atlas_sets[name] = first_gid;
     }
@@ -85,8 +86,8 @@ void MapSystem::loadMap(std::string& path)
     auto startIterator = m_entities.begin();
     startIterator++;
 
-    uint32_t width = 0;
-    uint32_t height = 0;
+    long width = 0;
+    long height = 0;
 
     for (auto& data : parsedFile["layers"])
     {
@@ -177,7 +178,7 @@ void MapSystem::doFlips(std::uint8_t flags, float& rotation, sf::Vector2f& scale
     }
 }
 
-std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, uint32_t>& atlas_sets, uint32_t i)
+std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long i)
 {
     std::string result;
     for (const auto& pair : atlas_sets)

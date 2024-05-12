@@ -1,5 +1,5 @@
 { "columns":18,
- "image":"..\/Player\/AnimSlimes.png",
+ "image":"..\/slimes\/AnimSlimes.png",
  "imageheight":128,
  "imagewidth":576,
  "margin":0,
@@ -131,10 +131,6 @@
         }, 
         {
          "animation":[
-                {
-                 "duration":100,
-                 "tileid":18
-                }, 
                 {
                  "duration":100,
                  "tileid":19
@@ -470,6 +466,10 @@
                 {
                  "duration":100,
                  "tileid":64
+                }, 
+                {
+                 "duration":100,
+                 "tileid":63
                 }, 
                 {
                  "duration":100,

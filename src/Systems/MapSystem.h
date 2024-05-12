@@ -3,7 +3,7 @@
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "System.h"
 #include "TextureAtlas.h"
-#include "Utils/Helpers.cpp"
+#include "Utils/Helpers.h"
 
 class MapSystem : public System
 {
@@ -14,5 +14,5 @@ public:
 private:
     sf::Vector2f size;
     static void doFlips(std::uint8_t, float& rotation, sf::Vector2f& scale);
-    static std::string findKeyLessThan(const std::unordered_map<std::string, uint32_t>& atlas_sets, uint32_t i);
+    static std::string findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long i);
 };
