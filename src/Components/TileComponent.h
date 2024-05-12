@@ -2,15 +2,13 @@
 
 #include <SFML/System/Vector2.hpp>
 
-struct TileComponent {
+struct TileComponent
+{
     uint32_t id = 0;
+    std::string tileset;
     int layer = 0;
 
-    TileComponent(const uint32_t id, const int layer)
-        : id(id),
-          layer(layer)
-    {}
+    explicit TileComponent(const uint32_t id) : id(id), tileset() {}
 
     TileComponent() = default;
-
 };

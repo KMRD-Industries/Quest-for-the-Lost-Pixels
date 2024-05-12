@@ -1,43 +1,45 @@
-#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
+#include <imgui-SFML.h>
 
+#include <SFML/System/Clock.hpp>
+#include <SFML/Window/Event.hpp>
 #include "Coordinator.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "RenderComponent.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/System/Clock.hpp>
-#include <SFML/Window/Event.hpp>
-#include <imgui-SFML.h>
-#include <imgui.h>
 
 #include "AnimationComponent.h"
-#include "Coordinator.h"
 #include "Paths.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
-#include "RenderComponent.h"
+#include "PositionComponent.h"
 #include "RenderSystem.h"
+#include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
 Coordinator gCoordinator;
 
-int main() {
+int main()
+{
     gCoordinator.init();
-    gCoordinator.registerComponent<RenderComponent>();
+    gCoordinator.registerComponent<AnimationFrame>();
+    gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
+    gCoordinator.registerComponent<PositionComponent>();
+    gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<TransformComponent>();
-    gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
+
 
     auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
     {
         Signature signature;
-        signature.set(gCoordinator.getComponentType<RenderComponent>());
+        signature.set(gCoordinator.getComponentType<AnimationComponent>());
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<TileComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 
@@ -58,6 +60,15 @@ int main() {
         gCoordinator.setSystemSignature<MapSystem>(signature);
     }
 
+    auto textureSystem = gCoordinator.getRegisterSystem<TextureSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<RenderComponent>());
+        signature.set(gCoordinator.getComponentType<AnimationComponent>());
+        signature.set(gCoordinator.getComponentType<TileComponent>());
+        gCoordinator.setSystemSignature<TextureSystem>(signature);
+    }
+
     std::vector<Entity> entities(MAX_ENTITIES - 1);
 
     // Local Player
@@ -68,29 +79,43 @@ int main() {
     texture.loadFromFile(PathToAssets + "/knight/knight.png");
 
     gCoordinator.addComponent(entities[0], RenderComponent{.sprite = sf::Sprite(texture)});
-    gCoordinator.addComponent(entities[0],TransformComponent(sf::Vector2f(0.f, 0.f), 0.f,sf::Vector2f(3.f, 3.f)));
+    gCoordinator.addComponent(entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(3.f, 3.f)));
     gCoordinator.addComponent(entities[0], PlayerComponent{});
+    gCoordinator.addComponent(entities[0], AnimationComponent{});
+    gCoordinator.addComponent(entities[0], TileComponent{});
+
 
     gCoordinator.addComponent(entities[1], RenderComponent{.sprite = sf::Sprite(texture)});
-    gCoordinator.addComponent(entities[1],TransformComponent(sf::Vector2f(0.f, 0.f), 0.f,sf::Vector2f(3.f, 3.f)));
+    gCoordinator.addComponent(entities[1], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(3.f, 3.f)));
     sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
-    ImGui::SFML::Init(window);
+
+    textureSystem->loadFromFile("../../resources/TileSets/CosmicLilacTiles.json");
+    textureSystem->loadFromFile("../../resources/TileSets/AnimSlimes.json");
+    textureSystem->loadFromFile("../../resources/TileSets/Decorative.json");
+    textureSystem->loadFromFile("../../resources/TileSets/DungeonWalls.json");
+    textureSystem->loadFromFile("../../resources/TileSets/Jungle.json");
+    textureSystem->loadFromFile("../../resources/TileSets/RetroAdventure.json");
+    textureSystem->loadFromFile("../../resources/TileSets/Graveyard.json");
+
+    int _ = ImGui::SFML::Init(window);
     window.setFramerateLimit(60);
 
-    for(int i = 1000; i < 1500; i++){
+    for (int i = 1000; i < 1017; i++)
+    {
         entities[i] = gCoordinator.createEntity();
+        gCoordinator.addComponent(entities[i], RenderComponent{});
         gCoordinator.addComponent(entities[i], TileComponent{});
         gCoordinator.addComponent(entities[i], TransformComponent{});
         gCoordinator.addComponent(entities[i], AnimationComponent{});
     }
 
-    std::string s("../../resources/Maps/map_01.json");
+
+    std::string s("../../resources/Maps/map_03.json");
     mapSystem->loadMap(s);
 
     sf::Clock deltaClock;
     while (window.isOpen())
     {
-
         sf::Event event{};
         while (window.pollEvent(event))
         {
@@ -102,12 +127,14 @@ int main() {
             }
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+        {
             s = ("../../resources/Maps/map_01.json");
             mapSystem->loadMap(s);
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+        {
             s = ("../../resources/Maps/map_02.json");
             mapSystem->loadMap(s);
         }
@@ -122,7 +149,8 @@ int main() {
             dir.x += 1;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) // Move Left
             dir.x -= 1;
-        if (dir.x != 0 || dir.y != 0){
+        if (dir.x != 0 || dir.y != 0)
+        {
             playerMovementSystem->onMove(dir);
         }
 
@@ -132,7 +160,7 @@ int main() {
         window.clear();
 
         // Draw the map tiles
-        mapSystem->draw(window);
+        textureSystem->loadTextures();
 
         // Draw other entities or systems here if needed
         renderSystem->draw(window);
@@ -143,5 +171,4 @@ int main() {
         // Display the rendered frame
         window.display();
     }
-
 }

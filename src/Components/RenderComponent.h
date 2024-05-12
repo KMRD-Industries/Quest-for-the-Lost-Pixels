@@ -3,6 +3,8 @@
 #include "SFML/Graphics/Shape.hpp"
 #include "SFML/Graphics/Sprite.hpp"
 
-struct RenderComponent{
+struct RenderComponent
+{
     sf::Sprite sprite;
+    int layer = 0;
 };
