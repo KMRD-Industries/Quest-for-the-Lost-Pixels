@@ -142,12 +142,14 @@ void MapSystem::doFlips(std::uint8_t flags, float& rotation, sf::Vector2f& scale
 std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long i)
 {
     std::string result;
+    long act = 0;
+
     for (const auto& pair : atlas_sets)
     {
-        if (pair.second <= i)
+        if (pair.second <= i && pair.second >= act)
         {
             result = pair.first;
-            break;
+            act = pair.second;
         }
     }
     return result;

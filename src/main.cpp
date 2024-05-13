@@ -242,7 +242,7 @@ int main()
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
         {
-            s = std::string(ASSET_PATH) + "/maps/map_07.json";
+            s = std::string(ASSET_PATH) + "/maps/map_04.json";
             mapSystem->loadMap(s);
         }
 

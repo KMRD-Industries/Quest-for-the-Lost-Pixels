@@ -8,7 +8,7 @@ struct TileComponent
     std::string tileset;
     int layer{};
 
-    explicit TileComponent(const uint32_t id) : id{id} {};
+    explicit TileComponent(const uint32_t id) : id{static_cast<long>(id)} {};
 
     TileComponent() = default;
 };
