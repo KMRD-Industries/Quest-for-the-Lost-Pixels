@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SFML/Graphics/Shape.hpp"
+#include "SFML/Graphics.hpp"
 
 struct RenderComponent
 {
-    sf::Shape* shape;
+    sf::Sprite sprite;
 };

@@ -1,22 +1,20 @@
-/*For Generator Preview Start*/
 #define GLM_ENABLE_EXPERIMENTAL
 #include <SFML/Graphics.hpp>
-#include <unordered_map>
-/*For Generator Preview End*/
-#include "Coordinator.h"
-
-#include <imgui-SFML.h>
-#include <imgui.h>
-
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <imgui-SFML.h>
+#include <imgui.h>
+#include <unordered_map>
 
+#include "Coordinator.h"
 #include "DungeonGenerator.h"
+#include "InputHandler.h"
 #include "Paths.h"
+#include "PlayerComponent.h"
+#include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
+#include "TransformComponent.h"
 
 Coordinator gCoordinator;
 
@@ -111,67 +109,106 @@ int main()
     gCoordinator.init();
 
     gCoordinator.registerComponent<RenderComponent>();
+    gCoordinator.registerComponent<TransformComponent>();
+    gCoordinator.registerComponent<PlayerComponent>();
 
     auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<RenderComponent>());
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 
-    std::vector<Entity> entities(MAX_ENTITIES - 1);
+    auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<PlayerComponent>());
+        gCoordinator.setSystemSignature<PlayerMovementSystem>(signature);
+    }
 
+    std::vector<Entity> entities(MAX_ENTITIES - 1);
+    // Local Player
     entities[0] = gCoordinator.createEntity();
-    gCoordinator.addComponent(entities[0], RenderComponent{new sf::CircleShape{1.f}});
+    // Server Player
+    entities[1] = gCoordinator.createEntity();
+    sf::Texture texture;
+    std::string PathToAssets{ASSET_PATH};
+    texture.loadFromFile(PathToAssets + "/knight/knight.png");
+    gCoordinator.addComponent(entities[0], RenderComponent{.sprite = sf::Sprite(texture)});
+    gCoordinator.addComponent(entities[0], TransformComponent{.position = sf::Vector2f(0.f, 0.f)});
+    gCoordinator.addComponent(entities[0], PlayerComponent{});
+
+    gCoordinator.addComponent(entities[1], RenderComponent{.sprite = sf::Sprite(texture)});
+    gCoordinator.addComponent(entities[1], TransformComponent{.position = sf::Vector2f(10.f, 10.f)});
     sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
     window.setFramerateLimit(60);
     auto _ = ImGui::SFML::Init(window);
 
     sf::Clock deltaClock;
-
-    sf::Font font;
-    const std::string assetPath = ASSET_PATH;
-    font.loadFromFile(assetPath + "/fonts/orion.ttf");
-
-    std::vector<sf::RectangleShape> rectangles;
-    std::vector<sf::Text> texts;
-
-    previevGenerator(font, rectangles, texts);
-
     while (window.isOpen())
     {
         sf::Event event{};
-        while (window.pollEvent(event))
-        {
-            ImGui::SFML::ProcessEvent(event);
+        InputHandler::getInstance()->update();
 
-            if (event.type == sf::Event::Closed)
+        sf::Font font;
+        const std::string assetPath = ASSET_PATH;
+        font.loadFromFile(assetPath + "/fonts/Bentinck-Regular.ttf");
+
+        std::vector<sf::RectangleShape> rectangles;
+        std::vector<sf::Text> texts;
+
+        previevGenerator(font, rectangles, texts);
+
+        while (window.isOpen())
+        {
+            sf::Event event{};
+            while (window.pollEvent(event))
             {
-                window.close();
+                ImGui::SFML::ProcessEvent(event);
+
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    const auto keyCode = event.key.code;
+                    InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+                }
+                else if (event.type == sf::Event::KeyReleased)
+                {
+                    const auto keyCode = event.key.code;
+                    InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+                }
+                if (event.type == sf::Event::Closed)
+                {
+                    window.close();
+                }
             }
+
+            playerMovementSystem->update();
+
+
+            ImGui::SFML::Update(window, deltaClock.restart());
+
+            ImGui::Begin("Hello, world!");
+            ImGui::Button("Look at this pretty button");
+            ImGui::End();
+
+            ImGui::ShowDemoWindow();
+
+            window.clear();
+
+            /*Draw generator start*/
+            for (const auto& rectangle : rectangles) window.draw(rectangle);
+            for (const auto& text : texts) window.draw(text);
+            /*Draw generator end*/
+
+            renderSystem->draw(window);
+            ImGui::SFML::Render(window);
+            window.display();
         }
 
-        ImGui::SFML::Update(window, deltaClock.restart());
+        ImGui::SFML::Shutdown();
 
-        ImGui::Begin("Hello, world!");
-        ImGui::Button("Look at this pretty button");
-        ImGui::End();
-
-        ImGui::ShowDemoWindow();
-
-        window.clear();
-
-        /*Draw generator start*/
-        for (const auto& rectangle : rectangles) window.draw(rectangle);
-        for (const auto& text : texts) window.draw(text);
-        /*Draw generator end*/
-
-        renderSystem->draw(window);
-        ImGui::SFML::Render(window);
-        window.display();
+        return 0;
     }
-
-    ImGui::SFML::Shutdown();
-
-    return 0;
 }

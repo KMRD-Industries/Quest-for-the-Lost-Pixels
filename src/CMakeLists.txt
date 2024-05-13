@@ -21,9 +21,13 @@ set(CORE
 	Core/Types.h
 	Core/Coordinator.h
 	Core/Coordinator.cpp
+	Core/InputHandler.h
+	Core/InputHandler.cpp
 )
 set(COMPONENTS
 	Components/RenderComponent.h
+	Components/TransformComponent.h
+	Components/PlayerComponent.h
 )
 set(MAP
 	Map/DungeonGenerator.cpp
@@ -31,7 +35,9 @@ set(MAP
 )
 set(SYSTEMS
 	Systems/RenderSystem.cpp
-	Systems/RenderSystem.h
+	Systems/RenderSystem.h	
+	Systems/PlayerMovementSystem.cpp
+	Systems/PlayerMovementSystem.h
 )
 source_group("Core" FILES ${CORE})
 source_group("Components" FILES ${COMPONENTS})
