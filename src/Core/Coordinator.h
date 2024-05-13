@@ -10,6 +10,7 @@
 class Coordinator
 {
 public:
+    Coordinator();
     void init();
     Entity createEntity() const;
     void destroyEntity(const Entity entity) const;

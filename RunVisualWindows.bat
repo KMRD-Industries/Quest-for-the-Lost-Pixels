@@ -1,1 +1,2 @@
 cmake . --preset=VS
+pause

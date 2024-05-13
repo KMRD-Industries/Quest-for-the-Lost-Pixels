@@ -13,20 +13,30 @@ FetchContent_Declare(glm
 FetchContent_MakeAvailable(glm)
 
 FetchContent_Declare(SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 2.6.x)
+        GIT_REPOSITORY https://github.com/SFML/SFML.git
+        GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
 FetchContent_Declare(ImGui
-    GIT_REPOSITORY https://github.com/ocornut/imgui
-    GIT_TAG v1.90.4)
+        GIT_REPOSITORY https://github.com/ocornut/imgui
+        GIT_TAG v1.90.4)
 FetchContent_MakeAvailable(ImGui)
 FetchContent_GetProperties(ImGui SOURCE_DIR IMGUI_DIR)
 
+FetchContent_Declare(glm
+        GIT_REPOSITORY	https://github.com/g-truc/glm.git
+        GIT_TAG 	1.0.1)
+FetchContent_MakeAvailable(glm)
+
+FetchContent_Declare(nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json
+        GIT_TAG v3.11.3)
+FetchContent_MakeAvailable(nlohmann_json)
+
 set(IMGUI_SFML_FIND_SFML OFF)
 FetchContent_Declare(ImGui-SFML
-    GIT_REPOSITORY https://github.com/SFML/imgui-sfml
-    GIT_TAG 2.6.x)
+        GIT_REPOSITORY https://github.com/SFML/imgui-sfml
+        GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(ImGui-SFML)
 
 add_subdirectory(src)

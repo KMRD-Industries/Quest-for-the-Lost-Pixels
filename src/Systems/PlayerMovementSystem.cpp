@@ -32,6 +32,6 @@ void PlayerMovementSystem::handleMovement() const
     {
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         const auto normalizedDir{normalize(dir)};
-        transformComponent.position += {normalizedDir.x, normalizedDir.y};
+        transformComponent.position += {normalizedDir.x * 5, normalizedDir.y * 5};
     }
 }

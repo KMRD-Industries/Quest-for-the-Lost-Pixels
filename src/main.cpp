@@ -1,19 +1,20 @@
-#define GLM_ENABLE_EXPERIMENTAL
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <imgui-SFML.h>
-#include <imgui.h>
-#include <unordered_map>
-
+#include "AnimationComponent.h"
 #include "Coordinator.h"
 #include "DungeonGenerator.h"
 #include "InputHandler.h"
+#include "MapComponent.h"
+#include "MapSystem.h"
 #include "Paths.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
+#include "TextureSystem.h"
+#include "TileComponent.h"
 #include "TransformComponent.h"
 
 Coordinator gCoordinator;
@@ -33,10 +34,10 @@ void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangle
     const int rectHeight = 50;
     const int gap = 20;
 
-
     auto fullMap = generator.getNodes();
     auto roomCount = generator.getCount();
     generator.makeLockAndKey();
+
     for (int i = 0; i < w; ++i)
     {
         for (int j = 0; j < h; ++j)
@@ -80,6 +81,7 @@ void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangle
             key.setFillColor(sf::Color::Black);
             key.setPosition(i * (rectWidth + gap) + 30, j * (rectHeight + gap) + 30);
             texts.push_back(key);
+
             if (const auto text = generator.getKey({i, j}))
             {
                 sf::Text key;
@@ -104,13 +106,16 @@ void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangle
     }
     /*Map Generator Preview End*/
 }
+
 int main()
 {
     gCoordinator.init();
-
-    gCoordinator.registerComponent<RenderComponent>();
-    gCoordinator.registerComponent<TransformComponent>();
+    gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
+    gCoordinator.registerComponent<RenderComponent>();
+    gCoordinator.registerComponent<TileComponent>();
+    gCoordinator.registerComponent<TransformComponent>();
+    gCoordinator.registerComponent<AnimationComponent>();
 
     auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
     {
@@ -128,87 +133,135 @@ int main()
         gCoordinator.setSystemSignature<PlayerMovementSystem>(signature);
     }
 
+    auto mapSystem = gCoordinator.getRegisterSystem<MapSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<TileComponent>());
+        signature.set(gCoordinator.getComponentType<AnimationComponent>());
+        gCoordinator.setSystemSignature<MapSystem>(signature);
+    }
+
+    auto textureSystem = gCoordinator.getRegisterSystem<TextureSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<RenderComponent>());
+        signature.set(gCoordinator.getComponentType<AnimationComponent>());
+        signature.set(gCoordinator.getComponentType<TileComponent>());
+        gCoordinator.setSystemSignature<TextureSystem>(signature);
+    }
     std::vector<Entity> entities(MAX_ENTITIES - 1);
-    // Local Player
+    // Local player
+
     entities[0] = gCoordinator.createEntity();
-    // Server Player
     entities[1] = gCoordinator.createEntity();
     sf::Texture texture;
     std::string PathToAssets{ASSET_PATH};
     texture.loadFromFile(PathToAssets + "/knight/knight.png");
-    gCoordinator.addComponent(entities[0], RenderComponent{.sprite = sf::Sprite(texture)});
-    gCoordinator.addComponent(entities[0], TransformComponent{.position = sf::Vector2f(0.f, 0.f)});
+
+    gCoordinator.addComponent(entities[0], RenderComponent{.sprite = sf::Sprite(texture), .layer = 4});
+    gCoordinator.addComponent(entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(entities[0], AnimationComponent{});
     gCoordinator.addComponent(entities[0], PlayerComponent{});
 
     gCoordinator.addComponent(entities[1], RenderComponent{.sprite = sf::Sprite(texture)});
-    gCoordinator.addComponent(entities[1], TransformComponent{.position = sf::Vector2f(10.f, 10.f)});
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
-    window.setFramerateLimit(60);
-    auto _ = ImGui::SFML::Init(window);
+    gCoordinator.addComponent(entities[1], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
 
+    sf::RenderWindow window(sf::VideoMode(16 * 26 * 3, 720), "ImGui + SFML = <3");
+
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/CosmicLilacTiles.json");
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/Decorative.json");
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/DungeonWalls.json");
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/Jungle.json");
+    textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/Graveyard.json");
+
+    int _ = ImGui::SFML::Init(window);
+    window.setFramerateLimit(60);
+
+    for (int i = 1000; i < 1500; i++)
+    {
+        entities[i] = gCoordinator.createEntity();
+        gCoordinator.addComponent(entities[i], RenderComponent{});
+        gCoordinator.addComponent(entities[i], TileComponent{});
+        gCoordinator.addComponent(entities[i], TransformComponent{});
+        gCoordinator.addComponent(entities[i], AnimationComponent{});
+    }
+    std::string s(std::string(ASSET_PATH) + "/maps/map_01.json");
+    mapSystem->loadMap(s);
     sf::Clock deltaClock;
+
+    sf::Font font;
+    const std::string assetPath = ASSET_PATH;
+    font.loadFromFile(assetPath + "/fonts/Bentinck-Regular.ttf");
+
+    std::vector<sf::RectangleShape> rectangles;
+    std::vector<sf::Text> texts;
+
+    previevGenerator(font, rectangles, texts);
+
     while (window.isOpen())
     {
         sf::Event event{};
         InputHandler::getInstance()->update();
 
-        sf::Font font;
-        const std::string assetPath = ASSET_PATH;
-        font.loadFromFile(assetPath + "/fonts/Bentinck-Regular.ttf");
-
-        std::vector<sf::RectangleShape> rectangles;
-        std::vector<sf::Text> texts;
-
-        previevGenerator(font, rectangles, texts);
-
-        while (window.isOpen())
+        while (window.pollEvent(event))
         {
-            sf::Event event{};
-            while (window.pollEvent(event))
+            ImGui::SFML::ProcessEvent(event);
+
+            if (event.type == sf::Event::KeyPressed)
             {
-                ImGui::SFML::ProcessEvent(event);
-
-                if (event.type == sf::Event::KeyPressed)
-                {
-                    const auto keyCode = event.key.code;
-                    InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
-                }
-                else if (event.type == sf::Event::KeyReleased)
-                {
-                    const auto keyCode = event.key.code;
-                    InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
-                }
-                if (event.type == sf::Event::Closed)
-                {
-                    window.close();
-                }
+                const auto keyCode = event.key.code;
+                InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
             }
-
-            playerMovementSystem->update();
-
-
-            ImGui::SFML::Update(window, deltaClock.restart());
-
-            ImGui::Begin("Hello, world!");
-            ImGui::Button("Look at this pretty button");
-            ImGui::End();
-
-            ImGui::ShowDemoWindow();
-
-            window.clear();
-
-            /*Draw generator start*/
-            for (const auto& rectangle : rectangles) window.draw(rectangle);
-            for (const auto& text : texts) window.draw(text);
-            /*Draw generator end*/
-
-            renderSystem->draw(window);
-            ImGui::SFML::Render(window);
-            window.display();
+            else if (event.type == sf::Event::KeyReleased)
+            {
+                const auto keyCode = event.key.code;
+                InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+            }
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+            }
         }
 
-        ImGui::SFML::Shutdown();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+        {
+            s = std::string(ASSET_PATH) + "/maps/map_01.json";
+            mapSystem->loadMap(s);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+        {
+            s = std::string(ASSET_PATH) + "/maps/map_02.json";
+            mapSystem->loadMap(s);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+        {
+            s = std::string(ASSET_PATH) + "/maps/map_03.json";
+            mapSystem->loadMap(s);
+        }
 
-        return 0;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
+        {
+            s = std::string(ASSET_PATH) + "/maps/map_04.json";
+            mapSystem->loadMap(s);
+        }
+
+        playerMovementSystem->update();
+
+        ImGui::SFML::Update(window, deltaClock.restart());
+        // Clear the window before drawing
+        window.clear();
+
+        textureSystem->loadTextures();
+
+        renderSystem->draw(window);
+
+        for (const auto& rectangle : rectangles) window.draw(rectangle);
+        for (const auto& text : texts) window.draw(text);
+
+        // Render ImGui
+        ImGui::SFML::Render(window);
+        // Display the rendered frame
+        window.display();
     }
 }

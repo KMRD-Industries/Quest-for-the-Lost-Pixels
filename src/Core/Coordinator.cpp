@@ -1,5 +1,7 @@
 #include "Coordinator.h"
 
+Coordinator::Coordinator() {  };
+
 void Coordinator::init()
 {
     m_componentManager = std::make_unique<ComponentManager>();
