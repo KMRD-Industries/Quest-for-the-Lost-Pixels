@@ -2,7 +2,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
-#include "DungeonGenerator.h"
 /*For Generator Preview End*/
 #include "Coordinator.h"
 
@@ -21,33 +20,9 @@
 
 Coordinator gCoordinator;
 
-int main()
+void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangles, std::vector<sf::Text>& texts)
 {
-    gCoordinator.init();
-
-    gCoordinator.registerComponent<RenderComponent>();
-
-    auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
-    {
-        Signature signature;
-        signature.set(gCoordinator.getComponentType<RenderComponent>());
-        gCoordinator.setSystemSignature<RenderSystem>(signature);
-    }
-
-    std::vector<Entity> entities(MAX_ENTITIES - 1);
-
-    entities[0] = gCoordinator.createEntity();
-    gCoordinator.addComponent(entities[0], RenderComponent{new sf::CircleShape{1.f}});
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
-    window.setFramerateLimit(60);
-    auto _ = ImGui::SFML::Init(window);
-
-    sf::Clock deltaClock;
-
     /*Map Generator Preview Start*/
-    sf::Font font;
-    const std::string assetPath = ASSET_PATH;
-    font.loadFromFile(assetPath + "/fonts/orion.ttf");
     int h = 5;
     int w = 6;
     DungeonGenerator generator(h, w);
@@ -59,8 +34,6 @@ int main()
     const int rectWidth = 50;
     const int rectHeight = 50;
     const int gap = 20;
-    std::vector<sf::RectangleShape> rectangles;
-    std::vector<sf::Text> texts;
 
 
     auto fullMap = generator.getNodes();
@@ -132,6 +105,38 @@ int main()
         }
     }
     /*Map Generator Preview End*/
+}
+int main()
+{
+    gCoordinator.init();
+
+    gCoordinator.registerComponent<RenderComponent>();
+
+    auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<RenderComponent>());
+        gCoordinator.setSystemSignature<RenderSystem>(signature);
+    }
+
+    std::vector<Entity> entities(MAX_ENTITIES - 1);
+
+    entities[0] = gCoordinator.createEntity();
+    gCoordinator.addComponent(entities[0], RenderComponent{new sf::CircleShape{1.f}});
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
+    window.setFramerateLimit(60);
+    auto _ = ImGui::SFML::Init(window);
+
+    sf::Clock deltaClock;
+
+    sf::Font font;
+    const std::string assetPath = ASSET_PATH;
+    font.loadFromFile(assetPath + "/fonts/orion.ttf");
+
+    std::vector<sf::RectangleShape> rectangles;
+    std::vector<sf::Text> texts;
+
+    previevGenerator(font, rectangles, texts);
 
     while (window.isOpen())
     {
@@ -155,6 +160,7 @@ int main()
         ImGui::ShowDemoWindow();
 
         window.clear();
+
         /*Draw generator start*/
         for (const auto& rectangle : rectangles) window.draw(rectangle);
         for (const auto& text : texts) window.draw(text);
