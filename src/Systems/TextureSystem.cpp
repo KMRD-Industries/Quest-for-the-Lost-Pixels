@@ -93,6 +93,17 @@ int TextureSystem::loadFromFile(const std::string& file_path)
     }
     return 1;
 }
+
+void TextureSystem::loadTexturesFromFiles()
+{
+    const auto prefix = std::string(ASSET_PATH) + "/tileSets/";
+    const auto sufix = ".json";
+    for (const auto& texture : texture_files)
+    {
+        loadFromFile(prefix + texture + sufix);
+    }
+}
+
 [[maybe_unused]] sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
 {
     try

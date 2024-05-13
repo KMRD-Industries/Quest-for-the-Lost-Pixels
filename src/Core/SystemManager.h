@@ -16,7 +16,7 @@ public:
     {
         const std::string typeName{typeid(T).name()};
 
-        assert(!m_systems.contains(typeName) && "Registering system more than once.");
+        if (m_systems.contains(typeName)) return std::static_pointer_cast<T>(m_systems[typeName]);
 
         const auto system{std::make_shared<T>()};
         m_systems[typeName] = std::static_pointer_cast<System>(system);

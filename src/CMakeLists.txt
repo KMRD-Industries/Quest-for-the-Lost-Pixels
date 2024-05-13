@@ -3,7 +3,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
 
 set(SOURCES
-        main.cpp
+	main.cpp
+	Game.cpp
+	Game.h
 )
 
 set(CORE
@@ -36,7 +38,13 @@ set(COMPONENTS
 
 set(MAP
         Map/DungeonGenerator.cpp
-        Map/DungeonGenerator.h
+        Map/DungeonGenerator.h        
+		Map/FloorGenerator.cpp
+        Map/FloorGenerator.h
+        Map/Dungeon.cpp
+        Map/Dungeon.h
+		Map/Room.cpp
+		Map/Room.h
 )
 
 set(SYSTEMS
@@ -58,7 +66,6 @@ set(ATLAS_COMPONENTS
 set(UTILS
         Utils/Paths.h
         Utils/Helpers.h
-        Systems/TextureSystem.cpp
 )
 
 source_group("Core" FILES ${CORE})

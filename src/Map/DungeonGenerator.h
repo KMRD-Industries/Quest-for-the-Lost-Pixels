@@ -35,6 +35,7 @@ public:
         int minPathLength{};
         int maxPathLength{};
     };
+    DungeonGenerator() {}
     DungeonGenerator(int height, int width);
     void generateMainPath(int pathLength);
     void generateSidePath(const sidePathConfig& pathConfig);
@@ -57,16 +58,16 @@ private:
     void validateMainPath(const PathConfig& pathConfig) const;
     void findPlaceForKey(const glm::ivec2& lock);
 
-    int m_height, m_width;
-    PathsNodes m_paths;
-    NodesPath m_nodeToPath;
-    PathNames m_pathNames;
-    DirectedGraph m_graph;
-    UnDirectedGraph m_uGraph;
-    RoomCount m_roomCount;
+    int m_height{}, m_width{};
+    PathsNodes m_paths{};
+    NodesPath m_nodeToPath{};
+    PathNames m_pathNames{};
+    DirectedGraph m_graph{};
+    UnDirectedGraph m_uGraph{};
+    RoomCount m_roomCount{};
     int m_freeKey{};
-    std::unordered_map<glm::ivec2, int> m_locks;
-    std::unordered_map<glm::ivec2, int> m_keys;
+    std::unordered_map<glm::ivec2, int> m_locks{};
+    std::unordered_map<glm::ivec2, int> m_keys{};
 
-    std::mt19937 gen;
+    std::mt19937 gen{};
 };
