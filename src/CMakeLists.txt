@@ -29,6 +29,10 @@ set(COMPONENTS
 	Components/TransformComponent.h
 	Components/PlayerComponent.h
 )
+set(MAP
+	Map/DungeonGenerator.cpp
+	Map/DungeonGenerator.h
+)
 set(SYSTEMS
 	Systems/RenderSystem.cpp
 	Systems/RenderSystem.h	
@@ -38,13 +42,16 @@ set(SYSTEMS
 source_group("Core" FILES ${CORE})
 source_group("Components" FILES ${COMPONENTS})
 source_group("Systems" FILES ${SYSTEMS})
+source_group("Map" FILES ${MAP})
+source_group("Utils" FILES ${UTILS})
 
 add_definitions( -D_ASSET_PATH=\"${ASSET_DIR}\")
-include_directories(./Core ./Components ./Systems ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${COMPONENTS} ${UTILS})
+add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS})
 target_link_libraries(sf PRIVATE sfml-graphics ImGui-SFML::ImGui-SFML glm::glm)
 target_compile_features(sf PRIVATE cxx_std_23)
+
 
 if(WIN32)
     add_custom_command(
