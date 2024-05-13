@@ -7,7 +7,6 @@
 class MapSystem : public System
 {
 public:
-    void draw(sf::RenderWindow& window) const;
     void loadMap(std::string&);
 
 private:

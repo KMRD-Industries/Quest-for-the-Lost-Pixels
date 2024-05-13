@@ -1,81 +1,38 @@
 #include "MapSystem.h"
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
-
-#include "AnimationComponent.h"
 #include "Coordinator.h"
-#include "RenderComponent.h"
-#include "SFML/Graphics/RenderWindow.hpp"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
 extern Coordinator gCoordinator;
 
-void MapSystem::draw(sf::RenderWindow& window) const
-{
-    for (const auto& entity : m_entities)
-    {
-        //        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-        //        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        //        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
-        //
-        //        renderComponent.sprite.setPosition(transformComponent.position);
-        //        renderComponent.sprite.setRotation(transformComponent.rotation);
-        //        renderComponent.sprite.setScale(sf::Vector2f(3.f, 3.f));
-
-        //        window.draw(renderComponent.sprite);
-
-
-        //        if (mapComponent.id == 0) continue;
-        //
-        //        // Calculate next frame of animation
-        //        if (!animationComponent.frames.empty())
-        //        {
-        //            // load next animation frame
-        //            animationComponent.ignoreFrames++;
-        //            if (animationComponent.ignoreFrames % 20 == 0)
-        //                animationComponent.actual = (animationComponent.actual + 1) %
-        //                animationComponent.frames.size();
-        //
-        //            mapComponent.id = animationComponent.frames[animationComponent.actual];
-        //        }
-        //
-        //        //            if(mapComponent.layer == i)
-        //        window.draw(createTile(mapComponent.id, transformComponent.position, transformComponent.rotation,
-        //                               transformComponent.scale));
-        //    }
-        //    }
-    }
-}
-
 void MapSystem::loadMap(std::string& path)
 {
     // Reset Map Entities to default
-
     for (const auto& entity : m_entities)
     {
-        auto& mapComponent = gCoordinator.getComponent<TileComponent>(entity);
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& map_component = gCoordinator.getComponent<TileComponent>(entity);
+        auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
 
-        mapComponent.id = 0;
-        mapComponent.layer = 0;
-        transformComponent.scale = sf::Vector2f(1.f, 1.f);
-        transformComponent.rotation = 0.f;
+        map_component.id = {};
+        map_component.layer = {};
+        transform_component.scale = sf::Vector2f(1.f, 1.f);
+        transform_component.rotation = {};
     }
 
-    std::ifstream jsonFile(path);
+    std::ifstream json_file(path);
 
-    if (!jsonFile.is_open())
+    if (!json_file.is_open())
     {
         return;
     }
 
     std::unordered_map<std::string, long> atlas_sets;
-    nlohmann::json parsedFile = nlohmann::json::parse(jsonFile);
+    nlohmann::json parsed_file = nlohmann::json::parse(json_file);
 
-    for (auto tileset : parsedFile["tilesets"])
+    for (auto tileset : parsed_file["tilesets"])
     {
         std::string name = extractFileName(tileset["source"], "/", ".");
         long first_gid = tileset["firstgid"];
@@ -83,23 +40,23 @@ void MapSystem::loadMap(std::string& path)
         atlas_sets[name] = first_gid;
     }
 
-    auto startIterator = m_entities.begin();
-    startIterator++;
+    auto start_iterator = m_entities.begin();
+    start_iterator++;
 
-    long width = 0;
-    long height = 0;
+    long width = {};
+    long height = {};
+    float tile_height = parsed_file["tileheight"];
+    float tile_width = parsed_file["tilewidth"];
 
-    for (auto& data : parsedFile["layers"])
+    for (auto& data : parsed_file["layers"])
     {
-        static const std::uint32_t mask = 0xf0000000;
-        int index = 0;
-
-        // TODO: Objects
         if (!data.contains("data")) continue;
 
-        width = static_cast<unsigned long>(data["width"]);
-        height = static_cast<unsigned long>(data["height"]);
+        static const std::uint32_t mask = 0xf0000000;
+        int index = {};
 
+        width = data["width"];
+        height = data["height"];
 
         for (uint32_t i : processDataString(data["data"], width * height, 0))
         {
@@ -107,31 +64,35 @@ void MapSystem::loadMap(std::string& path)
             uint32_t tileID = i & ~mask;
 
             int layer = data["id"];
-            int xPosition = index % (static_cast<int>(width));
-            int yPosition = index / (static_cast<int>(width));
+            int x_position = index % (static_cast<int>(width));
+            int y_position = index / (static_cast<int>(width));
 
-            if (tileID)
+            if (tileID < 1)
             {
-                auto& tileComponent = gCoordinator.getComponent<TileComponent>(*startIterator);
-                auto& transformMapComponent = gCoordinator.getComponent<TransformComponent>(*startIterator);
-
-                std::string tileset_name = findKeyLessThan(atlas_sets, tileID);
-                tileID = tileID - atlas_sets[tileset_name] + 1;
-
-                tileComponent.id = tileID;
-                tileComponent.tileset = tileset_name;
-                tileComponent.layer = layer;
-
-                transformMapComponent.position =
-                    sf::Vector2f(static_cast<float>(xPosition), static_cast<float>(yPosition)) * 16.f * 3.f;
-                doFlips(flipFlags, transformMapComponent.rotation, transformMapComponent.scale);
-
-                startIterator++;
+                index++;
+                continue;
             }
+
+            auto& tileComponent = gCoordinator.getComponent<TileComponent>(*start_iterator);
+            auto& transform_component = gCoordinator.getComponent<TransformComponent>(*start_iterator);
+
+            std::string tileset_name = findKeyLessThan(atlas_sets, tileID);
+            tileID = tileID - atlas_sets[tileset_name] + 1;
+
+            tileComponent.id = tileID;
+            tileComponent.tileset = tileset_name;
+            tileComponent.layer = layer;
+
+            transform_component.position =
+                sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) * tile_height * 3.f;
+            doFlips(flipFlags, transform_component.rotation, transform_component.scale);
+
+            start_iterator++;
             index++;
         }
     }
 }
+
 void MapSystem::doFlips(std::uint8_t flags, float& rotation, sf::Vector2f& scale)
 {
     // 0000 = no change

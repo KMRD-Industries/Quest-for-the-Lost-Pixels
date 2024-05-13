@@ -4,7 +4,6 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include "AnimationFrame.h"
 #include "AtlasComponents/Texture.h"
 
 struct AnimationComponent

@@ -4,11 +4,11 @@
 
 struct TileComponent
 {
-    long id = 0;
+    long id{};
     std::string tileset;
-    int layer = 0;
+    int layer{};
 
-    explicit TileComponent(const uint32_t id) : id(id), tileset() {}
+    explicit TileComponent(const uint32_t id) : id{id} {};
 
     TileComponent() = default;
 };

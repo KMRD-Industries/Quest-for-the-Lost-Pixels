@@ -15,7 +15,7 @@ void RenderSystem::draw(sf::RenderWindow& window) const
     {
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-        if (renderComponent.layer)
+        if (renderComponent.layer > 0)
         {
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);

@@ -6,5 +6,5 @@
 struct RenderComponent
 {
     sf::Sprite sprite;
-    int layer = 0;
+    int layer{};
 };

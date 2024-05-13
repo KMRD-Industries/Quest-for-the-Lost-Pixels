@@ -12,7 +12,6 @@
 #include "Paths.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
-#include "PositionComponent.h"
 #include "RenderSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
@@ -23,10 +22,8 @@ Coordinator gCoordinator;
 int main()
 {
     gCoordinator.init();
-    gCoordinator.registerComponent<AnimationFrame>();
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
-    gCoordinator.registerComponent<PositionComponent>();
     gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<TransformComponent>();
@@ -140,7 +137,7 @@ int main()
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
         {
-            std::string s(std::string(ASSET_PATH) + "/maps/map_04.json");
+            std::string s(std::string(ASSET_PATH) + "/maps/map_07.json");
             mapSystem->loadMap(s);
         }
 
