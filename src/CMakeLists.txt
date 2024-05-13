@@ -18,9 +18,9 @@ set(CORE
         Core/SystemManager.h
         Core/Types.h
         Core/Coordinator.h
-        Core/Coordinator.cpp	
+        Core/Coordinator.cpp
         Core/InputHandler.h
-	      Core/InputHandler.cpp
+        Core/InputHandler.cpp
 )
 
 set(COMPONENTS
@@ -35,8 +35,8 @@ set(COMPONENTS
 )
 
 set(MAP
-	Map/DungeonGenerator.cpp
-	Map/DungeonGenerator.h
+        Map/DungeonGenerator.cpp
+        Map/DungeonGenerator.h
 )
 
 set(SYSTEMS
@@ -69,14 +69,14 @@ source_group("Utils" FILES ${UTILS})
 source_group("Map" FILES ${MAP})
 
 add_definitions(-D_ASSET_PATH=\"${ASSET_DIR}\")
-include_directories(./Core ./Components ./Systems ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
 target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm)
 target_compile_features(sf PRIVATE cxx_std_23)
 
-if(WIN32)
+if (WIN32)
     add_custom_command(
             TARGET sf
             COMMENT "Copy OpenAL DLL"

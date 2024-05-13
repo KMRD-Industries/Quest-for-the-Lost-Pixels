@@ -1,22 +1,17 @@
-#define GLM_ENABLE_EXPERIMENTAL
 #include <SFML/Graphics.hpp>
-#include <imgui-SFML.h>
-#include <imgui.h>
-#include <unordered_map>
-
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-#include "Coordinator.h"
-#include "MapComponent.h"
-#include "MapSystem.h"
-#include "RenderComponent.h"
-
+#include <imgui-SFML.h>
 #include "AnimationComponent.h"
+#include "Coordinator.h"
 #include "DungeonGenerator.h"
 #include "InputHandler.h"
+#include "MapComponent.h"
+#include "MapSystem.h"
 #include "Paths.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
+#include "RenderComponent.h"
 #include "RenderSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
@@ -39,10 +34,10 @@ void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangle
     const int rectHeight = 50;
     const int gap = 20;
 
-
     auto fullMap = generator.getNodes();
     auto roomCount = generator.getCount();
     generator.makeLockAndKey();
+
     for (int i = 0; i < w; ++i)
     {
         for (int j = 0; j < h; ++j)
@@ -86,6 +81,7 @@ void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangle
             key.setFillColor(sf::Color::Black);
             key.setPosition(i * (rectWidth + gap) + 30, j * (rectHeight + gap) + 30);
             texts.push_back(key);
+
             if (const auto text = generator.getKey({i, j}))
             {
                 sf::Text key;
@@ -110,6 +106,7 @@ void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangle
     }
     /*Map Generator Preview End*/
 }
+
 int main()
 {
     gCoordinator.init();
@@ -153,10 +150,9 @@ int main()
         signature.set(gCoordinator.getComponentType<TileComponent>());
         gCoordinator.setSystemSignature<TextureSystem>(signature);
     }
-
     std::vector<Entity> entities(MAX_ENTITIES - 1);
-
     // Local player
+
     entities[0] = gCoordinator.createEntity();
     entities[1] = gCoordinator.createEntity();
     sf::Texture texture;
@@ -170,6 +166,7 @@ int main()
 
     gCoordinator.addComponent(entities[1], RenderComponent{.sprite = sf::Sprite(texture)});
     gCoordinator.addComponent(entities[1], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+
     sf::RenderWindow window(sf::VideoMode(16 * 26 * 3, 720), "ImGui + SFML = <3");
 
     textureSystem->loadFromFile(std::string(ASSET_PATH) + "/tileSets/CosmicLilacTiles.json");
@@ -189,129 +186,82 @@ int main()
         gCoordinator.addComponent(entities[i], TransformComponent{});
         gCoordinator.addComponent(entities[i], AnimationComponent{});
     }
-
-
     std::string s(std::string(ASSET_PATH) + "/maps/map_01.json");
     mapSystem->loadMap(s);
-
     sf::Clock deltaClock;
+
+    sf::Font font;
+    const std::string assetPath = ASSET_PATH;
+    font.loadFromFile(assetPath + "/fonts/Bentinck-Regular.ttf");
+
+    std::vector<sf::RectangleShape> rectangles;
+    std::vector<sf::Text> texts;
+
+    previevGenerator(font, rectangles, texts);
+
     while (window.isOpen())
     {
         sf::Event event{};
         InputHandler::getInstance()->update();
 
-        sf::Font font;
-        const std::string assetPath = ASSET_PATH;
-        font.loadFromFile(assetPath + "/fonts/Bentinck-Regular.ttf");
-
-        std::vector<sf::RectangleShape> rectangles;
-        std::vector<sf::Text> texts;
-
-        previevGenerator(font, rectangles, texts);
-
-        while (window.isOpen())
+        while (window.pollEvent(event))
         {
-            sf::Event event{};
-            while (window.pollEvent(event))
-            {
-                ImGui::SFML::ProcessEvent(event);
+            ImGui::SFML::ProcessEvent(event);
 
-                if (event.type == sf::Event::KeyPressed)
-                {
-                    const auto keyCode = event.key.code;
-                    InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
-                }
-                else if (event.type == sf::Event::KeyReleased)
-                {
-                    const auto keyCode = event.key.code;
-                    InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
-                }
-                if (event.type == sf::Event::Closed)
-                {
-                    window.close();
-                }
+            if (event.type == sf::Event::KeyPressed)
+            {
+                const auto keyCode = event.key.code;
+                InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+            }
+            else if (event.type == sf::Event::KeyReleased)
+            {
+                const auto keyCode = event.key.code;
+                InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+            }
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
             }
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
         {
-            std::string s(std::string(ASSET_PATH) + "/maps/map_01.json");
+            s = std::string(ASSET_PATH) + "/maps/map_01.json";
             mapSystem->loadMap(s);
         }
-
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
         {
-            std::string s(std::string(ASSET_PATH) + "/maps/map_02.json");
+            s = std::string(ASSET_PATH) + "/maps/map_02.json";
             mapSystem->loadMap(s);
         }
-
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
         {
-            std::string s(std::string(ASSET_PATH) + "/maps/map_03.json");
+            s = std::string(ASSET_PATH) + "/maps/map_03.json";
             mapSystem->loadMap(s);
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
         {
-            std::string s(std::string(ASSET_PATH) + "/maps/map_07.json");
+            s = std::string(ASSET_PATH) + "/maps/map_07.json";
             mapSystem->loadMap(s);
         }
 
-        glm::vec2 dir{};
+        playerMovementSystem->update();
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) // Move Up
-            dir.y -= 1;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) // Move Down
-            dir.y += 1;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) // Move Right
-            dir.x += 1;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) // Move Left
-            dir.x -= 1;
-        if (dir.x != 0 || dir.y != 0)
-        {
-            playerMovementSystem->onMove(dir);
-        }
-
-
-            playerMovementSystem->update();
-
+        ImGui::SFML::Update(window, deltaClock.restart());
         // Clear the window before drawing
         window.clear();
 
-        // Draw the map tiles
         textureSystem->loadTextures();
 
-        // Draw other entities or systems here if needed
         renderSystem->draw(window);
+
+        for (const auto& rectangle : rectangles) window.draw(rectangle);
+        for (const auto& text : texts) window.draw(text);
 
         // Render ImGui
         ImGui::SFML::Render(window);
-
         // Display the rendered frame
         window.display();
-
-            ImGui::SFML::Update(window, deltaClock.restart());
-
-            ImGui::Begin("Hello, world!");
-            ImGui::Button("Look at this pretty button");
-            ImGui::End();
-
-            ImGui::ShowDemoWindow();
-
-            window.clear();
-
-            /*Draw generator start*/
-            for (const auto& rectangle : rectangles) window.draw(rectangle);
-            for (const auto& text : texts) window.draw(text);
-            /*Draw generator end*/
-
-            renderSystem->draw(window);
-            ImGui::SFML::Render(window);
-            window.display();
-        }
-
-        ImGui::SFML::Shutdown();
-
-        return 0;
     }
 }

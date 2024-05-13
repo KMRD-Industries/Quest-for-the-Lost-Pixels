@@ -14,4 +14,6 @@ struct TransformComponent
         position{position}, rotation{rotation}, scale{scale}
     {
     }
+
+    TransformComponent(sf::Vector2f position) : position{position} {}
 };
