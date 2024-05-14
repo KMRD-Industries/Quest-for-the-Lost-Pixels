@@ -124,5 +124,10 @@ void Dungeon::makeSimpleFloor()
         {.pathName{"SecondC"}, .startingPathName{"Main"}, .endPathName{""}, .minPathLength{3}, .maxPathLength{5}});
     m_floorGenerator.makeLockAndKey();
 
-    m_roomMap = m_floorGenerator.getFloor();
+    m_roomMap = m_floorGenerator.getFloor(true);
+}
+
+void Dungeon::moveInDungeon(glm::ivec2 dir)
+{
+    if (m_roomMap.contains(m_currentPlayerPos + dir)) m_currentPlayerPos += dir;
 }

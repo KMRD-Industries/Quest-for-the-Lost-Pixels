@@ -38,6 +38,12 @@
          "id":3,
          "name":"Tile Layer 3",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"Door",
+                 "type":"string",
+                 "value":"NEWS"
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":26,

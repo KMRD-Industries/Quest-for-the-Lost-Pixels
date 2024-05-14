@@ -57,7 +57,20 @@ void MapSystem::loadMap(std::string& path)
 
         width = data["width"];
         height = data["height"];
-
+        const size_t underscorePos = path.find_last_of("_");
+        const size_t dotPos = path.find_last_of(".");
+        const std::string numberStr = path.substr(underscorePos + 1, dotPos - underscorePos - 1);
+        const int mapID = std::stoi(numberStr);
+        for (auto& properties : data["properties"])
+        {
+            const std::string doorData = properties["value"];
+            std::vector<GameType::DoorEntraces> doorsLoc;
+            for (const auto& doorType : doorData)
+            {
+                doorsLoc.push_back(static_cast<GameType::DoorEntraces>(doorType));
+            }
+            m_mapInfo.emplace_back(GameType::MapInfo{.mapID = mapID, .doorsLoc{doorsLoc}});
+        }
         for (uint32_t i : processDataString(data["data"], width * height, 0))
         {
             uint32_t flipFlags = (i & mask) >> 28;

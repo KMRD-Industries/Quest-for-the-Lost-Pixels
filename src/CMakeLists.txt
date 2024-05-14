@@ -66,6 +66,7 @@ set(ATLAS_COMPONENTS
 set(UTILS
         Utils/Paths.h
         Utils/Helpers.h
+        Utils/GameTypes.h
 )
 
 source_group("Core" FILES ${CORE})

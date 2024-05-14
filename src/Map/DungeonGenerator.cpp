@@ -20,6 +20,8 @@ DungeonGenerator::NodesPath DungeonGenerator::getNodes() { return m_nodeToPath; 
 
 DungeonGenerator::RoomCount DungeonGenerator::getCount() { return m_roomCount; }
 
+DungeonGenerator::UnDirectedGraph DungeonGenerator::getGraph() const { return m_uGraph; }
+
 std::optional<char> DungeonGenerator::getLock(const glm::ivec2& node) const
 {
     if (m_locks.contains(node)) return m_locks.at(node) + 'A';

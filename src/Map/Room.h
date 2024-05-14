@@ -5,6 +5,8 @@
 class Room
 {
 public:
+    Room() = default;
+    Room(const int id) : m_mapID(id) {}
     void init();
     void draw() const;
     void update();

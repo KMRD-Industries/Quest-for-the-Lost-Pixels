@@ -42,6 +42,7 @@ public:
     void makeLockAndKey();
     NodesPath getNodes();
     RoomCount getCount();
+    UnDirectedGraph getGraph() const;
     std::optional<char> getLock(const glm::ivec2& node) const;
     std::optional<char> getKey(const glm::ivec2& node) const;
     NodeOutEdgesCount m_nodeOutEdgesCount;

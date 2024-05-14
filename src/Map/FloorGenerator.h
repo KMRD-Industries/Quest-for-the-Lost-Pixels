@@ -3,24 +3,25 @@
 #include <vector>
 
 #include "DungeonGenerator.h"
+#include "GameTypes.h"
 #include "Room.h"
 
 class FloorGenerator
 {
+    const std::unordered_map<glm::ivec2, GameType::DoorEntraces> m_mapDirOnGraphToEntrace{
+        {glm::ivec2{-1, 0}, GameType::DoorEntraces::WEST},
+        {glm::ivec2{1, 0}, GameType::DoorEntraces::EAST},
+        {glm::ivec2{0, 1}, GameType::DoorEntraces::NORTH},
+        {glm::ivec2{0, -1}, GameType::DoorEntraces::SOUTH}};
+
 public:
     FloorGenerator(){};
     void generateFloor(const int h, const int w);
     void generateMainPath(const int mainPathLen) { m_generator.generateMainPath(mainPathLen); }
     void generateSidePath(const DungeonGenerator::sidePathConfig& path) { m_generator.generateSidePath(path); }
     void makeLockAndKey() { m_generator.makeLockAndKey(); }
-    void assembleFloor();
 
-    std::unordered_map<glm::ivec2, Room> getFloor()
-    {
-        m_floorMap[{}] = Room{};
-        m_floorMap[{}].setMapID(1);
-        return m_floorMap;
-    }
+    std::unordered_map<glm::ivec2, Room> getFloor(const bool generate);
 
 private:
     DungeonGenerator m_generator{};
