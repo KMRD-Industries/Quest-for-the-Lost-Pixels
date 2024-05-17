@@ -67,7 +67,6 @@ int main()
 
     while (window.isOpen())
     {
-        handleInput(window);
         game.update();
 
         ImGui::SFML::Update(window, deltaClock.restart());
@@ -81,5 +80,6 @@ int main()
         ImGui::SFML::Render(window);
         // Display the rendered frame
         window.display();
+        handleInput(window);
     }
 }

@@ -3,6 +3,7 @@
 #include "Coordinator.h"
 
 #include "AnimationComponent.h"
+#include "InputHandler.h"
 #include "MapComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
@@ -56,6 +57,26 @@ void Dungeon::update()
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
 
     m_roomMap.at(m_currentPlayerPos).update();
+
+    const auto inputHandler{InputHandler::getInstance()};
+
+    glm::ivec2 dir{0, 0};
+    if (inputHandler->isPressed(InputType::MoveUp)) // Move Up
+        dir += glm::ivec2{0, 1};
+    else if (inputHandler->isPressed(InputType::MoveDown)) // Move Down
+        dir -= glm::ivec2{0, 1};
+    else if (inputHandler->isPressed(InputType::MoveRight)) // Move Right
+        dir += glm::ivec2{1, 0};
+    else if (inputHandler->isPressed(InputType::MoveLeft)) // Move Left
+        dir -= glm::ivec2{1, 0};
+
+    if (dir != glm::ivec2{0, 0} && m_floorGenerator.isConnected(m_currentPlayerPos, m_currentPlayerPos + dir))
+    {
+        std::cout << "Dungeon";
+        m_currentPlayerPos += dir;
+        std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
+        gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
+    }
 }
 
 void Dungeon::setECS()
@@ -125,6 +146,7 @@ void Dungeon::makeSimpleFloor()
     m_floorGenerator.makeLockAndKey();
 
     m_roomMap = m_floorGenerator.getFloor(true);
+    m_currentPlayerPos = m_floorGenerator.getStartingRoom();
 }
 
 void Dungeon::moveInDungeon(glm::ivec2 dir)

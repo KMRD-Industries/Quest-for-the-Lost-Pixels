@@ -69,7 +69,6 @@ void MapSystem::loadMap(std::string& path)
             {
                 doorsLoc.push_back(static_cast<GameType::DoorEntraces>(doorType));
             }
-            m_mapInfo.emplace_back(GameType::MapInfo{.mapID = mapID, .doorsLoc{doorsLoc}});
         }
         for (uint32_t i : processDataString(data["data"], width * height, 0))
         {

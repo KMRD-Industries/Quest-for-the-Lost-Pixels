@@ -4,7 +4,7 @@
  "layers":[
         {
          "compression":"",
-         "data":"AQAAAGkBAABpAQAAAAAAAAEAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAABAAAAAAAAAAAAAAAAAAAAAQAAAA==",
+         "data":"AAAAAGkBAABpAQAAaQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaQEAAGkBAABpAQAAAAAAAA==",
          "encoding":"base64",
          "height":5,
          "id":1,
@@ -14,7 +14,7 @@
                 {
                  "name":"Door",
                  "type":"string",
-                 "value":"N"
+                 "value":"NS"
                 }],
          "type":"tilelayer",
          "visible":true,

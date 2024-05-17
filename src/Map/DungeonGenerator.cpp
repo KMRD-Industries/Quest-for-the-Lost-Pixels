@@ -1,5 +1,6 @@
 #include "DungeonGenerator.h"
 #include <algorithm>
+#include <iostream>
 #include <optional>
 #include <stack>
 
@@ -34,6 +35,13 @@ std::optional<char> DungeonGenerator::getKey(const glm::ivec2& node) const
     return std::nullopt;
 }
 
+glm::ivec2 DungeonGenerator::getStartingRoom() const { return m_startingRoom; }
+
+bool DungeonGenerator::isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const
+{
+    if (m_uGraph.contains(firstNode)) return m_uGraph.at(firstNode).contains(secondNode);
+}
+
 void DungeonGenerator::generateMainPath(const PathConfig& pathConfig)
 {
     std::deque<glm::ivec2> path;
@@ -42,6 +50,7 @@ void DungeonGenerator::generateMainPath(const PathConfig& pathConfig)
 
     path.push_back(pathConfig.start);
     inPath.insert(pathConfig.start);
+    m_startingRoom = pathConfig.start;
 
     while (path.size() < pathConfig.pathLength)
     {
@@ -147,7 +156,8 @@ void DungeonGenerator::generateSidePath(const sidePathConfig& pathConfig)
                 visitedNeighbors[current].clear();
                 path.pop_back();
                 inPath.erase(current);
-                path.push_back(pathToSidePath.back());
+                path.push_front(pathToSidePath.back());
+                start = pathToSidePath.back();
                 auto startVal{m_roomCount[pathToSidePath.back()]};
                 pathToSidePath.pop_back();
             }
@@ -155,12 +165,21 @@ void DungeonGenerator::generateSidePath(const sidePathConfig& pathConfig)
     }
     std::vector<glm::ivec2> sidePath;
 
+    m_graph[start].insert(path[1]);
+
+    m_uGraph[start].insert(path[1]);
+    m_uGraph[path[1]].insert(start);
+
+
     if (startVal < endVal || endVal == 0)
     {
         if (pathConfig.endPathName != "")
         {
             m_nodeEnterEdgesCount[path.back()]++;
             path.pop_back();
+            m_graph[path.back()].insert(end);
+            m_uGraph[path.back()].insert(end);
+            m_uGraph[end].insert(path.back());
         }
         m_nodeOutEdgesCount[path.front()]++;
         path.pop_front();
@@ -172,19 +191,14 @@ void DungeonGenerator::generateSidePath(const sidePathConfig& pathConfig)
         {
             m_nodeEnterEdgesCount[path.front()]++;
             path.pop_front();
+            m_graph[path.back()].insert(end);
+            m_uGraph[path.back()].insert(end);
+            m_uGraph[end].insert(path.back());
         }
         m_nodeOutEdgesCount[path.back()]++;
         path.pop_back();
         sidePath = std::vector<glm::ivec2>(path.rbegin(), path.rend());
     }
-
-    m_graph[start].insert(sidePath[0]);
-    m_graph[sidePath.back()].insert(end);
-
-    m_uGraph[start].insert(sidePath[0]);
-    m_uGraph[sidePath[0]].insert(start);
-    m_uGraph[sidePath.back()].insert(end);
-    m_uGraph[end].insert(sidePath.back());
 
     for (int i = 0; i < sidePath.size(); i++)
     {

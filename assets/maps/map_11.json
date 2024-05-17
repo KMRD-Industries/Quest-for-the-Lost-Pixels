@@ -4,7 +4,7 @@
  "layers":[
         {
          "compression":"",
-         "data":"AQAAAGkBAABpAQAAAAAAAAEAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAABAAAAAAAAAAAAAAAAAAAAAQAAAA==",
+         "data":"AQAAoAEAAKBpAQAAAQAAoAEAAKABAACgAAAAAAAAAAAAAAAAAQAAoGkBAAAAAAAAAAAAAAAAAABpAQAAAQAAoAAAAAAAAAAAAAAAAAEAAKABAACgAAAAAAAAAAAAAAAAAQAAoA==",
          "encoding":"base64",
          "height":5,
          "id":1,
@@ -14,7 +14,7 @@
                 {
                  "name":"Door",
                  "type":"string",
-                 "value":"N"
+                 "value":"NEW"
                 }],
          "type":"tilelayer",
          "visible":true,
@@ -25,12 +25,6 @@
  "nextlayerid":2,
  "nextobjectid":1,
  "orientation":"orthogonal",
- "properties":[
-        {
-         "name":"Door",
-         "type":"string",
-         "value":"NEWS"
-        }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
  "tileheight":16,

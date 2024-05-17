@@ -20,10 +20,14 @@ public:
     void generateMainPath(const int mainPathLen) { m_generator.generateMainPath(mainPathLen); }
     void generateSidePath(const DungeonGenerator::sidePathConfig& path) { m_generator.generateSidePath(path); }
     void makeLockAndKey() { m_generator.makeLockAndKey(); }
+    bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
 
     std::unordered_map<glm::ivec2, Room> getFloor(const bool generate);
+    inline glm::ivec2 getStartingRoom() const { return m_generator.getStartingRoom(); }
 
 private:
+    std::vector<GameType::MapInfo> getMapInfo();
+
     DungeonGenerator m_generator{};
     std::unordered_map<glm::ivec2, Room> m_floorMap{};
 

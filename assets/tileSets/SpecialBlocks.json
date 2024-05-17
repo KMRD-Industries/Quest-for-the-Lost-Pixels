@@ -1,0 +1,14 @@
+{ "columns":16,
+ "image":"..\/..\/assets\/floorAtlass\/SpecialBlocks.png",
+ "imageheight":112,
+ "imagewidth":256,
+ "margin":0,
+ "name":"SpecialBlocks",
+ "spacing":0,
+ "tilecount":112,
+ "tiledversion":"1.10.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.10"
+}
