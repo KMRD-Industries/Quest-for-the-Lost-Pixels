@@ -1,6 +1,14 @@
 #pragma once
 #include <vector>
 
+namespace SpecialBlocks
+{
+    enum class Blocks : int
+    {
+        DOORSCOLLIDER = 1
+    };
+} // namespace SpecialBlocks
+
 namespace GameType
 {
     enum class DoorEntraces : int

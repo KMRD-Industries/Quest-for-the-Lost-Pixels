@@ -1,13 +1,14 @@
 #include "FloorGenerator.h"
 
 #include <algorithm>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <ranges>
 #include <regex>
+#include <set>
 
+#include "Utils/Helpers.h"
 #include "Utils/Paths.h"
 
 void FloorGenerator::generateFloor(const int h, const int w) { m_generator = DungeonGenerator(h, w); }
@@ -76,7 +77,6 @@ std::vector<GameType::MapInfo> FloorGenerator::getMapInfo()
     using json = nlohmann::json;
 
     const std::string path = std::string(ASSET_PATH) + "/maps/";
-    const std::regex pattern(R"(map_\d+\.json)");
 
     std::vector<GameType::MapInfo> mapInfo{};
 
@@ -90,44 +90,7 @@ std::vector<GameType::MapInfo> FloorGenerator::getMapInfo()
 
         for (const auto& entry : fs::directory_iterator(path))
         {
-            if (entry.is_regular_file())
-            {
-                const std::string filename = entry.path().filename().string();
-                const size_t underscorePos = filename.find_last_of("_");
-                const size_t dotPos = filename.find_last_of(".");
-                const std::string numberStr = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
-                const int mapID = std::stoi(numberStr);
-
-                if (std::regex_match(filename, pattern))
-                {
-                    std::cout << "Found matching file: " << filename << std::endl;
-
-                    std::ifstream file(entry.path());
-                    if (file.is_open())
-                    {
-                        json parsed_file;
-                        file >> parsed_file;
-
-                        for (auto& data : parsed_file["layers"])
-                        {
-                            for (auto& properties : data["properties"])
-                            {
-                                const std::string doorData = properties["value"];
-                                std::vector<GameType::DoorEntraces> doorsLoc;
-                                for (const auto& doorType : doorData)
-                                {
-                                    doorsLoc.push_back(static_cast<GameType::DoorEntraces>(doorType));
-                                }
-                                mapInfo.emplace_back(GameType::MapInfo{.mapID = mapID, .doorsLoc{doorsLoc}});
-                            }
-                        }
-                    }
-                    else
-                    {
-                        std::cerr << "Unable to open file: " << filename << std::endl;
-                    }
-                }
-            }
+            checkSingleFile(entry, mapInfo);
         }
     }
     catch (const fs::filesystem_error& e)
@@ -147,4 +110,71 @@ std::vector<GameType::MapInfo> FloorGenerator::getMapInfo()
     }
 
     return mapInfo;
+}
+
+void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& entry,
+                                     std::vector<GameType::MapInfo>& mapInfo)
+{
+    namespace fs = std::filesystem;
+    using json = nlohmann::json;
+
+    if (!entry.is_regular_file()) return;
+
+    const std::regex pattern(R"(map_\d+\.json)");
+    const std::string filename = entry.path().filename().string();
+    const size_t underscorePos = filename.find_last_of("_");
+    const size_t dotPos = filename.find_last_of(".");
+    const std::string numberStr = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
+    const int mapID = std::stoi(numberStr);
+
+    if (!std::regex_match(filename, pattern)) return;
+
+    std::cout << "Found matching file: " << filename << std::endl;
+
+    std::ifstream file(entry.path());
+    if (!file.is_open())
+    {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+        return;
+    }
+
+    json parsed_file;
+    file >> parsed_file;
+
+    const auto& doorData = findSpecialBlocks(parsed_file);
+
+    const int mapWidth = parsed_file["width"];
+    const int mapHeight = parsed_file["height"];
+
+    std::set<int> xValues;
+    std::set<int> yValues;
+
+    for (const auto& door : doorData)
+    {
+        xValues.insert(door.first.x);
+        yValues.insert(door.first.y);
+    }
+
+    std::unordered_set<GameType::DoorEntraces> doorsLoc;
+
+    for (const auto& door : doorData)
+    {
+        if (door.first.y == 0 || door.first.y == mapHeight - 1)
+        {
+            if (door.first.y == 0)
+                doorsLoc.insert(GameType::DoorEntraces::NORTH);
+            else
+                doorsLoc.insert(GameType::DoorEntraces::SOUTH);
+        }
+
+        if (door.first.x == 0 || door.first.x == mapWidth - 1)
+        {
+            if (door.first.x == 0)
+                doorsLoc.insert(GameType::DoorEntraces::WEST);
+            else
+                doorsLoc.insert(GameType::DoorEntraces::EAST);
+        }
+    }
+
+    mapInfo.emplace_back(GameType::MapInfo{.mapID = mapID, .doorsLoc = {doorsLoc.begin(), doorsLoc.end()}});
 }

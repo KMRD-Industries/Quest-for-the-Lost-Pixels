@@ -1,4 +1,5 @@
 #pragma once
+#include <filesystem>
 #include <unordered_map>
 #include <vector>
 
@@ -27,6 +28,7 @@ public:
 
 private:
     std::vector<GameType::MapInfo> getMapInfo();
+    void checkSingleFile(const std::filesystem::directory_entry& entry, std::vector<GameType::MapInfo>& mapInfo);
 
     DungeonGenerator m_generator{};
     std::unordered_map<glm::ivec2, Room> m_floorMap{};

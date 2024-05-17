@@ -72,7 +72,6 @@ void Dungeon::update()
 
     if (dir != glm::ivec2{0, 0} && m_floorGenerator.isConnected(m_currentPlayerPos, m_currentPlayerPos + dir))
     {
-        std::cout << "Dungeon";
         m_currentPlayerPos += dir;
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
