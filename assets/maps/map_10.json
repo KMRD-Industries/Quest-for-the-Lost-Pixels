@@ -4,7 +4,7 @@
  "layers":[
         {
          "compression":"",
-         "data":"AAAAAGkBAABpAQAAaQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaQEAAGkBAABpAQAAAAAAAA==",
+         "data":"AAAAAGkAAABpAAAAaQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaQAAAGkAAABpAAAAAAAAAA==",
          "encoding":"base64",
          "height":5,
          "id":1,
@@ -41,10 +41,6 @@
         }, 
         {
          "firstgid":105,
-         "source":"..\/tileSets\/Decorative.json"
-        }, 
-        {
-         "firstgid":361,
          "source":"..\/tileSets\/SpecialBlocks.json"
         }],
  "tilewidth":16,
