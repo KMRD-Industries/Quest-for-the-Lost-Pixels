@@ -4,7 +4,7 @@
  "layers":[
         {
          "compression":"",
-         "data":"AAAAAGkAAABpAAAAaQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaQAAAGkAAABpAAAAAAAAAA==",
+         "data":"AAAAAGkAAABpAAAAaQAAAOwAAAAAAAAAAAAAAAAAAAAAAAAA8QEAAAAAAAAAAAAAZgMAAPQCAABvAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaQAAAGkAAABpAAAAAAAAAA==",
          "encoding":"base64",
          "height":5,
          "id":1,
@@ -42,6 +42,23 @@
         {
          "firstgid":105,
          "source":"..\/tileSets\/SpecialBlocks.json"
+        }, 
+        {
+         "firstgid":217,
+         "source":"..\/tileSets\/Decorative.json"
+        }, 
+        {
+         "firstgid":473,
+         "source":"..\/tileSets\/Jungle.json"
+        }, 
+        {
+         "firstgid":585,
+         "source":"..\/tileSets\/Graveyard.json"
+        },
+    
+        {
+         "firstgid":697,
+         "source":"..\/tileSets\/DungeonWalls.json"
         }],
  "tilewidth":16,
  "type":"map",

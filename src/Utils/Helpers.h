@@ -124,12 +124,23 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
 {
     std::unordered_multimap<glm::ivec2, int> result;
 
+    const int width = json["width"];
+    const int height = json["height"];
+
     int specialBlocksFirstGID = -1;
+    int nextTilesetFirstGID = INT_MAX; // Pocz¹tkowy identyfikator GID nastêpnego tilesetu
+
     for (const auto& tileset : json["tilesets"])
     {
+        // Sprawdzamy, czy aktualny tileset zawiera "SpecialBlocks.json"
         if (tileset["source"].get<std::string>().find("SpecialBlocks.json") != std::string::npos)
         {
             specialBlocksFirstGID = tileset["firstgid"];
+        }
+        // Znajdujemy pierwszy identyfikator GID nastêpnego tilesetu
+        else if (tileset["firstgid"] > specialBlocksFirstGID && specialBlocksFirstGID != -1)
+        {
+            nextTilesetFirstGID = tileset["firstgid"];
             break;
         }
     }
@@ -145,39 +156,31 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
         {
             continue;
         }
-        std::string encoded_data = layer["data"];
-        std::string decoded_data = base64_decode(encoded_data);
+        static const std::uint32_t mask = 0xf0000000;
 
-        std::vector<uint32_t> tileIDs(decoded_data.size() / 4);
-        for (size_t i = 0; i < tileIDs.size(); ++i)
+        int x = 0;
+        int y = 0;
+
+        for (uint32_t i : processDataString(layer["data"], width * height, 0))
         {
-            tileIDs[i] = static_cast<uint32_t>(decoded_data[i * 4]) |
-                (static_cast<uint32_t>(decoded_data[i * 4 + 1]) << 8) |
-                (static_cast<uint32_t>(decoded_data[i * 4 + 2]) << 16) |
-                (static_cast<uint32_t>(decoded_data[i * 4 + 3]) << 24);
-        }
+            uint32_t flipFlags = (i & mask) >> 28;
+            uint32_t tileID = i & ~mask;
 
-        int width = layer["width"];
-        int height = layer["height"];
-
-        for (int y = 0; y < height; ++y)
-        {
-            for (int x = 0; x < width; ++x)
+            if (tileID >= specialBlocksFirstGID && tileID < nextTilesetFirstGID)
             {
-                int index = y * width + x;
-                uint32_t globalTileID = tileIDs[index];
-
-                if (globalTileID >= specialBlocksFirstGID)
+                int localTileID = tileID - specialBlocksFirstGID;
+                if (localTileID >= 0)
                 {
-                    int localTileID = globalTileID - specialBlocksFirstGID;
-                    if (localTileID >= 0)
-                    {
-                        result.emplace(glm::ivec2{x, y}, localTileID);
-                    }
+                    result.emplace(glm::ivec2{x, y}, localTileID);
                 }
+            }
+            ++x;
+            if (x >= width)
+            {
+                x = 0;
+                ++y;
             }
         }
     }
-
     return result;
 }
