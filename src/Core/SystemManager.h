@@ -16,7 +16,7 @@ public:
     {
         const std::string typeName{typeid(T).name()};
 
-        assert(!m_systems.contains(typeName) && "Registering system more than once.");
+        if (m_systems.contains(typeName)) return std::static_pointer_cast<T>(m_systems[typeName]);
 
         const auto system{std::make_shared<T>()};
         m_systems[typeName] = std::static_pointer_cast<System>(system);
@@ -33,8 +33,8 @@ public:
         m_signatures[typeName] = signature;
     }
 
-    void entityDestroyed(const Entity entity);
-    void entitySignatureChanged(const Entity entity, const Signature& entitySignature);
+    void entityDestroyed(Entity entity);
+    void entitySignatureChanged(Entity entity, const Signature& entitySignature);
 
 private:
     std::unordered_map<std::string, Signature> m_signatures{};

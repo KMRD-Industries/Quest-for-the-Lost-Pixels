@@ -4,12 +4,18 @@
  "layers":[
         {
          "compression":"",
-         "data":"AQAAAAIAAAADAAAABAAAAGYAAAAOAAAA8wAAAPMAAAARAAAAZgAAABsAAABDAAAAZQAAAB4AAABmAAAAKAAAACkAAAAqAAAAKwAAAGYAAABmAAAAZgAAAGYAAABmAAAAZgAAAA==",
+         "data":"AQAAAGkBAABpAQAAAAAAAAEAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAAAAAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAABAAAAAAAAAAAAAAAAAAAAAQAAAA==",
          "encoding":"base64",
          "height":5,
          "id":1,
          "name":"Tile Layer 1",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"Door",
+                 "type":"string",
+                 "value":"N"
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":5,
@@ -19,6 +25,12 @@
  "nextlayerid":2,
  "nextobjectid":1,
  "orientation":"orthogonal",
+ "properties":[
+        {
+         "name":"Door",
+         "type":"string",
+         "value":"NEWS"
+        }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
  "tileheight":16,
@@ -30,6 +42,10 @@
         {
          "firstgid":105,
          "source":"..\/tileSets\/Decorative.json"
+        }, 
+        {
+         "firstgid":361,
+         "source":"..\/tileSets\/SpecialBlocks.json"
         }],
  "tilewidth":16,
  "type":"map",

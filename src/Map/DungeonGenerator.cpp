@@ -1,16 +1,16 @@
 #include "DungeonGenerator.h"
 #include <algorithm>
+#include <deque>
 #include <optional>
-#include <stack>
 
 using randInt = std::uniform_int_distribution<int>;
 
-DungeonGenerator::DungeonGenerator(int height, int width) :
+DungeonGenerator::DungeonGenerator(const int height, const int width) :
     m_height(height), m_width(width), gen(std::chrono::system_clock::now().time_since_epoch().count())
 {
 }
 
-void DungeonGenerator::generateMainPath(int pathLength)
+void DungeonGenerator::generateMainPath(const int pathLength)
 {
     const glm::ivec2 start{randInt(0, m_width - 1)(gen), randInt(0, m_height - 1)(gen)};
     generateMainPath({.start{start}, .pathName{"Main"}, .pathLength{pathLength}});
@@ -19,6 +19,8 @@ void DungeonGenerator::generateMainPath(int pathLength)
 DungeonGenerator::NodesPath DungeonGenerator::getNodes() { return m_nodeToPath; }
 
 DungeonGenerator::RoomCount DungeonGenerator::getCount() { return m_roomCount; }
+
+DungeonGenerator::UnDirectedGraph DungeonGenerator::getGraph() const { return m_uGraph; }
 
 std::optional<char> DungeonGenerator::getLock(const glm::ivec2& node) const
 {
@@ -32,6 +34,14 @@ std::optional<char> DungeonGenerator::getKey(const glm::ivec2& node) const
     return std::nullopt;
 }
 
+glm::ivec2 DungeonGenerator::getStartingRoom() const { return m_startingRoom; }
+
+bool DungeonGenerator::isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const
+{
+    if (m_uGraph.contains(firstNode)) return m_uGraph.at(firstNode).contains(secondNode);
+    return false;
+}
+
 void DungeonGenerator::generateMainPath(const PathConfig& pathConfig)
 {
     std::deque<glm::ivec2> path;
@@ -40,6 +50,7 @@ void DungeonGenerator::generateMainPath(const PathConfig& pathConfig)
 
     path.push_back(pathConfig.start);
     inPath.insert(pathConfig.start);
+    m_startingRoom = pathConfig.start;
 
     while (path.size() < pathConfig.pathLength)
     {
@@ -113,9 +124,9 @@ void DungeonGenerator::generateSidePath(const sidePathConfig& pathConfig)
     {
         auto current{path.back()};
 
-        auto neighbor{
-            getRandomNeighbor(current, inPath, visitedNeighbors, minPathLength, maxPathLength, pathConfig.endPathName)};
-        if (neighbor && path.size() <= maxPathLength)
+        if (auto neighbor{getRandomNeighbor(current, inPath, visitedNeighbors, minPathLength, maxPathLength,
+                                            pathConfig.endPathName)};
+            neighbor && path.size() <= maxPathLength)
         {
             const auto nextNode{neighbor.value()};
             path.push_back(nextNode);
@@ -145,20 +156,30 @@ void DungeonGenerator::generateSidePath(const sidePathConfig& pathConfig)
                 visitedNeighbors[current].clear();
                 path.pop_back();
                 inPath.erase(current);
-                path.push_back(pathToSidePath.back());
-                auto startVal{m_roomCount[pathToSidePath.back()]};
+                path.push_front(pathToSidePath.back());
+                start = pathToSidePath.back();
+                startVal = m_roomCount[pathToSidePath.back()];
                 pathToSidePath.pop_back();
             }
         }
     }
     std::vector<glm::ivec2> sidePath;
 
+    m_graph[start].insert(path[1]);
+
+    m_uGraph[start].insert(path[1]);
+    m_uGraph[path[1]].insert(start);
+
+
     if (startVal < endVal || endVal == 0)
     {
-        if (pathConfig.endPathName != "")
+        if (!pathConfig.endPathName.empty())
         {
             m_nodeEnterEdgesCount[path.back()]++;
             path.pop_back();
+            m_graph[path.back()].insert(end);
+            m_uGraph[path.back()].insert(end);
+            m_uGraph[end].insert(path.back());
         }
         m_nodeOutEdgesCount[path.front()]++;
         path.pop_front();
@@ -166,23 +187,18 @@ void DungeonGenerator::generateSidePath(const sidePathConfig& pathConfig)
     }
     else
     {
-        if (pathConfig.endPathName != "")
+        if (!pathConfig.endPathName.empty())
         {
             m_nodeEnterEdgesCount[path.front()]++;
             path.pop_front();
+            m_graph[path.back()].insert(end);
+            m_uGraph[path.back()].insert(end);
+            m_uGraph[end].insert(path.back());
         }
         m_nodeOutEdgesCount[path.back()]++;
         path.pop_back();
         sidePath = std::vector<glm::ivec2>(path.rbegin(), path.rend());
     }
-
-    m_graph[start].insert(sidePath[0]);
-    m_graph[sidePath.back()].insert(end);
-
-    m_uGraph[start].insert(sidePath[0]);
-    m_uGraph[sidePath[0]].insert(start);
-    m_uGraph[sidePath.back()].insert(end);
-    m_uGraph[end].insert(sidePath.back());
 
     for (int i = 0; i < sidePath.size(); i++)
     {
@@ -199,7 +215,7 @@ void DungeonGenerator::generateSidePath(const sidePathConfig& pathConfig)
         m_uGraph[sidePath[i]].insert(sidePath[i + 1]);
         m_uGraph[sidePath[i + 1]].insert(sidePath[i]);
     }
-    if (pathConfig.endPathName != "") m_nodeOutEdgesCount[sidePath.back()]++;
+    if (!pathConfig.endPathName.empty()) m_nodeOutEdgesCount[sidePath.back()]++;
 }
 
 void DungeonGenerator::makeLockAndKey()
@@ -300,35 +316,15 @@ std::optional<glm::ivec2> DungeonGenerator::getRandomNeighbor(
 
 void DungeonGenerator::validateSidePathConfig(const sidePathConfig& pathConfig) const
 {
-    if (m_pathNames.contains(pathConfig.pathName))
-    {
-        throw std::logic_error("Path with this name already exists");
-    }
+    if (m_pathNames.contains(pathConfig.pathName)) throw std::logic_error("Path with this name already exists");
     if (pathConfig.maxPathLength < pathConfig.minPathLength)
-    {
         throw std::logic_error("Max path length must be greater than min path length");
-    }
-    if (pathConfig.minPathLength < 1)
-    {
-        throw std::logic_error("Path length must be greater than 0");
-    }
-    if (!m_pathNames.contains(pathConfig.startingPathName))
-    {
-        throw std::logic_error("Side path should start somewhere");
-    }
+    if (pathConfig.minPathLength < 1) throw std::logic_error("Path length must be greater than 0");
+    if (!m_pathNames.contains(pathConfig.startingPathName)) throw std::logic_error("Side path should start somewhere");
 }
 void DungeonGenerator::validateMainPath(const PathConfig& pathConfig) const
 {
-    if (m_pathNames.contains(pathConfig.pathName))
-    {
-        throw std::logic_error("Path with this name already exists");
-    }
-    if (pathConfig.pathLength < 1)
-    {
-        throw std::logic_error("Path length must be greater than 0");
-    }
-    if (pathConfig.pathLength > m_width * m_height)
-    {
-        throw std::logic_error("Path length is too long");
-    }
+    if (m_pathNames.contains(pathConfig.pathName)) throw std::logic_error("Path with this name already exists");
+    if (pathConfig.pathLength < 1) throw std::logic_error("Path length must be greater than 0");
+    if (pathConfig.pathLength > m_width * m_height) throw std::logic_error("Path length is too long");
 }

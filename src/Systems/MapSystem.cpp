@@ -41,7 +41,7 @@ void MapSystem::loadMap(std::string& path)
     }
 
     auto start_iterator = m_entities.begin();
-    start_iterator++;
+    ++start_iterator;
 
     long width = {};
     long height = {};
@@ -52,7 +52,7 @@ void MapSystem::loadMap(std::string& path)
     {
         if (!data.contains("data")) continue;
 
-        static const std::uint32_t mask = 0xf0000000;
+        static constexpr std::uint32_t mask = 0xf0000000;
         int index = {};
 
         width = data["width"];
@@ -87,7 +87,7 @@ void MapSystem::loadMap(std::string& path)
                 sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) * tile_height * 3.f;
             doFlips(flipFlags, transform_component.rotation, transform_component.scale);
 
-            start_iterator++;
+            ++start_iterator;
             index++;
         }
     }

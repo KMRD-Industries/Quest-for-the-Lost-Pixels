@@ -93,6 +93,17 @@ int TextureSystem::loadFromFile(const std::string& file_path)
     }
     return 1;
 }
+
+void TextureSystem::loadTexturesFromFiles()
+{
+    const auto prefix = std::string(ASSET_PATH) + "/tileSets/";
+    const auto sufix = ".json";
+    for (const auto& texture : texture_files)
+    {
+        loadFromFile(prefix + texture + sufix);
+    }
+}
+
 [[maybe_unused]] sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
 {
     try
@@ -123,7 +134,7 @@ int TextureSystem::loadFromFile(const std::string& file_path)
 
 void TextureSystem::loadTextures()
 {
-    for (auto const& entity : m_entities)
+    for (const auto& entity : m_entities)
     {
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
         //        if (tile_component.id <= 0) continue;
