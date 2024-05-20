@@ -33,8 +33,8 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
         std::unordered_set<GameType::DoorEntraces> doorsForRoom;
         for (const auto& neighbor : nodeNeighbors)
         {
-            if (const auto dir = neighbor - nodePosition; m_mapDirOnGraphToEntrace.contains(dir))
-                doorsForRoom.insert(m_mapDirOnGraphToEntrace.at(dir));
+            if (const auto dir = neighbor - nodePosition; m_mapDirOnGraphToEntrance.contains(dir))
+                doorsForRoom.insert(m_mapDirOnGraphToEntrance.at(dir));
         }
         std::vector<GameType::MapInfo> availableMapsForRoom;
         const auto haveSameDoorsPlacement = [&doorsForRoom](const GameType::MapInfo& mapInfo)

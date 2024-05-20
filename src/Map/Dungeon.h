@@ -18,7 +18,7 @@ public:
 private:
     void setECS();
     void makeSimpleFloor();
-    void moveInDungeon(glm::ivec2 dir);
+    void moveInDungeon(const glm::ivec2& dir);
 
     FloorGenerator m_floorGenerator{};
     std::unordered_map<glm::ivec2, Room> m_roomMap{};

@@ -8,7 +8,7 @@
 #include <unordered_map>
 
 template <typename T>
-class ComponentArray : public IComponentArray
+class ComponentArray final : public IComponentArray
 {
 public:
     void insertData(const Entity entity, const T& component)

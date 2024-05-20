@@ -15,9 +15,7 @@ void SystemManager::entitySignatureChanged(const Entity entity, const Signature&
 {
     for (const auto& [type, system] : m_systems)
     {
-        const auto& systemSignature{m_signatures[type]};
-
-        if ((entitySignature & systemSignature) == systemSignature)
+        if (const auto& systemSignature{m_signatures[type]}; (entitySignature & systemSignature) == systemSignature)
         {
             system->m_entities.insert(entity);
         }

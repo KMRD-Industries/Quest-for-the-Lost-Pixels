@@ -11,7 +11,7 @@ public:
     Entity createEntity();
     void destroyEntity(Entity entity);
     void setSignature(Entity entity, const Signature& signature);
-    Signature getSignature(Entity entity) const;
+    [[nodiscard]] Signature getSignature(Entity entity) const;
 
 private:
     std::queue<Entity> m_availableEntities{};

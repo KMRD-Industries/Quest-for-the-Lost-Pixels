@@ -9,7 +9,7 @@
 
 class FloorGenerator
 {
-    const std::unordered_map<glm::ivec2, GameType::DoorEntraces> m_mapDirOnGraphToEntrace{
+    const std::unordered_map<glm::ivec2, GameType::DoorEntraces> m_mapDirOnGraphToEntrance{
         {glm::ivec2{-1, 0}, GameType::DoorEntraces::WEST},
         {glm::ivec2{1, 0}, GameType::DoorEntraces::EAST},
         {glm::ivec2{0, 1}, GameType::DoorEntraces::NORTH},

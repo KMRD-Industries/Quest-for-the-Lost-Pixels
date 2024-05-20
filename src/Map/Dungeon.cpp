@@ -111,7 +111,7 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<MapSystem>(signature);
     }
 
-    auto textureSystem = gCoordinator.getRegisterSystem<TextureSystem>();
+    const auto textureSystem = gCoordinator.getRegisterSystem<TextureSystem>();
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<RenderComponent>());
@@ -146,7 +146,7 @@ void Dungeon::makeSimpleFloor()
     m_currentPlayerPos = m_floorGenerator.getStartingRoom();
 }
 
-void Dungeon::moveInDungeon(glm::ivec2 dir)
+void Dungeon::moveInDungeon(const glm::ivec2& dir)
 {
     if (m_roomMap.contains(m_currentPlayerPos + dir)) m_currentPlayerPos += dir;
 }

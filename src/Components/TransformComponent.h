@@ -11,10 +11,11 @@ struct TransformComponent
     b2Vec2 velocity{0.f, 0.f};
     TransformComponent() = default;
 
-    TransformComponent(sf::Vector2f position, float rotation, sf::Vector2f scale, b2Vec2 vecloity = {0.f, 0.f}) :
-        position{position}, rotation{rotation}, scale{scale}, velocity{vecloity}
+    TransformComponent(const sf::Vector2f& position, const float rotation, const sf::Vector2f scale,
+                       const b2Vec2& velocity = {0.f, 0.f}) :
+        position{position}, rotation{rotation}, scale{scale}, velocity{velocity}
     {
     }
 
-    TransformComponent(sf::Vector2f position) : position{position} {}
+    explicit TransformComponent(const sf::Vector2f& position) : position{position} {}
 };

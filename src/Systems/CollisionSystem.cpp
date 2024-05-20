@@ -65,8 +65,8 @@ void CollisionSystem::createBody(const Entity entity, const glm::vec2& colliderS
 
     if (useTextureSize)
     {
-        const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-        const auto spriteBounds = renderComponent.sprite.getGlobalBounds();
+        const auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
+        const auto spriteBounds = sprite.getGlobalBounds();
         boxShape.SetAsBox(convertPixelsToMeters(spriteBounds.width * config::gameScale) / 2,
                           convertPixelsToMeters(spriteBounds.height * config::gameScale) / 2);
     }

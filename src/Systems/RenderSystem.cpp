@@ -14,16 +14,14 @@ void RenderSystem::draw(sf::RenderWindow& window) const
 
     for (const auto& entity : m_entities)
     {
-        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-
-        if (renderComponent.layer > 0)
+        if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity); layer > 0)
         {
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
-            renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
-            renderComponent.sprite.setPosition(transformComponent.position);
-            renderComponent.sprite.setRotation(transformComponent.rotation);
-            tiles[renderComponent.layer].push_back(renderComponent.sprite);
+            sprite.setScale(transformComponent.scale * config::gameScale);
+            sprite.setPosition(transformComponent.position);
+            sprite.setRotation(transformComponent.rotation);
+            tiles[layer].push_back(sprite);
         }
     }
 
