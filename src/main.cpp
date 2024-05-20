@@ -39,13 +39,13 @@ void handleInput(sf::RenderWindow& window)
 
 int main()
 {
-    // Pobranie rozdzielczoœci ekranu
+    // Pobranie rozdzielczoï¿½ci ekranu
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
 
     // Utworzenie okna SFML
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
 
-    // Ustawienie okna na pe³ny ekran z rozdzielczoœci¹ ekranu
+    // Ustawienie okna na peï¿½ny ekran z rozdzielczoï¿½ciï¿½ ekranu
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Fullscreen);
 
     int _ = ImGui::SFML::Init(window);
