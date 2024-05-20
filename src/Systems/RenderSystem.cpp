@@ -19,7 +19,6 @@ void RenderSystem::draw(sf::RenderWindow& window) const
         if (renderComponent.layer > 0)
         {
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
 
             renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
             renderComponent.sprite.setPosition(transformComponent.position);

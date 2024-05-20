@@ -19,7 +19,8 @@ void CollisionSystem::updateCollision() const
 
         if (!transformComponent.velocity.IsValid()) continue;
         b2Body* body = colliderComponent.body;
-        body->SetLinearVelocity(transformComponent.velocity);
+        body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
+                                 convertPixelsToMeters(transformComponent.velocity.y)});
     }
 }
 void CollisionSystem::updateSimulation(const float timeStep, const int32 velocityIterations,
@@ -49,7 +50,8 @@ void CollisionSystem::createBody(const Entity entity, const glm::vec2& colliderS
 {
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
     b2BodyDef bodyDef;
-    bodyDef.position.Set(transformComponent.position.x, transformComponent.position.y);
+    bodyDef.position.Set(convertPixelsToMeters(transformComponent.position.x),
+                         convertPixelsToMeters(transformComponent.position.y));
     bodyDef.angle = transformComponent.rotation;
 
     if (isStatic)

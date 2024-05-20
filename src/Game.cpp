@@ -42,5 +42,5 @@ void Game::handleCollision()
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     collisionSystem->updateCollision();
     constexpr auto timeStep = 1.f / 60.f;
-    collisionSystem->updateSimulation(timeStep, 8, 3);
+    collisionSystem->updateSimulation(timeStep, 64, 64);
 };

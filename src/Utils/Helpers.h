@@ -7,6 +7,8 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+
+#include "Config.h"
 #include "glm/gtx/hash.hpp"
 
 static inline std::string base64_decode(const std::string& encoded_string)
@@ -185,13 +187,14 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
     return result;
 }
 
-inline static float convertMetersToPixel(const float meterValue)
+template <typename T>
+inline static T convertMetersToPixel(const T meterValue)
 {
-    constexpr float meterToPixelRatio = 8.f;
-    return meterValue * meterToPixelRatio;
+    return meterValue * config::meterToPixelRatio;
 }
-inline static float convertPixelsToMeters(const float pixelValue)
+
+template <typename T>
+inline static T convertPixelsToMeters(const T pixelValue)
 {
-    constexpr float meterToPixelRatio = 8.f;
-    return pixelValue / meterToPixelRatio;
+    return pixelValue / config::meterToPixelRatio;
 }

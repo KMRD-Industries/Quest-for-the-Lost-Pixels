@@ -5,6 +5,7 @@
 #include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "Helpers.h"
 #include "InputHandler.h"
 #include "MapComponent.h"
 #include "PlayerComponent.h"
@@ -14,7 +15,6 @@
 
 #include "MapSystem.h"
 #include "PlayerMovementSystem.h"
-#include "RenderSystem.h"
 #include "TextureSystem.h"
 
 #include "Paths.h"

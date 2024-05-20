@@ -58,6 +58,8 @@ int main()
 
     while (window.isOpen())
     {
+        game.handleCollision();
+
         // Clear the window before drawing
         window.clear();
 
@@ -73,7 +75,5 @@ int main()
         // Display the rendered frame
         window.display();
         handleInput(window);
-
-        game.handleCollision();
     }
 }
