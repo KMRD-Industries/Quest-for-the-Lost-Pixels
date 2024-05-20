@@ -5,7 +5,8 @@ namespace SpecialBlocks
 {
     enum class Blocks : int
     {
-        DOORSCOLLIDER = 1
+        DOORSCOLLIDER = 0,
+        STATICWALLCOLLIDER = 1
     };
 } // namespace SpecialBlocks
 

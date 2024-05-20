@@ -107,6 +107,7 @@ void Dungeon::setECS()
         Signature signature;
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         signature.set(gCoordinator.getComponentType<TileComponent>());
+        signature.set(gCoordinator.getComponentType<ColliderComponent>());
         signature.set(gCoordinator.getComponentType<AnimationComponent>());
         gCoordinator.setSystemSignature<MapSystem>(signature);
     }
@@ -129,6 +130,7 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], TileComponent{});
         gCoordinator.addComponent(m_entities[i], TransformComponent{});
         gCoordinator.addComponent(m_entities[i], AnimationComponent{});
+        gCoordinator.addComponent(m_entities[i], ColliderComponent{});
     }
 }
 

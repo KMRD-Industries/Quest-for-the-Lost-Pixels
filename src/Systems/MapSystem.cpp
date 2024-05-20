@@ -3,6 +3,8 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+#include "ColliderComponent.h"
+#include "CollisionSystem.h"
 #include "Config.h"
 #include "Coordinator.h"
 #include "TileComponent.h"
@@ -12,12 +14,15 @@ extern Coordinator gCoordinator;
 
 void MapSystem::loadMap(std::string& path)
 {
+    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+
     // Reset Map Entities to default
     for (const auto& entity : m_entities)
     {
         auto& map_component = gCoordinator.getComponent<TileComponent>(entity);
         auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
 
+        collisionSystem->deleteBody(entity);
         map_component.id = {};
         map_component.layer = {};
         transform_component.scale = sf::Vector2f(1.f, 1.f);
@@ -77,6 +82,11 @@ void MapSystem::loadMap(std::string& path)
 
             auto& tileComponent = gCoordinator.getComponent<TileComponent>(*start_iterator);
             auto& transform_component = gCoordinator.getComponent<TransformComponent>(*start_iterator);
+
+            if (tileID - atlas_sets["SpecialBlocks"] == 1)
+            {
+                collisionSystem->createBody(*start_iterator, {}, true, true);
+            }
 
             std::string tileset_name = findKeyLessThan(atlas_sets, tileID);
             tileID = tileID - atlas_sets[tileset_name] + 1;

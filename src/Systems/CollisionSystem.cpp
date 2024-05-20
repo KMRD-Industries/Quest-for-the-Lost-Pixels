@@ -19,6 +19,7 @@ void CollisionSystem::updateCollision() const
 
         if (!transformComponent.velocity.IsValid()) continue;
         b2Body* body = colliderComponent.body;
+        if (body == nullptr) continue;
         body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
                                  convertPixelsToMeters(transformComponent.velocity.y)});
     }
@@ -33,6 +34,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         const b2Body* body = colliderComponent.body;
+        if (body == nullptr || body->GetType() != b2_dynamicBody) continue;
         const auto position = body->GetPosition();
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
     }
@@ -87,4 +89,9 @@ void CollisionSystem::createBody(const Entity entity, const glm::vec2& colliderS
 
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
     colliderComponent.body = body;
+}
+void CollisionSystem::deleteBody(Entity entity)
+{
+    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+    if (colliderComponent.body != nullptr) m_world.DestroyBody(colliderComponent.body);
 }

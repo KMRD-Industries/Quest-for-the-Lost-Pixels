@@ -14,6 +14,7 @@ public:
     void updateCollision() const;
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations);
     void createBody(Entity entity, const glm::vec2& colliderSize, bool isStatic = true, bool useTextureSize = false);
+    void deleteBody(Entity entity);
 
 private:
     b2World m_world;
