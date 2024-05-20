@@ -2,8 +2,8 @@
 
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "System.h"
-#include "Utils/GameTypes.h"
-#include "Utils/Helpers.h"
+#include "GameTypes.h"
+#include "Helpers.h"
 
 class MapSystem : public System
 {

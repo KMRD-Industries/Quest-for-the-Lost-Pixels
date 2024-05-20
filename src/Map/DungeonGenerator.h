@@ -35,20 +35,18 @@ public:
         int minPathLength{};
         int maxPathLength{};
     };
-    DungeonGenerator() {}
+    DungeonGenerator() = default;
     DungeonGenerator(int height, int width);
     void generateMainPath(int pathLength);
     void generateSidePath(const sidePathConfig& pathConfig);
     void makeLockAndKey();
     NodesPath getNodes();
     RoomCount getCount();
-    UnDirectedGraph getGraph() const;
-    std::optional<char> getLock(const glm::ivec2& node) const;
-    std::optional<char> getKey(const glm::ivec2& node) const;
-    glm::ivec2 getStartingRoom() const;
-    NodeOutEdgesCount m_nodeOutEdgesCount;
-    NodeEnterEdgesCount m_nodeEnterEdgesCount;
-    bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
+    [[nodiscard]] UnDirectedGraph getGraph() const;
+    [[nodiscard]] std::optional<char> getLock(const glm::ivec2& node) const;
+    [[nodiscard]] std::optional<char> getKey(const glm::ivec2& node) const;
+    [[nodiscard]] glm::ivec2 getStartingRoom() const;
+    [[nodiscard]] bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
 
 private:
     void generateMainPath(const PathConfig& pathConfig);
@@ -72,6 +70,8 @@ private:
     glm::ivec2 m_startingRoom{};
     std::unordered_map<glm::ivec2, int> m_locks{};
     std::unordered_map<glm::ivec2, int> m_keys{};
+    NodeOutEdgesCount m_nodeOutEdgesCount;
+    NodeEnterEdgesCount m_nodeEnterEdgesCount;
 
     std::mt19937 gen{};
 };

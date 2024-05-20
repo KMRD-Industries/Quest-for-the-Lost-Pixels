@@ -25,8 +25,8 @@ void Dungeon::init()
 
     m_entities[0] = gCoordinator.createEntity();
     m_entities[1] = gCoordinator.createEntity();
-    sf::Texture* texture = new sf::Texture();
-    std::string PathToAssets{ASSET_PATH};
+    const auto texture = new sf::Texture();
+    const std::string PathToAssets{ASSET_PATH};
     texture->loadFromFile(PathToAssets + "/knight/knight.png");
 
     gCoordinator.addComponent(m_entities[0], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});

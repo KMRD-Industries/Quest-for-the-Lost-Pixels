@@ -16,19 +16,19 @@ class FloorGenerator
         {glm::ivec2{0, -1}, GameType::DoorEntraces::SOUTH}};
 
 public:
-    FloorGenerator(){};
-    void generateFloor(const int h, const int w);
+    FloorGenerator() = default;
+    void generateFloor(int h, int w);
     void generateMainPath(const int mainPathLen) { m_generator.generateMainPath(mainPathLen); }
     void generateSidePath(const DungeonGenerator::sidePathConfig& path) { m_generator.generateSidePath(path); }
     void makeLockAndKey() { m_generator.makeLockAndKey(); }
     bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
 
-    std::unordered_map<glm::ivec2, Room> getFloor(const bool generate);
-    inline glm::ivec2 getStartingRoom() const { return m_generator.getStartingRoom(); }
+    std::unordered_map<glm::ivec2, Room> getFloor(bool generate);
+    glm::ivec2 getStartingRoom() const { return m_generator.getStartingRoom(); }
 
 private:
     std::vector<GameType::MapInfo> getMapInfo();
-    void checkSingleFile(const std::filesystem::directory_entry& entry, std::vector<GameType::MapInfo>& mapInfo);
+    static void checkSingleFile(const std::filesystem::directory_entry& entry, std::vector<GameType::MapInfo>& mapInfo);
 
     DungeonGenerator m_generator{};
     std::unordered_map<glm::ivec2, Room> m_floorMap{};

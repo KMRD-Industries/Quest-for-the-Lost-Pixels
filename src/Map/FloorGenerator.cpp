@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
-#include <ranges>
 #include <regex>
 #include <set>
 
@@ -24,39 +22,39 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
 
     m_floorMap.clear();
 
-    const auto avaibleMaps = getMapInfo();
+    const auto availableMaps = getMapInfo();
 
-    std::unordered_map<GameType::MapInfo, int> choosedMap{};
+    std::unordered_map<GameType::MapInfo, int> choosesMap{};
 
     const auto graphMap = m_generator.getGraph();
 
-    for (const auto& [nodePosition, nodeNeighbours] : graphMap)
+    for (const auto& [nodePosition, nodeNeighbors] : graphMap)
     {
         std::unordered_set<GameType::DoorEntraces> doorsForRoom;
-        for (const auto& neighbour : nodeNeighbours)
+        for (const auto& neighbor : nodeNeighbors)
         {
-            const auto dir = neighbour - nodePosition;
-            if (m_mapDirOnGraphToEntrace.contains(dir)) doorsForRoom.insert(m_mapDirOnGraphToEntrace.at(dir));
+            if (const auto dir = neighbor - nodePosition; m_mapDirOnGraphToEntrace.contains(dir))
+                doorsForRoom.insert(m_mapDirOnGraphToEntrace.at(dir));
         }
-        std::vector<GameType::MapInfo> avaibleMapsForRoom;
-        const auto haveSameDoorsPlacement = [&doorsForRoom](GameType::MapInfo mapInfo)
+        std::vector<GameType::MapInfo> availableMapsForRoom;
+        const auto haveSameDoorsPlacement = [&doorsForRoom](const GameType::MapInfo& mapInfo)
         {
             const std::unordered_set<GameType::DoorEntraces> mapDoors(mapInfo.doorsLoc.begin(), mapInfo.doorsLoc.end());
             return mapDoors == doorsForRoom;
         };
-        std::ranges::copy_if(avaibleMaps, std::back_inserter(avaibleMapsForRoom), haveSameDoorsPlacement);
+        std::ranges::copy_if(availableMaps, std::back_inserter(availableMapsForRoom), haveSameDoorsPlacement);
 
         int minVal = std::numeric_limits<int>::max();
 
-        for (const auto& mapInfo : avaibleMapsForRoom)
+        for (const auto& mapInfo : availableMapsForRoom)
         {
-            minVal = choosedMap[mapInfo];
+            minVal = choosesMap[mapInfo];
         }
 
         std::vector<GameType::MapInfo> mapToChoose;
-        const auto haveMinimalValueOfDoors = [&choosedMap, &minVal](GameType::MapInfo mapInfo)
-        { return choosedMap[mapInfo] == minVal; };
-        std::ranges::copy_if(avaibleMapsForRoom, std::back_inserter(mapToChoose), haveMinimalValueOfDoors);
+        const auto haveMinimalValueOfDoors = [&choosesMap, &minVal](const GameType::MapInfo& mapInfo)
+        { return choosesMap[mapInfo] == minVal; };
+        std::ranges::copy_if(availableMapsForRoom, std::back_inserter(mapToChoose), haveMinimalValueOfDoors);
 
         std::random_device rd;
         std::mt19937 g(rd());
@@ -64,7 +62,7 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
         std::ranges::shuffle(mapToChoose, g);
 
         auto selectedMap = mapToChoose.front();
-        choosedMap[selectedMap]++;
+        choosesMap[selectedMap]++;
         m_floorMap[nodePosition] = Room(selectedMap.mapID);
     }
 
@@ -149,27 +147,27 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     std::set<int> xValues;
     std::set<int> yValues;
 
-    for (const auto& door : doorData)
+    for (const auto& key : doorData | std::views::keys)
     {
-        xValues.insert(door.first.x);
-        yValues.insert(door.first.y);
+        xValues.insert(key.x);
+        yValues.insert(key.y);
     }
 
     std::unordered_set<GameType::DoorEntraces> doorsLoc;
 
-    for (const auto& door : doorData)
+    for (const auto& key : doorData | std::views::keys)
     {
-        if (door.first.y == 0 || door.first.y == mapHeight - 1)
+        if (key.y == 0 || key.y == mapHeight - 1)
         {
-            if (door.first.y == 0)
+            if (key.y == 0)
                 doorsLoc.insert(GameType::DoorEntraces::NORTH);
             else
                 doorsLoc.insert(GameType::DoorEntraces::SOUTH);
         }
 
-        if (door.first.x == 0 || door.first.x == mapWidth - 1)
+        if (key.x == 0 || key.x == mapWidth - 1)
         {
-            if (door.first.x == 0)
+            if (key.x == 0)
                 doorsLoc.insert(GameType::DoorEntraces::WEST);
             else
                 doorsLoc.insert(GameType::DoorEntraces::EAST);

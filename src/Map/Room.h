@@ -6,11 +6,11 @@ class Room
 {
 public:
     Room() = default;
-    Room(const int id) : m_mapID(id) {}
+    explicit Room(const int id) : m_mapID(id) {}
     void init();
     void draw() const;
     void update();
-    std::string getMap() const;
+    [[nodiscard]] std::string getMap() const;
     void setMapID(const int id) { m_mapID = id; }
 
 private:

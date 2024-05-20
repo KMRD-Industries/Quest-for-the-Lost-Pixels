@@ -3,22 +3,11 @@
 #include <SFML/Window/Event.hpp>
 #include <imgui-SFML.h>
 
-#include "AnimationComponent.h"
 #include "Coordinator.h"
-#include "Dungeon.h"
-#include "DungeonGenerator.h"
 #include "Game.h"
 #include "InputHandler.h"
-#include "MapComponent.h"
 #include "MapSystem.h"
-#include "Paths.h"
-#include "PlayerComponent.h"
-#include "PlayerMovementSystem.h"
-#include "RenderComponent.h"
 #include "RenderSystem.h"
-#include "TextureSystem.h"
-#include "TileComponent.h"
-#include "TransformComponent.h"
 
 Coordinator gCoordinator;
 
@@ -59,11 +48,6 @@ int main()
 
     Game game;
     game.init();
-
-    /*
-    std::string s(std::string(ASSET_PATH) + "/maps/map_01.json");
-    mapSystem->loadMap(s);
-    */
 
     while (window.isOpen())
     {
