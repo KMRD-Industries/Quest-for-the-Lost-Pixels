@@ -3,6 +3,8 @@
 #include "Coordinator.h"
 
 #include "AnimationComponent.h"
+#include "ColliderComponent.h"
+#include "CollisionSystem.h"
 #include "InputHandler.h"
 #include "MapComponent.h"
 #include "PlayerComponent.h"
@@ -33,6 +35,8 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
+    gCoordinator.addComponent(m_entities[0], ColliderComponent{});
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[0], {}, false, true);
 
     gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = sf::Sprite(*texture)});
     gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
@@ -80,21 +84,10 @@ void Dungeon::update()
 
 void Dungeon::setECS()
 {
-    gCoordinator.init();
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
-    gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TileComponent>();
-    gCoordinator.registerComponent<TransformComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
-
-    auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
-    {
-        Signature signature;
-        signature.set(gCoordinator.getComponentType<RenderComponent>());
-        signature.set(gCoordinator.getComponentType<TransformComponent>());
-        gCoordinator.setSystemSignature<RenderSystem>(signature);
-    }
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {

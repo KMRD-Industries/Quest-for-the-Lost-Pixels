@@ -29,6 +29,7 @@ set(COMPONENTS
         Components/RenderComponent.h
         Components/TransformComponent.h
         Components/PlayerComponent.h
+        Components/ColliderComponent.h
         Components/TransformComponent.h
         Components/TileComponent.h
         Components/MapComponent.h
@@ -52,6 +53,8 @@ set(SYSTEMS
         Systems/RenderSystem.h
         Systems/PlayerMovementSystem.cpp
         Systems/PlayerMovementSystem.h
+        Systems/CollisionSystem.cpp
+        Systems/CollisionSystem.h
         Systems/MapSystem.cpp
         Systems/MapSystem.h
         Systems/TextureSystem.cpp

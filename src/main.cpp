@@ -65,5 +65,6 @@ int main()
         // Display the rendered frame
         window.display();
         handleInput(window);
+        game.handleCollision();
     }
 }
