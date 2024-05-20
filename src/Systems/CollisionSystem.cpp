@@ -76,13 +76,14 @@ void CollisionSystem::createBody(const Entity entity, const glm::vec2& colliderS
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &boxShape;
     constexpr auto defaultDensity{1.f};
-    constexpr auto defaultFriction{0.3f};
+    constexpr auto defaultFriction{0.f};
     fixtureDef.density = defaultDensity;
     fixtureDef.friction = defaultFriction;
     fixtureDef.filter.categoryBits = 0x0002;
     fixtureDef.filter.maskBits = 0x0002;
 
     body->CreateFixture(&fixtureDef);
+    body->SetFixedRotation(true);
 
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
     colliderComponent.body = body;
