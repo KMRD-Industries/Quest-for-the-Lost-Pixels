@@ -1,5 +1,6 @@
 #include "RenderSystem.h"
 #include "AnimationComponent.h"
+#include "Config.h"
 #include "Coordinator.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/RenderWindow.hpp"
@@ -20,7 +21,7 @@ void RenderSystem::draw(sf::RenderWindow& window) const
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
 
-            renderComponent.sprite.setScale(transformComponent.scale * 3.f);
+            renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
             renderComponent.sprite.setPosition(transformComponent.position);
             renderComponent.sprite.setRotation(transformComponent.rotation);
             tiles[renderComponent.layer].push_back(renderComponent.sprite);

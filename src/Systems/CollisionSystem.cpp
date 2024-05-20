@@ -1,11 +1,11 @@
 #include "CollisionSystem.h"
 
 #include "ColliderComponent.h"
+#include "Config.h"
 #include "Coordinator.h"
 #include "Helpers.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
-
 
 struct RenderComponent;
 extern Coordinator gCoordinator;
@@ -33,7 +33,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         const b2Body* body = colliderComponent.body;
         const auto position = body->GetPosition();
-        transformComponent.position = {position.x, position.y};
+        transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
     }
 }
 
@@ -65,8 +65,8 @@ void CollisionSystem::createBody(const Entity entity, const glm::vec2& colliderS
     {
         const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         const auto spriteBounds = renderComponent.sprite.getGlobalBounds();
-        boxShape.SetAsBox(convertPixelsToMeters(spriteBounds.width / 2),
-                          convertPixelsToMeters(spriteBounds.height / 2));
+        boxShape.SetAsBox(convertPixelsToMeters(spriteBounds.width * config::gameScale) / 2,
+                          convertPixelsToMeters(spriteBounds.height * config::gameScale) / 2);
     }
     else
         boxShape.SetAsBox(convertPixelsToMeters(colliderSize.x / 2), convertPixelsToMeters(colliderSize.y / 2));
@@ -77,6 +77,8 @@ void CollisionSystem::createBody(const Entity entity, const glm::vec2& colliderS
     constexpr auto defaultFriction{0.3f};
     fixtureDef.density = defaultDensity;
     fixtureDef.friction = defaultFriction;
+    fixtureDef.filter.categoryBits = 0x0002;
+    fixtureDef.filter.maskBits = 0x0002;
 
     body->CreateFixture(&fixtureDef);
 

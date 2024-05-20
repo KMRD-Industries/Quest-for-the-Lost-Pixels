@@ -28,8 +28,10 @@ void Dungeon::init()
     m_entities[0] = gCoordinator.createEntity();
     m_entities[1] = gCoordinator.createEntity();
     const auto texture = new sf::Texture();
+    const auto texture2 = new sf::Texture();
     const std::string PathToAssets{ASSET_PATH};
     texture->loadFromFile(PathToAssets + "/knight/knight.png");
+    texture2->loadFromFile(PathToAssets + "/knight/knight.png");
 
     gCoordinator.addComponent(m_entities[0], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
     gCoordinator.addComponent(m_entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
@@ -38,8 +40,11 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[0], ColliderComponent{});
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[0], {}, false, true);
 
-    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = sf::Sprite(*texture)});
-    gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer = 4});
+    gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(50.f, 50.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(m_entities[1], AnimationComponent{});
+    gCoordinator.addComponent(m_entities[1], ColliderComponent{});
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[1], {}, true, true);
 
     makeSimpleFloor();
 

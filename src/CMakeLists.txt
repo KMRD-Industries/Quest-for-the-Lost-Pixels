@@ -70,6 +70,7 @@ set(UTILS
         Utils/Paths.h
         Utils/Helpers.h
         Utils/GameTypes.h
+	Utils/Config.h
 )
 
 source_group("Core" FILES ${CORE})

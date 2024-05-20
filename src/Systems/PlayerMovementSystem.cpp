@@ -25,15 +25,10 @@ void PlayerMovementSystem::handleMovement() const
         dir.x -= 1;
     for (const auto& entity : m_entities)
     {
-        const auto noInput{dir.x == 0 && dir.y == 0};
-        const auto normalizedDir{normalize(dir)};
-        const auto playerSpeed = glm::vec2{normalizedDir.x * 5, normalizedDir.y * 5};
+        const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
+        constexpr int playerAcc = 30;
+        const auto playerSpeed = glm::vec2{normalizedDir.x * playerAcc, normalizedDir.y * playerAcc};
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
-        if (noInput)
-        {
-            return;
-        }
-        transformComponent.position += {playerSpeed.x, playerSpeed.y};
     }
 }

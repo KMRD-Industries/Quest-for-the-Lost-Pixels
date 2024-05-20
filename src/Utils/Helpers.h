@@ -185,8 +185,13 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
     return result;
 }
 
+inline static float convertMetersToPixel(const float meterValue)
+{
+    constexpr float meterToPixelRatio = 8.f;
+    return meterValue * meterToPixelRatio;
+}
 inline static float convertPixelsToMeters(const float pixelValue)
 {
-    constexpr float meterToPixelRatio = 0.01f;
-    return pixelValue * meterToPixelRatio;
+    constexpr float meterToPixelRatio = 8.f;
+    return pixelValue / meterToPixelRatio;
 }

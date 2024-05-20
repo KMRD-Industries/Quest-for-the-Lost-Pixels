@@ -39,7 +39,14 @@ void handleInput(sf::RenderWindow& window)
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(16 * 26 * 3, 720), "ImGui + SFML = <3");
+    // Pobranie rozdzielczoœci ekranu
+    sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+
+    // Utworzenie okna SFML
+    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
+
+    // Ustawienie okna na pe³ny ekran z rozdzielczoœci¹ ekranu
+    window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Fullscreen);
 
     int _ = ImGui::SFML::Init(window);
     window.setFramerateLimit(60);
@@ -51,20 +58,22 @@ int main()
 
     while (window.isOpen())
     {
-        game.update();
-
-        ImGui::SFML::Update(window, deltaClock.restart());
         // Clear the window before drawing
         window.clear();
 
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         game.draw();
 
+        game.update();
+
+        ImGui::SFML::Update(window, deltaClock.restart());
+
         // Render ImGui
         ImGui::SFML::Render(window);
         // Display the rendered frame
         window.display();
         handleInput(window);
+
         game.handleCollision();
     }
 }
