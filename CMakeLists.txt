@@ -7,6 +7,11 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 include(FetchContent)
 
+FetchContent_Declare(box2d
+	GIT_REPOSITORY https://github.com/erincatto/box2d.git
+	GIT_TAG 411acc3)
+FetchContent_MakeAvailable(box2d)
+
 FetchContent_Declare(glm
 	GIT_REPOSITORY	https://github.com/g-truc/glm.git
 	GIT_TAG 	1.0.1)

@@ -32,8 +32,8 @@ public:
         }
         return m_instance;
     };
-    bool isHeld(InputType input) const;
-    bool isPressed(InputType input) const;
+    [[nodiscard]] bool isHeld(InputType input) const;
+    [[nodiscard]] bool isPressed(InputType input) const;
     void handleKeyboardInput(sf::Keyboard::Key key, bool isPressed);
     void clearPressedInputs();
     void update();

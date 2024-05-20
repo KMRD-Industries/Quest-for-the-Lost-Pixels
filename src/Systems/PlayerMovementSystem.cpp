@@ -23,15 +23,12 @@ void PlayerMovementSystem::handleMovement() const
         dir.x += 1;
     if (inputHandler->isHeld(InputType::MoveLeft)) // Move Left
         dir.x -= 1;
-    const auto noInput{dir.x == 0 && dir.y == 0};
-    if (noInput)
-    {
-        return;
-    }
     for (const auto& entity : m_entities)
     {
+        const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
+        constexpr int playerAcc = 150;
+        const auto playerSpeed = glm::vec2{normalizedDir.x * playerAcc, normalizedDir.y * playerAcc};
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto normalizedDir{normalize(dir)};
-        transformComponent.position += {normalizedDir.x * 5, normalizedDir.y * 5};
+        transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
     }
 }

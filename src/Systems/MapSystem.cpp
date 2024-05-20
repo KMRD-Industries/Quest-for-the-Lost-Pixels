@@ -2,6 +2,8 @@
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
+
+#include "Config.h"
 #include "Coordinator.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -84,7 +86,8 @@ void MapSystem::loadMap(std::string& path)
             tileComponent.layer = layer;
 
             transform_component.position =
-                sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) * tile_height * 3.f;
+                sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) * tile_height *
+                config::gameScale;
             doFlips(flipFlags, transform_component.rotation, transform_component.scale);
 
             ++start_iterator;

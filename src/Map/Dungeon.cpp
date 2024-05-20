@@ -3,6 +3,9 @@
 #include "Coordinator.h"
 
 #include "AnimationComponent.h"
+#include "ColliderComponent.h"
+#include "CollisionSystem.h"
+#include "Helpers.h"
 #include "InputHandler.h"
 #include "MapComponent.h"
 #include "PlayerComponent.h"
@@ -12,7 +15,6 @@
 
 #include "MapSystem.h"
 #include "PlayerMovementSystem.h"
-#include "RenderSystem.h"
 #include "TextureSystem.h"
 
 #include "Paths.h"
@@ -26,16 +28,23 @@ void Dungeon::init()
     m_entities[0] = gCoordinator.createEntity();
     m_entities[1] = gCoordinator.createEntity();
     const auto texture = new sf::Texture();
+    const auto texture2 = new sf::Texture();
     const std::string PathToAssets{ASSET_PATH};
     texture->loadFromFile(PathToAssets + "/knight/knight.png");
+    texture2->loadFromFile(PathToAssets + "/knight/knight.png");
 
     gCoordinator.addComponent(m_entities[0], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
     gCoordinator.addComponent(m_entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
+    gCoordinator.addComponent(m_entities[0], ColliderComponent{});
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[0], {}, false, true);
 
-    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = sf::Sprite(*texture)});
-    gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer = 4});
+    gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(50.f, 50.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(m_entities[1], AnimationComponent{});
+    gCoordinator.addComponent(m_entities[1], ColliderComponent{});
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[1], {}, true, true);
 
     makeSimpleFloor();
 
@@ -80,21 +89,10 @@ void Dungeon::update()
 
 void Dungeon::setECS()
 {
-    gCoordinator.init();
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
-    gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TileComponent>();
-    gCoordinator.registerComponent<TransformComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
-
-    auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
-    {
-        Signature signature;
-        signature.set(gCoordinator.getComponentType<RenderComponent>());
-        signature.set(gCoordinator.getComponentType<TransformComponent>());
-        gCoordinator.setSystemSignature<RenderSystem>(signature);
-    }
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -113,7 +111,7 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<MapSystem>(signature);
     }
 
-    auto textureSystem = gCoordinator.getRegisterSystem<TextureSystem>();
+    const auto textureSystem = gCoordinator.getRegisterSystem<TextureSystem>();
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<RenderComponent>());
@@ -148,7 +146,7 @@ void Dungeon::makeSimpleFloor()
     m_currentPlayerPos = m_floorGenerator.getStartingRoom();
 }
 
-void Dungeon::moveInDungeon(glm::ivec2 dir)
+void Dungeon::moveInDungeon(const glm::ivec2& dir)
 {
     if (m_roomMap.contains(m_currentPlayerPos + dir)) m_currentPlayerPos += dir;
 }

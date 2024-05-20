@@ -27,7 +27,7 @@ public:
     }
 
     template <typename T>
-    ComponentType getComponentType() const
+    [[nodiscard]] ComponentType getComponentType() const
     {
         const std::string componentName{typeid(T).name()};
 

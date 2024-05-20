@@ -29,6 +29,7 @@ set(COMPONENTS
         Components/RenderComponent.h
         Components/TransformComponent.h
         Components/PlayerComponent.h
+        Components/ColliderComponent.h
         Components/TransformComponent.h
         Components/TileComponent.h
         Components/MapComponent.h
@@ -52,6 +53,8 @@ set(SYSTEMS
         Systems/RenderSystem.h
         Systems/PlayerMovementSystem.cpp
         Systems/PlayerMovementSystem.h
+        Systems/CollisionSystem.cpp
+        Systems/CollisionSystem.h
         Systems/MapSystem.cpp
         Systems/MapSystem.h
         Systems/TextureSystem.cpp
@@ -67,6 +70,7 @@ set(UTILS
         Utils/Paths.h
         Utils/Helpers.h
         Utils/GameTypes.h
+	Utils/Config.h
 )
 
 source_group("Core" FILES ${CORE})
@@ -81,7 +85,7 @@ include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_
 include_directories(./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
-target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm)
+target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d)
 target_compile_features(sf PRIVATE cxx_std_23)
 
 if (WIN32)

@@ -7,6 +7,8 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+
+#include "Config.h"
 #include "glm/gtx/hash.hpp"
 
 static inline std::string base64_decode(const std::string& encoded_string)
@@ -128,7 +130,7 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
     const int height = json["height"];
 
     int specialBlocksFirstGID = -1;
-    int nextTilesetFirstGID = INT_MAX; // Pocz¹tkowy identyfikator GID nastêpnego tilesetu
+    int nextTilesetFirstGID = INT_MAX; // Poczï¿½tkowy identyfikator GID nastï¿½pnego tilesetu
 
     for (const auto& tileset : json["tilesets"])
     {
@@ -137,7 +139,7 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
         {
             specialBlocksFirstGID = tileset["firstgid"];
         }
-        // Znajdujemy pierwszy identyfikator GID nastêpnego tilesetu
+        // Znajdujemy pierwszy identyfikator GID nastï¿½pnego tilesetu
         else if (tileset["firstgid"] > specialBlocksFirstGID && specialBlocksFirstGID != -1)
         {
             nextTilesetFirstGID = tileset["firstgid"];
@@ -183,4 +185,16 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
         }
     }
     return result;
+}
+
+template <typename T>
+inline static T convertMetersToPixel(const T meterValue)
+{
+    return meterValue * config::meterToPixelRatio;
+}
+
+template <typename T>
+inline static T convertPixelsToMeters(const T pixelValue)
+{
+    return pixelValue / config::meterToPixelRatio;
 }
