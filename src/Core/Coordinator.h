@@ -13,7 +13,7 @@ public:
     Coordinator();
     void init();
     Entity createEntity() const;
-    void destroyEntity(const Entity entity) const;
+    void destroyEntity(Entity entity) const;
 
     template <typename T>
     void registerComponent() const

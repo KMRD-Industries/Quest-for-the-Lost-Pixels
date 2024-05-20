@@ -134,7 +134,7 @@ void TextureSystem::loadTexturesFromFiles()
 
 void TextureSystem::loadTextures()
 {
-    for (auto const& entity : m_entities)
+    for (const auto& entity : m_entities)
     {
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
         //        if (tile_component.id <= 0) continue;

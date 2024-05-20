@@ -33,8 +33,8 @@ public:
         m_signatures[typeName] = signature;
     }
 
-    void entityDestroyed(const Entity entity);
-    void entitySignatureChanged(const Entity entity, const Signature& entitySignature);
+    void entityDestroyed(Entity entity);
+    void entitySignatureChanged(Entity entity, const Signature& entitySignature);
 
 private:
     std::unordered_map<std::string, Signature> m_signatures{};

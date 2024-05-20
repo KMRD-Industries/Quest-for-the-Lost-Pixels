@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include "glm/gtx/hash.hpp"
 
-static inline std::string base64_decode(std::string const& encoded_string)
+static inline std::string base64_decode(const std::string& encoded_string)
 {
     static const std::string base64_chars =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -156,7 +156,7 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
         {
             continue;
         }
-        static const std::uint32_t mask = 0xf0000000;
+        static constexpr std::uint32_t mask = 0xf0000000;
 
         int x = 0;
         int y = 0;

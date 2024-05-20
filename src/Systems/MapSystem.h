@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SFML/Graphics/RenderWindow.hpp"
-#include "System.h"
 #include "GameTypes.h"
 #include "Helpers.h"
+#include "SFML/Graphics/RenderWindow.hpp"
+#include "System.h"
 
 class MapSystem : public System
 {

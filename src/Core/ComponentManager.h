@@ -54,7 +54,7 @@ public:
         return getComponentArray<T>()->getData(entity);
     }
 
-    void entityDestroyed(const Entity entity) const;
+    void entityDestroyed(Entity entity) const;
 
 private:
     std::unordered_map<std::string, ComponentType> m_componentTypes{};

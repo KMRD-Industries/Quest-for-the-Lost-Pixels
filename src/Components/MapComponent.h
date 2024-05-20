@@ -2,6 +2,7 @@
 
 #include <string>
 
-struct MapComponent {
+struct MapComponent
+{
     std::string path;
 };
