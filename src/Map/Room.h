@@ -1,7 +1,14 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
+#include "glm/vec2.hpp"
+
+namespace GameType
+{
+    enum class DoorEntraces;
+}
 class Room
 {
 public:
@@ -12,6 +19,8 @@ public:
     void update();
     [[nodiscard]] std::string getMap() const;
     void setMapID(const int id) { m_mapID = id; }
+
+    std::unordered_map<GameType::DoorEntraces, glm::vec2> m_doorPosition;
 
 private:
     int m_mapID{};

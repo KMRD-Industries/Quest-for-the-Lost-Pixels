@@ -87,6 +87,13 @@ void Dungeon::update()
         m_moveInDungeon.pop_front();
         moveInDungeon(tmpMove);
     }
+
+    counter++;
+    if (m_passedBy && counter > (60 * 3))
+    {
+        m_passedBy = false;
+        counter = 0;
+    }
 }
 
 void Dungeon::setECS()
@@ -160,11 +167,23 @@ void Dungeon::makeSimpleFloor()
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)
 {
-    if (m_roomMap.contains(m_currentPlayerPos + dir))
+    if (m_roomMap.contains(m_currentPlayerPos + dir) && !m_passedBy)
     {
         m_currentPlayerPos += dir;
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
         gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
+        const auto newDoor = dir * -1;
+        const auto doorType = GameType::geoToMapDoors.at(newDoor);
+        const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
+        const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
+        const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
+        gCoordinator.getComponent<TransformComponent>(m_entities[0]).position = newPosition;
+        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[0]);
+        colliderComponent.body->SetTransform(
+            {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
+            colliderComponent.body->GetAngle());
+        m_passedBy = true;
+        counter = 0;
     }
 }

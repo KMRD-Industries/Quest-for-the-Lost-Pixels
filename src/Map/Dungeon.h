@@ -26,4 +26,6 @@ private:
     glm::ivec2 m_currentPlayerPos{};
     std::vector<Entity> m_entities{};
     std::deque<glm::ivec2> m_moveInDungeon{};
+    float counter = 0;
+    bool m_passedBy = false;
 };

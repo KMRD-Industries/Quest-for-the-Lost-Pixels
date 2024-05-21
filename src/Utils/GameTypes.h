@@ -2,7 +2,8 @@
 #include <unordered_map>
 #include <vector>
 #include "Types.h"
-#include "glm/vec2.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/hash.hpp"
 namespace SpecialBlocks
 {
     enum class Blocks : int
@@ -25,6 +26,10 @@ namespace GameType
                                                                      {DoorEntraces::SOUTH, {0, -1}},
                                                                      {DoorEntraces::EAST, {1, 0}},
                                                                      {DoorEntraces::WEST, {-1, 0}}};
+    const std::unordered_map<glm::ivec2, DoorEntraces> geoToMapDoors{{{0, 1}, DoorEntraces::NORTH},
+                                                                     {{0, -1}, DoorEntraces::SOUTH},
+                                                                     {{1, 0}, DoorEntraces::EAST},
+                                                                     {{-1, 0}, DoorEntraces::WEST}};
 
     struct MapInfo
     {
