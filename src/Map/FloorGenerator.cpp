@@ -4,7 +4,6 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
-#include <set>
 
 #include "Utils/Helpers.h"
 #include "Utils/Paths.h"

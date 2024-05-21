@@ -1,4 +1,5 @@
 #pragma once
+#include <deque>
 #include <unordered_map>
 #include <vector>
 
@@ -24,4 +25,5 @@ private:
     std::unordered_map<glm::ivec2, Room> m_roomMap{};
     glm::ivec2 m_currentPlayerPos{};
     std::vector<Entity> m_entities{};
+    std::deque<glm::ivec2> m_moveInDungeon{};
 };

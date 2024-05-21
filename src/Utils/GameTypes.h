@@ -1,7 +1,8 @@
 #pragma once
+#include <unordered_map>
 #include <vector>
 #include "Types.h"
-
+#include "glm/vec2.hpp"
 namespace SpecialBlocks
 {
     enum class Blocks : int
@@ -20,6 +21,10 @@ namespace GameType
         WEST = static_cast<int>('W'),
         EAST = static_cast<int>('E')
     };
+    const std::unordered_map<DoorEntraces, glm::ivec2> mapDoorsToGeo{{DoorEntraces::NORTH, {0, 1}},
+                                                                     {DoorEntraces::SOUTH, {0, -1}},
+                                                                     {DoorEntraces::EAST, {1, 0}},
+                                                                     {DoorEntraces::WEST, {-1, 0}}};
 
     struct MapInfo
     {

@@ -7,6 +7,7 @@
 #include "CollisionSystem.h"
 #include "Config.h"
 #include "Coordinator.h"
+#include "DoorComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
@@ -102,9 +103,22 @@ void MapSystem::loadMap(std::string& path)
                         *start_iterator, "Wall", {tile_width, tile_height},
                         [](const GameType::CollisionData& entityT) {}, true, false);
                 else if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
+                {
                     collisionSystem->createBody(
                         *start_iterator, "Door", {tile_width, tile_height},
                         [](const GameType::CollisionData& entityT) {}, true, false);
+                    gCoordinator.addComponent(*start_iterator, DoorComponent{});
+                    auto& doorComponent = gCoordinator.getComponent<DoorComponent>(*start_iterator);
+
+                    if (y_position == 0)
+                        doorComponent.entrance = GameType::DoorEntraces::NORTH;
+                    else if (y_position == height - 1)
+                        doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+                    if (x_position == 0)
+                        doorComponent.entrance = GameType::DoorEntraces::WEST;
+                    else if (x_position == width - 1)
+                        doorComponent.entrance = GameType::DoorEntraces::EAST;
+                }
             }
 
             ++start_iterator;

@@ -122,6 +122,7 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
 }
 void CollisionSystem::deleteBody(Entity entity)
 {
-    const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
     if (colliderComponent.body != nullptr) m_world.DestroyBody(colliderComponent.body);
+    colliderComponent.body = nullptr;
 }
