@@ -6,5 +6,6 @@
 namespace config
 {
     static constexpr float gameScale{3.f};
-    static constexpr float meterToPixelRatio{25.f};
+    static constexpr double meterToPixelRatio{25.};
+    static constexpr double pixelToMeterRatio{0.04};
 } // namespace config

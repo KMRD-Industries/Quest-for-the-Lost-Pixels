@@ -38,13 +38,16 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
     gCoordinator.addComponent(m_entities[0], ColliderComponent{});
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[0], {}, false, true);
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
+        m_entities[0], "FirstPlayer", {},
+        [](const GameType::CollisionData& entityT) { std::cout << entityT.tag << '\n'; }, false, true);
 
     gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer = 4});
     gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(50.f, 50.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[1], AnimationComponent{});
     gCoordinator.addComponent(m_entities[1], ColliderComponent{});
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[1], {}, true, true);
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
+        m_entities[1], "SecondPlayer", {}, [](const GameType::CollisionData& entityT) {}, true, true);
 
     makeSimpleFloor();
 
@@ -79,12 +82,13 @@ void Dungeon::update()
     else if (inputHandler->isPressed(InputType::MoveLeft)) // Move Left
         dir -= glm::ivec2{1, 0};
 
+    /*
     if (dir != glm::ivec2{0, 0} && m_floorGenerator.isConnected(m_currentPlayerPos, m_currentPlayerPos + dir))
     {
         m_currentPlayerPos += dir;
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
-    }
+    }*/
 }
 
 void Dungeon::setECS()

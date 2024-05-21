@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 #include <glm/glm.hpp>
+#include <iostream>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
@@ -188,13 +189,22 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
 }
 
 template <typename T>
+inline static T roundTo(T value, int places)
+{
+    T factor = std::pow(10.0, places);
+    return std::round(value * factor) / factor;
+}
+
+template <typename T>
 inline static T convertMetersToPixel(const T meterValue)
 {
-    return meterValue * config::meterToPixelRatio;
+    T result = meterValue * config::meterToPixelRatio;
+    return roundTo(result, 2);
 }
 
 template <typename T>
 inline static T convertPixelsToMeters(const T pixelValue)
 {
-    return pixelValue / config::meterToPixelRatio;
+    T result = pixelValue * config::pixelToMeterRatio;
+    return roundTo(result, 2);
 }

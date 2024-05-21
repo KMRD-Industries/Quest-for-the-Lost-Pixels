@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "Types.h"
 
 namespace SpecialBlocks
 {
@@ -26,6 +27,12 @@ namespace GameType
         std::vector<DoorEntraces> doorsLoc{};
 
         bool operator==(const MapInfo& other) const { return mapID == other.mapID; }
+    };
+
+    struct CollisionData
+    {
+        Entity entityID;
+        std::string tag;
     };
 } // namespace GameType
 

@@ -83,11 +83,6 @@ void MapSystem::loadMap(std::string& path)
             auto& tileComponent = gCoordinator.getComponent<TileComponent>(*start_iterator);
             auto& transform_component = gCoordinator.getComponent<TransformComponent>(*start_iterator);
 
-            if (tileID - atlas_sets["SpecialBlocks"] == 1)
-            {
-                collisionSystem->createBody(*start_iterator, {}, true, true);
-            }
-
             std::string tileset_name = findKeyLessThan(atlas_sets, tileID);
             tileID = tileID - atlas_sets[tileset_name] + 1;
 
@@ -99,6 +94,18 @@ void MapSystem::loadMap(std::string& path)
                 sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) * tile_height *
                 config::gameScale;
             doFlips(flipFlags, transform_component.rotation, transform_component.scale);
+
+            if (tileset_name == "SpecialBlocks")
+            {
+                if (tileID == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER) + 1)
+                    collisionSystem->createBody(
+                        *start_iterator, "Wall", {tile_width, tile_height},
+                        [](const GameType::CollisionData& entityT) {}, true, false);
+                else if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
+                    collisionSystem->createBody(
+                        *start_iterator, "Door", {tile_width, tile_height},
+                        [](const GameType::CollisionData& entityT) {}, true, false);
+            }
 
             ++start_iterator;
             index++;
