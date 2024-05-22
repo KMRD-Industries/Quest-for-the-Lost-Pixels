@@ -1,5 +1,6 @@
 #include "Game.h"
 
+#include "AnimationSystem.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
@@ -12,7 +13,6 @@ extern Coordinator gCoordinator;
 void Game::init()
 {
     gCoordinator.init();
-
     gCoordinator.registerComponent<ColliderComponent>();
     gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TransformComponent>();
@@ -35,6 +35,7 @@ void Game::init()
     }
     m_dungeon.init();
 };
+
 void Game::draw() const { m_dungeon.draw(); };
 void Game::update() { m_dungeon.update(); }
 void Game::handleCollision()

@@ -2,8 +2,6 @@
 
 
 #include <iostream>
-
-#include "../../build/debug/VS/_deps/box2d-src/extern/sajson/sajson.h"
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
@@ -120,6 +118,7 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
     colliderComponent.collisionReaction = collisionReaction;
     colliderComponent.tag = tag;
 }
+
 void CollisionSystem::deleteBody(Entity entity)
 {
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);

@@ -19,6 +19,7 @@
 #include "PlayerMovementSystem.h"
 #include "TextureSystem.h"
 
+#include "AnimationSystem.h"
 #include "Paths.h"
 
 extern Coordinator gCoordinator;
@@ -40,6 +41,7 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
     gCoordinator.addComponent(m_entities[0], ColliderComponent{});
+
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
         m_entities[0], "FirstPlayer", {},
         [&](const GameType::CollisionData& entityT)
@@ -71,14 +73,13 @@ void Dungeon::init()
 void Dungeon::draw() const
 {
     gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
-
+    gCoordinator.getRegisterSystem<AnimationSystem>()->updateFrames();
     m_roomMap.at(m_currentPlayerPos).draw();
 }
 
 void Dungeon::update()
 {
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
-
     m_roomMap.at(m_currentPlayerPos).update();
 
     if (!m_moveInDungeon.empty())
@@ -89,7 +90,7 @@ void Dungeon::update()
     }
 
     counter++;
-    if (m_passedBy && counter > (60 * 3))
+    if (m_passedBy && counter > (30))
     {
         m_passedBy = false;
         counter = 0;
@@ -138,9 +139,17 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<TextureSystem>(signature);
     }
 
+    const auto animationSystem = gCoordinator.getRegisterSystem<AnimationSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TileComponent>());
+        signature.set(gCoordinator.getComponentType<AnimationComponent>());
+        gCoordinator.setSystemSignature<AnimationSystem>(signature);
+    }
+
     textureSystem->loadTexturesFromFiles();
 
-    for (int i = 1000; i < 1500; i++)
+    for (int i = 1000; i < 1800; i++)
     {
         m_entities[i] = gCoordinator.createEntity();
         gCoordinator.addComponent(m_entities[i], RenderComponent{});

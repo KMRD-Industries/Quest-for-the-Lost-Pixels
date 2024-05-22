@@ -8,5 +8,8 @@
 
 struct AnimationComponent
 {
-    AnimationComponent() = default;
+    AnimationComponent() : it(frames.end()) {} // Initialize iterator to end
+    std::vector<long> frames;
+    std::vector<long>::iterator it;
+    long ignore_frames = 10;
 };

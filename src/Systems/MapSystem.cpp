@@ -3,6 +3,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+#include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Config.h"
@@ -16,19 +17,25 @@ extern Coordinator gCoordinator;
 void MapSystem::loadMap(std::string& path)
 {
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+    auto mapSystem = gCoordinator.getRegisterSystem<MapSystem>();
 
-    // Reset Map Entities to default
+    //  Reset Map Entities to default
     for (const auto& entity : m_entities)
     {
         auto& map_component = gCoordinator.getComponent<TileComponent>(entity);
         auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
 
         collisionSystem->deleteBody(entity);
+
+        transform_component.position = {0.f, 0.f};
         map_component.id = {};
         map_component.layer = {};
         transform_component.scale = sf::Vector2f(1.f, 1.f);
         transform_component.rotation = {};
+        animation_component.frames.clear();
     }
+
 
     std::ifstream json_file(path);
 

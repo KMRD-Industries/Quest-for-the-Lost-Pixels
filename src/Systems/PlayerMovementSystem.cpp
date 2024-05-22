@@ -26,7 +26,7 @@ void PlayerMovementSystem::handleMovement() const
     for (const auto& entity : m_entities)
     {
         const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
-        constexpr int playerAcc = 150;
+        constexpr int playerAcc = 300;
         const auto playerSpeed = glm::vec2{normalizedDir.x * playerAcc, normalizedDir.y * playerAcc};
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         transformComponent.velocity = {playerSpeed.x, playerSpeed.y};

@@ -1,5 +1,5 @@
 { "columns":13,
- "image":"..\/..\/assets\/floorAtlass\/CosmicLilac.png",
+ "image":"..\/floorAtlass\/CosmicLilac.png",
  "imageheight":128,
  "imagewidth":208,
  "margin":0,
@@ -13,7 +13,31 @@
          "animation":[
                 {
                  "duration":100,
-                 "tileid":66
+                 "tileid":12
+                }, 
+                {
+                 "duration":100,
+                 "tileid":24
+                }, 
+                {
+                 "duration":100,
+                 "tileid":36
+                }, 
+                {
+                 "duration":100,
+                 "tileid":48
+                }, 
+                {
+                 "duration":100,
+                 "tileid":60
+                }],
+         "id":66
+        }, 
+        {
+         "animation":[
+                {
+                 "duration":100,
+                 "tileid":74
                 }, 
                 {
                  "duration":100,
@@ -22,30 +46,10 @@
                 {
                  "duration":100,
                  "tileid":74
-                }],
-         "id":66
-        }, 
-        {
-         "animation":[
-                {
-                 "duration":100,
-                 "tileid":100
                 }, 
                 {
                  "duration":100,
-                 "tileid":100
-                }, 
-                {
-                 "duration":100,
-                 "tileid":66
-                }, 
-                {
-                 "duration":100,
-                 "tileid":78
-                }, 
-                {
-                 "duration":100,
-                 "tileid":66
+                 "tileid":74
                 }],
          "id":100
         }],
