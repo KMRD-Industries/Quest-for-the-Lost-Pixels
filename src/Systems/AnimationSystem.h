@@ -8,6 +8,5 @@ public:
     void updateFrames();
 
 private:
-    long ignore_frames = 30;
     long frame_time;
 };

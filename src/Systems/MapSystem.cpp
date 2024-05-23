@@ -16,36 +16,36 @@ extern Coordinator gCoordinator;
 
 void MapSystem::loadMap(std::string& path)
 {
+    std::unordered_map<std::string, long> atlas_sets;
+
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     auto mapSystem = gCoordinator.getRegisterSystem<MapSystem>();
 
-    //  Reset Map Entities to default
     for (const auto& entity : m_entities)
     {
-        auto& map_component = gCoordinator.getComponent<TileComponent>(entity);
-        auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
-        auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
+        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
+
+        if (tileComponent.player) continue;
 
         collisionSystem->deleteBody(entity);
-
-        transform_component.position = {0.f, 0.f};
-        map_component.id = {};
-        map_component.layer = {};
-        transform_component.scale = sf::Vector2f(1.f, 1.f);
-        transform_component.rotation = {};
-        animation_component.frames.clear();
+        transformComponent.position = {0.f, 0.f};
+        tileComponent.id = {};
+        tileComponent.layer = {};
+        transformComponent.scale = sf::Vector2f(1.f, 1.f);
+        transformComponent.rotation = {};
+        animationComponent.frames.clear();
     }
 
+    std::ifstream jsonFile(path);
 
-    std::ifstream json_file(path);
-
-    if (!json_file.is_open())
+    if (!jsonFile.is_open())
     {
         return;
     }
-
-    std::unordered_map<std::string, long> atlas_sets;
-    nlohmann::json parsed_file = nlohmann::json::parse(json_file);
+    
+    nlohmann::json parsed_file = nlohmann::json::parse(jsonFile);
 
     for (auto tileset : parsed_file["tilesets"])
     {

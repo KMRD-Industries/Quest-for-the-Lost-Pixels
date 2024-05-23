@@ -3,4 +3,6 @@
 
 struct AnimationFrame
 {
+    long tileid{};
+    long duration{};
 };

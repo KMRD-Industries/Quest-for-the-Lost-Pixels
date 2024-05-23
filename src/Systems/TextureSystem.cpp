@@ -1,6 +1,7 @@
 #include "TextureSystem.h"
 #include <fstream>
 #include <iostream>
+#include "AnimationFrame.h"
 #include "Coordinator.h"
 #include "Paths.h"
 #include "RenderComponent.h"
@@ -14,79 +15,88 @@ extern Coordinator gCoordinator;
 /**
  * This is to load TileSet from json file to atlas.
  * @param file_path path to TileSet
- * @return
+ * @return succes or fail
  */
 int TextureSystem::loadFromFile(const std::string& file_path)
 {
-    std::ifstream json_file(file_path);
-
-    if (!json_file.is_open())
+    try
     {
-        std::cout << "Failed to load TileSet." << std::endl;
-        return 0;
-    }
+        std::ifstream json_file(file_path);
 
-    nlohmann::json parsed_file = nlohmann::json::parse(json_file);
-    std::string image_path = parsed_file["image"];
-
-    sf::Image image;
-
-    if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlass/" + extractFileName(image_path, "/", ".") + ".png"))
-    {
-        std::cout << "Failed to load image." << std::endl;
-        return 0;
-    }
-
-    unsigned int width = parsed_file["imagewidth"];
-    unsigned int height = parsed_file["imageheight"];
-    int tile_width = parsed_file["tilewidth"];
-    int tile_height = parsed_file["tileheight"];
-
-    long gid = no_textures;
-    std::string tileset_name = extractFileName(file_path, "/", ".");
-    texture_indexes[tileset_name] = gid;
-
-    gid = texture_map.size() + 1;
-    long fist_gid_copy = gid;
-
-    sf::Texture tex;
-    tex.loadFromImage(image);
-
-    textures[tileset_name] = tex;
-
-    for (int y = 0; y < height; y += tile_height)
-    {
-        for (int x = 0; x < width; x += tile_width)
+        if (!json_file.is_open())
         {
-            texture_map[gid++] = sf::IntRect(x, y, tile_width, tile_height);
+            throw std::runtime_error("Cannot open file: " + file_path);
         }
-    }
 
-    no_textures = texture_map.size();
+        nlohmann::json parsed_file = nlohmann::json::parse(json_file);
+        std::string image_path = parsed_file["image"];
 
-    // Animation (MAP ONLY)
-    auto it = parsed_file.find("tiles");
-    if (it != parsed_file.end())
-    {
-        auto& tilesArray = parsed_file["tiles"];
-        for (auto& tile : tilesArray)
+        sf::Image image;
+
+        if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlas/" + extractFileName(image_path, "/", ".") +
+                                ".png"))
         {
-            auto& animationArray = tile["animation"];
-            long firstId = tile["id"];
-            firstId += texture_indexes.at(tileset_name);
+            throw std::runtime_error("Cannot open image: " + image_path);
+        }
 
-            std::vector<long> frames;
+        unsigned int width = parsed_file["imagewidth"];
+        unsigned int height = parsed_file["imageheight"];
+        int tile_width = parsed_file["tilewidth"];
+        int tile_height = parsed_file["tileheight"];
 
-            for (auto& frame : animationArray)
+        long gid = noTextures;
+        std::string tileset_name = extractFileName(file_path, "/", ".");
+        textureIndexes[tileset_name] = gid;
+
+        gid = textureMap.size() + 1;
+        long fist_gid_copy = gid;
+
+        sf::Texture tex;
+        tex.loadFromImage(image);
+
+        textures[tileset_name] = tex;
+
+        for (int y = 0; y < height; y += tile_height)
+        {
+            for (int x = 0; x < width; x += tile_width)
             {
-                long tileid = frame["tileid"];
-                frames.push_back(tileid + 1);
+                textureMap[gid++] = sf::IntRect(x, y, tile_width, tile_height);
             }
-
-            map_animations[firstId] = frames;
         }
+
+        noTextures = textureMap.size();
+
+        // Animation (MAP ONLY)
+        if (auto it = parsed_file.find("tiles"); it != parsed_file.end())
+        {
+            for (auto& tile : parsed_file["tiles"])
+            {
+                long firstId = tile["id"];
+                firstId += textureIndexes.at(tileset_name);
+                std::vector<AnimationFrame> frames;
+
+                for (auto& frame : tile["animation"])
+                {
+                    long id = frame["tileid"];
+                    long duration = frame["duration"];
+                    frames.push_back({id + 1, duration});
+                }
+
+                mapAnimations[firstId] = frames;
+            }
+        }
+        return 1;
     }
-    return 1;
+    catch (const std::exception& e)
+    {
+        std::cout << "Caught an exception: " << e.what() << std::endl;
+        return 0;
+    }
+    catch (...)
+    {
+        std::cout << "Caught an unknown exception" << std::endl;
+        return 1;
+    }
 }
 
 void TextureSystem::loadTexturesFromFiles()
@@ -99,11 +109,11 @@ void TextureSystem::loadTexturesFromFiles()
     }
 }
 
-[[maybe_unused]] sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
+sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
 {
     try
     {
-        sf::Sprite s(textures[tileset_name], texture_map[id + texture_indexes[tileset_name]]);
+        sf::Sprite s(textures[tileset_name], textureMap[id + textureIndexes[tileset_name]]);
         return s;
     }
     catch (...)
@@ -113,12 +123,11 @@ void TextureSystem::loadTexturesFromFiles()
     }
 }
 
-
-[[maybe_unused]] std::vector<long> TextureSystem::getAnimations(long id)
+std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileset_name, long id)
 {
     try
     {
-        return map_animations[id];
+        return mapAnimations[id + textureIndexes[tileset_name]];
     }
     catch (...)
     {
@@ -133,7 +142,7 @@ void TextureSystem::loadTextures()
     {
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
 
-        if (tile_component.id <= 0 || tile_component.id > no_textures)
+        if (tile_component.id <= 0 || tile_component.id > noTextures)
         {
             tile_component.layer = -1;
             tile_component.id = -1;
@@ -142,13 +151,11 @@ void TextureSystem::loadTextures()
 
         auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
         auto& render_component = gCoordinator.getComponent<RenderComponent>(entity);
-        long adjusted_id = tile_component.id - 1 + texture_indexes.at(tile_component.tileset);
+        long adjusted_id = tile_component.id - 1 + textureIndexes.at(tile_component.tileset);
 
-        if (map_animations.contains(adjusted_id))
+        if (mapAnimations.contains(adjusted_id + 1))
         {
-            if (animation_component.frames.size() < 5) animation_component.ignore_frames = 30;
-
-            animation_component.frames = getAnimations(adjusted_id);
+            animation_component.frames = getAnimations(tile_component.tileset, tile_component.id);
             if (!animation_component.frames.empty())
             {
                 animation_component.it = animation_component.frames.begin();

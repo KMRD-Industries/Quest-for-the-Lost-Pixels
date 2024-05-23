@@ -17,7 +17,7 @@ void RenderSystem::draw(sf::RenderWindow& window) const
 
     for (const auto& entity : m_entities)
     {
-        if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity); layer > 0)
+        if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity); layer > 0 && layer < 5)
         {
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             sf::FloatRect spriteBounds = sprite.getLocalBounds();

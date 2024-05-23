@@ -1,15 +1,10 @@
 #include "CollisionSystem.h"
-
-
 #include <iostream>
 #include "ColliderComponent.h"
 #include "Config.h"
-#include "Coordinator.h"
-#include "GameTypes.h"
 #include "Helpers.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
-#include "Types.h"
 
 struct RenderComponent;
 extern Coordinator gCoordinator;

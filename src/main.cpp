@@ -40,9 +40,7 @@ void handleInput(sf::RenderWindow& window)
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
-
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
@@ -61,9 +59,8 @@ int main()
         window.clear();
 
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
-        game.draw();
-
         game.update();
+        game.draw();
 
         ImGui::SFML::Update(window, deltaClock.restart());
 

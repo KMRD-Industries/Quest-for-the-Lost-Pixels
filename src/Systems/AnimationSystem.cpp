@@ -8,7 +8,7 @@ extern Coordinator gCoordinator;
 
 void AnimationSystem::updateFrames()
 {
-    frame_time++;
+    frame_time = (frame_time + 1) % 60;
 
     for (const auto& entity : m_entities)
     {
@@ -18,19 +18,16 @@ void AnimationSystem::updateFrames()
         if (!animation_component.frames.empty())
         {
             if (animation_component.it == animation_component.frames.end())
-            {
                 animation_component.it = animation_component.frames.begin();
-            }
 
-            if (frame_time % animation_component.ignore_frames == 0)
+            if (frame_time % static_cast<long>((animation_component.it->duration * 100 / 1667) + 1) == 0)
             {
                 ++animation_component.it;
-                if (animation_component.it == animation_component.frames.end())
-                {
-                    animation_component.it = animation_component.frames.begin();
-                }
 
-                tile_component.id = *animation_component.it;
+                if (animation_component.it == animation_component.frames.end())
+                    animation_component.it = animation_component.frames.begin();
+
+                tile_component.id = animation_component.it->tileid;
             }
         }
     }

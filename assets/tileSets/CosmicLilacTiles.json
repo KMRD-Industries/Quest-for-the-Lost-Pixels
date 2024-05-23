@@ -1,5 +1,5 @@
 { "columns":13,
- "image":"..\/floorAtlass\/CosmicLilac.png",
+ "image":"..\/floorAtlas\/CosmicLilac.png",
  "imageheight":128,
  "imagewidth":208,
  "margin":0,
@@ -36,11 +36,11 @@
         {
          "animation":[
                 {
-                 "duration":100,
+                 "duration":50,
                  "tileid":74
                 }, 
                 {
-                 "duration":100,
+                 "duration":400,
                  "tileid":78
                 }, 
                 {
