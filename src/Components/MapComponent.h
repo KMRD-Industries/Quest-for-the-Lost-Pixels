@@ -4,5 +4,4 @@
 
 struct MapComponent
 {
-    std::string path;
 };

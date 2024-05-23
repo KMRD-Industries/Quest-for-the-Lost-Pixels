@@ -1,7 +1,6 @@
 #include "TextureSystem.h"
 #include <fstream>
 #include <iostream>
-#include "AnimationFrame.h"
 #include "Coordinator.h"
 #include "Paths.h"
 #include "RenderComponent.h"

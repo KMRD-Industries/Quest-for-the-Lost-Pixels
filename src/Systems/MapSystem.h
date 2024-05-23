@@ -15,4 +15,6 @@ private:
 
     static void doFlips(std::uint8_t, float& rotation, sf::Vector2f& scale);
     static std::string findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long i);
+    void resetMap();
+    static void loadJsonFile(std::string& basicString, nlohmann::json json);
 };

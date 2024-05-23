@@ -16,47 +16,38 @@ extern Coordinator gCoordinator;
 
 void MapSystem::loadMap(std::string& path)
 {
-    std::unordered_map<std::string, long> atlas_sets;
-
+    resetMap();
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-    auto mapSystem = gCoordinator.getRegisterSystem<MapSystem>();
 
-    for (const auto& entity : m_entities)
-    {
-        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
-
-        if (tileComponent.player) continue;
-
-        collisionSystem->deleteBody(entity);
-        transformComponent.position = {0.f, 0.f};
-        tileComponent.id = {};
-        tileComponent.layer = {};
-        transformComponent.scale = sf::Vector2f(1.f, 1.f);
-        transformComponent.rotation = {};
-        animationComponent.frames.clear();
-    }
-
+    nlohmann::json parsed_file;
     std::ifstream jsonFile(path);
 
     if (!jsonFile.is_open())
     {
+        std::cerr << "Error: Could not open the file: " << path << std::endl;
         return;
     }
-    
-    nlohmann::json parsed_file = nlohmann::json::parse(jsonFile);
+
+    try
+    {
+        jsonFile >> parsed_file;
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+        std::cerr << "Error: Failed to parse JSON fi    le: " << e.what() << std::endl;
+        return;
+    }
+
+    std::unordered_map<std::string, long> atlas_sets;
 
     for (auto tileset : parsed_file["tilesets"])
     {
         std::string name = extractFileName(tileset["source"], "/", ".");
         long first_gid = tileset["firstgid"];
-
         atlas_sets[name] = first_gid;
     }
 
     auto start_iterator = m_entities.begin();
-    ++start_iterator;
 
     long width = {};
     long height = {};
@@ -134,6 +125,7 @@ void MapSystem::loadMap(std::string& path)
     }
 }
 
+
 void MapSystem::doFlips(std::uint8_t flags, float& rotation, sf::Vector2f& scale)
 {
     // 0000 = no change
@@ -194,4 +186,43 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
         }
     }
     return result;
+}
+
+void MapSystem::resetMap()
+{
+    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+
+    for (const auto& entity : m_entities)
+    {
+        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
+
+        collisionSystem->deleteBody(entity);
+        transformComponent.position = {0.f, 0.f};
+        tileComponent.id = {};
+        tileComponent.layer = {};
+        transformComponent.scale = sf::Vector2f(1.f, 1.f);
+        transformComponent.rotation = {};
+        animationComponent.frames.clear();
+    }
+}
+
+void MapSystem::loadJsonFile(std::string& path, nlohmann::json json)
+{
+    std::ifstream jsonFile(path);
+
+    if (!jsonFile.is_open())
+    {
+        throw std::runtime_error("Error: Could not open the file: " + path);
+    }
+
+    try
+    {
+        jsonFile >> json;
+    }
+    catch (const nlohmann::json::parse_error& e)
+    {
+        throw std::runtime_error("Error: Failed to parse JSON file: " + std::string(e.what()));
+    }
 }
