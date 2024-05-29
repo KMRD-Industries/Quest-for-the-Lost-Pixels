@@ -4,11 +4,17 @@
 
 #include "Paths.h"
 
-void Room::init() {}
+void Room::init()
+{
+}
 
-void Room::draw() const {}
+void Room::draw() const
+{
+}
 
-void Room::update() {}
+void Room::update()
+{
+}
 
 std::string Room::getMap() const
 {

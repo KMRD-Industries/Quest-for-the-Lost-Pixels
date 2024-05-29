@@ -9,11 +9,17 @@ namespace GameType
 {
     enum class DoorEntraces;
 }
+
 class Room
 {
 public:
     Room() = default;
-    explicit Room(const int id) : m_mapID(id) {}
+
+    explicit Room(const int id) :
+        m_mapID(id)
+    {
+    }
+
     void init();
     void draw() const;
     void update();

@@ -4,6 +4,7 @@
 #include "Types.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/hash.hpp"
+
 namespace SpecialBlocks
 {
     enum class Blocks : int
@@ -22,6 +23,7 @@ namespace GameType
         WEST = static_cast<int>('W'),
         EAST = static_cast<int>('E')
     };
+
     const std::unordered_map<DoorEntraces, glm::ivec2> mapDoorsToGeo{{DoorEntraces::NORTH, {0, 1}},
                                                                      {DoorEntraces::SOUTH, {0, -1}},
                                                                      {DoorEntraces::EAST, {1, 0}},

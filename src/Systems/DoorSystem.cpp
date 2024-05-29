@@ -18,6 +18,7 @@ void DoorSystem::clearDoors() const
         entityToRemove.pop_front();
     }
 }
+
 sf::Vector2f DoorSystem::getDoorPosition(const GameType::DoorEntraces entrance) const
 {
     for (const auto& entity : m_entities)

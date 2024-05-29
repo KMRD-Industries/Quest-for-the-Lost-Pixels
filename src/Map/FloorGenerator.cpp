@@ -52,7 +52,9 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
 
         std::vector<GameType::MapInfo> mapToChoose;
         const auto haveMinimalValueOfDoors = [&choosesMap, &minVal](const GameType::MapInfo& mapInfo)
-        { return choosesMap[mapInfo] == minVal; };
+        {
+            return choosesMap[mapInfo] == minVal;
+        };
         std::ranges::copy_if(availableMapsForRoom, std::back_inserter(mapToChoose), haveMinimalValueOfDoors);
 
         std::random_device rd;
