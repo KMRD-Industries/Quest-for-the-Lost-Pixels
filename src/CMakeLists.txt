@@ -36,6 +36,7 @@ set(COMPONENTS
         Components/AnimationComponent.h
         Components/AnimationFrame.h
         Components/DoorComponent.h
+		Components/TravellingDungeonComponent.h
 )
 
 set(MAP
@@ -61,7 +62,9 @@ set(SYSTEMS
         Systems/TextureSystem.cpp
         Systems/AnimationSystem.cpp
         Systems/DoorSystem.cpp
-        Systems/DoorSystem.h
+        Systems/DoorSystem.h            
+		Systems/TravellingSystem.cpp
+        Systems/TravellingSystem.h        
 )
 
 set(ATLAS_COMPONENTS

@@ -26,12 +26,25 @@ void MyContactListener::BeginContact(b2Contact* contact)
     {
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
-        colliderComponentA.collisionReaction({bodyBData->entityID, bodyBData->tag});
-        colliderComponentB.collisionReaction({bodyAData->entityID, bodyAData->tag});
+        colliderComponentA.onCollisionEnter({bodyBData->entityID, bodyBData->tag});
+        colliderComponentB.onCollisionEnter({bodyAData->entityID, bodyAData->tag});
     }
 }
 
-void MyContactListener::EndContact(b2Contact* contact) { std::cout << "Stop collision\n"; }
+void MyContactListener::EndContact(b2Contact* contact)
+{
+    const auto bodyAData =
+        reinterpret_cast<GameType::CollisionData*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
+    const auto bodyBData =
+        reinterpret_cast<GameType::CollisionData*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
+    if (bodyAData && bodyBData)
+    {
+        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
+        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
+        colliderComponentA.onCollisionOut({bodyBData->entityID, bodyBData->tag});
+        colliderComponentB.onCollisionOut({bodyAData->entityID, bodyAData->tag});
+    }
+}
 
 void CollisionSystem::updateCollision() const
 {
@@ -47,6 +60,7 @@ void CollisionSystem::updateCollision() const
                                  convertPixelsToMeters(transformComponent.velocity.y)});
     }
 }
+
 void CollisionSystem::updateSimulation(const float timeStep, const int32 velocityIterations,
                                        const int32 positionIterations)
 {
@@ -67,11 +81,14 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
  * \brief Makes 2d box collider for giving entity in our world
  * \param entity The entity for which the physical body should be created.
  * \param colliderSize The size of the collider in pixels (if not using texture size)
+ * \param onCollisionEnter Callback to function run on enter collision.
+ * \param onCollisionOut Callback to function run on leave collision.
  * \param isStatic Specifies whether the body should be static (not moving) or dynamic (moving).
  * \param useTextureSize Specifies whether the collider size should be based on the entity's texture size.
  */
 void CollisionSystem::createBody(const Entity entity, const std::string& tag, const glm::vec2& colliderSize,
-                                 const std::function<void(GameType::CollisionData)>& collisionReaction,
+                                 const std::function<void(GameType::CollisionData)>& onCollisionEnter,
+                                 const std::function<void(GameType::CollisionData)>& onCollisionOut,
                                  const bool isStatic, const bool useTextureSize)
 {
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
@@ -117,9 +134,11 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
     body->CreateFixture(&fixtureDef);
     body->SetFixedRotation(true);
     colliderComponent.body = body;
-    colliderComponent.collisionReaction = collisionReaction;
+    colliderComponent.onCollisionEnter = onCollisionEnter;
+    colliderComponent.onCollisionOut = onCollisionOut;
     colliderComponent.tag = tag;
 }
+
 void CollisionSystem::deleteBody(Entity entity)
 {
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);

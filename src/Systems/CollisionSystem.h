@@ -20,14 +20,20 @@ class MyContactListener : public b2ContactListener
 class CollisionSystem : public System
 {
 public:
-    explicit CollisionSystem() : m_world(b2Vec2(0.f, 0.f)) { m_world.SetContactListener(&m_myContactListenerInstance); }
+    explicit CollisionSystem() :
+        m_world(b2Vec2(0.f, 0.f)) { m_world.SetContactListener(&m_myContactListenerInstance); }
 
     void updateCollision() const;
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations);
     void createBody(
-        Entity entity, const std::string& tag, const glm::vec2& colliderSize,
-        const std::function<void(GameType::CollisionData)>& collisionReaction = [](const GameType::CollisionData&) {},
-        bool isStatic = true, bool useTextureSize = false);
+        Entity entity, const std::string& tag, const glm::vec2& colliderSize = {},
+        const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&)
+        {
+        },
+        const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&)
+        {
+        },
+        bool isStatic = true, bool useTextureSize = true);
     void deleteBody(Entity entity);
 
 private:
