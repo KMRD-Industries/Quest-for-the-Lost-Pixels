@@ -6,6 +6,7 @@
 #include "Coordinator.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
+#include "TileComponent.h"
 #include "TransformComponent.h"
 
 void Game::init()
@@ -14,6 +15,7 @@ void Game::init()
     gCoordinator.registerComponent<ColliderComponent>();
     gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TransformComponent>();
+    gCoordinator.registerComponent<TileComponent>();
 
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     {
@@ -21,6 +23,7 @@ void Game::init()
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         signature.set(gCoordinator.getComponentType<ColliderComponent>());
+        signature.set(gCoordinator.getComponentType<TileComponent>());
         gCoordinator.setSystemSignature<CollisionSystem>(signature);
     }
 
@@ -31,6 +34,7 @@ void Game::init()
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
+    
     m_dungeon.init();
 };
 

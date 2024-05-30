@@ -5,7 +5,6 @@
 #include "InputHandler.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
-#include "glm/detail/func_geometric.inl"
 #include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;

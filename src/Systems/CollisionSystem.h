@@ -22,7 +22,7 @@ class CollisionSystem : public System
 public:
     explicit CollisionSystem() : m_world(b2Vec2(0.f, 0.f)) { m_world.SetContactListener(&m_myContactListenerInstance); }
 
-    void updateCollision() const;
+    void updateCollision();
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations);
     void createBody(
         Entity entity, const std::string& tag, const glm::vec2& colliderSize,

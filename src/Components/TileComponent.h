@@ -5,14 +5,14 @@
 
 struct TileComponent
 {
-    long id{};
+    int64_t id{};
     std::string tileset;
     int layer{};
 
-    explicit TileComponent(uint32_t id) : id{static_cast<long>(id)}, layer{0} {};
+    explicit TileComponent(uint32_t tile_id) : id{static_cast<int64_t>(tile_id)} {};
 
-    TileComponent(uint32_t id, std::string tileset, int layer, bool player) :
-        id{static_cast<long>(id)}, tileset{std::move(tileset)}, layer{layer}
+    TileComponent(uint32_t tile_id, std::string tileset, int layer, bool player) :
+        id{static_cast<int64_t>(tile_id)}, tileset{std::move(tileset)}, layer{layer}
     {
     }
 

@@ -123,12 +123,12 @@ Collision TextureSystem::getCollision(const std::string& tileset_name, long id)
     try
     {
         long ad = id + texture_indexes.at(tileset_name);
-        return map_collisions.at(ad);
+        if (map_collisions.contains(ad)) return map_collisions.at(ad);
+        return Collision{};
     }
     catch (...)
     {
-        std::cout << "Texture ID out of range";
-        return {};
+        return Collision{};
     }
 }
 

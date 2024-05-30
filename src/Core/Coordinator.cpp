@@ -1,6 +1,6 @@
 #include "Coordinator.h"
 
-Coordinator::Coordinator(){};
+Coordinator::Coordinator() = default;
 
 void Coordinator::init()
 {
@@ -9,9 +9,9 @@ void Coordinator::init()
     m_systemManager = std::make_unique<SystemManager>();
 }
 
-Entity Coordinator::createEntity() const { return m_entityManager->createEntity(); }
+auto Coordinator::createEntity() const -> Entity { return m_entityManager->createEntity(); }
 
-void Coordinator::destroyEntity(const Entity entity) const
+[[maybe_unused]] void Coordinator::destroyEntity(const Entity entity) const
 {
     m_entityManager->destroyEntity(entity);
     m_componentManager->entityDestroyed(entity);

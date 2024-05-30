@@ -66,7 +66,6 @@ set(SYSTEMS
 )
 
 set(ATLAS_COMPONENTS
-        AtlasComponents/Texture.cpp
         AtlasComponents/Texture.h
         AtlasComponents/Map.h
         AtlasComponents/Tileset.h

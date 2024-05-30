@@ -11,4 +11,5 @@ public:
 
 private:
     Dungeon m_dungeon;
+    std::vector<Entity> m_entities{};
 };

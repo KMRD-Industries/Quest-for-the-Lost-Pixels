@@ -12,7 +12,7 @@ class Coordinator
 public:
     Coordinator();
     void init();
-    Entity createEntity() const;
+    auto createEntity() const -> Entity;
     void destroyEntity(Entity entity) const;
 
     template <typename T>
@@ -46,19 +46,19 @@ public:
     }
 
     template <typename T>
-    T& getComponent(const Entity entity) const
+    auto getComponent(const Entity entity) const -> T&
     {
         return m_componentManager->getComponent<T>(entity);
     }
 
     template <typename T>
-    ComponentType getComponentType() const
+    [[nodiscard]] auto getComponentType() const -> ComponentType
     {
         return m_componentManager->getComponentType<T>();
     }
-    
+
     template <typename T>
-    std::shared_ptr<T> getRegisterSystem()
+    auto getRegisterSystem() -> std::shared_ptr<T>
     {
         return m_systemManager->registerSystem<T>();
     }

@@ -45,10 +45,10 @@ public:
         --m_size;
     }
 
-    T& getData(const Entity entity)
+    auto getData(const Entity entity) -> T&
     {
         assert(m_entityToIndex.contains(entity) && "Retrieving non-existent component.");
-        return m_componentArray[m_entityToIndex.at(entity)];
+        return m_componentArray.at(m_entityToIndex.at(entity));
     }
 
     void entityDestroyed(const Entity entity) override

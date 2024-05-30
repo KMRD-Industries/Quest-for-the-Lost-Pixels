@@ -12,19 +12,23 @@ void AnimationSystem::updateFrames()
     {
         auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
 
-        // Ignore if there is no animations
-        if (animation_component.frames.empty()) continue;
-
-        // Check if animation frame time is up
-        if (frame_time % static_cast<long>((animation_component.it->duration * 100 / config::oneFrameTime) + 1))
+        if (animation_component.frames.empty())
+        {
             continue;
+        }
+
+        auto duration = static_cast<float>(animation_component.it->duration);
+        long frameDuration = static_cast<long>(duration / config::oneFrameTime) + 1;
+
+        if (frame_time % frameDuration != 0)
+        {
+            continue;
+        }
 
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
 
-        // Get new frame
         ++animation_component.it;
 
-        // Play animation from beginning if frames reach to end
         if (animation_component.it == animation_component.frames.end())
         {
             animation_component.it = animation_component.frames.begin();

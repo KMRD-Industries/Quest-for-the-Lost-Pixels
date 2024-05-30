@@ -4,6 +4,9 @@
 #include "Config.h"
 #include "Helpers.h"
 #include "RenderComponent.h"
+#include "TextureSystem.h"
+#include "TileComponent.h"
+#include "Tileset.h"
 #include "TransformComponent.h"
 
 struct RenderComponent;
@@ -26,10 +29,11 @@ void MyContactListener::BeginContact(b2Contact* contact)
 
 void MyContactListener::EndContact(b2Contact* contact) { std::cout << "Stop collision\n"; }
 
-void CollisionSystem::updateCollision() const
+void CollisionSystem::updateCollision()
 {
-    for (const auto& entity : m_entities)
+    for (auto& entity : m_entities)
     {
+        resetCollisions();
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
@@ -63,9 +67,9 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
  * \param isStatic Specifies whether the body should be static (not moving) or dynamic (moving).
  * \param useTextureSize Specifies whether the collider size should be based on the entity's texture size.
  */
-void CollisionSystem::createBody(const Entity entity, const std::string& tag, const glm::vec2& colliderSize,
-                                 const std::function<void(GameType::CollisionData)>& collisionReaction,
-                                 const bool isStatic, const bool useTextureSize, const glm::vec2& offset)
+void CollisionSystem::createBody(Entity entity, const std::string& tag, const glm::vec2& colliderSize,
+                                 const std::function<void(GameType::CollisionData)>& collisionReaction, bool isStatic,
+                                 bool useTextureSize, const glm::vec2& offset)
 {
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
@@ -128,7 +132,10 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
 void CollisionSystem::deleteBody(Entity entity)
 {
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-    if (colliderComponent.body != nullptr) m_world.DestroyBody(colliderComponent.body);
+    if (colliderComponent.body != nullptr)
+    {
+        m_world.DestroyBody(colliderComponent.body);
+    }
     colliderComponent.body = nullptr;
 }
 

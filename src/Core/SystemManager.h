@@ -12,11 +12,14 @@ class SystemManager
 {
 public:
     template <typename T>
-    std::shared_ptr<T> registerSystem()
+    auto registerSystem() -> std::shared_ptr<T>
     {
         const std::string typeName{typeid(T).name()};
 
-        if (m_systems.contains(typeName)) return std::static_pointer_cast<T>(m_systems.at(typeName));
+        if (m_systems.contains(typeName))
+        {
+            return std::static_pointer_cast<T>(m_systems.at(typeName));
+        }
 
         const auto system{std::make_shared<T>()};
 

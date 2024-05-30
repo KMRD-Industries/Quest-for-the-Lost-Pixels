@@ -1,7 +1,7 @@
 #pragma once
 
-#include <unordered_map>
 #include "nlohmann/json.hpp"
+#include <unordered_map>
 
 using json = nlohmann::json;
 
@@ -41,7 +41,7 @@ struct Map
     std::string renderorder;
     std::string tiledversion;
     int tileheight;
-    std::unordered_map<std::string, long> tilesets;
+    std::unordered_map<std::string, std::int64_t> tilesets;
     int tilewidth;
     std::string type;
     std::string version;

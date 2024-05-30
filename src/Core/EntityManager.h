@@ -8,10 +8,10 @@ class EntityManager
 {
 public:
     EntityManager();
-    Entity createEntity();
+    auto createEntity() -> Entity;
     void destroyEntity(Entity entity);
     void setSignature(Entity entity, const Signature& signature);
-    [[nodiscard]] Signature getSignature(Entity entity) const;
+    [[nodiscard]] auto getSignature(Entity entity) const -> Signature;
 
 private:
     std::queue<Entity> m_availableEntities{};

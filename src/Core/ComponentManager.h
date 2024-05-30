@@ -27,12 +27,10 @@ public:
     }
 
     template <typename T>
-    [[nodiscard]] ComponentType getComponentType() const
+    [[nodiscard]] auto getComponentType() const -> ComponentType
     {
         const std::string componentName{typeid(T).name()};
-
         assert(m_componentTypes.contains(componentName) && "Component not registered before use.");
-
         return m_componentTypes.at(componentName);
     }
 
@@ -50,11 +48,11 @@ public:
 
 
     template <typename T>
-    T& getComponent(const Entity entity) const
+    auto getComponent(const Entity entity) const -> T&
     {
         return getComponentArray<T>()->getData(entity);
     }
-    
+
     void entityDestroyed(Entity entity) const;
 
 private:
@@ -63,10 +61,9 @@ private:
     ComponentType m_nextFreeComponentType{};
 
     template <typename T>
-    std::shared_ptr<ComponentArray<T>> getComponentArray() const
+    auto getComponentArray() const -> std::shared_ptr<ComponentArray<T>>
     {
         const std::string componentName{typeid(T).name()};
-
         assert(m_componentTypes.contains(componentName) && "Component not registered before use.");
 
         return std::static_pointer_cast<ComponentArray<T>>(m_componentArrays.at(componentName));

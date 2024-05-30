@@ -1,7 +1,9 @@
 #pragma once
 
+#include "CollisionSystem.h"
 #include "GameTypes.h"
 #include "Helpers.h"
+#include "Map.h"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "System.h"
 

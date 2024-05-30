@@ -1,11 +1,8 @@
 #pragma once
 
-#include <SFML/System/Vector2.hpp>
-#include <iostream>
+#include "AnimationFrame.h"
 #include <utility>
 #include <vector>
-#include "AnimationFrame.h"
-#include "AtlasComponents/Texture.h"
 
 struct AnimationComponent
 {
@@ -15,5 +12,5 @@ struct AnimationComponent
     bool loop_animation = true;
 
     explicit AnimationComponent(const std::vector<AnimationFrame>& frames) :
-        frames(frames), it(this->frames.end()), loop_animation{true} {};
+        frames(frames), it(this->frames.end()) {};
 };

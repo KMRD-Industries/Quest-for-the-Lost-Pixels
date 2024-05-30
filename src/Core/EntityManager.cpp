@@ -10,22 +10,22 @@ EntityManager::EntityManager()
     }
 }
 
-Entity EntityManager::createEntity()
+auto EntityManager::createEntity() -> Entity
 {
     assert(m_livingEntityCount < MAX_ENTITIES && "Too many entities in existence.");
 
-    const Entity id{m_availableEntities.front()};
+    const Entity entity_id{m_availableEntities.front()};
     m_availableEntities.pop();
     ++m_livingEntityCount;
 
-    return id;
+    return entity_id;
 }
 
 void EntityManager::destroyEntity(const Entity entity)
 {
     assert(entity < MAX_ENTITIES && "Entity out of range.");
 
-    m_signatures[entity].reset();
+    m_signatures.at(entity).reset();
     m_availableEntities.push(entity);
     --m_livingEntityCount;
 }
@@ -33,13 +33,11 @@ void EntityManager::destroyEntity(const Entity entity)
 void EntityManager::setSignature(const Entity entity, const Signature& signature)
 {
     assert(entity < MAX_ENTITIES && "Entity out of range.");
-
-    m_signatures[entity] = signature;
+    m_signatures.at(entity) = signature;
 }
 
-Signature EntityManager::getSignature(const Entity entity) const
+auto EntityManager::getSignature(const Entity entity) const -> Signature
 {
     assert(entity < MAX_ENTITIES && "Entity out of range.");
-
-    return m_signatures[entity];
+    return m_signatures.at(entity);
 }
