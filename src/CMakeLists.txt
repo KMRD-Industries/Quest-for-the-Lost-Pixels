@@ -68,6 +68,8 @@ set(SYSTEMS
 set(ATLAS_COMPONENTS
         AtlasComponents/Texture.cpp
         AtlasComponents/Texture.h
+        AtlasComponents/Map.h
+        AtlasComponents/Tileset.h
 )
 
 set(UTILS
@@ -75,6 +77,9 @@ set(UTILS
         Utils/Helpers.h
         Utils/GameTypes.h
         Utils/Config.h
+        Utils/MapParser.h
+        Utils/TextureParser.h
+
 )
 
 source_group("Core" FILES ${CORE})

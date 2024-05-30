@@ -1,8 +1,6 @@
 #include "Dungeon.h"
-
-#include "Coordinator.h"
-
 #include "AnimationComponent.h"
+#include "AnimationSystem.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "DoorComponent.h"
@@ -10,19 +8,15 @@
 #include "Helpers.h"
 #include "InputHandler.h"
 #include "MapComponent.h"
+#include "MapSystem.h"
+#include "Paths.h"
 #include "PlayerComponent.h"
+#include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
+#include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
-#include "MapSystem.h"
-#include "PlayerMovementSystem.h"
-#include "TextureSystem.h"
-
-#include "AnimationSystem.h"
-#include "Paths.h"
-
-extern Coordinator gCoordinator;
 
 void Dungeon::init()
 {
@@ -30,24 +24,26 @@ void Dungeon::init()
 
     m_entities[0] = gCoordinator.createEntity();
     m_entities[1] = gCoordinator.createEntity();
-    sf::Sprite texture = *new sf::Sprite();
+    const auto texture = new sf::Texture();
     const auto texture2 = new sf::Texture();
     const std::string PathToAssets{ASSET_PATH};
+    texture->loadFromFile(PathToAssets + "/knight/knight.png");
     texture2->loadFromFile(PathToAssets + "/knight/knight.png");
 
-    std::vector<AnimationFrame> animations =
-        gCoordinator.getRegisterSystem<TextureSystem>()->getAnimations("Characters", 184);
-
-    gCoordinator.addComponent(m_entities[0], TileComponent{184, "Characters", 4, true});
-    gCoordinator.addComponent(m_entities[0], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer = 4});
-    gCoordinator.addComponent(m_entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
-    gCoordinator.addComponent(m_entities[0], AnimationComponent{animations});
+    gCoordinator.addComponent(m_entities[0], TileComponent{243, "Characters", 4, true});
+    gCoordinator.addComponent(m_entities[0], RenderComponent{});
+    gCoordinator.addComponent(m_entities[0], TransformComponent(sf::Vector2f(1.f, 1.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
     gCoordinator.addComponent(m_entities[0], ColliderComponent{});
 
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", 185);
+
+    glm::vec2 collider_size{cc.width, cc.height};
+    glm::vec2 offset{cc.x, cc.y + 32};
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        m_entities[0], "FirstPlayer", {},
+        m_entities[0], "FirstPlayer", collider_size,
         [&](const GameType::CollisionData& entityT)
         {
             if (entityT.tag == "Door")
@@ -57,15 +53,14 @@ void Dungeon::init()
                 m_moveInDungeon.emplace_back(GameType::mapDoorsToGeo.at(doorComponent.entrance));
             }
         },
-        false, true);
+        false, false, offset);
 
-    gCoordinator.addComponent(m_entities[1], RenderComponent{});
-    gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(50.f, 50.f), 0.f, sf::Vector2f(1.f, 1.f)));
-    gCoordinator.addComponent(m_entities[1], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[1], ColliderComponent{});
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        m_entities[1], "SecondPlayer", {}, [](const GameType::CollisionData& entityT) {}, true, true);
-
+    //    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer =
+    //    4}); gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(50.f, 50.f), 0.f,
+    //    sf::Vector2f(1.f, 1.f))); gCoordinator.addComponent(m_entities[1], AnimationComponent{});
+    //    gCoordinator.addComponent(m_entities[1], ColliderComponent{});
+    //    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
+    //        m_entities[1], "SecondPlayer", {}, [](const GameType::CollisionData& entityT) {}, true, true);
     makeSimpleFloor();
 
     m_roomMap.at(m_currentPlayerPos).init();
@@ -141,6 +136,7 @@ void Dungeon::setECS()
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         signature.set(gCoordinator.getComponentType<AnimationComponent>());
         signature.set(gCoordinator.getComponentType<TileComponent>());
+        signature.set(gCoordinator.getComponentType<ColliderComponent>());
         gCoordinator.setSystemSignature<TextureSystem>(signature);
     }
 

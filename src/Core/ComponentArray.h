@@ -15,8 +15,10 @@ public:
     {
         assert(!m_entityToIndex.contains(entity) && "Component added to same entity more than once.");
         const size_t newIndex{m_size};
-        m_entityToIndex[entity] = newIndex;
-        m_indexToEntity[newIndex] = entity;
+
+        m_entityToIndex.insert(std::make_pair(entity, newIndex));
+        m_indexToEntity.emplace(newIndex, entity).first->second = entity;
+
         m_componentArray[newIndex] = component;
         ++m_size;
     }
@@ -25,13 +27,17 @@ public:
     {
         assert(m_entityToIndex.contains(entity) && "Removing non-existent component.");
 
-        const size_t indexOfRemovedEntity{m_entityToIndex[entity]};
+        const size_t indexOfRemovedEntity{m_entityToIndex.at(entity)};
         const size_t indexOfLastElement{m_size - 1};
         m_componentArray[indexOfRemovedEntity] = m_componentArray[indexOfLastElement];
 
-        const Entity entityOfLastElement{m_indexToEntity[indexOfLastElement]};
-        m_entityToIndex[entityOfLastElement] = indexOfRemovedEntity;
-        m_indexToEntity[indexOfRemovedEntity] = entityOfLastElement;
+        const Entity entityOfLastElement{m_indexToEntity.at(indexOfLastElement)};
+
+        m_entityToIndex.emplace(entityOfLastElement, indexOfRemovedEntity).first->second = indexOfRemovedEntity;
+        m_indexToEntity.emplace(indexOfRemovedEntity, entityOfLastElement).first->second = entityOfLastElement;
+
+        //        m_entityToIndex[entityOfLastElement] = indexOfRemovedEntity;
+        //        m_indexToEntity[indexOfRemovedEntity] = entityOfLastElement;
 
         m_entityToIndex.erase(entity);
         m_indexToEntity.erase(indexOfLastElement);
@@ -42,7 +48,7 @@ public:
     T& getData(const Entity entity)
     {
         assert(m_entityToIndex.contains(entity) && "Retrieving non-existent component.");
-        return m_componentArray[m_entityToIndex[entity]];
+        return m_componentArray[m_entityToIndex.at(entity)];
     }
 
     void entityDestroyed(const Entity entity) override

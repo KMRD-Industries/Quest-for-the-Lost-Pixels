@@ -1,7 +1,9 @@
 #include "PlayerMovementSystem.h"
 #include <iostream>
+#include "AnimationComponent.h"
 #include "Coordinator.h"
 #include "InputHandler.h"
+#include "TileComponent.h"
 #include "TransformComponent.h"
 #include "glm/detail/func_geometric.inl"
 #include "glm/vec2.hpp"
@@ -28,7 +30,7 @@ void PlayerMovementSystem::handleMovement()
         flip = true;
         dir.x -= 1;
     }
-
+    
     for (const auto& entity : m_entities)
     {
         const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);

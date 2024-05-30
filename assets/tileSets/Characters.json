@@ -79,7 +79,36 @@
                  "duration":80,
                  "tileid":184
                 }],
-         "id":184
+         "id":184,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":6,
+                     "id":12,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"36",
+                             "type":"string",
+                             "value":"184"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":12.5,
+                     "x":3.5,
+                     "y":24
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
         }, 
         {
          "animation":[

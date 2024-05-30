@@ -65,7 +65,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
  */
 void CollisionSystem::createBody(const Entity entity, const std::string& tag, const glm::vec2& colliderSize,
                                  const std::function<void(GameType::CollisionData)>& collisionReaction,
-                                 const bool isStatic, const bool useTextureSize)
+                                 const bool isStatic, const bool useTextureSize, const glm::vec2& offset)
 {
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
@@ -95,8 +95,19 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
                           convertPixelsToMeters(spriteBounds.height * config::gameScale) / 2);
     }
     else
-        boxShape.SetAsBox(convertPixelsToMeters(colliderSize.x * config::gameScale) / 2,
-                          convertPixelsToMeters(colliderSize.y * config::gameScale) / 2);
+    {
+        // Set the collision box size
+        float boxWidth = convertPixelsToMeters(colliderSize.x * config::gameScale) / 2;
+        float boxHeight = convertPixelsToMeters(colliderSize.y * config::gameScale) / 2;
+
+        // Set the collision box position relative to the entity's position
+        float offsetX = convertPixelsToMeters((offset.x + colliderSize.x / 2.f * config::gameScale));
+        float offsetY = convertPixelsToMeters((offset.y + colliderSize.y / 2.f * config::gameScale));
+
+        boxShape.SetAsBox(boxWidth, boxHeight, b2Vec2(offsetX, offsetY), 0);
+    }
+    //    boxShape.SetAsBox(convertPixelsToMeters((colliderSize.x + offset.x) * config::gameScale / 2),
+    //                      convertPixelsToMeters((colliderSize.y + offset.y) * config::gameScale / 2));
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &boxShape;
@@ -120,3 +131,5 @@ void CollisionSystem::deleteBody(Entity entity)
     if (colliderComponent.body != nullptr) m_world.DestroyBody(colliderComponent.body);
     colliderComponent.body = nullptr;
 }
+
+void CollisionSystem::resetCollisions() { m_world.ClearForces(); }

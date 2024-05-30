@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <utility>
 
 class b2Body;
 
@@ -11,9 +12,9 @@ struct ColliderComponent
 
     ColliderComponent() = default;
 
-    explicit ColliderComponent(b2Body* body, const std::string& tag,
+    explicit ColliderComponent(b2Body* body, std::string tag,
                                const std::function<void(GameType::CollisionData)>& collisionReaction) :
-        body{body}, tag{tag}, collisionReaction{collisionReaction}
+        body{body}, tag{std::move(tag)}, collisionReaction{collisionReaction}
     {
     }
 };

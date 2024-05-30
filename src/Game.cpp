@@ -8,8 +8,6 @@
 #include "RenderSystem.h"
 #include "TransformComponent.h"
 
-extern Coordinator gCoordinator;
-
 void Game::init()
 {
     gCoordinator.init();
@@ -38,10 +36,11 @@ void Game::init()
 
 void Game::draw() const { m_dungeon.draw(); };
 void Game::update() { m_dungeon.update(); }
+
 void Game::handleCollision()
 {
     const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     collisionSystem->updateCollision();
-    constexpr auto timeStep = 1.f / 60.f;
+    constexpr auto timeStep = 1.F / 60.F;
     collisionSystem->updateSimulation(timeStep, 8, 3);
 };

@@ -1,89 +1,85 @@
 #include "TextureSystem.h"
-#include <fstream>
 #include <iostream>
+#include "CollisionSystem.h"
 #include "Coordinator.h"
+#include "DoorComponent.h"
 #include "Paths.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/Image.hpp"
+#include "TextureParser.h"
 #include "TileComponent.h"
 #include "Utils/Helpers.h"
-#include "nlohmann/json.hpp"
 
 extern Coordinator gCoordinator;
 
 /**
  * This is to load TileSet from json file to atlas.
+
  * @param file_path path to TileSet
- * @return succes or fail
+ * @return success or fail
  */
-int TextureSystem::loadFromFile(const std::string& file_path)
+int TextureSystem::loadFromFile(const std::string& path)
 {
     try
     {
-        std::ifstream json_file(file_path);
-
-        if (!json_file.is_open())
-        {
-            throw std::runtime_error("Cannot open file: " + file_path);
-        }
-
-        nlohmann::json parsed_file = nlohmann::json::parse(json_file);
-        std::string image_path = parsed_file["image"];
-
+        Tileset parsed_tileset = parseTileset(path); // Parse Tileset to struct
         sf::Image image;
+        long gid = static_cast<long>(texture_map.size()); // Get id first unused tile id
 
-        if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlas/" + extractFileName(image_path, "/", ".") +
-                                ".png"))
+        // Load image
+        if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlas/" + parsed_tileset.image + ".png"))
         {
-            throw std::runtime_error("Cannot open image: " + image_path);
+            throw std::runtime_error("Cannot open image: " + parsed_tileset.image);
         }
 
-        unsigned int width = parsed_file["imagewidth"];
-        unsigned int height = parsed_file["imageheight"];
-        int tile_width = parsed_file["tilewidth"];
-        int tile_height = parsed_file["tileheight"];
+        // When loading maps, tiles are numerated from 0 and tilesets in system may have different starting IDs.
+        // To synchronize map tilesets with loaded tilesets, it's essential to store the first ID of each loaded set
+        // and then adjust map tilesets while loading.
+        texture_indexes.emplace(parsed_tileset.name, gid);
 
-        long gid = noTextures;
-        std::string tileset_name = extractFileName(file_path, "/", ".");
-        textureIndexes[tileset_name] = gid;
-
-        gid = textureMap.size() + 1;
-        long fist_gid_copy = gid;
+        gid += 1; // First unused ID
+        long first_gid_copy = gid;
 
         sf::Texture tex;
         tex.loadFromImage(image);
+        textures.emplace(parsed_tileset.name, tex);
 
-        textures[tileset_name] = tex;
-
-        for (int y = 0; y < height; y += tile_height)
+        // Read all tiles into system
+        for (int y = 0; y < parsed_tileset.imageheight; y += parsed_tileset.tileheight)
         {
-            for (int x = 0; x < width; x += tile_width)
+            for (int x = 0; x < parsed_tileset.imagewidth; x += parsed_tileset.tilewidth)
             {
-                textureMap[gid++] = sf::IntRect(x, y, tile_width, tile_height);
+                texture_map.emplace(gid++, sf::IntRect(x, y, parsed_tileset.tilewidth, parsed_tileset.tileheight));
             }
         }
 
-        noTextures = textureMap.size();
+        no_textures = static_cast<long>(texture_map.size());
 
-        // Animation (MAP ONLY)
-        if (auto it = parsed_file.find("tiles"); it != parsed_file.end())
+        // Animations are also stored in TilesetFormat
+        for (auto& tile : parsed_tileset.tiles)
         {
-            for (auto& tile : parsed_file["tiles"])
+            long adjusted_id = first_gid_copy + tile.id;
+
+            if (!tile.animation.empty())
             {
-                long firstId = tile["id"];
-                firstId += textureIndexes.at(tileset_name);
                 std::vector<AnimationFrame> frames;
 
-                for (auto& frame : tile["animation"])
+                for (auto& frame : tile.animation)
                 {
-                    long id = frame["tileid"];
-                    long duration = frame["duration"];
-                    frames.push_back({id + 1, duration});
+                    long id = frame.tileid + 1;
+                    long duration = frame.duration;
+                    frames.push_back({id, duration});
                 }
 
-                mapAnimations[firstId] = frames;
+                map_animations.emplace(adjusted_id, frames);
+            }
+
+            if (!tile.objects.empty())
+            {
+                map_collisions.emplace(adjusted_id, tile.objects.at(0));
             }
         }
+
         return 1;
     }
     catch (const std::exception& e)
@@ -112,7 +108,7 @@ sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
 {
     try
     {
-        sf::Sprite s(textures[tileset_name], textureMap[id + textureIndexes[tileset_name]]);
+        sf::Sprite s(textures.at(tileset_name), texture_map.at(id + texture_indexes.at(tileset_name)));
         return s;
     }
     catch (...)
@@ -122,11 +118,12 @@ sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
     }
 }
 
-std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileset_name, long id)
+Collision TextureSystem::getCollision(const std::string& tileset_name, long id)
 {
     try
     {
-        return mapAnimations[id + textureIndexes[tileset_name]];
+        long ad = id + texture_indexes.at(tileset_name);
+        return map_collisions.at(ad);
     }
     catch (...)
     {
@@ -135,36 +132,57 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
     }
 }
 
+
+std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileset_name, long id)
+{
+    try
+    {
+        return map_animations.at(id + texture_indexes.at(tileset_name));
+    }
+    catch (...)
+    {
+        std::cout << "Texture ID out of range";
+        return {};
+    }
+}
+
+/**
+ * Load textures into tiles.
+ */
 void TextureSystem::loadTextures()
 {
+    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+
     for (const auto& entity : m_entities)
     {
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
 
-        if (tile_component.id <= 0 || tile_component.id > noTextures)
-        {
-            tile_component.layer = -1;
-            tile_component.id = -1;
-            continue;
-        }
+        // Ignore invalid values
+        if (tile_component.id <= 0 || tile_component.id > no_textures) continue;
 
         auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
         auto& render_component = gCoordinator.getComponent<RenderComponent>(entity);
-        long adjusted_id = tile_component.id - 1 + textureIndexes.at(tile_component.tileset);
 
-        if (mapAnimations.contains(adjusted_id + 1))
+        // Adjust tile index
+        long adjusted_id = tile_component.id + texture_indexes.at(tile_component.tileset);
+
+        // Load animations from system if tile is animated
+        if (map_animations.contains(adjusted_id))
         {
             animation_component.frames = getAnimations(tile_component.tileset, tile_component.id);
-            if (!animation_component.frames.empty())
-            {
-                animation_component.it = animation_component.frames.begin();
-            }
-            else
-            {
-                animation_component.it = animation_component.frames.end();
-            }
+            animation_component.it = animation_component.frames.begin();
         }
 
+        //        if (map_collisions.contains(adjusted_id))
+        //        {
+        //            Collision cc = getCollision(tile_component.tileset, tile_component.id);
+        //            collisionSystem->createBody(entity, "Wall", {cc.width, cc.height},
+        //                                        [](const GameType::CollisionData& entityT) {}, true, false, {cc.x,
+        //                                        cc.y});
+        //        }
+
+
+        // Load texture of tile with that id to render component
         render_component.sprite = getTile(tile_component.tileset, tile_component.id);
         render_component.layer = tile_component.layer;
     }

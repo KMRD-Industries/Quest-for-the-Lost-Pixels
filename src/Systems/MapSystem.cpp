@@ -1,77 +1,39 @@
 #include "MapSystem.h"
-#include <fstream>
-#include <iostream>
 #include <nlohmann/json.hpp>
-
 #include "AnimationComponent.h"
-#include "ColliderComponent.h"
 #include "CollisionSystem.h"
-#include "Config.h"
-#include "Coordinator.h"
 #include "DoorComponent.h"
+#include "Map.h"
+#include "MapParser.h"
+#include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
 extern Coordinator gCoordinator;
 
-void MapSystem::loadMap(std::string& path)
+void MapSystem::loadMap(const std::string& path)
 {
-    resetMap();
-    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-
-    nlohmann::json parsed_file;
-    std::ifstream jsonFile(path);
-
-    if (!jsonFile.is_open())
-    {
-        std::cerr << "Error: Could not open the file: " << path << std::endl;
-        return;
-    }
-
-    try
-    {
-        jsonFile >> parsed_file;
-    }
-    catch (const nlohmann::json::parse_error& e)
-    {
-        std::cerr << "Error: Failed to parse JSON fi    le: " << e.what() << std::endl;
-        return;
-    }
-
-    std::unordered_map<std::string, long> atlas_sets;
-
-    for (auto tileset : parsed_file["tilesets"])
-    {
-        std::string name = extractFileName(tileset["source"], "/", ".");
-        long first_gid = tileset["firstgid"];
-        atlas_sets[name] = first_gid;
-    }
+    resetMap(); // Reset old map entities
+    Map parsed_map = parseMap(path); // Parse json map
 
     auto start_iterator = m_entities.begin();
+    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
 
-    long width = {};
-    long height = {};
-    float tile_height = parsed_file["tileheight"];
-    float tile_width = parsed_file["tilewidth"];
-
-    for (auto& data : parsed_file["layers"])
+    for (auto& layer : parsed_map.layers)
     {
-        if (!data.contains("data")) continue;
+        if (layer.data.empty()) continue;
 
         static constexpr std::uint32_t mask = 0xf0000000;
         int index = {};
 
-        width = data["width"];
-        height = data["height"];
-
-        for (uint32_t i : processDataString(data["data"], width * height, 0))
+        for (uint32_t i : processDataString(layer.data, layer.width * layer.height, 0))
         {
             uint32_t flipFlags = (i & mask) >> 28;
             uint32_t tileID = i & ~mask;
 
-            int layer = data["id"];
-            int x_position = index % (static_cast<int>(width));
-            int y_position = index / (static_cast<int>(width));
+            int layer_id = layer.id;
+            int x_position = index % (static_cast<int>(layer.width));
+            int y_position = index / (static_cast<int>(layer.width));
 
             if (tileID < 1)
             {
@@ -82,39 +44,43 @@ void MapSystem::loadMap(std::string& path)
             auto& tileComponent = gCoordinator.getComponent<TileComponent>(*start_iterator);
             auto& transform_component = gCoordinator.getComponent<TransformComponent>(*start_iterator);
 
-            std::string tileset_name = findKeyLessThan(atlas_sets, tileID);
-            tileID = tileID - atlas_sets[tileset_name] + 1;
+            std::string tileset_name = findKeyLessThan(parsed_map.tilesets, tileID);
+            tileID = tileID - parsed_map.tilesets.at(tileset_name) + 1;
 
             tileComponent.id = tileID;
             tileComponent.tileset = tileset_name;
-            tileComponent.layer = layer;
+            tileComponent.layer = layer_id;
 
             transform_component.position =
-                sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) * tile_height *
-                config::gameScale;
+                sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) *
+                static_cast<float>(parsed_map.tileheight) * config::gameScale;
             doFlips(flipFlags, transform_component.rotation, transform_component.scale);
 
             if (tileset_name == "SpecialBlocks")
             {
                 if (tileID == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER) + 1)
-                    collisionSystem->createBody(
-                        *start_iterator, "Wall", {tile_width, tile_height},
-                        [](const GameType::CollisionData& entityT) {}, true, false);
-                else if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
+                {
+                    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("SpecialBlocks", 2);
+
+                    collisionSystem->createBody(*start_iterator, "Wall", {cc.width, cc.height},
+                                                [](const GameType::CollisionData& entityT) {}, true, false,
+                                                {cc.x, cc.y});
+                }
+                if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
                 {
                     collisionSystem->createBody(
-                        *start_iterator, "Door", {tile_width, tile_height},
+                        *start_iterator, "Door", {parsed_map.tilewidth, parsed_map.tileheight},
                         [](const GameType::CollisionData& entityT) {}, true, false);
                     gCoordinator.addComponent(*start_iterator, DoorComponent{});
                     auto& doorComponent = gCoordinator.getComponent<DoorComponent>(*start_iterator);
 
                     if (y_position == 0)
                         doorComponent.entrance = GameType::DoorEntraces::NORTH;
-                    else if (y_position == height - 1)
+                    else if (y_position == layer.height - 1)
                         doorComponent.entrance = GameType::DoorEntraces::SOUTH;
                     if (x_position == 0)
                         doorComponent.entrance = GameType::DoorEntraces::WEST;
-                    else if (x_position == width - 1)
+                    else if (x_position == layer.width - 1)
                         doorComponent.entrance = GameType::DoorEntraces::EAST;
                 }
             }
@@ -199,30 +165,12 @@ void MapSystem::resetMap()
         auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
 
         collisionSystem->deleteBody(entity);
+
         transformComponent.position = {0.f, 0.f};
         tileComponent.id = {};
         tileComponent.layer = {};
         transformComponent.scale = sf::Vector2f(1.f, 1.f);
         transformComponent.rotation = {};
         animationComponent.frames.clear();
-    }
-}
-
-void MapSystem::loadJsonFile(std::string& path, nlohmann::json json)
-{
-    std::ifstream jsonFile(path);
-
-    if (!jsonFile.is_open())
-    {
-        throw std::runtime_error("Error: Could not open the file: " + path);
-    }
-
-    try
-    {
-        jsonFile >> json;
-    }
-    catch (const nlohmann::json::parse_error& e)
-    {
-        throw std::runtime_error("Error: Failed to parse JSON file: " + std::string(e.what()));
     }
 }

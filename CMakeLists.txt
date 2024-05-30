@@ -8,13 +8,13 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 include(FetchContent)
 
 FetchContent_Declare(box2d
-	GIT_REPOSITORY https://github.com/erincatto/box2d.git
-	GIT_TAG 411acc3)
+        GIT_REPOSITORY https://github.com/erincatto/box2d.git
+        GIT_TAG 411acc3)
 FetchContent_MakeAvailable(box2d)
 
 FetchContent_Declare(glm
-	GIT_REPOSITORY	https://github.com/g-truc/glm.git
-	GIT_TAG 	1.0.1)
+        GIT_REPOSITORY https://github.com/g-truc/glm.git
+        GIT_TAG 1.0.1)
 FetchContent_MakeAvailable(glm)
 
 FetchContent_Declare(SFML
@@ -29,8 +29,8 @@ FetchContent_MakeAvailable(ImGui)
 FetchContent_GetProperties(ImGui SOURCE_DIR IMGUI_DIR)
 
 FetchContent_Declare(glm
-        GIT_REPOSITORY	https://github.com/g-truc/glm.git
-        GIT_TAG 	1.0.1)
+        GIT_REPOSITORY https://github.com/g-truc/glm.git
+        GIT_TAG 1.0.1)
 FetchContent_MakeAvailable(glm)
 
 FetchContent_Declare(nlohmann_json
@@ -43,6 +43,21 @@ FetchContent_Declare(ImGui-SFML
         GIT_REPOSITORY https://github.com/SFML/imgui-sfml
         GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(ImGui-SFML)
+
+set(CLANG_TIDY_CHECKS "\
+    -bugprone-*,\
+    -cppcoreguidelines-*,\
+    -modernize-*,\
+    -performance-*,\
+    -portability-*,\
+    -*modernize-use-trailing-return-type\
+")
+
+add_custom_target(clang-tidy
+        COMMAND clang-tidy
+        ${YOUR_SOURCE_FILES}
+        -checks=${CLANG_TIDY_CHECKS}
+)
 
 add_subdirectory(src)
 install(TARGETS sf)

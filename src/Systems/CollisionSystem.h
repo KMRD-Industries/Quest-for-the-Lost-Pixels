@@ -27,10 +27,11 @@ public:
     void createBody(
         Entity entity, const std::string& tag, const glm::vec2& colliderSize,
         const std::function<void(GameType::CollisionData)>& collisionReaction = [](const GameType::CollisionData&) {},
-        bool isStatic = true, bool useTextureSize = false);
+        bool isStatic = true, bool useTextureSize = false, const glm::vec2& offset = {0., 0.});
     void deleteBody(Entity entity);
 
 private:
     MyContactListener m_myContactListenerInstance;
     b2World m_world;
+    void resetCollisions();
 };

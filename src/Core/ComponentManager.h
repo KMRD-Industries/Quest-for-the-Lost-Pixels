@@ -22,8 +22,8 @@ public:
         const ComponentType componentType{m_nextFreeComponentType};
         ++m_nextFreeComponentType;
 
-        m_componentTypes[componentName] = componentType;
-        m_componentArrays[componentName] = std::make_shared<ComponentArray<T>>();
+        m_componentTypes.insert(std::make_pair(componentName, componentType));
+        m_componentArrays.insert(std::make_pair(componentName, std::make_shared<ComponentArray<T>>()));
     }
 
     template <typename T>
@@ -48,12 +48,13 @@ public:
         getComponentArray<T>()->removeData(entity);
     }
 
+
     template <typename T>
     T& getComponent(const Entity entity) const
     {
         return getComponentArray<T>()->getData(entity);
     }
-
+    
     void entityDestroyed(Entity entity) const;
 
 private:
