@@ -8,6 +8,7 @@
 #include "InputHandler.h"
 #include "MapSystem.h"
 #include "RenderSystem.h"
+#include "SpawnerSystem.h"
 
 Coordinator gCoordinator;
 
@@ -60,6 +61,7 @@ int main()
         game.draw();
         game.handleCollision();
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
+        gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
 
         ImGui::SFML::Update(window, deltaClock.restart());
 

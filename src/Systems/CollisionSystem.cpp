@@ -92,9 +92,13 @@ void CollisionSystem::createBody(Entity entity, const std::string& tag, const gl
     bodyDef.angle = transformComponent.rotation;
 
     if (isStatic)
+    {
         bodyDef.type = b2_staticBody;
+    }
     else
+    {
         bodyDef.type = b2_dynamicBody;
+    }
 
     auto* collisionData = new GameType::CollisionData{.entityID = entity, .tag = tag};
 
@@ -214,14 +218,22 @@ void CollisionSystem::loadCollisions()
             auto& doorComponent = gCoordinator.getComponent<DoorComponent>(entity);
 
             if (transformComponent.position.y == 0)
+            {
                 doorComponent.entrance = GameType::DoorEntraces::NORTH;
+            }
             else if (transformComponent.position.y > 0)
+            {
                 doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+            }
 
             if (transformComponent.position.x == 0)
+            {
                 doorComponent.entrance = GameType::DoorEntraces::WEST;
+            }
             else if (transformComponent.position.x > 0)
+            {
                 doorComponent.entrance = GameType::DoorEntraces::EAST;
+            }
         }
         else
         {

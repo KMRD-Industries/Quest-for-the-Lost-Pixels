@@ -7,6 +7,7 @@
 #include "Map.h"
 #include "MapParser.h"
 #include "PlayerComponent.h"
+#include "SpawnerComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -15,6 +16,7 @@ extern Coordinator gCoordinator;
 
 void MapSystem::loadMap(const std::string& path)
 {
+    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     resetMap();
     Map parsed_map = parseMap(path);
 
@@ -58,39 +60,33 @@ void MapSystem::loadMap(const std::string& path)
             transform_component.position = getPosition(x_position, y_position, parsed_map.tileheight);
             doFlips(flipFlags, transform_component.rotation, transform_component.scale);
 
+            if (tileID == static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK) + 1 && tileset_name == "SpecialBlocks")
+            {
+                gCoordinator.addComponent(*start_iterator, SpawnerComponent{});
+            }
 
-            //            Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileset_name,
-            //            tileID);
-            //
-            //            if (cc.width > 0 && cc.height > 0)
-            //            {
-            //                collisionSystem->createBody(*start_iterator, "Wall", {cc.width, cc.height},
-            //                                            [](const GameType::CollisionData& entityT) {}, true, false,
-            //                                            {cc.x, cc.y});
-            //            }
 
-            //            if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1 && tileset_name ==
-            //            "SpecialBlocks")
+            //            if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1 && tileset_name
+            //            == "SpecialBlocks")
             //            {
-            //                //                collisionSystem->createBody(
-            //                //                    *start_iterator, "Door", {parsed_map.tilewidth,
-            //                parsed_map.tileheight},
-            //                //                    [](const GameType::CollisionData& entityT) {}, true, false);
-            //                //                gCoordinator.addComponent(*start_iterator, DoorComponent{});
-            //                //                auto& doorComponent =
-            //                gCoordinator.getComponent<DoorComponent>(*start_iterator);
-            //                //
-            //                //                if (y_position == 0)
-            //                //                    doorComponent.entrance = GameType::DoorEntraces::NORTH;
-            //                //                else if (y_position == layer.height - 1)
-            //                //                    doorComponent.entrance = GameType::DoorEntraces::SOUTH;
-            //                //                if (x_position == 0)
-            //                //                    doorComponent.entrance = GameType::DoorEntraces::WEST;
-            //                //                else if (x_position == layer.width - 1)
-            //                //                    doorComponent.entrance = GameType::DoorEntraces::EAST;
+            //                collisionSystem->createBody(
+            //                    *start_iterator, "Door", {parsed_map.tilewidth, parsed_map.tileheight},
+            //                    [](const GameType::CollisionData& entityT) {}, true, false);
+            //                gCoordinator.addComponent(*start_iterator, DoorComponent{});
+            //                auto& doorComponent = gCoordinator.getComponent<DoorComponent>(*start_iterator);
             //
-            //                auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(*start_iterator);
-            //                colliderComponent.tag = "Door";
+            //                if (y_position == 0)
+            //                    doorComponent.entrance = GameType::DoorEntraces::NORTH;
+            //                else if (y_position == layer.height - 1)
+            //                    doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+            //                if (x_position == 0)
+            //                    doorComponent.entrance = GameType::DoorEntraces::WEST;
+            //                else if (x_position == layer.width - 1)
+            //                    doorComponent.entrance = GameType::DoorEntraces::EAST;
+            //
+            //                auto colliderComponent =
+            //                gCoordinator.getComponent<ColliderComponent>(*start_iterator); colliderComponent.tag =
+            //                "Door";
             //            }
 
 

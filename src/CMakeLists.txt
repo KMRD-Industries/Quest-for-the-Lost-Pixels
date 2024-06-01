@@ -36,6 +36,8 @@ set(COMPONENTS
         Components/AnimationComponent.h
         Components/AnimationFrame.h
         Components/DoorComponent.h
+        Components/EnemyComponent.h
+        Components/SpawnerComponent.h
 )
 
 set(MAP
@@ -63,6 +65,8 @@ set(SYSTEMS
         Systems/DoorSystem.cpp
         Systems/DoorSystem.h
         Systems/AnimationSystem.h
+        Systems/SpawnerSystem.cpp
+        Systems/SpawnerSystem.h
 )
 
 set(ATLAS_COMPONENTS
@@ -78,6 +82,8 @@ set(UTILS
         Utils/Config.h
         Utils/MapParser.h
         Utils/TextureParser.h
+        Systems/EnemySystem.cpp
+        Systems/EnemySystem.h
 
 )
 

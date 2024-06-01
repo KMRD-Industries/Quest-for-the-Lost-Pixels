@@ -4,8 +4,11 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
+#include "EnemyComponent.h"
+#include "EnemySystem.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
+#include "SpawnerSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
@@ -16,6 +19,8 @@ void Game::init()
     gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TransformComponent>();
     gCoordinator.registerComponent<TileComponent>();
+    gCoordinator.registerComponent<EnemyComponent>();
+    gCoordinator.registerComponent<SpawnerComponent>();
 
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     {
@@ -34,12 +39,33 @@ void Game::init()
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
-    
+
+    const auto enemySystem = gCoordinator.getRegisterSystem<EnemySystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<EnemyComponent>());
+        gCoordinator.setSystemSignature<EnemySystem>(signature);
+    }
+
+    const auto spawnerSystem = gCoordinator.getRegisterSystem<SpawnerSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TileComponent>());
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<SpawnerComponent>());
+        gCoordinator.setSystemSignature<SpawnerSystem>(signature);
+    }
+
     m_dungeon.init();
 };
 
 void Game::draw() const { m_dungeon.draw(); };
-void Game::update() { m_dungeon.update(); }
+
+void Game::update()
+{
+    m_dungeon.update();
+    gCoordinator.getRegisterSystem<EnemySystem>()->update();
+}
 
 void Game::handleCollision()
 {

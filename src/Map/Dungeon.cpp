@@ -5,6 +5,8 @@
 #include "CollisionSystem.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
+#include "EnemyComponent.h"
+#include "EnemySystem.h"
 #include "Helpers.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
@@ -12,6 +14,8 @@
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
+#include "SpawnerComponent.h"
+#include "SpawnerSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -22,9 +26,8 @@ void Dungeon::init()
 
     m_entities[0] = gCoordinator.createEntity();
     m_entities[1] = gCoordinator.createEntity();
-    const std::string PathToAssets{ASSET_PATH};
 
-    gCoordinator.addComponent(m_entities[0], TileComponent{243, "Characters", 4, true});
+    gCoordinator.addComponent(m_entities[0], TileComponent{243, "Characters", 4});
     gCoordinator.addComponent(m_entities[0], RenderComponent{});
     gCoordinator.addComponent(m_entities[0], TransformComponent(sf::Vector2f(1.f, 1.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
@@ -49,7 +52,6 @@ void Dungeon::init()
 
             if (entityT.tag == "Wall")
             {
-                auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_entities[0]);
             }
         },
         false, false, offset);
@@ -102,6 +104,7 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<PlayerComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
     gCoordinator.registerComponent<DoorComponent>();
+    gCoordinator.registerComponent<SpawnerSystem>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -139,6 +142,7 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<TextureSystem>(signature);
     }
 
+
     const auto animationSystem = gCoordinator.getRegisterSystem<AnimationSystem>();
     {
         Signature signature;
@@ -158,6 +162,17 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], AnimationComponent{});
         gCoordinator.addComponent(m_entities[i], ColliderComponent{});
         gCoordinator.addComponent(m_entities[i], MapComponent{});
+    }
+
+    for (int i = 2000; i < 2100; i++)
+    {
+        m_entities[i] = gCoordinator.createEntity();
+        gCoordinator.addComponent(m_entities[i], RenderComponent{});
+        gCoordinator.addComponent(m_entities[i], TileComponent{});
+        gCoordinator.addComponent(m_entities[i], TransformComponent{});
+        gCoordinator.addComponent(m_entities[i], AnimationComponent{});
+        gCoordinator.addComponent(m_entities[i], ColliderComponent{});
+        gCoordinator.addComponent(m_entities[i], EnemyComponent{});
     }
 }
 
