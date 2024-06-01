@@ -33,6 +33,13 @@ public:
         m_systemManager->entitySignatureChanged(entity, signature);
     }
 
+
+    template <typename T>
+    auto hasComponent(const Entity entity) const -> bool
+    {
+        return m_componentManager->hasComponent<T>(entity);
+    }
+
     template <typename T>
     void removeComponent(const Entity entity)
     {

@@ -1,5 +1,6 @@
 #include "TextureSystem.h"
 #include <iostream>
+#include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
 #include "DoorComponent.h"
@@ -122,8 +123,17 @@ Collision TextureSystem::getCollision(const std::string& tileset_name, long id)
 {
     try
     {
+        if (!texture_indexes.contains(tileset_name))
+        {
+            return Collision{};
+        }
+
         long ad = id + texture_indexes.at(tileset_name);
-        if (map_collisions.contains(ad)) return map_collisions.at(ad);
+
+        if (map_collisions.contains(ad))
+        {
+            return map_collisions.at(ad);
+        }
         return Collision{};
     }
     catch (...)
@@ -151,17 +161,19 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
  */
 void TextureSystem::loadTextures()
 {
-    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-
     for (const auto& entity : m_entities)
     {
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
 
         // Ignore invalid values
-        if (tile_component.id <= 0 || tile_component.id > no_textures) continue;
+        if (tile_component.id <= 0 || tile_component.id > no_textures)
+        {
+            continue;
+        }
 
         auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
         auto& render_component = gCoordinator.getComponent<RenderComponent>(entity);
+        auto& collider_component = gCoordinator.getComponent<ColliderComponent>(entity);
 
         // Adjust tile index
         long adjusted_id = tile_component.id + texture_indexes.at(tile_component.tileset);
@@ -173,14 +185,11 @@ void TextureSystem::loadTextures()
             animation_component.it = animation_component.frames.begin();
         }
 
-        //        if (map_collisions.contains(adjusted_id))
-        //        {
-        //            Collision cc = getCollision(tile_component.tileset, tile_component.id);
-        //            collisionSystem->createBody(entity, "Wall", {cc.width, cc.height},
-        //                                        [](const GameType::CollisionData& entityT) {}, true, false, {cc.x,
-        //                                        cc.y});
-        //        }
-
+        // Load collisions from system if tile contains collisions
+        if (map_collisions.contains(adjusted_id))
+        {
+            collider_component.collisionDescription = map_collisions.at(adjusted_id);
+        }
 
         // Load texture of tile with that id to render component
         render_component.sprite = getTile(tile_component.tileset, tile_component.id);

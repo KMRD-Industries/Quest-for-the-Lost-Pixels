@@ -1,5 +1,8 @@
 #pragma once
 
+#include "GameTypes.h"
+#include "Tileset.h"
+
 class b2Body;
 
 struct ColliderComponent
@@ -7,6 +10,7 @@ struct ColliderComponent
     b2Body* body{nullptr};
     std::string tag{};
     std::function<void(GameType::CollisionData)> collisionReaction;
+    Collision collisionDescription;
 
     ColliderComponent() = default;
 

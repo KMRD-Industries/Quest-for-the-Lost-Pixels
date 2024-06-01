@@ -8,11 +8,13 @@ struct TileComponent
     int64_t id{};
     std::string tileset;
     int layer{};
+    bool player{};
+
 
     explicit TileComponent(uint32_t tile_id) : id{static_cast<int64_t>(tile_id)} {};
 
-    TileComponent(uint32_t tile_id, std::string tileset, int layer, bool player) :
-        id{static_cast<int64_t>(tile_id)}, tileset{std::move(tileset)}, layer{layer}
+    TileComponent(uint32_t tile_id, std::string tileset, int layer, bool player = false) :
+        id{static_cast<int64_t>(tile_id)}, tileset{std::move(tileset)}, layer{layer}, player{player}
     {
     }
 

@@ -2,49 +2,50 @@
 
 #include "Helpers.h"
 #include "Tileset.h"
+#include <fstream>
 #include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
-void from_json(const json& j, ObjectProperty& p)
+void from_json(const json& json, ObjectProperty& objectProperty)
 {
-    j.at("name").get_to(p.name);
-    j.at("type").get_to(p.type);
-    j.at("value").get_to(p.value);
+    json.at("name").get_to(objectProperty.name);
+    json.at("type").get_to(objectProperty.type);
+    json.at("value").get_to(objectProperty.value);
 }
 
-void from_json(const json& j, AnimationFrame& frame)
+void from_json(const json& json, AnimationFrame& frame)
 {
-    j.at("duration").get_to(frame.duration);
-    j.at("tileid").get_to(frame.tileid);
+    json.at("duration").get_to(frame.duration);
+    json.at("tileid").get_to(frame.tileid);
 }
 
-void from_json(const json& j, Collision& obj)
+void from_json(const json& json, Collision& obj)
 {
-    j.at("id").get_to(obj.id);
-    j.at("x").get_to(obj.x);
-    j.at("y").get_to(obj.y);
-    j.at("width").get_to(obj.width);
-    j.at("height").get_to(obj.height);
+    json.at("id").get_to(obj.id);
+    json.at("x").get_to(obj.x);
+    json.at("y").get_to(obj.y);
+    json.at("width").get_to(obj.width);
+    json.at("height").get_to(obj.height);
 
-    if (j.find("properties") != j.end())
+    if (json.find("properties") != json.end())
     {
-        j.at("properties").get_to(obj.properties);
+        json.at("properties").get_to(obj.properties);
     }
 }
 
-void from_json(const json& j, Tile& tile)
+void from_json(const json& json, Tile& tile)
 {
-    j.at("id").get_to(tile.id);
+    json.at("id").get_to(tile.id);
 
-    if (j.find("animation") != j.end())
+    if (json.find("animation") != json.end())
     {
-        j.at("animation").get_to(tile.animation);
+        json.at("animation").get_to(tile.animation);
     };
 
-    if (j.find("objectgroup") != j.end())
+    if (json.find("objectgroup") != json.end())
     {
-        auto objectgroup = j.at("objectgroup");
+        auto objectgroup = json.at("objectgroup");
 
         if (objectgroup.find("animations") != objectgroup.end())
         {
@@ -58,27 +59,27 @@ void from_json(const json& j, Tile& tile)
     };
 }
 
-void from_json(const json& j, Tileset& tileset)
+void from_json(const json& json, Tileset& tileset)
 {
-    j.at("columns").get_to(tileset.columns);
-    j.at("imageheight").get_to(tileset.imageheight);
-    j.at("imagewidth").get_to(tileset.imagewidth);
-    j.at("margin").get_to(tileset.margin);
-    j.at("name").get_to(tileset.name);
-    j.at("spacing").get_to(tileset.spacing);
-    j.at("tilecount").get_to(tileset.tilecount);
-    j.at("tiledversion").get_to(tileset.tiledversion);
-    j.at("tileheight").get_to(tileset.tileheight);
-    j.at("tilewidth").get_to(tileset.tilewidth);
-    j.at("type").get_to(tileset.type);
-    j.at("version").get_to(tileset.version);
+    json.at("columns").get_to(tileset.columns);
+    json.at("imageheight").get_to(tileset.imageheight);
+    json.at("imagewidth").get_to(tileset.imagewidth);
+    json.at("margin").get_to(tileset.margin);
+    json.at("name").get_to(tileset.name);
+    json.at("spacing").get_to(tileset.spacing);
+    json.at("tilecount").get_to(tileset.tilecount);
+    json.at("tiledversion").get_to(tileset.tiledversion);
+    json.at("tileheight").get_to(tileset.tileheight);
+    json.at("tilewidth").get_to(tileset.tilewidth);
+    json.at("type").get_to(tileset.type);
+    json.at("version").get_to(tileset.version);
 
-    if (j.find("tiles") != j.end())
+    if (json.find("tiles") != json.end())
     {
-        j.at("tiles").get_to(tileset.tiles);
+        json.at("tiles").get_to(tileset.tiles);
     }
 
-    auto image = j.at("image");
+    auto image = json.at("image");
     tileset.image = extractFileName(image.get<std::string>(), "/", ".");
 }
 

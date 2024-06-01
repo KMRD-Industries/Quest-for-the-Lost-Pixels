@@ -36,9 +36,6 @@ public:
         m_entityToIndex.emplace(entityOfLastElement, indexOfRemovedEntity).first->second = indexOfRemovedEntity;
         m_indexToEntity.emplace(indexOfRemovedEntity, entityOfLastElement).first->second = entityOfLastElement;
 
-        //        m_entityToIndex[entityOfLastElement] = indexOfRemovedEntity;
-        //        m_indexToEntity[indexOfRemovedEntity] = entityOfLastElement;
-
         m_entityToIndex.erase(entity);
         m_indexToEntity.erase(indexOfLastElement);
 
@@ -58,6 +55,8 @@ public:
             removeData(entity);
         }
     }
+
+    auto hasData(const Entity entity) const -> bool { return m_entityToIndex.contains(entity); }
 
 private:
     std::array<T, MAX_ENTITIES> m_componentArray{};

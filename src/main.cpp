@@ -53,14 +53,13 @@ int main()
 
     while (window.isOpen())
     {
-        game.handleCollision();
-
         // Clear the window before drawing
         window.clear();
 
-        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         game.update();
         game.draw();
+        game.handleCollision();
+        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
 
         ImGui::SFML::Update(window, deltaClock.restart());
 

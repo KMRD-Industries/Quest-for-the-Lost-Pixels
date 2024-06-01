@@ -46,6 +46,12 @@ public:
         getComponentArray<T>()->removeData(entity);
     }
 
+    template <typename T>
+    bool hasComponent(const Entity entity) const
+    {
+        return getComponentArray<T>()->hasData(entity);
+    }
+
 
     template <typename T>
     auto getComponent(const Entity entity) const -> T&

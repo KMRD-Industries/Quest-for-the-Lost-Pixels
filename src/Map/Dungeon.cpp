@@ -6,7 +6,6 @@
 #include "DoorComponent.h"
 #include "DoorSystem.h"
 #include "Helpers.h"
-#include "InputHandler.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "Paths.h"
@@ -17,18 +16,13 @@
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
-
 void Dungeon::init()
 {
     setECS();
 
     m_entities[0] = gCoordinator.createEntity();
     m_entities[1] = gCoordinator.createEntity();
-    const auto texture = new sf::Texture();
-    const auto texture2 = new sf::Texture();
     const std::string PathToAssets{ASSET_PATH};
-    texture->loadFromFile(PathToAssets + "/knight/knight.png");
-    texture2->loadFromFile(PathToAssets + "/knight/knight.png");
 
     gCoordinator.addComponent(m_entities[0], TileComponent{243, "Characters", 4, true});
     gCoordinator.addComponent(m_entities[0], RenderComponent{});
@@ -52,6 +46,11 @@ void Dungeon::init()
 
                 m_moveInDungeon.emplace_back(GameType::mapDoorsToGeo.at(doorComponent.entrance));
             }
+
+            if (entityT.tag == "Wall")
+            {
+                auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_entities[0]);
+            }
         },
         false, false, offset);
 
@@ -72,6 +71,7 @@ void Dungeon::init()
 void Dungeon::draw() const
 {
     gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
+    gCoordinator.getRegisterSystem<CollisionSystem>()->loadCollisions();
     gCoordinator.getRegisterSystem<AnimationSystem>()->updateFrames();
     m_roomMap.at(m_currentPlayerPos).draw();
 }
@@ -100,7 +100,6 @@ void Dungeon::setECS()
 {
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
-    //    gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
     gCoordinator.registerComponent<DoorComponent>();
 

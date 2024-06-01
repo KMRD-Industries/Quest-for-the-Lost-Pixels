@@ -1,39 +1,57 @@
 #include "AnimationSystem.h"
-#include "AnimationComponent.h"
 #include "Config.h"
 #include "RenderComponent.h"
 #include "TileComponent.h"
 
+constexpr int FRAME_CYCLE = 60;
+
 void AnimationSystem::updateFrames()
 {
-    frame_time = (frame_time + 1) % 60;
+    updateFrameTime();
 
     for (const auto& entity : m_entities)
     {
-        auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
-
-        if (animation_component.frames.empty())
-        {
-            continue;
-        }
-
-        auto duration = static_cast<float>(animation_component.it->duration);
-        long frameDuration = static_cast<long>(duration / config::oneFrameTime) + 1;
-
-        if (frame_time % frameDuration != 0)
-        {
-            continue;
-        }
-
-        auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
-
-        ++animation_component.it;
-
-        if (animation_component.it == animation_component.frames.end())
-        {
-            animation_component.it = animation_component.frames.begin();
-        }
-
-        tile_component.id = animation_component.it->tileid;
+        updateEntityAnimation(entity);
     }
+}
+
+void AnimationSystem::updateFrameTime() { frame_time = (frame_time + 1) % FRAME_CYCLE; }
+
+void AnimationSystem::updateEntityAnimation(Entity entity) const
+{
+    auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
+
+    if (animation.frames.empty())
+    {
+        return;
+    }
+
+    const int frameDuration = calculateFrameDuration(animation);
+
+    if (!isTimeForNextFrame(frameDuration))
+    {
+        return;
+    }
+
+    loadNextFrame(entity, animation);
+}
+
+int AnimationSystem::calculateFrameDuration(const AnimationComponent& animation)
+{
+    const auto duration = static_cast<float>(animation.it->duration);
+    return static_cast<int>(duration / config::oneFrameTime) + 1;
+}
+
+bool AnimationSystem::isTimeForNextFrame(int frameDuration) const { return frame_time % frameDuration == 0; }
+
+void AnimationSystem::loadNextFrame(Entity entity, AnimationComponent& animation)
+{
+    auto& tile = gCoordinator.getComponent<TileComponent>(entity);
+
+    if (++animation.it == animation.frames.end())
+    {
+        animation.it = animation.frames.begin();
+    }
+
+    tile.id = animation.it->tileid;
 }

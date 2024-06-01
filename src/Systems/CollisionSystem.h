@@ -13,8 +13,8 @@
 class MyContactListener : public b2ContactListener
 {
     void BeginContact(b2Contact* contact) override;
-
     void EndContact(b2Contact* contact) override;
+    void handlePlayerCollision(Entity playerEntity);
 };
 
 class CollisionSystem : public System
@@ -29,9 +29,11 @@ public:
         const std::function<void(GameType::CollisionData)>& collisionReaction = [](const GameType::CollisionData&) {},
         bool isStatic = true, bool useTextureSize = false, const glm::vec2& offset = {0., 0.});
     void deleteBody(Entity entity);
+    void loadCollisions();
 
 private:
     MyContactListener m_myContactListenerInstance;
     b2World m_world;
     void resetCollisions();
+    void handlePlayerCollision(const GameType::CollisionData& collisionData);
 };

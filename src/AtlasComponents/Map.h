@@ -1,9 +1,7 @@
 #pragma once
 
-#include "nlohmann/json.hpp"
 #include <unordered_map>
-
-using json = nlohmann::json;
+#include "nlohmann/json.hpp"
 
 struct Property
 {

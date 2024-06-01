@@ -1,10 +1,12 @@
 #include "MapSystem.h"
 #include <nlohmann/json.hpp>
 #include "AnimationComponent.h"
+#include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "DoorComponent.h"
 #include "Map.h"
 #include "MapParser.h"
+#include "PlayerComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -13,16 +15,17 @@ extern Coordinator gCoordinator;
 
 void MapSystem::loadMap(const std::string& path)
 {
-    resetMap(); // Reset old map entities
-    Map parsed_map = parseMap(path); // Parse json map
+    resetMap();
+    Map parsed_map = parseMap(path);
 
     auto start_iterator = m_entities.begin();
-    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-    auto textureSystem = gCoordinator.getRegisterSystem<TextureSystem>();
 
     for (auto& layer : parsed_map.layers)
     {
-        if (layer.data.empty()) continue;
+        if (layer.data.empty())
+        {
+            continue;
+        }
 
         static constexpr std::uint32_t mask = 0xf0000000;
         int index = {};
@@ -42,46 +45,53 @@ void MapSystem::loadMap(const std::string& path)
                 continue;
             }
 
-            auto& tileComponent = gCoordinator.getComponent<TileComponent>(*start_iterator);
+            auto& tile_component = gCoordinator.getComponent<TileComponent>(*start_iterator);
             auto& transform_component = gCoordinator.getComponent<TransformComponent>(*start_iterator);
 
             std::string tileset_name = findKeyLessThan(parsed_map.tilesets, tileID);
             tileID = tileID - parsed_map.tilesets.at(tileset_name) + 1;
 
-            tileComponent.id = tileID;
-            tileComponent.tileset = tileset_name;
-            tileComponent.layer = layer_id;
+            tile_component.id = tileID;
+            tile_component.tileset = tileset_name;
+            tile_component.layer = layer_id;
 
-            transform_component.position =
-                sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) *
-                static_cast<float>(parsed_map.tileheight) * config::gameScale;
+            transform_component.position = getPosition(x_position, y_position, parsed_map.tileheight);
             doFlips(flipFlags, transform_component.rotation, transform_component.scale);
 
-            Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileset_name, tileID);
 
-            if (cc.width > 0 && cc.height > 0)
-            {
-                collisionSystem->createBody(*start_iterator, "Wall", {cc.width, cc.height},
-                                            [](const GameType::CollisionData& entityT) {}, true, false, {cc.x, cc.y});
-            }
-            
-            if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1 && tileset_name == "SpecialBlocks")
-            {
-                collisionSystem->createBody(
-                    *start_iterator, "Door", {parsed_map.tilewidth, parsed_map.tileheight},
-                    [](const GameType::CollisionData& entityT) {}, true, false);
-                gCoordinator.addComponent(*start_iterator, DoorComponent{});
-                auto& doorComponent = gCoordinator.getComponent<DoorComponent>(*start_iterator);
+            //            Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileset_name,
+            //            tileID);
+            //
+            //            if (cc.width > 0 && cc.height > 0)
+            //            {
+            //                collisionSystem->createBody(*start_iterator, "Wall", {cc.width, cc.height},
+            //                                            [](const GameType::CollisionData& entityT) {}, true, false,
+            //                                            {cc.x, cc.y});
+            //            }
 
-                if (y_position == 0)
-                    doorComponent.entrance = GameType::DoorEntraces::NORTH;
-                else if (y_position == layer.height - 1)
-                    doorComponent.entrance = GameType::DoorEntraces::SOUTH;
-                if (x_position == 0)
-                    doorComponent.entrance = GameType::DoorEntraces::WEST;
-                else if (x_position == layer.width - 1)
-                    doorComponent.entrance = GameType::DoorEntraces::EAST;
-            }
+            //            if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1 && tileset_name ==
+            //            "SpecialBlocks")
+            //            {
+            //                //                collisionSystem->createBody(
+            //                //                    *start_iterator, "Door", {parsed_map.tilewidth,
+            //                parsed_map.tileheight},
+            //                //                    [](const GameType::CollisionData& entityT) {}, true, false);
+            //                //                gCoordinator.addComponent(*start_iterator, DoorComponent{});
+            //                //                auto& doorComponent =
+            //                gCoordinator.getComponent<DoorComponent>(*start_iterator);
+            //                //
+            //                //                if (y_position == 0)
+            //                //                    doorComponent.entrance = GameType::DoorEntraces::NORTH;
+            //                //                else if (y_position == layer.height - 1)
+            //                //                    doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+            //                //                if (x_position == 0)
+            //                //                    doorComponent.entrance = GameType::DoorEntraces::WEST;
+            //                //                else if (x_position == layer.width - 1)
+            //                //                    doorComponent.entrance = GameType::DoorEntraces::EAST;
+            //
+            //                auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(*start_iterator);
+            //                colliderComponent.tag = "Door";
+            //            }
 
 
             ++start_iterator;
@@ -107,26 +117,32 @@ void MapSystem::doFlips(std::uint8_t flags, float& rotation, sf::Vector2f& scale
 
     switch (flags)
     {
-    case 0x4: // 0100 = vertical flip
+    case VerticalFlip:
         scale.y *= -1;
         break;
-    case 0x8: // 1000 = horizontal flip
+
+    case HorizontalFlip:
         scale.x *= -1;
         break;
-    case 0xC: // 1100 = horizontal and vertical flip
+
+    case HorizontalVerticalFlip:
         scale = -scale;
         break;
-    case 0x2: // 0010 = diagonal flip
+
+    case DiagonalFlip:
         scale.x *= -1;
         rotation += 90.f;
         break;
-    case 0x6: // 0110 = diagonal and vertical flip
+
+    case DiagonalVerticalFlip:
         rotation += 270.f;
         break;
-    case 0xA: // 1010 = diagonal and horizontal flip
+
+    case DiagonalHorizontalFlip:
         rotation += 90.f;
         break;
-    case 0xE: // 1110 = diagonal, horizontal, and vertical flip
+
+    case AllFlips:
         rotation += 90.f;
         scale.x *= -1;
         break;
@@ -136,20 +152,21 @@ void MapSystem::doFlips(std::uint8_t flags, float& rotation, sf::Vector2f& scale
     }
 }
 
-auto MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long i) -> std::string
+auto MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long threshold) -> std::string
 {
-    std::string result;
-    long act = 0;
+    std::string best_key;
+    long max_value = std::numeric_limits<long>::min();
 
-    for (const auto& pair : atlas_sets)
+    for (const auto& [key, value] : atlas_sets)
     {
-        if (pair.second <= i && pair.second >= act)
+        if (value <= threshold && value >= max_value)
         {
-            result = pair.first;
-            act = pair.second;
+            best_key = key;
+            max_value = value;
         }
     }
-    return result;
+
+    return best_key;
 }
 
 void MapSystem::resetMap()
@@ -161,14 +178,33 @@ void MapSystem::resetMap()
         auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<DoorComponent>(entity))
+        {
+            continue;
+        }
 
         collisionSystem->deleteBody(entity);
 
         transformComponent.position = {0.F, 0.F};
         tileComponent.id = {};
         tileComponent.layer = {};
+
         transformComponent.scale = sf::Vector2f(1.F, 1.F);
         transformComponent.rotation = {};
+
         animationComponent.frames.clear();
+
+        colliderComponent.body = nullptr;
+        colliderComponent.collisionDescription = {};
+        colliderComponent.tag = {};
+        colliderComponent.collisionReaction = {};
     }
+}
+
+sf::Vector2f MapSystem::getPosition(int x_axis, int y_axis, int map_tile_width)
+{
+    return sf::Vector2f(static_cast<float>(x_axis), static_cast<float>(y_axis)) * static_cast<float>(map_tile_width) *
+        config::gameScale;
 }

@@ -1,13 +1,9 @@
 #pragma once
 
 #include "AnimationFrame.h"
-#include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
-
-using json = nlohmann::json;
 
 struct ObjectProperty
 {
