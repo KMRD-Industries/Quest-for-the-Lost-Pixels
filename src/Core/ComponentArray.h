@@ -39,6 +39,11 @@ public:
         --m_size;
     }
 
+    bool hasComponent(const Entity entity) const
+    {
+        return m_entityToIndex.contains(entity);
+    }
+
     T& getData(const Entity entity)
     {
         assert(m_entityToIndex.contains(entity) && "Retrieving non-existent component.");

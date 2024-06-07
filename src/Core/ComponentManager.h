@@ -54,6 +54,12 @@ public:
         return getComponentArray<T>()->getData(entity);
     }
 
+    template <typename T>
+    [[nodiscard]] bool hasComponent(const Entity entity) const
+    {
+        return getComponentArray<T>()->hasComponent(entity);
+    }
+
     void entityDestroyed(Entity entity) const;
 
 private:

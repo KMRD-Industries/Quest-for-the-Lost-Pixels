@@ -83,6 +83,7 @@ void Dungeon::init()
 
     auto mapPath = m_roomMap.at(m_currentPlayerPos).getMap();
     gCoordinator.getRegisterSystem<MapSystem>()->loadMap(mapPath);
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 }
 
 void Dungeon::draw() const
@@ -185,6 +186,8 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
         gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
+        gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
+
         const auto newDoor = dir * -1;
         const auto doorType = GameType::geoToMapDoors.at(newDoor);
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);

@@ -23,6 +23,7 @@ public:
     explicit CollisionSystem() :
         m_world(b2Vec2(0.f, 0.f)) { m_world.SetContactListener(&m_myContactListenerInstance); }
 
+    void createMapCollision();
     void updateCollision() const;
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations);
     void createBody(

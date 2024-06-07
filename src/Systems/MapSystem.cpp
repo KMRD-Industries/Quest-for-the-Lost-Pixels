@@ -1,6 +1,5 @@
 #include "MapSystem.h"
 #include <fstream>
-#include <iostream>
 #include <nlohmann/json.hpp>
 
 #include "ColliderComponent.h"
@@ -15,15 +14,12 @@ extern Coordinator gCoordinator;
 
 void MapSystem::loadMap(std::string& path)
 {
-    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-
     // Reset Map Entities to default
     for (const auto& entity : m_entities)
     {
         auto& map_component = gCoordinator.getComponent<TileComponent>(entity);
         auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
 
-        collisionSystem->deleteBody(entity);
         map_component.id = {};
         map_component.layer = {};
         transform_component.scale = sf::Vector2f(1.f, 1.f);
@@ -98,23 +94,8 @@ void MapSystem::loadMap(std::string& path)
 
             if (tileset_name == "SpecialBlocks")
             {
-                if (tileID == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER) + 1)
-                    collisionSystem->createBody(
-                        *start_iterator, "Wall", {tile_width, tile_height},
-                        [](const GameType::CollisionData& entityT)
-                        {
-                        }, [](const GameType::CollisionData& entityT)
-                        {
-                        }, true, false);
-                else if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
+                if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
                 {
-                    collisionSystem->createBody(
-                        *start_iterator, "Door", {tile_width, tile_height},
-                        [](const GameType::CollisionData& entityT)
-                        {
-                        }, [](const GameType::CollisionData& entityT)
-                        {
-                        }, true, false);
                     gCoordinator.addComponent(*start_iterator, DoorComponent{});
                     auto& doorComponent = gCoordinator.getComponent<DoorComponent>(*start_iterator);
 
