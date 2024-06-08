@@ -36,6 +36,7 @@ public:
         },
         bool isStatic = true, bool useTextureSize = true);
     void deleteBody(Entity entity);
+    void deleteMarkedBodies();
 
 private:
     MyContactListener m_myContactListenerInstance;

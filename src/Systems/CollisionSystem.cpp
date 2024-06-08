@@ -179,7 +179,27 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
 
 void CollisionSystem::deleteBody(Entity entity)
 {
+    if (!gCoordinator.hasComponent<ColliderComponent>(entity))
+        return;
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
     if (colliderComponent.body != nullptr) m_world.DestroyBody(colliderComponent.body);
     colliderComponent.body = nullptr;
+}
+
+void CollisionSystem::deleteMarkedBodies()
+{
+    std::unordered_set<Entity> entityToKill{};
+
+    for (const auto& entity : m_entities)
+    {
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        if (!colliderComponent.toDestroy)
+            continue;
+        deleteBody(entity);
+        entityToKill.insert(entity);
+    }
+
+    for (auto& entity : entityToKill)
+        gCoordinator.destroyEntity(entity);
+    entityToKill.clear();
 }
