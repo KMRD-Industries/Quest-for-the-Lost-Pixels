@@ -1,10 +1,12 @@
 #include "MapSystem.h"
 #include <fstream>
-#include <iostream>
 #include <nlohmann/json.hpp>
 
+#include "ColliderComponent.h"
+#include "CollisionSystem.h"
 #include "Config.h"
 #include "Coordinator.h"
+#include "DoorComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
@@ -89,6 +91,24 @@ void MapSystem::loadMap(std::string& path)
                 sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) * tile_height *
                 config::gameScale;
             doFlips(flipFlags, transform_component.rotation, transform_component.scale);
+
+            if (tileset_name == "SpecialBlocks")
+            {
+                if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
+                {
+                    gCoordinator.addComponent(*start_iterator, DoorComponent{});
+                    auto& doorComponent = gCoordinator.getComponent<DoorComponent>(*start_iterator);
+
+                    if (y_position == 0)
+                        doorComponent.entrance = GameType::DoorEntraces::NORTH;
+                    else if (y_position == height - 1)
+                        doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+                    if (x_position == 0)
+                        doorComponent.entrance = GameType::DoorEntraces::WEST;
+                    else if (x_position == width - 1)
+                        doorComponent.entrance = GameType::DoorEntraces::EAST;
+                }
+            }
 
             ++start_iterator;
             index++;

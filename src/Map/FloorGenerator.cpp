@@ -4,7 +4,6 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
-#include <set>
 
 #include "Utils/Helpers.h"
 #include "Utils/Paths.h"
@@ -53,7 +52,9 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
 
         std::vector<GameType::MapInfo> mapToChoose;
         const auto haveMinimalValueOfDoors = [&choosesMap, &minVal](const GameType::MapInfo& mapInfo)
-        { return choosesMap[mapInfo] == minVal; };
+        {
+            return choosesMap[mapInfo] == minVal;
+        };
         std::ranges::copy_if(availableMapsForRoom, std::back_inserter(mapToChoose), haveMinimalValueOfDoors);
 
         std::random_device rd;
@@ -144,35 +145,29 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     const int mapWidth = parsed_file["width"];
     const int mapHeight = parsed_file["height"];
 
-    std::set<int> xValues;
-    std::set<int> yValues;
+    std::vector<glm::ivec2> doorsPositions;
 
-    for (const auto& key : doorData | std::views::keys)
+    for (const auto& [doorPosition, blockType] : doorData)
     {
-        xValues.insert(key.x);
-        yValues.insert(key.y);
+        if (blockType != static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER)) continue;
+        doorsPositions.push_back(doorPosition);
     }
 
     std::unordered_set<GameType::DoorEntraces> doorsLoc;
 
-    for (const auto& key : doorData | std::views::keys)
+    for (const auto& doorPosition : doorsPositions)
     {
-        if (key.y == 0 || key.y == mapHeight - 1)
-        {
-            if (key.y == 0)
-                doorsLoc.insert(GameType::DoorEntraces::NORTH);
-            else
-                doorsLoc.insert(GameType::DoorEntraces::SOUTH);
-        }
+        if (doorPosition.y == 0)
+            doorsLoc.insert(GameType::DoorEntraces::NORTH);
+        else if (doorPosition.y == mapHeight - 1)
+            doorsLoc.insert(GameType::DoorEntraces::SOUTH);
 
-        if (key.x == 0 || key.x == mapWidth - 1)
-        {
-            if (key.x == 0)
-                doorsLoc.insert(GameType::DoorEntraces::WEST);
-            else
-                doorsLoc.insert(GameType::DoorEntraces::EAST);
-        }
+        if (doorPosition.x == 0)
+            doorsLoc.insert(GameType::DoorEntraces::WEST);
+        else if (doorPosition.x == mapWidth - 1)
+            doorsLoc.insert(GameType::DoorEntraces::EAST);
     }
+
 
     mapInfo.emplace_back(GameType::MapInfo{.mapID = mapID, .doorsLoc = {doorsLoc.begin(), doorsLoc.end()}});
 }

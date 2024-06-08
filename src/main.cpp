@@ -43,7 +43,7 @@ int main()
 
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
 
-    window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Fullscreen);
+    window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
     window.setFramerateLimit(60);

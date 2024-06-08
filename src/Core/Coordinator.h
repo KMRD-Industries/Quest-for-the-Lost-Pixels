@@ -38,7 +38,7 @@ public:
     {
         m_componentManager->removeComponent<T>(entity);
 
-        const auto signature{m_entityManager->getSignature(entity)};
+        auto signature{m_entityManager->getSignature(entity)};
         signature.set(m_componentManager->getComponentType<T>(), false);
         m_entityManager->setSignature(entity, signature);
 
@@ -49,6 +49,12 @@ public:
     T& getComponent(const Entity entity) const
     {
         return m_componentManager->getComponent<T>(entity);
+    }
+
+    template <typename T>
+    bool hasComponent(const Entity entity) const
+    {
+        return m_componentManager->hasComponent<T>(entity);
     }
 
     template <typename T>

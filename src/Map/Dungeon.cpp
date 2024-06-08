@@ -5,6 +5,8 @@
 #include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "DoorComponent.h"
+#include "DoorSystem.h"
 #include "Helpers.h"
 #include "InputHandler.h"
 #include "MapComponent.h"
@@ -12,10 +14,12 @@
 #include "RenderComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
+#include "TravellingDungeonComponent.h"
 
 #include "MapSystem.h"
 #include "PlayerMovementSystem.h"
 #include "TextureSystem.h"
+#include "TravellingSystem.h"
 
 #include "Paths.h"
 
@@ -38,13 +42,40 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
     gCoordinator.addComponent(m_entities[0], ColliderComponent{});
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[0], {}, false, true);
+    gCoordinator.addComponent(m_entities[0], TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir)
+    {
+        moveInDungeon(dir);
+    }});
+
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
+        m_entities[0], "FirstPlayer", {},
+        [&](const GameType::CollisionData& entityT)
+        {
+            if (entityT.tag == "Door")
+            {
+                const auto& doorComponent = gCoordinator.getComponent<DoorComponent>(entityT.entityID);
+                auto& travellingDungeonComponent = gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[0]);
+
+                if (travellingDungeonComponent.doorsPassed == 0)
+                    travellingDungeonComponent.moveInDungeon.emplace_back(
+                        GameType::mapDoorsToGeo.at(doorComponent.entrance));
+                ++travellingDungeonComponent.doorsPassed;
+            }
+        }, [&](const GameType::CollisionData& entityT)
+        {
+            if (entityT.tag == "Door")
+            {
+                auto& travellingDungeonComponent = gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[0]);
+                --travellingDungeonComponent.doorsPassed;
+            }
+        },
+        false, true);
 
     gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer = 4});
     gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(50.f, 50.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[1], AnimationComponent{});
     gCoordinator.addComponent(m_entities[1], ColliderComponent{});
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[1], {}, true, true);
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[1], "SecondPlayer");
 
     makeSimpleFloor();
 
@@ -52,6 +83,7 @@ void Dungeon::init()
 
     auto mapPath = m_roomMap.at(m_currentPlayerPos).getMap();
     gCoordinator.getRegisterSystem<MapSystem>()->loadMap(mapPath);
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 }
 
 void Dungeon::draw() const
@@ -64,27 +96,9 @@ void Dungeon::draw() const
 void Dungeon::update()
 {
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
+    gCoordinator.getRegisterSystem<TravellingSystem>()->update();
 
     m_roomMap.at(m_currentPlayerPos).update();
-
-    const auto inputHandler{InputHandler::getInstance()};
-
-    glm::ivec2 dir{0, 0};
-    if (inputHandler->isPressed(InputType::MoveUp)) // Move Up
-        dir += glm::ivec2{0, 1};
-    else if (inputHandler->isPressed(InputType::MoveDown)) // Move Down
-        dir -= glm::ivec2{0, 1};
-    else if (inputHandler->isPressed(InputType::MoveRight)) // Move Right
-        dir += glm::ivec2{1, 0};
-    else if (inputHandler->isPressed(InputType::MoveLeft)) // Move Left
-        dir -= glm::ivec2{1, 0};
-
-    if (dir != glm::ivec2{0, 0} && m_floorGenerator.isConnected(m_currentPlayerPos, m_currentPlayerPos + dir))
-    {
-        m_currentPlayerPos += dir;
-        std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
-        gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
-    }
 }
 
 void Dungeon::setECS()
@@ -93,6 +107,8 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<PlayerComponent>();
     gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
+    gCoordinator.registerComponent<DoorComponent>();
+    gCoordinator.registerComponent<TravellingDungeonComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -107,8 +123,23 @@ void Dungeon::setECS()
         Signature signature;
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         signature.set(gCoordinator.getComponentType<TileComponent>());
+        signature.set(gCoordinator.getComponentType<ColliderComponent>());
         signature.set(gCoordinator.getComponentType<AnimationComponent>());
         gCoordinator.setSystemSignature<MapSystem>(signature);
+    }
+
+    auto doorSystem = gCoordinator.getRegisterSystem<DoorSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<DoorComponent>());
+        gCoordinator.setSystemSignature<DoorSystem>(signature);
+    }
+
+    auto travellingSystem = gCoordinator.getRegisterSystem<TravellingSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TravellingDungeonComponent>());
+        gCoordinator.setSystemSignature<TravellingSystem>(signature);
     }
 
     const auto textureSystem = gCoordinator.getRegisterSystem<TextureSystem>();
@@ -129,6 +160,7 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], TileComponent{});
         gCoordinator.addComponent(m_entities[i], TransformComponent{});
         gCoordinator.addComponent(m_entities[i], AnimationComponent{});
+        gCoordinator.addComponent(m_entities[i], ColliderComponent{});
     }
 }
 
@@ -148,5 +180,23 @@ void Dungeon::makeSimpleFloor()
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)
 {
-    if (m_roomMap.contains(m_currentPlayerPos + dir)) m_currentPlayerPos += dir;
+    if (m_roomMap.contains(m_currentPlayerPos + dir))
+    {
+        m_currentPlayerPos += dir;
+        std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
+        gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
+        gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
+        gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
+
+        const auto newDoor = dir * -1;
+        const auto doorType = GameType::geoToMapDoors.at(newDoor);
+        const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
+        const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
+        const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
+        gCoordinator.getComponent<TransformComponent>(m_entities[0]).position = newPosition;
+        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[0]);
+        colliderComponent.body->SetTransform(
+            {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
+            colliderComponent.body->GetAngle());
+    }
 }

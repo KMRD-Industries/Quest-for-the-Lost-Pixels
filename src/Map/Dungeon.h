@@ -1,4 +1,5 @@
 #pragma once
+#include <deque>
 #include <unordered_map>
 #include <vector>
 
@@ -9,7 +10,10 @@
 class Dungeon
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1) {}
+    Dungeon() :
+        m_entities(MAX_ENTITIES - 1)
+    {
+    }
 
     void init();
     void draw() const;
