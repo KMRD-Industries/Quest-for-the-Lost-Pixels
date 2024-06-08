@@ -10,6 +10,8 @@ set(SOURCES
 
 set(CORE
         Core/ComponentArray.h
+        Core/Physics.h
+        Core/Physics.cpp
         Core/ComponentManager.cpp
         Core/ComponentManager.h
         Core/EntityManager.cpp

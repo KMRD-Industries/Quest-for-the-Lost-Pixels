@@ -1,6 +1,5 @@
 #include "CollisionSystem.h"
 
-
 #include <iostream>
 
 #include "ColliderComponent.h"
@@ -46,7 +45,7 @@ void MyContactListener::EndContact(b2Contact* contact)
     }
 }
 
-void CollisionSystem::createMapCollision()
+void CollisionSystem::createMapCollision() const
 {
     for (const auto& entity : m_entities)
     {
@@ -100,9 +99,9 @@ void CollisionSystem::updateCollision() const
 }
 
 void CollisionSystem::updateSimulation(const float timeStep, const int32 velocityIterations,
-                                       const int32 positionIterations)
+                                       const int32 positionIterations) const
 {
-    m_world.Step(timeStep, velocityIterations, positionIterations);
+    Physics::getWorld()->Step(timeStep, velocityIterations, positionIterations);
     for (const auto& entity : m_entities)
     {
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
@@ -145,7 +144,7 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
     auto* collisionData = new GameType::CollisionData{.entityID = entity, .tag = tag};
 
     bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(collisionData);
-    b2Body* body = m_world.CreateBody(&bodyDef);
+    b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
 
     b2PolygonShape boxShape;
 
@@ -182,11 +181,11 @@ void CollisionSystem::deleteBody(Entity entity)
     if (!gCoordinator.hasComponent<ColliderComponent>(entity))
         return;
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-    if (colliderComponent.body != nullptr) m_world.DestroyBody(colliderComponent.body);
+    if (colliderComponent.body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent.body);
     colliderComponent.body = nullptr;
 }
 
-void CollisionSystem::deleteMarkedBodies()
+void CollisionSystem::deleteMarkedBodies() const
 {
     std::unordered_set<Entity> entityToKill{};
 

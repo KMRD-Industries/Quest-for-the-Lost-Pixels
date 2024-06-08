@@ -1,19 +1,24 @@
 #include "PlayerMovementSystem.h"
+
 #include <iostream>
+
 #include "Coordinator.h"
 #include "InputHandler.h"
+#include "Physics.h"
 #include "TransformComponent.h"
-#include "glm/detail/func_geometric.inl"
 #include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;
 
-void PlayerMovementSystem::update() const { handleMovement(); }
+void PlayerMovementSystem::update() const
+{
+    handleMovement();
+    handleAttack();
+}
 
 void PlayerMovementSystem::handleMovement() const
 {
     const auto inputHandler{InputHandler::getInstance()};
-
     glm::vec2 dir{};
     if (inputHandler->isHeld(InputType::MoveUp)) // Move Up
         dir.y -= 1;
@@ -30,5 +35,21 @@ void PlayerMovementSystem::handleMovement() const
         const auto playerSpeed = glm::vec2{normalizedDir.x * playerAcc, normalizedDir.y * playerAcc};
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
+    }
+}
+
+void PlayerMovementSystem::handleAttack() const
+{
+    const auto inputHandler{InputHandler::getInstance()};
+    for (const auto& entity : m_entities)
+    {
+        if (!inputHandler->isPressed(InputType::Attack))
+            continue;
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        const auto data = Physics::rayCast({transformComponent.position.x, transformComponent.position.y}, {1, 0},
+                                           entity);
+        if (data == nullptr)
+            continue;
+        std::cout << data->tag;
     }
 }

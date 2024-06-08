@@ -78,7 +78,7 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(50.f, 50.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[1], AnimationComponent{});
     gCoordinator.addComponent(m_entities[1], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[1], CharacterComponent{.hp = -10.f});
+    gCoordinator.addComponent(m_entities[1], CharacterComponent{.hp = 10.f});
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[1], "SecondPlayer");
 
     makeSimpleFloor();
