@@ -46,10 +46,11 @@ void PlayerMovementSystem::handleAttack() const
         if (!inputHandler->isPressed(InputType::Attack))
             continue;
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto data = Physics::rayCast({transformComponent.position.x, transformComponent.position.y}, {1, 0},
+        const auto data = Physics::rayCast({transformComponent.position.x, transformComponent.position.y},
+                                           {transformComponent.position.x + 100, transformComponent.position.y},
                                            entity);
-        if (data == nullptr)
+        if (data.tag == "")
             continue;
-        std::cout << data->tag;
+        std::cout << data.tag;
     }
 }

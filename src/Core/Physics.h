@@ -1,5 +1,6 @@
 #pragma once
 #include "GameTypes.h"
+#include "Helpers.h"
 #include "box2d/b2_world.h"
 #include "box2d/b2_fixture.h"
 
@@ -49,20 +50,30 @@ public:
         return m_physics;
     }
 
-    static GameType::CollisionData* rayCast(const b2Vec2 point1, const b2Vec2 point2, const Entity entity = -10)
+    /**
+     * \brief 
+     * \param point1 starting point of ray
+     * \param point2 ening point of ray
+     * \param entity entity to ignore, default nothing
+     * \return RaycastData of raycasted object 
+     */
+    static GameType::RaycastData rayCast(const GameType::MyVec2& point1, const GameType::MyVec2& point2,
+                                         const Entity entity = -10)
     {
+        const b2Vec2 newPoint1{convertPixelsToMeters(point1.x), convertPixelsToMeters(point1.y)};
+        const b2Vec2 newPoint2{convertPixelsToMeters(point2.x), convertPixelsToMeters(point2.y)};
         RayCastCallback callback;
-        if (entity != -10)
+        if (entity >= 0)
         {
             callback.m_myEntity = entity;
             callback.m_ignoreYourself = true;
         }
-        getInstance()->getWorld()->RayCast(&callback, point1, point2);
+        getInstance()->getWorld()->RayCast(&callback, newPoint1, newPoint2);
         if (!callback.m_fixture)
-            return nullptr;
+            return {0, "", {0, 0}};
         const auto bodyData =
             reinterpret_cast<GameType::CollisionData*>(callback.m_fixture->GetBody()->GetUserData().pointer);
-        return bodyData;
+        return {bodyData->entityID, bodyData->tag, callback.m_point};
     }
 
     static b2World* getWorld()
