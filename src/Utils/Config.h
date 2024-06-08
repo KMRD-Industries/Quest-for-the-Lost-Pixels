@@ -9,5 +9,7 @@ namespace config
     static constexpr double meterToPixelRatio{25.};
     static constexpr double pixelToMeterRatio{0.04};
     static constexpr float tileHeight{16.f};
-    static constexpr float playerAttackRange{50.f};
+    static constexpr float playerAttackRange{300.f};
+    static constexpr float playerAttackDamage{100.f};
+    static constexpr float playerAttackAngle{0.785f};
 } // namespace config

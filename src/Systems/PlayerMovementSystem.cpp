@@ -47,15 +47,16 @@ void PlayerMovementSystem::handleAttack() const
         if (!inputHandler->isPressed(InputType::Attack))
             continue;
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto data = Physics::rayCast({transformComponent.position.x, transformComponent.position.y},
-                                           {transformComponent.position.x + 100, transformComponent.position.y},
-                                           entity);
-        const auto targetInCircle = Physics::circleCast(transformComponent.position, 100, entity);
-        for (const auto& target : targetInCircle)
+        const auto forwardPlayerVector = GameType::MyVec2{transformComponent.position.x + 10,
+                                                          transformComponent.position.y};
+        const auto targetInCircle = Physics::circleCast(transformComponent.position, config::playerAttackRange, entity);
+        const auto targetInCone = Physics::coneCast(transformComponent.position, forwardPlayerVector,
+                                                    config::playerAttackRange, config::playerAttackAngle, entity);
+        for (const auto& target : targetInCone)
         {
             if (!gCoordinator.hasComponent<CharacterComponent>(target.entityID))
                 continue;
-            gCoordinator.getComponent<CharacterComponent>(target.entityID).hp -= 100;
+            //gCoordinator.getComponent<CharacterComponent>(target.entityID).hp -= config::playerAttackDamage;
         }
     }
 }
