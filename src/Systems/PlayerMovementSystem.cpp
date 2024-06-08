@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "CharacterComponent.h"
 #include "Coordinator.h"
 #include "InputHandler.h"
 #include "Physics.h"
@@ -49,8 +50,12 @@ void PlayerMovementSystem::handleAttack() const
         const auto data = Physics::rayCast({transformComponent.position.x, transformComponent.position.y},
                                            {transformComponent.position.x + 100, transformComponent.position.y},
                                            entity);
-        if (data.tag == "")
-            continue;
-        std::cout << data.tag;
+        const auto targetInCircle = Physics::circleCast(transformComponent.position, 100, entity);
+        for (const auto& target : targetInCircle)
+        {
+            if (!gCoordinator.hasComponent<CharacterComponent>(target.entityID))
+                continue;
+            gCoordinator.getComponent<CharacterComponent>(target.entityID).hp -= 100;
+        }
     }
 }

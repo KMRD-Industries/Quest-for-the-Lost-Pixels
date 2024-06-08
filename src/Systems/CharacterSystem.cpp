@@ -18,12 +18,10 @@ void CharacterSystem::cleanUpDeadEntities() const
     {
         if (gCoordinator.getComponent<CharacterComponent>(entity).hp > 0)
             continue;
-        {
-            if (gCoordinator.hasComponent<ColliderComponent>(entity))
-                gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
-            else
-                entityToKill.insert(entity);
-        }
+        if (gCoordinator.hasComponent<ColliderComponent>(entity))
+            gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
+        else
+            entityToKill.insert(entity);
     }
     for (auto& entity : entityToKill)
         gCoordinator.destroyEntity(entity);
