@@ -122,8 +122,8 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     const size_t underscorePos = filename.find_last_of('_');
     const size_t dotPos = filename.find_last_of('.');
     const std::string numberStr = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
-    //    const int mapID = std::stoi(numberStr);
-    const int mapID = 110;
+    const int mapID = std::stoi(numberStr);
+    //    const int mapID = 110;
 
     if (!std::regex_match(filename, pattern)) return;
 

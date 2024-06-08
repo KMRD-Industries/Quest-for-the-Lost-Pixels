@@ -10,11 +10,9 @@
 #include "Helpers.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
-#include "Paths.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
-#include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
@@ -52,6 +50,8 @@ void Dungeon::init()
 
             if (entityT.tag == "Wall")
             {
+                auto transformComponent = gCoordinator.getComponent<TransformComponent>(entityT.entityID);
+                transformComponent.velocity *= -1.;
             }
         },
         false, false, offset);
@@ -81,6 +81,8 @@ void Dungeon::draw() const
 void Dungeon::update()
 {
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
+    gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
+    gCoordinator.getRegisterSystem<EnemySystem>()->update();
     m_roomMap.at(m_currentPlayerPos).update();
 
     if (!m_moveInDungeon.empty())
@@ -164,7 +166,7 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], MapComponent{});
     }
 
-    for (int i = 2000; i < 2100; i++)
+    for (int i = 2000; i < 3000; i++)
     {
         m_entities[i] = gCoordinator.createEntity();
         gCoordinator.addComponent(m_entities[i], RenderComponent{});
@@ -196,15 +198,19 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
     {
         m_currentPlayerPos += dir;
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
+
         gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
+
         const auto newDoor = dir * -1;
         const auto doorType = GameType::geoToMapDoors.at(newDoor);
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
         const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
+
         const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
         gCoordinator.getComponent<TransformComponent>(m_entities[0]).position = newPosition;
         auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[0]);
+
         colliderComponent.body->SetTransform(
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
             colliderComponent.body->GetAngle());

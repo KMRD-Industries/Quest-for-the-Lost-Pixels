@@ -61,11 +61,7 @@ void Game::init()
 
 void Game::draw() const { m_dungeon.draw(); };
 
-void Game::update()
-{
-    m_dungeon.update();
-    gCoordinator.getRegisterSystem<EnemySystem>()->update();
-}
+void Game::update() { m_dungeon.update(); }
 
 void Game::handleCollision()
 {

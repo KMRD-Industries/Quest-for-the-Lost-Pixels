@@ -5,7 +5,7 @@
 
 namespace config
 {
-    static constexpr float gameScale{3.f};
+    static constexpr float gameScale{3.};
     static constexpr double meterToPixelRatio{25.};
     static constexpr double pixelToMeterRatio{0.04};
     static constexpr float oneFrameTime{16.67};
