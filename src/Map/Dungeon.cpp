@@ -40,7 +40,8 @@ void Dungeon::init()
     texture2->loadFromFile(PathToAssets + "/knight/knight.png");
 
     gCoordinator.addComponent(m_entities[0], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
-    gCoordinator.addComponent(m_entities[0], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(m_entities[0],
+                              TransformComponent(sf::Vector2f(100.f, 100.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
     gCoordinator.addComponent(m_entities[0], ColliderComponent{});
@@ -75,7 +76,8 @@ void Dungeon::init()
         false, true);
 
     gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer = 4});
-    gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(50.f, 50.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(m_entities[1],
+                              TransformComponent(sf::Vector2f(250.f, 250.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[1], AnimationComponent{});
     gCoordinator.addComponent(m_entities[1], ColliderComponent{});
     gCoordinator.addComponent(m_entities[1], CharacterComponent{.hp = 10.f});
