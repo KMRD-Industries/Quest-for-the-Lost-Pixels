@@ -2,8 +2,10 @@
 #include "GameTypes.h"
 #include "Helpers.h"
 #include "box2d/b2_circle_shape.h"
+#include "box2d/b2_distance.h"
 #include "box2d/b2_world.h"
 #include "box2d/b2_fixture.h"
+#include "box2d/b2_polygon_shape.h"
 
 class RayCastCallback : public b2RayCastCallback
 {
@@ -49,10 +51,7 @@ public:
             if (m_ignoreYourself && bodyData->entityID == m_myEntity)
                 return true;
 
-            const auto position = fixture->GetBody()->GetPosition();
-            if ((position - m_circleCenter).Length() > m_circleRadius)
-                return true;
-            m_fixtures.push_back(fixture);
+            //TODO: HOW TO CHECK IF CIRCLE OVERLAP POLYGON ?????
         }
         return true;
     }
@@ -61,14 +60,14 @@ public:
     bool m_ignoreYourself{};
     Entity m_myEntity{};
     b2Vec2 m_circleCenter{};
-    b2Vec2 m_forwardVector{};
     float m_circleRadius{};
+    b2CircleShape m_circle;
 };
 
-class ConeCastCallback : public b2QueryCallback
+class BoxCastCallback : public b2QueryCallback
 {
 public:
-    ConeCastCallback() = default;
+    BoxCastCallback() = default;
 
     bool ReportFixture(b2Fixture* fixture) override
     {
@@ -78,15 +77,7 @@ public:
             if (m_ignoreYourself && bodyData->entityID == m_myEntity)
                 return true;
 
-            const auto position = fixture->GetBody()->GetPosition();
-            auto vectorToTarget = (position - m_circleCenter);
-            if (vectorToTarget.Length() > m_circleRadius)
-                return true;
-
-            vectorToTarget.Normalize();
-            const auto angle = b2Dot(vectorToTarget, m_forwardVector);
-            if (angle <= m_angle && angle >= -m_angle)
-                m_fixtures.push_back(fixture);
+            m_fixtures.push_back(fixture);
         }
         return true;
     }
@@ -94,10 +85,6 @@ public:
     std::vector<b2Fixture*> m_fixtures;
     bool m_ignoreYourself{};
     Entity m_myEntity{};
-    b2Vec2 m_circleCenter{};
-    b2Vec2 m_forwardVector{};
-    float m_circleRadius{};
-    float m_angle{};
 };
 
 class Physics
@@ -141,6 +128,42 @@ public:
         return {bodyData->entityID, bodyData->tag, callback.m_point};
     }
 
+    static std::vector<GameType::RaycastData> boxCast(const GameType::MyVec2& lowerBound,
+                                                      const GameType::MyVec2& upperBound,
+                                                      const int entity = -10)
+    {
+        b2AABB aabb;
+        aabb.lowerBound = {convertPixelsToMeters(lowerBound.x), convertPixelsToMeters(lowerBound.y)};
+        aabb.upperBound = {convertPixelsToMeters(upperBound.x), convertPixelsToMeters(upperBound.y)};
+
+        BoxCastCallback callback;
+        if (entity >= 0)
+        {
+            callback.m_myEntity = entity;
+            callback.m_ignoreYourself = true;
+        }
+
+        getInstance()->getWorld()->QueryAABB(&callback, aabb);
+
+        std::vector<GameType::RaycastData> results;
+
+        for (const auto fixture : callback.m_fixtures)
+        {
+            const auto bodyData =
+                reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
+            GameType::RaycastData data{bodyData->entityID, bodyData->tag, fixture->GetBody()->GetPosition()};
+            results.push_back(data);
+        }
+
+        return results;
+    }
+
+    static std::vector<GameType::RaycastData> boxCast(const GameType::MyVec2& center, const float radius,
+                                                      const int entity = -10)
+    {
+        return boxCast(center - b2Vec2(radius, radius), center + b2Vec2(radius, radius), entity);
+    }
+
     static std::vector<GameType::RaycastData> circleCast(const GameType::MyVec2& center, const float radius,
                                                          const int entity = -10)
     {
@@ -152,7 +175,8 @@ public:
         circle.m_p = newCenter;
 
         b2AABB aabb;
-        circle.ComputeAABB(&aabb, b2Transform(newCenter, b2Rot(0.0f)), 0);
+        aabb.lowerBound = newCenter - b2Vec2(newRadius, newRadius);
+        aabb.upperBound = newCenter + b2Vec2(newRadius, newRadius);
 
         CircleCastCallback callback;
         if (entity >= 0)
@@ -162,6 +186,7 @@ public:
         }
         callback.m_circleCenter = newCenter;
         callback.m_circleRadius = newRadius;
+        callback.m_circle = circle;
 
         getInstance()->getWorld()->QueryAABB(&callback, aabb);
 

@@ -5,12 +5,12 @@
 
 namespace config
 {
-    static constexpr bool debugBoundingBox{true};
+    static constexpr bool debugMode{false};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{25.};
     static constexpr double pixelToMeterRatio{0.04};
     static constexpr float tileHeight{16.f};
-    static constexpr float playerAttackRange{48.f};
+    static constexpr float playerAttackRange{100.f};
     static constexpr float playerAttackDamage{100.f};
     static constexpr float playerAttackAngle{0.785f};
 } // namespace config

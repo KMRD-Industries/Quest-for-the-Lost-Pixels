@@ -43,29 +43,20 @@ void PlayerMovementSystem::handleAttack() const
     const auto inputHandler{InputHandler::getInstance()};
     for (const auto& entity : m_entities)
     {
-        //if (!inputHandler->isPressed(InputType::Attack))
-        //    continue;
+        if (!inputHandler->isPressed(InputType::Attack))
+            continue;
 
         auto renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         const auto bounds = renderComponent.sprite.getGlobalBounds();
 
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto center = glm::vec2{transformComponent.position.x,
-                                      transformComponent.position.y};
+        const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        const auto center = glm::vec2{
+            transformComponent.position.x + bounds.width / 2,
+            transformComponent.position.y + bounds.height / 2};
+        const auto range = glm::vec2{center.x * config::playerAttackRange * transformComponent.scale.x, center.y};
 
-        const auto forwardPlayerVector = GameType::MyVec2{
-            (center.x + 10) * transformComponent.scale.x,
-            center.y};
-        const auto targetInCircle = Physics::circleCast(center, config::playerAttackRange, entity);
-        const auto targetInCone = Physics::coneCast(center, forwardPlayerVector,
-                                                    config::playerAttackRange, config::playerAttackAngle, entity);
-        if (targetInCircle.size() > 0)
-            std::cout << "player\n";
-        for (const auto& target : targetInCone)
-        {
-            if (!gCoordinator.hasComponent<CharacterComponent>(target.entityID))
-                continue;
-            //gCoordinator.getComponent<CharacterComponent>(target.entityID).hp -= config::playerAttackDamage;
-        }
+        const auto targetInBox = Physics::rayCast(center, range, entity);
+        if (targetInBox.tag == "SecondPlayer")
+            gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID).hp -= config::playerAttackDamage;
     }
 }

@@ -15,9 +15,6 @@ extern Coordinator gCoordinator;
 
 void RenderSystem::draw(sf::RenderWindow& window) const
 {
-    if (config::debugBoundingBox)
-        debugBoundingBoxes(window);
-
     std::vector<std::vector<sf::Sprite>> tiles(5);
 
     for (const auto& entity : m_entities)
@@ -40,10 +37,43 @@ void RenderSystem::draw(sf::RenderWindow& window) const
             window.draw(sprite);
         }
     }
+
+    if (config::debugMode)
+        debugBoundingBoxes(window);
 }
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 {
+    auto renderComponent = gCoordinator.getComponent<RenderComponent>(500);
+    const auto bounds = renderComponent.sprite.getGlobalBounds();
+
+    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(500);
+    const auto center = GameType::MyVec2{transformComponent.position.x + bounds.width / 2,
+                                         transformComponent.position.y + bounds.height / 2};
+    sf::CircleShape centerPoint(5);
+    centerPoint.setFillColor(sf::Color::Red);
+    centerPoint.setPosition(center.x, center.y);
+    window.draw(centerPoint);
+
+    sf::VertexArray line(sf::Lines, 2);
+    line[0].position = center;
+    line[0].color = sf::Color::Red;
+    line[1].position = {center.x + config::playerAttackRange, center.y};
+    line[1].color = sf::Color::Red;
+    window.draw(line);
+
+    const b2Vec2 newCenter{convertPixelsToMeters(center.x), convertPixelsToMeters(center.y)};
+    const float newRadius = convertPixelsToMeters(config::playerAttackRange);
+
+    b2CircleShape circle;
+    circle.m_radius = newRadius;
+    circle.m_p = newCenter;
+
+    sf::CircleShape collision(convertMetersToPixel(newRadius));
+    collision.setOrigin(convertMetersToPixel(newRadius), convertMetersToPixel(newRadius));
+    collision.setPosition({convertMetersToPixel(newCenter.x), convertMetersToPixel(newCenter.y)});
+    window.draw(collision);
+
     for (b2Body* body = Physics::getWorld()->GetBodyList(); body; body = body->GetNext())
     {
         for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext())
