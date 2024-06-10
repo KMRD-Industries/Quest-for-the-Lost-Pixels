@@ -143,12 +143,12 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
         const auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
         const auto spriteBounds = sprite.getGlobalBounds();
         bodyDef.position.Set(
-            convertPixelsToMeters(transformComponent.position.x + spriteBounds.width * config::gameScale / 2),
+            convertPixelsToMeters(transformComponent.position.x - spriteBounds.width * config::gameScale / 2),
             convertPixelsToMeters(transformComponent.position.y + spriteBounds.height * config::gameScale / 2));
     }
     else
         bodyDef.position.Set(
-            convertPixelsToMeters(transformComponent.position.x + colliderSize.x * config::gameScale / 2),
+            convertPixelsToMeters(transformComponent.position.x - colliderSize.x * config::gameScale / 2),
             convertPixelsToMeters(transformComponent.position.y + colliderSize.y * config::gameScale / 2));
     bodyDef.angle = transformComponent.rotation;
 
