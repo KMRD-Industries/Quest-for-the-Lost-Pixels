@@ -183,41 +183,24 @@ public:
                                                        const float angle,
                                                        const int entity = -10)
     {
+        const auto resultFromCircle = circleCast(center, radius, entity);
+
         const b2Vec2 newCenter{convertPixelsToMeters(center.x), convertPixelsToMeters(center.y)};
-        const float newRadius = convertPixelsToMeters(radius);
         b2Vec2 newForward = {convertPixelsToMeters(forwardVector.x), convertPixelsToMeters(forwardVector.y)};
         newForward.Normalize();
-        b2CircleShape circle;
-        circle.m_radius = newRadius;
-        circle.m_p = newCenter;
 
-        b2AABB aabb;
-        circle.ComputeAABB(&aabb, b2Transform(newCenter, b2Rot(0.0f)), 0);
-
-        ConeCastCallback callback;
-        if (entity >= 0)
+        std::vector<GameType::RaycastData> elementsInCone{};
+        for (const auto& element : resultFromCircle)
         {
-            callback.m_myEntity = entity;
-            callback.m_ignoreYourself = true;
-        }
-        callback.m_circleCenter = newCenter;
-        callback.m_circleRadius = newRadius;
-        callback.m_angle = angle;
-        callback.m_forwardVector = newForward;
+            auto vectorToTarget = (element.position - newCenter);
+            vectorToTarget.Normalize();
 
-        getInstance()->getWorld()->QueryAABB(&callback, aabb);
-
-        std::vector<GameType::RaycastData> results;
-
-        for (const auto fixture : callback.m_fixtures)
-        {
-            const auto bodyData =
-                reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
-            GameType::RaycastData data{bodyData->entityID, bodyData->tag, fixture->GetBody()->GetPosition()};
-            results.push_back(data);
+            const auto elementAngle = b2Dot(vectorToTarget, newForward);
+            if (elementAngle <= angle && elementAngle >= -angle)
+                elementsInCone.push_back(element);
         }
 
-        return results;
+        return elementsInCone;
     }
 
     static b2World* getWorld()

@@ -110,7 +110,13 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         const b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
         const auto position = body->GetPosition();
-        transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
+        const auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
+        const auto spriteBounds = sprite.getGlobalBounds();
+        int mulForBlocks = 1;
+        if (gCoordinator.hasComponent<TileComponent>(entity))
+            mulForBlocks = config::gameScale;
+        transformComponent.position = {convertMetersToPixel(position.x) - spriteBounds.width / 2 * mulForBlocks,
+                                       convertMetersToPixel(position.y) - spriteBounds.height / 2 * mulForBlocks};
     }
 }
 
@@ -132,8 +138,18 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
     b2BodyDef bodyDef;
-    bodyDef.position.Set(convertPixelsToMeters(transformComponent.position.x),
-                         convertPixelsToMeters(transformComponent.position.y));
+    if (useTextureSize)
+    {
+        const auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
+        const auto spriteBounds = sprite.getGlobalBounds();
+        bodyDef.position.Set(
+            convertPixelsToMeters(transformComponent.position.x + spriteBounds.width * config::gameScale / 2),
+            convertPixelsToMeters(transformComponent.position.y + spriteBounds.height * config::gameScale / 2));
+    }
+    else
+        bodyDef.position.Set(
+            convertPixelsToMeters(transformComponent.position.x + colliderSize.x * config::gameScale / 2),
+            convertPixelsToMeters(transformComponent.position.y + colliderSize.y * config::gameScale / 2));
     bodyDef.angle = transformComponent.rotation;
 
     if (isStatic)

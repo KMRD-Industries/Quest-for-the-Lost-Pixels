@@ -1,11 +1,10 @@
 #include "PlayerMovementSystem.h"
 
-#include <iostream>
-
 #include "CharacterComponent.h"
 #include "Coordinator.h"
 #include "InputHandler.h"
 #include "Physics.h"
+#include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "glm/vec2.hpp"
 
@@ -44,14 +43,24 @@ void PlayerMovementSystem::handleAttack() const
     const auto inputHandler{InputHandler::getInstance()};
     for (const auto& entity : m_entities)
     {
-        if (!inputHandler->isPressed(InputType::Attack))
-            continue;
+        //if (!inputHandler->isPressed(InputType::Attack))
+        //    continue;
+
+        auto renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        const auto bounds = renderComponent.sprite.getGlobalBounds();
+
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto forwardPlayerVector = GameType::MyVec2{transformComponent.position.x + 10,
-                                                          transformComponent.position.y};
-        const auto targetInCircle = Physics::circleCast(transformComponent.position, config::playerAttackRange, entity);
-        const auto targetInCone = Physics::coneCast(transformComponent.position, forwardPlayerVector,
+        const auto center = glm::vec2{transformComponent.position.x,
+                                      transformComponent.position.y};
+
+        const auto forwardPlayerVector = GameType::MyVec2{
+            (center.x + 10) * transformComponent.scale.x,
+            center.y};
+        const auto targetInCircle = Physics::circleCast(center, config::playerAttackRange, entity);
+        const auto targetInCone = Physics::coneCast(center, forwardPlayerVector,
                                                     config::playerAttackRange, config::playerAttackAngle, entity);
+        if (targetInCircle.size() > 0)
+            std::cout << "player\n";
         for (const auto& target : targetInCone)
         {
             if (!gCoordinator.hasComponent<CharacterComponent>(target.entityID))
