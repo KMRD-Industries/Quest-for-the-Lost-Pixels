@@ -84,10 +84,10 @@ void MultiplayerSystem::update()
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
         m_position.ParseFromArray(&m_buf, received);
-        std::cout << m_position.ShortDebugString() << '\n';
         std::uint32_t id = m_position.entity_id();
 
         if (m_entity_map.contains(id)) {
+            std::cout << m_position.ShortDebugString() << '\n';
             Entity& target = m_entity_map[id];
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
 
