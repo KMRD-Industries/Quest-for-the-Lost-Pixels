@@ -9,4 +9,5 @@ namespace config
     static constexpr double meterToPixelRatio{25.};
     static constexpr double pixelToMeterRatio{0.04};
     static constexpr float tileHeight{16.f};
+    static constexpr float oneFrameTime{16.67};
 } // namespace config

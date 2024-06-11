@@ -7,8 +7,9 @@
 class PlayerMovementSystem : public System
 {
 public:
-    void update() const;
+    void update();
 
 private:
-    void handleMovement() const;
+    void handleMovement();
+    bool flip = false;
 };

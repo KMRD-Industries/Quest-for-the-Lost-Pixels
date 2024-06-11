@@ -2,11 +2,11 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
-#include "Config.h"
-#include "Coordinator.h"
 #include "DoorComponent.h"
+#include "PlayerComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
@@ -17,13 +17,25 @@ void MapSystem::loadMap(std::string& path)
     // Reset Map Entities to default
     for (const auto& entity : m_entities)
     {
-        auto& map_component = gCoordinator.getComponent<TileComponent>(entity);
-        auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-        map_component.id = {};
-        map_component.layer = {};
-        transform_component.scale = sf::Vector2f(1.f, 1.f);
-        transform_component.rotation = {};
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<DoorComponent>(entity))
+        {
+            continue;
+        }
+
+        auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+        collisionSystem->deleteBody(entity);
+        transformComponent.position = {0.F, 0.F};
+
+        tileComponent.id = {};
+        tileComponent.layer = {};
+        transformComponent.scale = sf::Vector2f(1.f, 1.f);
+        transformComponent.rotation = {};
+        animationComponent.frames.clear();
     }
 
     std::ifstream json_file(path);
@@ -45,7 +57,7 @@ void MapSystem::loadMap(std::string& path)
     }
 
     auto start_iterator = m_entities.begin();
-    ++start_iterator;
+    start_iterator++;
 
     long width = {};
     long height = {};

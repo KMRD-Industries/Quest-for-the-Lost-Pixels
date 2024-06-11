@@ -6,8 +6,10 @@
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
+#include "DoorComponent.h"
 #include "GameTypes.h"
 #include "Helpers.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -50,35 +52,30 @@ void CollisionSystem::createMapCollision()
 {
     for (const auto& entity : m_entities)
     {
-        if (!gCoordinator.hasComponent<TileComponent>(entity))
+        if (!gCoordinator.hasComponent<TileComponent>(entity)) continue;
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<DoorComponent>(entity))
             continue;
 
         deleteBody(entity);
     }
     for (const auto& entity : m_entities)
     {
-        if (!gCoordinator.hasComponent<TileComponent>(entity))
-            continue;
-        if (auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity); tileComponent.tileset ==
-            "SpecialBlocks")
+        if (!gCoordinator.hasComponent<TileComponent>(entity)) continue;
+        if (auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+            tileComponent.tileset == "SpecialBlocks")
         {
             if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER) + 1)
                 createBody(
                     entity, "Wall", {config::tileHeight, config::tileHeight},
-                    [](const GameType::CollisionData& entityT)
-                    {
-                    }, [](const GameType::CollisionData& entityT)
-                    {
-                    }, true, false);
+                    [](const GameType::CollisionData& entityT) {}, [](const GameType::CollisionData& entityT) {}, true,
+                    false);
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
             {
                 createBody(
                     entity, "Door", {config::tileHeight, config::tileHeight},
-                    [](const GameType::CollisionData& entityT)
-                    {
-                    }, [](const GameType::CollisionData& entityT)
-                    {
-                    }, true, false);
+                    [](const GameType::CollisionData& entityT) {}, [](const GameType::CollisionData& entityT) {}, true,
+                    false);
             }
         }
     }
