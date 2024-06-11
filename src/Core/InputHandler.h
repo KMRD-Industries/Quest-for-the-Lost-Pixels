@@ -9,7 +9,8 @@ enum class InputType
     MoveLeft,
     MoveRight,
     MoveUp,
-    MoveDown
+    MoveDown,
+    Attack
 };
 
 class InputHandler
@@ -19,7 +20,8 @@ class InputHandler
     std::unordered_map<sf::Keyboard::Key, InputType> m_keyToMapInput{{sf::Keyboard::Key::W, InputType::MoveUp},
                                                                      {sf::Keyboard::Key::A, InputType::MoveLeft},
                                                                      {sf::Keyboard::Key::S, InputType::MoveDown},
-                                                                     {sf::Keyboard::Key::D, InputType::MoveRight}};
+                                                                     {sf::Keyboard::Key::D, InputType::MoveRight},
+                                                                     {sf::Keyboard::Key::Space, InputType::Attack}};
     inline static InputHandler* m_instance{};
     InputHandler() = default;
 

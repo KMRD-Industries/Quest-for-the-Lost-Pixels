@@ -3,6 +3,8 @@
 #include <vector>
 #include "Types.h"
 #define GLM_ENABLE_EXPERIMENTAL
+#include "SFML/System/Vector2.hpp"
+#include "box2d/b2_math.h"
 #include "glm/gtx/hash.hpp"
 
 namespace SpecialBlocks
@@ -16,6 +18,37 @@ namespace SpecialBlocks
 
 namespace GameType
 {
+    struct MyVec2
+    {
+        float x, y;
+
+        MyVec2(const float x, const float y):
+            x{x}, y{y}
+        {
+        }
+
+        MyVec2(const glm::vec2& vec) :
+            x(vec.x), y(vec.y)
+        {
+        }
+
+        operator glm::vec2() const { return {x, y}; }
+
+        MyVec2(const sf::Vector2f& vec) :
+            x(vec.x), y(vec.y)
+        {
+        }
+
+        operator sf::Vector2f() const { return {x, y}; }
+
+        MyVec2(const b2Vec2& vec) :
+            x(vec.x), y(vec.y)
+        {
+        }
+
+        operator b2Vec2() const { return {x, y}; }
+    };
+
     enum class DoorEntraces : int
     {
         NORTH = static_cast<int>('N'),
@@ -45,6 +78,13 @@ namespace GameType
     {
         Entity entityID;
         std::string tag;
+    };
+
+    struct RaycastData
+    {
+        Entity entityID;
+        std::string tag;
+        MyVec2 position;
     };
 } // namespace GameType
 
