@@ -3,6 +3,7 @@
 #include <SFML/Window/Event.hpp>
 #include <imgui-SFML.h>
 
+#include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
@@ -29,6 +30,11 @@ void handleInput(sf::RenderWindow& window)
         {
             const auto keyCode = event.key.code;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+        }
+        else if (event.type == sf::Event::MouseMoved && config::debugMode)
+        {
+            sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+            std::cout << "Pozycja myszki: x=" << mousePosition.x << " y=" << mousePosition.y << std::endl;
         }
         if (event.type == sf::Event::Closed)
         {

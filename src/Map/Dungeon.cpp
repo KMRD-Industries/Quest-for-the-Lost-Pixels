@@ -8,6 +8,8 @@
 #include "Coordinator.h"
 
 #include "AnimationComponent.h"
+#include "CharacterComponent.h"
+#include "CharacterSystem.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "DoorComponent.h"
@@ -58,6 +60,7 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[id], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
     gCoordinator.addComponent(m_entities[id], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[id], AnimationComponent{});
+    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = 100.f});
     gCoordinator.addComponent(m_entities[id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[id], TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) {
@@ -111,6 +114,7 @@ void Dungeon::update()
 {
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
     gCoordinator.getRegisterSystem<TravellingSystem>()->update();
+    gCoordinator.getRegisterSystem<CharacterSystem>()->update();
 
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
 
@@ -141,6 +145,7 @@ void Dungeon::update()
                                       TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
             gCoordinator.addComponent(m_entities[id], AnimationComponent{});
             gCoordinator.addComponent(m_entities[id], ColliderComponent{});
+            gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = 100.f});
 
             gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[id], tag);
 
@@ -165,6 +170,7 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<AnimationComponent>();
     gCoordinator.registerComponent<DoorComponent>();
     gCoordinator.registerComponent<TravellingDungeonComponent>();
+    gCoordinator.registerComponent<CharacterComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -179,6 +185,13 @@ void Dungeon::setECS()
         Signature signature;
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         gCoordinator.setSystemSignature<MultiplayerSystem>(signature);
+    }
+
+    auto characterSystem = gCoordinator.getRegisterSystem<CharacterSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<CharacterComponent>());
+        gCoordinator.setSystemSignature<CharacterSystem>(signature);
     }
 
     auto mapSystem = gCoordinator.getRegisterSystem<MapSystem>();

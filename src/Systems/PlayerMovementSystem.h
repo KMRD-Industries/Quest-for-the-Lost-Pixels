@@ -11,4 +11,5 @@ public:
 
 private:
     void handleMovement() const;
+    void handleAttack() const;
 };

@@ -6,9 +6,9 @@
 #include "Coordinator.h"
 #include "Core/Types.h"
 #include "GameTypes.h"
+#include "Physics.h"
 #include "System.h"
 #include "glm/vec2.hpp"
-
 
 class MyContactListener : public b2ContactListener
 {
@@ -20,13 +20,15 @@ class MyContactListener : public b2ContactListener
 class CollisionSystem : public System
 {
 public:
-    explicit CollisionSystem() :
-        m_world(b2Vec2(0.f, 0.f)) { m_world.SetContactListener(&m_myContactListenerInstance); }
+    explicit CollisionSystem()
+    {
+        Physics::getWorld()->SetContactListener(&m_myContactListenerInstance);
+    }
 
-    void createMapCollision();
+    void createMapCollision() const;
     void updateCollision() const;
-    void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations);
-    void createBody(
+    void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations) const;
+    static void createBody(
         Entity entity, const std::string& tag, const glm::vec2& colliderSize = {},
         const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&)
         {
@@ -35,9 +37,9 @@ public:
         {
         },
         bool isStatic = true, bool useTextureSize = true);
-    void deleteBody(Entity entity);
+    static void deleteBody(Entity entity);
+    void deleteMarkedBodies() const;
 
 private:
     MyContactListener m_myContactListenerInstance;
-    b2World m_world;
 };
