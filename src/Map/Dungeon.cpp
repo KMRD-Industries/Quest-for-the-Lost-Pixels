@@ -21,7 +21,11 @@
 #include "TextureSystem.h"
 #include "TravellingSystem.h"
 
+#include "EnemyComponent.h"
+#include "EnemySystem.h"
 #include "Paths.h"
+#include "SpawnerComponent.h"
+#include "SpawnerSystem.h"
 
 extern Coordinator gCoordinator;
 
@@ -42,10 +46,9 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
     gCoordinator.addComponent(m_entities[0], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[0], TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir)
-    {
-        moveInDungeon(dir);
-    }});
+    gCoordinator.addComponent(m_entities[0], TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) {
+                                  moveInDungeon(dir);
+                              }});
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
         m_entities[0], "FirstPlayer", {},
@@ -61,7 +64,8 @@ void Dungeon::init()
                         GameType::mapDoorsToGeo.at(doorComponent.entrance));
                 ++travellingDungeonComponent.doorsPassed;
             }
-        }, [&](const GameType::CollisionData& entityT)
+        },
+        [&](const GameType::CollisionData& entityT)
         {
             if (entityT.tag == "Door")
             {
@@ -96,6 +100,8 @@ void Dungeon::draw() const
 void Dungeon::update()
 {
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
+    gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
+    gCoordinator.getRegisterSystem<EnemySystem>()->update();
     gCoordinator.getRegisterSystem<TravellingSystem>()->update();
 
     m_roomMap.at(m_currentPlayerPos).update();
@@ -109,6 +115,8 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<AnimationComponent>();
     gCoordinator.registerComponent<DoorComponent>();
     gCoordinator.registerComponent<TravellingDungeonComponent>();
+    gCoordinator.registerComponent<SpawnerComponent>();
+    gCoordinator.registerComponent<EnemyComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -125,6 +133,7 @@ void Dungeon::setECS()
         signature.set(gCoordinator.getComponentType<TileComponent>());
         signature.set(gCoordinator.getComponentType<ColliderComponent>());
         signature.set(gCoordinator.getComponentType<AnimationComponent>());
+        signature.set(gCoordinator.getComponentType<MapComponent>());
         gCoordinator.setSystemSignature<MapSystem>(signature);
     }
 
@@ -151,6 +160,23 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<TextureSystem>(signature);
     }
 
+    const auto enemySystem = gCoordinator.getRegisterSystem<EnemySystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<EnemyComponent>());
+        gCoordinator.setSystemSignature<EnemySystem>(signature);
+    }
+
+    const auto spawnerSystem = gCoordinator.getRegisterSystem<SpawnerSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TileComponent>());
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<SpawnerComponent>());
+        gCoordinator.setSystemSignature<SpawnerSystem>(signature);
+    }
+
+
     textureSystem->loadTexturesFromFiles();
 
     for (int i = 1000; i < 1500; i++)
@@ -161,6 +187,18 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], TransformComponent{});
         gCoordinator.addComponent(m_entities[i], AnimationComponent{});
         gCoordinator.addComponent(m_entities[i], ColliderComponent{});
+        gCoordinator.addComponent(m_entities[i], MapComponent{});
+    }
+
+    for (int i = 2000; i < 3000; i++)
+    {
+        m_entities[i] = gCoordinator.createEntity();
+        gCoordinator.addComponent(m_entities[i], RenderComponent{});
+        gCoordinator.addComponent(m_entities[i], TileComponent{});
+        gCoordinator.addComponent(m_entities[i], TransformComponent{});
+        gCoordinator.addComponent(m_entities[i], AnimationComponent{});
+        gCoordinator.addComponent(m_entities[i], ColliderComponent{});
+        gCoordinator.addComponent(m_entities[i], EnemyComponent{});
     }
 }
 

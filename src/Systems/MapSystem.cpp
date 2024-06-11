@@ -7,6 +7,8 @@
 #include "Config.h"
 #include "Coordinator.h"
 #include "DoorComponent.h"
+#include "EnemySystem.h"
+#include "SpawnerComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
@@ -20,11 +22,18 @@ void MapSystem::loadMap(std::string& path)
         auto& map_component = gCoordinator.getComponent<TileComponent>(entity);
         auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
 
+        if (gCoordinator.hasComponent<SpawnerComponent>(entity))
+        {
+            gCoordinator.removeComponent<SpawnerComponent>(entity);
+        }
+
         map_component.id = {};
         map_component.layer = {};
         transform_component.scale = sf::Vector2f(1.f, 1.f);
         transform_component.rotation = {};
     }
+
+    gCoordinator.getRegisterSystem<EnemySystem>()->deleteEnemies();
 
     std::ifstream json_file(path);
 
@@ -107,6 +116,12 @@ void MapSystem::loadMap(std::string& path)
                         doorComponent.entrance = GameType::DoorEntraces::WEST;
                     else if (x_position == width - 1)
                         doorComponent.entrance = GameType::DoorEntraces::EAST;
+                }
+
+                if (tileID == static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK) + 1 &&
+                    tileset_name == "SpecialBlocks")
+                {
+                    gCoordinator.addComponent(*start_iterator, SpawnerComponent{});
                 }
             }
 

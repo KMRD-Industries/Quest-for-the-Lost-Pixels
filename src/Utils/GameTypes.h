@@ -10,7 +10,8 @@ namespace SpecialBlocks
     enum class Blocks : int
     {
         DOORSCOLLIDER = 0,
-        STATICWALLCOLLIDER = 1
+        STATICWALLCOLLIDER = 1,
+        SPAWNERBLOCK = 2
     };
 } // namespace SpecialBlocks
 

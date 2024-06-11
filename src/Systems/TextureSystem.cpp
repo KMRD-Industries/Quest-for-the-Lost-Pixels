@@ -31,7 +31,7 @@ int TextureSystem::loadFromFile(const std::string& file_path)
 
     sf::Image image;
 
-    if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlass/" + extractFileName(image_path, "/", ".") + ".png"))
+    if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlas/" + extractFileName(image_path, "/", ".") + ".png"))
     {
         std::cout << "Failed to load image." << std::endl;
         return 0;

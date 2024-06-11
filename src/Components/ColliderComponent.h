@@ -1,5 +1,7 @@
 #pragma once
+#include <functional>
 #include <string>
+#include "GameTypes.h"
 
 class b2Body;
 
