@@ -1,5 +1,3 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
 
 set(SOURCES
@@ -55,6 +53,8 @@ set(SYSTEMS
         Systems/RenderSystem.h
         Systems/PlayerMovementSystem.cpp
         Systems/PlayerMovementSystem.h
+        Systems/MultiplayerSystem.cpp
+        Systems/MultiplayerSystem.h
         Systems/CollisionSystem.cpp
         Systems/CollisionSystem.h
         Systems/MapSystem.cpp
@@ -90,15 +90,15 @@ add_definitions(-D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
-target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d)
-target_compile_features(sf PRIVATE cxx_std_23)
+add_executable(qlp ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
+target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
+target_compile_features(qlp PRIVATE cxx_std_23)
 
 if (WIN32)
     add_custom_command(
-            TARGET sf
+            TARGET qlp
             COMMENT "Copy OpenAL DLL"
-            PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:sf>
+            PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:qlp>
             VERBATIM
     )
 endif ()

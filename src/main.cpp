@@ -6,7 +6,7 @@
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
-#include "MapSystem.h"
+#include "MultiplayerSystem.h"
 #include "RenderSystem.h"
 
 Coordinator gCoordinator;
@@ -73,4 +73,8 @@ int main()
         window.display();
         handleInput(window);
     }
+
+    gCoordinator.getRegisterSystem<MultiplayerSystem>()->disconnect();
+    ImGui::SFML::Shutdown();
+    return 0;
 }

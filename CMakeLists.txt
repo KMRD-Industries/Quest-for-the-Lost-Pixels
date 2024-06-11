@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
-project(sf LANGUAGES CXX)
+project(qlp LANGUAGES CXX)
 
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 include(FetchContent)
@@ -44,5 +43,18 @@ FetchContent_Declare(ImGui-SFML
         GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(ImGui-SFML)
 
+set(BOOST_INCLUDE_LIBRARIES asio)
+set(BOOST_ENABLE_CMAKE ON)
+FetchContent_Declare(Boost
+    URL https://github.com/boostorg/boost/releases/download/boost-1.85.0/boost-1.85.0-cmake.tar.xz
+    URL_MD5 badea970931766604d4d5f8f4090b176
+)
+FetchContent_MakeAvailable(Boost)
+
+FetchContent_Declare(qlp-proto
+    GIT_REPOSITORY https://github.com/kmrd-industries/qlp-proto-bindings
+    GIT_TAG v0.1.1)
+FetchContent_MakeAvailable(qlp-proto)
+
 add_subdirectory(src)
-install(TARGETS sf)
+install(TARGETS qlp)
