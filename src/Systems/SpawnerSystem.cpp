@@ -26,12 +26,18 @@ void SpawnerSystem::processSpawner(Entity entity)
     auto& spawner = gCoordinator.getComponent<SpawnerComponent>(entity);
     auto spawnCooldown = spawner.spawnCooldown;
 
+    if (!spawner.loopSpawn && spawner.noSpawns >= 1)
+    {
+        return;
+    }
+
     if (!isReadyToSpawn(spawnCooldown))
     {
         return;
     }
 
     spawnEnemy(entity);
+    spawner.noSpawns++;
 }
 
 bool SpawnerSystem::isReadyToSpawn(int cooldown) const { return spawnTime % cooldown == 0; }
@@ -45,7 +51,7 @@ void SpawnerSystem::spawnEnemy(Entity entity)
     auto& enemyTileComponent = gCoordinator.getComponent<TileComponent>(new_monster);
     auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(new_monster);
     auto& enemyAnimationComponent = gCoordinator.getComponent<AnimationComponent>(new_monster);
-    
+
     enemyTileComponent = {19, "AnimSlimes", 4};
     enemyTransformComponent = TransformComponent(spawnerTransform.position, 0., sf::Vector2f(1., 1.));
 };
