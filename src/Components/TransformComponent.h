@@ -17,5 +17,8 @@ struct TransformComponent
     {
     }
 
-    explicit TransformComponent(const sf::Vector2f& position) : position{position} {}
+    explicit TransformComponent(const sf::Vector2f& position) :
+        position{position}
+    {
+    }
 };

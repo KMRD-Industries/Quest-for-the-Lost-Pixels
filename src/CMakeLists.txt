@@ -10,6 +10,8 @@ set(SOURCES
 
 set(CORE
         Core/ComponentArray.h
+        Core/Physics.h
+        Core/Physics.cpp
         Core/ComponentManager.cpp
         Core/ComponentManager.h
         Core/EntityManager.cpp
@@ -30,6 +32,7 @@ set(COMPONENTS
         Components/TransformComponent.h
         Components/PlayerComponent.h
         Components/ColliderComponent.h
+        Components/CharacterComponent.h
         Components/TransformComponent.h
         Components/TileComponent.h
         Components/MapComponent.h
@@ -52,7 +55,9 @@ set(MAP
 
 set(SYSTEMS
         Systems/RenderSystem.cpp
-        Systems/RenderSystem.h
+        Systems/RenderSystem.cpp
+        Systems/CharacterSystem.cpp
+        Systems/CharacterSystem.h
         Systems/PlayerMovementSystem.cpp
         Systems/PlayerMovementSystem.h
         Systems/CollisionSystem.cpp
