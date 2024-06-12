@@ -10,6 +10,8 @@
 #include "System.h"
 #include "glm/vec2.hpp"
 
+struct TransformComponent;
+
 class MyContactListener : public b2ContactListener
 {
     void BeginContact(b2Contact* contact) override;
@@ -41,5 +43,6 @@ public:
     void deleteMarkedBodies() const;
 
 private:
+    static void correctPosition(Entity entity, b2Body* body, const TransformComponent& transformComponent);
     MyContactListener m_myContactListenerInstance;
 };
