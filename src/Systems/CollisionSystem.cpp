@@ -87,12 +87,16 @@ void CollisionSystem::updateCollision() const
 {
     for (const auto& entity : m_entities)
     {
-        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         if (!transformComponent.velocity.IsValid()) continue;
+
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
+
+        correctPosition(entity, body, transformComponent);
+
         body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
                                  convertPixelsToMeters(transformComponent.velocity.y)});
     }
@@ -108,7 +112,8 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         const b2Body* body = colliderComponent.body;
-        if (body == nullptr) continue;
+        if (body == nullptr || transformComponent.velocity == b2Vec2{})
+            continue;
         const auto position = body->GetPosition();
         const auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
         const auto spriteBounds = sprite.getGlobalBounds();
@@ -217,4 +222,23 @@ void CollisionSystem::deleteMarkedBodies() const
     for (auto& entity : entityToKill)
         gCoordinator.destroyEntity(entity);
     entityToKill.clear();
+}
+
+void CollisionSystem::correctPosition(const Entity entity, b2Body* body, const TransformComponent& transformComponent)
+{
+    float xOffset = 0;
+    float yOffset = 0;
+    float mulForBlocks = 1.f;
+    if (gCoordinator.hasComponent<RenderComponent>(entity))
+    {
+        const auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
+        const auto spriteBounds = sprite.getGlobalBounds();
+        xOffset = spriteBounds.width;
+        yOffset = spriteBounds.height;
+    }
+    if (gCoordinator.hasComponent<TileComponent>(entity))
+        mulForBlocks = config::gameScale;
+    body->SetTransform(
+    {convertPixelsToMeters(transformComponent.position.x + xOffset / 2 * mulForBlocks),
+     convertPixelsToMeters(transformComponent.position.y + yOffset / 2 * mulForBlocks)}, 0);
 }
