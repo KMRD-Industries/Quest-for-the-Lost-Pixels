@@ -33,7 +33,6 @@ void MapSystem::loadMap(std::string& path)
             uint32_t flipFlags = (i & mask) >> 28;
             uint32_t tileID = i & ~mask;
 
-            int layer_id = layer.id;
             int x_position = index % (static_cast<int>(layer.width));
             int y_position = index / (static_cast<int>(layer.width));
 
@@ -106,8 +105,8 @@ void MapSystem::doFlips(std::uint8_t flags, float& rotation, sf::Vector2f& scale
     }
 }
 
-void MapSystem::processTile(auto& entityIterator, uint32_t tileID, uint32_t flipFlags, int layerID, int xPos, int yPos,
-                            const Map& parsed_map)
+void MapSystem::processTile(auto& entityIterator, uint32_t tileID, const uint32_t flipFlags, const int layerID,
+                            const int xPos, const int yPos, const Map& parsed_map)
 {
     auto& tile_component = gCoordinator.getComponent<TileComponent>(*entityIterator);
     auto& transform_component = gCoordinator.getComponent<TransformComponent>(*entityIterator);
@@ -161,7 +160,7 @@ void MapSystem::resetMap()
 {
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
 
-    for (const auto& entity : m_entities)
+    for (auto& entity : m_entities)
     {
         auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
@@ -173,7 +172,7 @@ void MapSystem::resetMap()
 
         collisionSystem->deleteBody(entity);
 
-        transformComponent.position = {0.F, 0.F};
+        transformComponent.position = {0.f, 0.f};
         tileComponent.id = {};
         tileComponent.layer = {};
 
