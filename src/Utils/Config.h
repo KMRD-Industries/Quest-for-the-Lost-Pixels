@@ -5,6 +5,7 @@
 
 namespace config
 {
+    static constexpr bool debugMode{false};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{25.};
     static constexpr double pixelToMeterRatio{0.04};
@@ -12,4 +13,7 @@ namespace config
     static constexpr float oneFrameTime{16.67};
     static constexpr int frameCycle{60};
     static constexpr int maximumNumberOfLayers{5};
+    static constexpr float playerAttackRange{100.f};
+    static constexpr float playerAttackDamage{100.f};
+    static constexpr float playerAttackAngle{0.785f};
 } // namespace config

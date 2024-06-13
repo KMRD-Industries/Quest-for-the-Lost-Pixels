@@ -96,7 +96,6 @@ Tileset parseTileset(const std::string& path)
     }
     catch (...)
     {
-        // Some error handling idk.
         std::cerr << "Caught an unknown exception" << std::endl;
     }
 }

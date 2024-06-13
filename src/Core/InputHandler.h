@@ -10,33 +10,24 @@ enum class InputType
     MoveLeft,
     MoveRight,
     MoveUp,
-    MoveDown
-};
-
-struct KeyHash
-{
-    std::size_t operator()(const sf::Keyboard::Key& key) const { return std::hash<int>()(static_cast<int>(key)); }
-};
-
-struct InputTypeHash
-{
-    std::size_t operator()(const InputType& input) const { return std::hash<int>()(static_cast<int>(input)); }
+    MoveDown,
+    Attack
 };
 
 class InputHandler
 {
-    std::unordered_set<InputType, InputTypeHash> m_keysHeld{};
-    std::unordered_set<InputType, InputTypeHash> m_keysPressed{};
-    std::unordered_map<sf::Keyboard::Key, InputType, KeyHash> m_keyToMapInput{
-        {sf::Keyboard::Key::W, InputType::MoveUp},
-        {sf::Keyboard::Key::A, InputType::MoveLeft},
-        {sf::Keyboard::Key::S, InputType::MoveDown},
-        {sf::Keyboard::Key::D, InputType::MoveRight}};
+    std::unordered_set<InputType> m_keysHeld{};
+    std::unordered_set<InputType> m_keysPressed{};
+    std::unordered_map<sf::Keyboard::Key, InputType> m_keyToMapInput{{sf::Keyboard::Key::W, InputType::MoveUp},
+                                                                     {sf::Keyboard::Key::A, InputType::MoveLeft},
+                                                                     {sf::Keyboard::Key::S, InputType::MoveDown},
+                                                                     {sf::Keyboard::Key::D, InputType::MoveRight},
+                                                                     {sf::Keyboard::Key::Space, InputType::Attack}};
     inline static InputHandler* m_instance{};
     InputHandler() = default;
 
 public:
-    static auto getInstance() -> InputHandler*
+    static InputHandler* getInstance()
     {
         if (m_instance == nullptr)
         {
@@ -44,8 +35,8 @@ public:
         }
         return m_instance;
     };
-    [[nodiscard]] bool isHeld(const InputType input) const;
-    [[nodiscard]] bool isPressed(const InputType input) const;
+    [[nodiscard]] bool isHeld(InputType input) const;
+    [[nodiscard]] bool isPressed(InputType input) const;
     void handleKeyboardInput(sf::Keyboard::Key key, bool isPressed);
     void clearPressedInputs();
     void update();
