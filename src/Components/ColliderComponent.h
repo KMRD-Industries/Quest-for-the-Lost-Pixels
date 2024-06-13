@@ -11,6 +11,7 @@ struct ColliderComponent
     std::string tag{};
     std::function<void(GameType::CollisionData)> onCollisionEnter;
     std::function<void(GameType::CollisionData)> onCollisionOut;
+    bool toDestroy{false};
 
     ColliderComponent() = default;
 

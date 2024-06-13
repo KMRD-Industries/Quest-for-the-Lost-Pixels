@@ -10,6 +10,8 @@ set(SOURCES
 
 set(CORE
         Core/ComponentArray.h
+        Core/Physics.h
+        Core/Physics.cpp
         Core/ComponentManager.cpp
         Core/ComponentManager.h
         Core/EntityManager.cpp
@@ -30,6 +32,7 @@ set(COMPONENTS
         Components/TransformComponent.h
         Components/PlayerComponent.h
         Components/ColliderComponent.h
+        Components/CharacterComponent.h
         Components/TransformComponent.h
         Components/TileComponent.h
         Components/MapComponent.h
@@ -54,7 +57,9 @@ set(MAP
 
 set(SYSTEMS
         Systems/RenderSystem.cpp
-        Systems/RenderSystem.h
+        Systems/RenderSystem.cpp
+        Systems/CharacterSystem.cpp
+        Systems/CharacterSystem.h
         Systems/PlayerMovementSystem.cpp
         Systems/PlayerMovementSystem.h
         Systems/CollisionSystem.cpp
@@ -72,8 +77,9 @@ set(SYSTEMS
 )
 
 set(ATLAS_COMPONENTS
-        AtlasComponents/Texture.cpp
         AtlasComponents/Texture.h
+        AtlasComponents/Map.h
+        AtlasComponents/Tileset.h
 )
 
 set(UTILS
@@ -81,6 +87,8 @@ set(UTILS
         Utils/Helpers.h
         Utils/GameTypes.h
         Utils/Config.h
+        Utils/MapParser.h
+        Utils/TextureParser.h
 )
 
 source_group("Core" FILES ${CORE})

@@ -9,6 +9,9 @@
 #include "DoorComponent.h"
 #include "EnemySystem.h"
 #include "SpawnerComponent.h"
+#include "MapParser.h"
+#include "PlayerComponent.h"
+#include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
@@ -16,69 +19,29 @@ extern Coordinator gCoordinator;
 
 void MapSystem::loadMap(std::string& path)
 {
-    // Reset Map Entities to default
-    for (const auto& entity : m_entities)
-    {
-        auto& map_component = gCoordinator.getComponent<TileComponent>(entity);
-        auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
+    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+    resetMap();
 
-        if (gCoordinator.hasComponent<SpawnerComponent>(entity))
-        {
-            gCoordinator.removeComponent<SpawnerComponent>(entity);
-        }
-
-        map_component.id = {};
-        map_component.layer = {};
-        transform_component.scale = sf::Vector2f(1.f, 1.f);
-        transform_component.rotation = {};
-    }
-
-    gCoordinator.getRegisterSystem<EnemySystem>()->deleteEnemies();
-
-    std::ifstream json_file(path);
-
-    if (!json_file.is_open())
-    {
-        return;
-    }
-
-    std::unordered_map<std::string, long> atlas_sets;
-    nlohmann::json parsed_file = nlohmann::json::parse(json_file);
-
-    for (auto tileset : parsed_file["tilesets"])
-    {
-        std::string name = extractFileName(tileset["source"], "/", ".");
-        long first_gid = tileset["firstgid"];
-
-        atlas_sets[name] = first_gid;
-    }
-
+    Map parsed_map = parseMap(path);
     auto start_iterator = m_entities.begin();
-    ++start_iterator;
 
-    long width = {};
-    long height = {};
-    float tile_height = parsed_file["tileheight"];
-    float tile_width = parsed_file["tilewidth"];
-
-    for (auto& data : parsed_file["layers"])
+    for (auto& layer : parsed_map.layers)
     {
-        if (!data.contains("data")) continue;
+        if (layer.data.empty())
+        {
+            continue;
+        }
 
         static constexpr std::uint32_t mask = 0xf0000000;
         int index = {};
 
-        width = data["width"];
-        height = data["height"];
-
-        for (uint32_t i : processDataString(data["data"], width * height, 0))
+        for (uint32_t i : processDataString(layer.data, layer.width * layer.height, 0))
         {
             uint32_t flipFlags = (i & mask) >> 28;
             uint32_t tileID = i & ~mask;
 
-            int layer = data["id"];
-            int x_position = index % (static_cast<int>(width));
-            int y_position = index / (static_cast<int>(width));
+            int x_position = index % (static_cast<int>(layer.width));
+            int y_position = index / (static_cast<int>(layer.width));
 
             if (tileID < 1)
             {
@@ -86,44 +49,10 @@ void MapSystem::loadMap(std::string& path)
                 continue;
             }
 
-            auto& tileComponent = gCoordinator.getComponent<TileComponent>(*start_iterator);
+            auto& tile_component = gCoordinator.getComponent<TileComponent>(*start_iterator);
             auto& transform_component = gCoordinator.getComponent<TransformComponent>(*start_iterator);
 
-            std::string tileset_name = findKeyLessThan(atlas_sets, tileID);
-            tileID = tileID - atlas_sets[tileset_name] + 1;
-
-            tileComponent.id = tileID;
-            tileComponent.tileset = tileset_name;
-            tileComponent.layer = layer;
-
-            transform_component.position =
-                sf::Vector2f(static_cast<float>(x_position), static_cast<float>(y_position)) * tile_height *
-                config::gameScale;
-            doFlips(flipFlags, transform_component.rotation, transform_component.scale);
-
-            if (tileset_name == "SpecialBlocks")
-            {
-                if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
-                {
-                    gCoordinator.addComponent(*start_iterator, DoorComponent{});
-                    auto& doorComponent = gCoordinator.getComponent<DoorComponent>(*start_iterator);
-
-                    if (y_position == 0)
-                        doorComponent.entrance = GameType::DoorEntraces::NORTH;
-                    else if (y_position == height - 1)
-                        doorComponent.entrance = GameType::DoorEntraces::SOUTH;
-                    if (x_position == 0)
-                        doorComponent.entrance = GameType::DoorEntraces::WEST;
-                    else if (x_position == width - 1)
-                        doorComponent.entrance = GameType::DoorEntraces::EAST;
-                }
-
-                if (tileID == static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK) + 1 &&
-                    tileset_name == "SpecialBlocks")
-                {
-                    gCoordinator.addComponent(*start_iterator, SpawnerComponent{});
-                }
-            }
+            processTile(start_iterator, tileID, flipFlags, layer.id, x_position, y_position, parsed_map);
 
             ++start_iterator;
             index++;
@@ -148,32 +77,79 @@ void MapSystem::doFlips(std::uint8_t flags, float& rotation, sf::Vector2f& scale
 
     switch (flags)
     {
-    case 0x4: // 0100 = vertical flip
+    case VerticalFlip:
         scale.y *= -1;
         break;
-    case 0x8: // 1000 = horizontal flip
+
+    case HorizontalFlip:
         scale.x *= -1;
         break;
-    case 0xC: // 1100 = horizontal and vertical flip
+
+    case HorizontalVerticalFlip:
         scale = -scale;
         break;
-    case 0x2: // 0010 = diagonal flip
+
+    case DiagonalFlip:
         scale.x *= -1;
-        rotation += 90.f;
+        rotation += ROTATION_90;
         break;
-    case 0x6: // 0110 = diagonal and vertical flip
-        rotation += 270.f;
+
+    case DiagonalVerticalFlip:
+        rotation += ROTATION_270;
         break;
-    case 0xA: // 1010 = diagonal and horizontal flip
-        rotation += 90.f;
+
+    case DiagonalHorizontalFlip:
+        rotation += ROTATION_90;
         break;
-    case 0xE: // 1110 = diagonal, horizontal, and vertical flip
-        rotation += 90.f;
+
+    case AllFlips:
+        rotation += ROTATION_90;
         scale.x *= -1;
         break;
     default:
         // No flip, do nothing
         break;
+    }
+}
+
+void MapSystem::processTile(auto& entityIterator, uint32_t tileID, const uint32_t flipFlags, const int layerID,
+                            const int xPos, const int yPos, const Map& parsed_map)
+{
+    auto& tile_component = gCoordinator.getComponent<TileComponent>(*entityIterator);
+    auto& transform_component = gCoordinator.getComponent<TransformComponent>(*entityIterator);
+
+    std::string tileset_name = findKeyLessThan(parsed_map.tilesets, tileID);
+    tileID = tileID - parsed_map.tilesets.at(tileset_name) + 1;
+
+    tile_component.id = tileID;
+    tile_component.tileset = tileset_name;
+    tile_component.layer = layerID;
+
+    transform_component.position = getPosition(xPos, yPos, parsed_map.tileheight);
+    doFlips(flipFlags, transform_component.rotation, transform_component.scale);
+
+    if (tileset_name == "SpecialBlocks")
+    {
+        if (tileID == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
+        {
+            gCoordinator.addComponent(*entityIterator, DoorComponent{});
+            auto& doorComponent = gCoordinator.getComponent<DoorComponent>(*entityIterator);
+
+            if (yPos == 0)
+                doorComponent.entrance = GameType::DoorEntraces::NORTH;
+            else if (yPos == parsed_map.height - 1)
+                doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+            if (xPos == 0)
+                doorComponent.entrance = GameType::DoorEntraces::WEST;
+            else if (xPos == parsed_map.width - 1)
+                doorComponent.entrance = GameType::DoorEntraces::EAST;
+        }
+
+        if (tileID == static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK) + 1 &&
+            tileset_name == "SpecialBlocks")
+        {
+            gCoordinator.addComponent(*entityIterator, SpawnerComponent{});
+        }
     }
 }
 
@@ -191,4 +167,35 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
         }
     }
     return result;
+}
+
+void MapSystem::resetMap()
+{
+    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+
+    for (auto& entity : m_entities)
+    {
+        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<DoorComponent>(entity))
+        {
+            continue;
+        }
+
+        collisionSystem->deleteBody(entity);
+
+        transformComponent.position = {0.f, 0.f};
+        tileComponent.id = {};
+        tileComponent.layer = {};
+
+        transformComponent.scale = sf::Vector2f(1.F, 1.F);
+        transformComponent.rotation = {};
+    }
+}
+
+sf::Vector2f MapSystem::getPosition(int x_axis, int y_axis, int map_tile_width)
+{
+    return sf::Vector2f(static_cast<float>(x_axis), static_cast<float>(y_axis)) * static_cast<float>(map_tile_width) *
+        config::gameScale;
 }
