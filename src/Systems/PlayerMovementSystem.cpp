@@ -5,12 +5,11 @@
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
-#include "glm/detail/func_geometric.inl"
 #include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;
 
-void PlayerMovementSystem::update() const
+void PlayerMovementSystem::update()
 {
     handleMovement();
     handleAttack();
@@ -57,21 +56,19 @@ void PlayerMovementSystem::handleMovement()
     }
 }
 
-void PlayerMovementSystem::handleAttack() const
+void PlayerMovementSystem::handleAttack()
 {
     const auto inputHandler{InputHandler::getInstance()};
     for (const auto& entity : m_entities)
     {
-        if (!inputHandler->isPressed(InputType::Attack))
-            continue;
+        if (!inputHandler->isPressed(InputType::Attack)) continue;
 
         auto renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         const auto bounds = renderComponent.sprite.getGlobalBounds();
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto center = glm::vec2{
-            transformComponent.position.x + bounds.width / 2,
-            transformComponent.position.y + bounds.height / 2};
+        const auto center = glm::vec2{transformComponent.position.x + bounds.width / 2,
+                                      transformComponent.position.y + bounds.height / 2};
         const auto range = glm::vec2{center.x * config::playerAttackRange * transformComponent.scale.x, center.y};
 
         const auto targetInBox = Physics::rayCast(center, range, entity);

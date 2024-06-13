@@ -1,8 +1,9 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
+#include <cstdint>
 
 struct AnimationFrame
 {
-    long tileid{};
-    long duration{};
+    int64_t tileid{};
+    int64_t duration{};
 };

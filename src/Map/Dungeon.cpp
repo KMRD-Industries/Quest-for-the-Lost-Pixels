@@ -5,10 +5,8 @@
 #include "CharacterSystem.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
-#include "Coordinator.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
-#include "Helpers.h"
 #include "InputHandler.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
@@ -29,14 +27,10 @@ void Dungeon::init()
     setECS();
 
     m_entities[0] = gCoordinator.createEntity();
-    m_entities[1] = gCoordinator.createEntity();
-    const auto texture = new sf::Texture();
-    const auto texture2 = new sf::Texture();
-    const std::string PathToAssets{ASSET_PATH};
-    texture->loadFromFile(PathToAssets + "/knight/knight.png");
-    texture2->loadFromFile(PathToAssets + "/knight/knight.png");
 
-    gCoordinator.addComponent(m_entities[0], TileComponent{243, "Characters", 4});
+    constexpr int playerAnimationTile = 243;
+
+    gCoordinator.addComponent(m_entities[0], TileComponent{playerAnimationTile, "Characters", 4});
     gCoordinator.addComponent(m_entities[0], RenderComponent{});
     gCoordinator.addComponent(m_entities[0],
                               TransformComponent(sf::Vector2f(100.f, 100.f), 0.f, sf::Vector2f(1.f, 1.f)));
@@ -58,8 +52,10 @@ void Dungeon::init()
                 auto& travellingDungeonComponent = gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[0]);
 
                 if (travellingDungeonComponent.doorsPassed == 0)
+                {
                     travellingDungeonComponent.moveInDungeon.emplace_back(
                         GameType::mapDoorsToGeo.at(doorComponent.entrance));
+                }
                 ++travellingDungeonComponent.doorsPassed;
             }
         },
@@ -73,9 +69,12 @@ void Dungeon::init()
         },
         false, false);
 
-        false, true);
+    m_entities[1] = gCoordinator.createEntity();
+    const auto texture = new sf::Texture();
+    const std::string PathToAssets{ASSET_PATH};
+    texture->loadFromFile(PathToAssets + "/knight/knight.png");
 
-    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer = 4});
+    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
     gCoordinator.addComponent(m_entities[1],
                               TransformComponent(sf::Vector2f(250.f, 250.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[1], AnimationComponent{});
@@ -104,6 +103,7 @@ void Dungeon::update()
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
     gCoordinator.getRegisterSystem<TravellingSystem>()->update();
     gCoordinator.getRegisterSystem<CharacterSystem>()->update();
+    gCoordinator.getRegisterSystem<AnimationSystem>()->updateFrames();
 
     m_roomMap.at(m_currentPlayerPos).update();
 }

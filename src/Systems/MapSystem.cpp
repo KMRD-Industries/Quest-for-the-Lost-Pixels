@@ -8,7 +8,6 @@
 #include "MapParser.h"
 #include "PlayerComponent.h"
 #include "TextureSystem.h"
-#include "PlayerComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
@@ -168,6 +167,7 @@ void MapSystem::resetMap()
     {
         auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
 
         if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<DoorComponent>(entity))
         {
@@ -176,12 +176,14 @@ void MapSystem::resetMap()
 
         collisionSystem->deleteBody(entity);
 
-        transformComponent.position = {0.f, 0.f};
         tileComponent.id = {};
         tileComponent.layer = {};
 
+        transformComponent.position = {0.f, 0.f};
         transformComponent.scale = sf::Vector2f(1.F, 1.F);
         transformComponent.rotation = {};
+
+        animationComponent = {};
     }
 }
 

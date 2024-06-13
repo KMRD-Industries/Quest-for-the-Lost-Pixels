@@ -11,5 +11,6 @@ public:
 
 private:
     void handleMovement();
+    void handleAttack();
     bool flip = false;
 };
