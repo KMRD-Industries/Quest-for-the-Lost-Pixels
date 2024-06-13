@@ -10,4 +10,6 @@ namespace config
     static constexpr double pixelToMeterRatio{0.04};
     static constexpr float tileHeight{16.f};
     static constexpr float oneFrameTime{16.67};
+    static constexpr int frameCycle{60};
+    static constexpr int maximumNumberOfLayers{5};
 } // namespace config

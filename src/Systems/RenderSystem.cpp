@@ -11,14 +11,15 @@ extern Coordinator gCoordinator;
 
 void RenderSystem::draw(sf::RenderWindow& window) const
 {
-    std::vector<std::vector<sf::Sprite>> tiles(5);
-    sf::Vector2<unsigned int> window_size = window.getSize();
+    std::vector<std::vector<sf::Sprite>> tiles(config::maximumNumberOfLayers);
+    sf::Vector2<unsigned int> windowSize = window.getSize();
     float max_x = 0;
     float max_y = 0;
 
     for (const auto& entity : m_entities)
     {
-        if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity); layer > 0 && layer < 5)
+        if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
+            layer > 0 && layer < config::maximumNumberOfLayers)
         {
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             const auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
@@ -39,8 +40,8 @@ void RenderSystem::draw(sf::RenderWindow& window) const
     {
         for (auto& sprite : layer)
         {
-            sprite.setPosition({sprite.getPosition().x + (window_size.x - max_x) / 2,
-                                sprite.getPosition().y + (window_size.y - max_y) / 2});
+            sprite.setPosition({sprite.getPosition().x + (windowSize.x - max_x) / 2,
+                                sprite.getPosition().y + (windowSize.y - max_y) / 2});
             window.draw(sprite);
         }
     }

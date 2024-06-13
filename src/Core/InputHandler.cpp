@@ -1,8 +1,8 @@
 #include "InputHandler.h"
 
-auto InputHandler::isHeld(const InputType input) const -> bool { return m_keysHeld.contains(input); }
+bool InputHandler::isHeld(const InputType input) const { return m_keysHeld.contains(input); }
 
-auto InputHandler::isPressed(const InputType input) const -> bool { return m_keysPressed.contains(input); }
+bool InputHandler::isPressed(const InputType input) const { return m_keysPressed.contains(input); }
 
 void InputHandler::handleKeyboardInput(sf::Keyboard::Key key, bool isPressed)
 {

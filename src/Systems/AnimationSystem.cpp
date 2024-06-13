@@ -3,21 +3,19 @@
 #include "RenderComponent.h"
 #include "TileComponent.h"
 
-constexpr int FRAME_CYCLE = 60;
-
 void AnimationSystem::updateFrames()
 {
     updateFrameTime();
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         updateEntityAnimation(entity);
     }
 }
 
-void AnimationSystem::updateFrameTime() { frame_time = (frame_time + 1) % FRAME_CYCLE; }
+void AnimationSystem::updateFrameTime() { frame_time = (frame_time + 1) % config::frameCycle; }
 
-void AnimationSystem::updateEntityAnimation(Entity entity) const
+void AnimationSystem::updateEntityAnimation(const Entity entity) const
 {
     auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
 
@@ -42,9 +40,9 @@ int AnimationSystem::calculateFrameDuration(const AnimationComponent& animation)
     return static_cast<int>(duration / config::oneFrameTime) + 1;
 }
 
-bool AnimationSystem::isTimeForNextFrame(int frameDuration) const { return frame_time % frameDuration == 0; }
+bool AnimationSystem::isTimeForNextFrame(const int frameDuration) const { return frame_time % frameDuration == 0; }
 
-void AnimationSystem::loadNextFrame(Entity entity, AnimationComponent& animation)
+void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& animation)
 {
     auto& tile = gCoordinator.getComponent<TileComponent>(entity);
 

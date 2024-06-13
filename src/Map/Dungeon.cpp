@@ -70,13 +70,7 @@ void Dungeon::init()
             }
         },
         false, false);
-
-    //    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer =
-    //    4}); gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(50.f, 50.f), 0.f,
-    //    sf::Vector2f(1.f, 1.f))); gCoordinator.addComponent(m_entities[1], AnimationComponent{});
-    //    gCoordinator.addComponent(m_entities[1], ColliderComponent{});
-    //    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[1], "SecondPlayer");
-
+    
     makeSimpleFloor();
 
     m_roomMap.at(m_currentPlayerPos).init();

@@ -1,8 +1,8 @@
 #pragma once
+
 #include <unordered_map>
 #include <unordered_set>
 #include "Helpers.h"
-
 #include "SFML/Window/Keyboard.hpp"
 
 enum class InputType
@@ -44,8 +44,8 @@ public:
         }
         return m_instance;
     };
-    [[nodiscard]] auto isHeld(InputType input) const -> bool;
-    [[nodiscard]] bool isPressed(InputType input) const;
+    [[nodiscard]] bool isHeld(const InputType input) const;
+    [[nodiscard]] bool isPressed(const InputType input) const;
     void handleKeyboardInput(sf::Keyboard::Key key, bool isPressed);
     void clearPressedInputs();
     void update();
