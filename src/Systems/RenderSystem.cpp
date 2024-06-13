@@ -62,8 +62,9 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     const auto bounds = renderComponent.sprite.getGlobalBounds();
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(500);
-    const auto center = GameType::MyVec2{transformComponent.position.x + bounds.width / 2,
-                                         transformComponent.position.y + bounds.height / 2};
+    const auto center = GameType::MyVec2{
+        transformComponent.position.x + bounds.width / 2 - renderComponent.sprite.getLocalBounds().width - 7,
+        transformComponent.position.y + bounds.height / 2 - renderComponent.sprite.getLocalBounds().height + 4};
     sf::CircleShape centerPoint(5);
     centerPoint.setFillColor(sf::Color::Red);
     centerPoint.setPosition(center.x, center.y);
@@ -108,8 +109,10 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
                 convex.setFillColor(sf::Color::Transparent);
                 convex.setOutlineThickness(1.f);
                 convex.setOutlineColor(sf::Color::Green);
-                convex.setPosition(body->GetPosition().x * config::meterToPixelRatio,
-                                   body->GetPosition().y * config::meterToPixelRatio);
+                convex.setPosition(body->GetPosition().x * config::meterToPixelRatio -
+                                       renderComponent.sprite.getLocalBounds().height + 7,
+                                   body->GetPosition().y * config::meterToPixelRatio -
+                                       renderComponent.sprite.getLocalBounds().width - 10);
                 convex.setRotation(body->GetAngle() * 180 / b2_pi);
                 window.draw(convex);
             }
