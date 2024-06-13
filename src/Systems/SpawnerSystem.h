@@ -13,7 +13,7 @@ public:
 private:
     int spawnTime;
     void incrementSpawnTimer();
-    void processSpawner(Entity entity);
-    bool isReadyToSpawn(int cooldown) const;
-    static void spawnEnemy(Entity entity);
+    void processSpawner(const Entity entity);
+    bool isReadyToSpawn(const int cooldown) const;
+    static void spawnEnemy(const Entity entity);
 };

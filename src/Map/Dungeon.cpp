@@ -49,14 +49,10 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
     gCoordinator.addComponent(m_entities[0], ColliderComponent{});
+    gCoordinator.addComponent(m_entities[0], CharacterComponent{.hp = 100.f});
     gCoordinator.addComponent(m_entities[0], TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) {
                                   moveInDungeon(dir);
                               }});
-    gCoordinator.addComponent(m_entities[0], CharacterComponent{.hp = 100.f});
-    gCoordinator.addComponent(m_entities[0], TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir)
-    {
-        moveInDungeon(dir);
-    }});
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
         m_entities[0], "FirstPlayer", {},
@@ -218,6 +214,7 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], AnimationComponent{});
         gCoordinator.addComponent(m_entities[i], ColliderComponent{});
         gCoordinator.addComponent(m_entities[i], EnemyComponent{});
+        gCoordinator.addComponent(m_entities[i], CharacterComponent{.hp = 10.f});
     }
 }
 

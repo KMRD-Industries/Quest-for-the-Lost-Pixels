@@ -10,22 +10,22 @@ void EnemySystem::update()
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dis(-1, 1); // Uniform distribution between -1 and 1
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TransformComponent>(entity))
         {
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
             float rand_x = dis(gen); // Generate random number for x between -1 and 1
             float rand_y = dis(gen); // Generate random number for y between -1 and 1
-            transformComponent.position.x += rand_x;
-            transformComponent.position.y += rand_y;
+            transform_component.position.x += rand_x;
+            transform_component.position.y += rand_y;
         }
     }
 }
 
 Entity EnemySystem::getFirstUnused()
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TileComponent>(entity))
         {
