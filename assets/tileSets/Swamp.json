@@ -1,0 +1,14 @@
+{ "columns":21,
+ "image":"..\/floorAtlass\/Swamp.png",
+ "imageheight":160,
+ "imagewidth":336,
+ "margin":0,
+ "name":"Swamp",
+ "spacing":0,
+ "tilecount":210,
+ "tiledversion":"1.10.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.10"
+}
