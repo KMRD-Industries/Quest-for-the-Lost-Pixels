@@ -34,7 +34,7 @@
             "generator": "Visual Studio 17 2022",
             "binaryDir": "${sourceDir}/build/debug/VS",
 			"cacheVariables": {
-				"CMAKE_CXX_FLAGS": "/MP"
+				"CMAKE_CXX_FLAGS": "/MP /EHsc"
             }
         },
         {
@@ -43,7 +43,7 @@
             "binaryDir": "${sourceDir}/build/release/VS",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-				"CMAKE_CXX_FLAGS": "/MP"
+				"CMAKE_CXX_FLAGS": "/MP /EHsc"
             }
         }
     ]
