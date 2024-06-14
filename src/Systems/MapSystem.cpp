@@ -161,10 +161,10 @@ void MapSystem::processTile(auto& entityIterator, uint32_t tileID, const uint32_
     }
 }
 
-std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, int64_t>& atlas_sets, int64_t value)
+std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long value)
 {
     std::string result;
-    int64_t act = 0;
+    long act = 0;
 
     for (const auto& pair : atlas_sets)
     {
