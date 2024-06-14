@@ -14,7 +14,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -33,6 +32,38 @@
                      "width":14,
                      "x":1,
                      "y":0
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "id":63,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":10.875,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"63"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":9.875,
+                     "x":4,
+                     "y":1.75
                     }],
              "opacity":1,
              "type":"objectgroup",

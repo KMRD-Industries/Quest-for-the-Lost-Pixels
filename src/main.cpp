@@ -64,7 +64,7 @@ int main()
 
         // Clear the window before drawing
         window.clear();
-
+        
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         game.draw();
 

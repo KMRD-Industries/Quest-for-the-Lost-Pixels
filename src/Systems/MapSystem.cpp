@@ -137,7 +137,7 @@ void MapSystem::processTile(auto& entityIterator, uint32_t tileID, const uint32_
             else if (xPos == parsed_map.width - 1)
                 doorComponent.entrance = GameType::DoorEntraces::EAST;
         }
-    }
+    };
 }
 
 std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long i)
