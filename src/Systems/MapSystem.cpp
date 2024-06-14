@@ -153,11 +153,10 @@ void MapSystem::processTile(auto& entityIterator, uint32_t tileID, const uint32_
 
         else if (tileID == static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK) + 1 && tileset_name == "SpecialBlocks")
         {
-            if (gCoordinator.hasComponent<SpawnerComponent>(*entityIterator))
+            if (!gCoordinator.hasComponent<SpawnerComponent>(*entityIterator))
             {
-                gCoordinator.removeComponent<SpawnerComponent>(*entityIterator);
+                gCoordinator.addComponent(*entityIterator, SpawnerComponent{});
             }
-            gCoordinator.addComponent(*entityIterator, SpawnerComponent{});
         }
     }
 }
@@ -183,7 +182,7 @@ void MapSystem::resetMap()
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     gCoordinator.getRegisterSystem<EnemySystem>()->deleteEnemies();
 
-    for (auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);

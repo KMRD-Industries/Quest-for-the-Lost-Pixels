@@ -6,10 +6,10 @@
 #include "RenderComponent.h"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "TransformComponent.h"
-#include "box2d/b2_fixture.h"
-#include "box2d/b2_shape.h"
 #include "box2d/b2_api.h"
+#include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_shape.h"
 
 extern Coordinator gCoordinator;
 
@@ -38,16 +38,15 @@ void RenderSystem::draw(sf::RenderWindow& window) const
         }
     }
 
-    if (config::debugMode)
-        debugBoundingBoxes(window);
+    if (config::debugMode) debugBoundingBoxes(window);
 }
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 {
-    auto renderComponent = gCoordinator.getComponent<RenderComponent>(500);
+    auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     const auto bounds = renderComponent.sprite.getGlobalBounds();
 
-    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(500);
+    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
     const auto center = GameType::MyVec2{transformComponent.position.x + bounds.width / 2,
                                          transformComponent.position.y + bounds.height / 2};
     sf::CircleShape centerPoint(5);
@@ -88,8 +87,8 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
                 for (int32 i = 0; i < count; ++i)
                 {
                     const b2Vec2 point = polygonShape->m_vertices[i];
-                    convex.setPoint(i, sf::Vector2f(point.x * config::meterToPixelRatio,
-                                                    point.y * config::meterToPixelRatio));
+                    convex.setPoint(
+                        i, sf::Vector2f(point.x * config::meterToPixelRatio, point.y * config::meterToPixelRatio));
                 }
                 convex.setFillColor(sf::Color::Transparent);
                 convex.setOutlineThickness(1.f);

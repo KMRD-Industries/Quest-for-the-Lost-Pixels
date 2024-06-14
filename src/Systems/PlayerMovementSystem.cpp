@@ -31,8 +31,7 @@ void PlayerMovementSystem::handleMovement() const
     for (const auto& entity : m_entities)
     {
         const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
-        constexpr int playerAcc = 150;
-        const auto playerSpeed = glm::vec2{normalizedDir.x * playerAcc, normalizedDir.y * playerAcc};
+        const auto playerSpeed = glm::vec2{normalizedDir.x * config::playerAcc, normalizedDir.y * config::playerAcc};
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
     }
@@ -43,16 +42,14 @@ void PlayerMovementSystem::handleAttack() const
     const auto inputHandler{InputHandler::getInstance()};
     for (const auto& entity : m_entities)
     {
-        if (!inputHandler->isPressed(InputType::Attack))
-            continue;
+        if (!inputHandler->isPressed(InputType::Attack)) continue;
 
         auto renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         const auto bounds = renderComponent.sprite.getGlobalBounds();
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto center = glm::vec2{
-            transformComponent.position.x + bounds.width / 2,
-            transformComponent.position.y + bounds.height / 2};
+        const auto center = glm::vec2{transformComponent.position.x + bounds.width / 2,
+                                      transformComponent.position.y + bounds.height / 2};
         const auto range = glm::vec2{center.x * config::playerAttackRange * transformComponent.scale.x, center.y};
 
         const auto targetInBox = Physics::rayCast(center, range, entity);

@@ -1,5 +1,6 @@
 #include "EnemySystem.h"
 #include <random>
+#include "Config.h"
 #include "RenderComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -14,11 +15,11 @@ void EnemySystem::update()
     {
         if (gCoordinator.hasComponent<TransformComponent>(entity))
         {
-            auto& transform_component = gCoordinator.getComponent<TransformComponent>(entity);
-            float rand_x = dis(gen); // Generate random number for x between -1 and 1
-            float rand_y = dis(gen); // Generate random number for y between -1 and 1
-            transform_component.position.x += rand_x;
-            transform_component.position.y += rand_y;
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            float randX = dis(gen); // Generate random number for x between -1 and 1
+            float randY = dis(gen); // Generate random number for y between -1 and 1
+            transformComponent.velocity.x += randX * config::enemyAcc;
+            transformComponent.velocity.y += randY * config::enemyAcc;
         }
     }
 }
@@ -40,17 +41,17 @@ Entity EnemySystem::getFirstUnused()
 }
 void EnemySystem::deleteEnemies()
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TileComponent>(entity))
         {
             auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto& renderCompoenent = gCoordinator.getComponent<RenderComponent>(entity);
+            auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
             tileComponent = {};
             transformComponent = {};
-            renderCompoenent = {};
+            renderComponent = {};
         }
     }
 }

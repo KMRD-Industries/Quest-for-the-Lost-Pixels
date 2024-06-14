@@ -38,10 +38,8 @@ void Dungeon::init()
     m_entities[0] = gCoordinator.createEntity();
     m_entities[1] = gCoordinator.createEntity();
     const auto texture = new sf::Texture();
-    const auto texture2 = new sf::Texture();
     const std::string PathToAssets{ASSET_PATH};
     texture->loadFromFile(PathToAssets + "/knight/knight.png");
-    texture2->loadFromFile(PathToAssets + "/knight/knight.png");
 
     gCoordinator.addComponent(m_entities[0], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
     gCoordinator.addComponent(m_entities[0],
@@ -79,7 +77,7 @@ void Dungeon::init()
         },
         false, true);
 
-    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture2)), .layer = 4});
+    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
     gCoordinator.addComponent(m_entities[1],
                               TransformComponent(sf::Vector2f(250.f, 250.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[1], AnimationComponent{});
@@ -194,7 +192,7 @@ void Dungeon::setECS()
 
     textureSystem->loadTexturesFromFiles();
 
-    for (int i = 1000; i < 1500; i++)
+    for (int i = config::mapFirstEntity; i < config::mapFirstEntity + config::numberOfMapEntities; i++)
     {
         m_entities[i] = gCoordinator.createEntity();
         gCoordinator.addComponent(m_entities[i], RenderComponent{});
@@ -205,7 +203,7 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], MapComponent{});
     }
 
-    for (int i = 2000; i < 3000; i++)
+    for (int i = config::enemyFirstEntity; i < config::enemyFirstEntity + config::numberOfEnemyEntities; i++)
     {
         m_entities[i] = gCoordinator.createEntity();
         gCoordinator.addComponent(m_entities[i], RenderComponent{});
@@ -239,6 +237,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         m_currentPlayerPos += dir;
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
         gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
+        gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
         gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 

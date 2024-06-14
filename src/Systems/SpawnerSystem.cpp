@@ -64,4 +64,19 @@ void SpawnerSystem::spawnEnemy(const Entity entity)
         [&](const GameType::CollisionData& entityT) {}, false, false);
 
     enemyTransformComponent = TransformComponent(spawnerTransform.position, 0., sf::Vector2f(1., 1.));
-};
+}
+
+void SpawnerSystem::clearSpawners() const
+{
+    std::deque<Entity> entityToRemove;
+    for (const auto& entity : m_entities)
+    {
+        entityToRemove.push_back(entity);
+    }
+
+    while (!entityToRemove.empty())
+    {
+        gCoordinator.removeComponent<SpawnerComponent>(entityToRemove.front());
+        entityToRemove.pop_front();
+    }
+}

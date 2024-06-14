@@ -9,6 +9,7 @@ class SpawnerSystem : public System
 {
 public:
     void update();
+    void clearSpawners() const;
 
 private:
     int spawnTime;
