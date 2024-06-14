@@ -113,7 +113,6 @@ if (WIN32)
             PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:qlp>
             COMMAND ${CMAKE_COMMAND} -E copy ${BOX2D_SOURCE_DIR}/box2d.dll $<TARGET_FILE_DIR:qlp>
             COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/abseil_dll.dll $<TARGET_FILE_DIR:qlp>
-            COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobuf.dll $<TARGET_FILE_DIR:qlp>
             VERBATIM
     )
     # Dodanie komendy do kopiowania libprotobufd.dll, jeśli istnieje
