@@ -4,6 +4,6 @@
 
 struct AnimationFrame
 {
-    int64_t tileid{};
-    int64_t duration{};
+    long tileid{};
+    long duration{};
 };
