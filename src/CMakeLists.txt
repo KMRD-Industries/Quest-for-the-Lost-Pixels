@@ -1,9 +1,9 @@
 set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
 
 set(SOURCES
-	main.cpp
-	Game.cpp
-	Game.h
+        main.cpp
+        Game.cpp
+        Game.h
 )
 
 set(CORE
@@ -37,18 +37,18 @@ set(COMPONENTS
         Components/AnimationComponent.h
         Components/AnimationFrame.h
         Components/DoorComponent.h
-		Components/TravellingDungeonComponent.h
+        Components/TravellingDungeonComponent.h
 )
 
 set(MAP
         Map/DungeonGenerator.cpp
-        Map/DungeonGenerator.h        
-		Map/FloorGenerator.cpp
+        Map/DungeonGenerator.h
+        Map/FloorGenerator.cpp
         Map/FloorGenerator.h
         Map/Dungeon.cpp
         Map/Dungeon.h
-		Map/Room.cpp
-		Map/Room.h
+        Map/Room.cpp
+        Map/Room.h
 )
 
 set(SYSTEMS
@@ -67,21 +67,24 @@ set(SYSTEMS
         Systems/TextureSystem.cpp
         Systems/AnimationSystem.cpp
         Systems/DoorSystem.cpp
-        Systems/DoorSystem.h            
-		Systems/TravellingSystem.cpp
-        Systems/TravellingSystem.h        
+        Systems/DoorSystem.h
+        Systems/TravellingSystem.cpp
+        Systems/TravellingSystem.h
 )
 
 set(ATLAS_COMPONENTS
-        AtlasComponents/Texture.cpp
         AtlasComponents/Texture.h
+        AtlasComponents/Map.h
+        AtlasComponents/Tileset.h
 )
 
 set(UTILS
         Utils/Paths.h
         Utils/Helpers.h
         Utils/GameTypes.h
-	Utils/Config.h
+        Utils/Config.h
+        Utils/MapParser.h
+        Utils/TextureParser.h
 )
 
 source_group("Core" FILES ${CORE})
