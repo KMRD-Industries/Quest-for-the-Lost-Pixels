@@ -22,23 +22,16 @@ class MyContactListener : public b2ContactListener
 class CollisionSystem : public System
 {
 public:
-    explicit CollisionSystem()
-    {
-        Physics::getWorld()->SetContactListener(&m_myContactListenerInstance);
-    }
+    explicit CollisionSystem() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
 
     void createMapCollision() const;
     void updateCollision() const;
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations) const;
     static void createBody(
         Entity entity, const std::string& tag, const glm::vec2& colliderSize = {},
-        const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&)
-        {
-        },
-        const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&)
-        {
-        },
-        bool isStatic = true, bool useTextureSize = true);
+        const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&) {},
+        const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&) {},
+        bool isStatic = true, bool useTextureSize = true, const glm::vec2& offset = {0., 0.});
     static void deleteBody(Entity entity);
     void deleteMarkedBodies() const;
 
