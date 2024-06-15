@@ -1,5 +1,6 @@
 #include "RenderSystem.h"
 #include "AnimationComponent.h"
+#include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
 #include "Physics.h"
@@ -17,14 +18,24 @@ extern Coordinator gCoordinator;
 
 void RenderSystem::draw(sf::RenderWindow& window) const
 {
-    std::vector<std::vector<sf::Sprite>> tiles(5);
+    std::vector<std::vector<sf::Sprite>> tiles(config::maximumNumberOfLayers);
+    sf::Vector2<unsigned int> windowSize = window.getSize();
+    float max_x = 0;
+    float max_y = 0;
 
     for (const auto& entity : m_entities)
     {
-        if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity); layer > 0)
+        if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
+            layer > 0 && layer < config::maximumNumberOfLayers)
         {
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            const auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
+            sf::FloatRect spriteBounds = sprite.getLocalBounds();
+            max_x = std::max(max_x, transformComponent.position.x);
+            max_y = std::max(max_y, transformComponent.position.y);
+
+            sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
             sprite.setScale(transformComponent.scale * config::gameScale);
             sprite.setPosition(transformComponent.position);
             sprite.setRotation(transformComponent.rotation);
@@ -32,25 +43,30 @@ void RenderSystem::draw(sf::RenderWindow& window) const
         }
     }
 
-    for (const auto& pair : tiles)
+    for (auto& layer : tiles)
     {
-        for (const auto& sprite : pair)
+        for (auto& sprite : layer)
         {
+            sprite.setPosition({sprite.getPosition().x, sprite.getPosition().y});
             window.draw(sprite);
         }
     }
 
-    if (config::debugMode) debugBoundingBoxes(window);
+    if (config::debugMode)
+    {
+        debugBoundingBoxes(window);
+    }
 }
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 {
-    auto renderComponent = gCoordinator.getComponent<RenderComponent>(500);
+    auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     const auto bounds = renderComponent.sprite.getGlobalBounds();
 
-    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(500);
-    const auto center = GameType::MyVec2{transformComponent.position.x + bounds.width / 2,
-                                         transformComponent.position.y + bounds.height / 2};
+    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
+    const auto center = GameType::MyVec2{
+        transformComponent.position.x + bounds.width / 2 - renderComponent.sprite.getLocalBounds().width - 7,
+        transformComponent.position.y + bounds.height / 2 - renderComponent.sprite.getLocalBounds().height + 4};
     sf::CircleShape centerPoint(5);
     centerPoint.setFillColor(sf::Color::Red);
     centerPoint.setPosition(center.x, center.y);
@@ -95,8 +111,10 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
                 convex.setFillColor(sf::Color::Transparent);
                 convex.setOutlineThickness(1.f);
                 convex.setOutlineColor(sf::Color::Green);
-                convex.setPosition(body->GetPosition().x * config::meterToPixelRatio,
-                                   body->GetPosition().y * config::meterToPixelRatio);
+                convex.setPosition(body->GetPosition().x * config::meterToPixelRatio -
+                                       renderComponent.sprite.getLocalBounds().height + 7,
+                                   body->GetPosition().y * config::meterToPixelRatio -
+                                       renderComponent.sprite.getLocalBounds().width - 10);
                 convex.setRotation(body->GetAngle() * 180 / b2_pi);
                 window.draw(convex);
             }

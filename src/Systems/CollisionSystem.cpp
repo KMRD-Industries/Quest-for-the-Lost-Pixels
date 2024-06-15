@@ -5,8 +5,10 @@
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
+#include "DoorComponent.h"
 #include "GameTypes.h"
 #include "Helpers.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
@@ -52,10 +54,16 @@ void CollisionSystem::createMapCollision() const
     {
         if (!gCoordinator.hasComponent<TileComponent>(entity)) continue;
 
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<DoorComponent>(entity))
+            continue;
+
         deleteBody(entity);
     }
     for (const auto& entity : m_entities)
     {
+        if (!gCoordinator.hasComponent<TileComponent>(entity)) continue;
+        if (auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+            tileComponent.tileset == "SpecialBlocks")
         if (!gCoordinator.hasComponent<TileComponent>(entity)) continue;
 
         if (auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);

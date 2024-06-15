@@ -3,6 +3,8 @@
 #include <utility>
 #include <vector>
 #include "AnimationFrame.h"
+#include "AtlasComponents/Texture.h"
+#include "AnimationFrame.h"
 
 struct AnimationComponent
 {
@@ -13,3 +15,4 @@ struct AnimationComponent
     AnimationComponent() : it(frames.end()) {}
     explicit AnimationComponent(const std::vector<AnimationFrame>& frames) : frames(frames), it(this->frames.end()){};
 };
+

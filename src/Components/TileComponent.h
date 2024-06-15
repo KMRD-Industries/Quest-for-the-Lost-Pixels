@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/System/Vector2.hpp>
+#include <utility>
 
 struct TileComponent
 {
@@ -8,7 +9,14 @@ struct TileComponent
     std::string tileset;
     int layer{};
 
-    explicit TileComponent(const uint32_t id) : id{static_cast<long>(id)} {};
+
+    explicit TileComponent(uint32_t tile_id) : id{static_cast<long>(tile_id)} {};
+
+    TileComponent(uint32_t tile_id, std::string tileset, int layer) :
+        id{static_cast<long>(tile_id)}, tileset{std::move(tileset)}, layer{layer}
+    {
+    }
+
 
     TileComponent() = default;
 };

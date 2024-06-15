@@ -8,6 +8,7 @@
 #include "InputHandler.h"
 #include "MapSystem.h"
 #include "RenderSystem.h"
+#include "SpawnerSystem.h"
 
 Coordinator gCoordinator;
 
@@ -45,9 +46,7 @@ void handleInput(sf::RenderWindow& window)
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
-
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
@@ -60,15 +59,13 @@ int main()
 
     while (window.isOpen())
     {
-        game.handleCollision();
-
         // Clear the window before drawing
         window.clear();
-        
-        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
-        game.draw();
 
         game.update();
+        game.draw();
+        Game::handleCollision();
+        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
