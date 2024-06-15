@@ -62,8 +62,9 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     const auto bounds = renderComponent.sprite.getGlobalBounds();
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
-    const auto center = GameType::MyVec2{transformComponent.position.x + bounds.width / 2,
-                                         transformComponent.position.y + bounds.height / 2};
+    const auto center = GameType::MyVec2{
+        transformComponent.position.x + bounds.width / 2 - renderComponent.sprite.getLocalBounds().width - 7,
+        transformComponent.position.y + bounds.height / 2 - renderComponent.sprite.getLocalBounds().height + 4};
     sf::CircleShape centerPoint(5);
     centerPoint.setFillColor(sf::Color::Red);
     centerPoint.setPosition(center.x, center.y);

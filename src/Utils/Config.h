@@ -23,7 +23,7 @@ namespace config
     static constexpr int numberOfEnemyEntities{100};
     static constexpr int playerEntity{numberOfEnemyEntities + numberOfMapEntities};
 
-    static constexpr int playerAcc = 150;
-    static constexpr int enemyAcc = 50;
+    static constexpr int playerAcc = 300;
+    static constexpr int enemyAcc = 25;
 
 } // namespace config

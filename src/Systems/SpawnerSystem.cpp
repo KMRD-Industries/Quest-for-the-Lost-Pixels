@@ -60,7 +60,7 @@ void SpawnerSystem::spawnEnemy(const Entity entity)
     enemyTileComponent = {19, "AnimSlimes", 4};
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        new_monster, "SecondPlayer", {16.f, 16.f}, [&](const GameType::CollisionData& entityT) {},
+        new_monster, "SecondPlayer", {16, 16}, [&](const GameType::CollisionData& entityT) {},
         [&](const GameType::CollisionData& entityT) {}, false, false);
 
     enemyTransformComponent = TransformComponent(spawnerTransform.position, 0., sf::Vector2f(1., 1.));

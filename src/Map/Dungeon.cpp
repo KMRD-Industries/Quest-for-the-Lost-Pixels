@@ -80,7 +80,6 @@ void Dungeon::init()
         false, false);
 
     gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
-    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
     gCoordinator.addComponent(m_entities[1],
                               TransformComponent(sf::Vector2f(250.f, 250.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[1], AnimationComponent{});
@@ -214,7 +213,6 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], TransformComponent{});
         gCoordinator.addComponent(m_entities[i], AnimationComponent{});
         gCoordinator.addComponent(m_entities[i], ColliderComponent{});
-        gCoordinator.addComponent(m_entities[i], MapComponent{});
         gCoordinator.addComponent(m_entities[i], MapComponent{});
     }
 
