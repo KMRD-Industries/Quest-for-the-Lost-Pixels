@@ -17,13 +17,14 @@ private:
     std::unordered_map<std::string, sf::Texture> textures;
     std::unordered_map<long, sf::IntRect> texture_map;
     std::unordered_map<std::string, long> texture_indexes;
-    std::unordered_map<long, std::vector<sf::Sprite>> map_animations;
-    [[maybe_unused]] long no_textures = 0;
+    std::unordered_map<long, std::vector<AnimationFrame>> map_animations;
+
+    long no_textures = 0;
 
 public:
     int loadFromFile(const std::string&);
     void loadTexturesFromFiles();
-    [[maybe_unused]] sf::Sprite getTile(const std::string&, long);
-    [[maybe_unused]] std::vector<sf::Sprite> getAnimations(const std::string&, long);
+    sf::Sprite getTile(const std::string&, long);
+    std::vector<AnimationFrame> getAnimations(const std::string&, long);
     void loadTextures();
 };
