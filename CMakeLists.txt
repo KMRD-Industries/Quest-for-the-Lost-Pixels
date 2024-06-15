@@ -4,7 +4,12 @@ project(qlp LANGUAGES CXX)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 set(CMAKE_CXX_EXTENSIONS OFF)
-option(BUILD_SHARED_LIBS "Build shared libraries" YES)
+
+if (WIN32)
+    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+else ()
+    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+endif()
 
 include(FetchContent)
 
