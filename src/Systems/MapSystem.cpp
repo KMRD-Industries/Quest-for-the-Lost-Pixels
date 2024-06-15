@@ -1,12 +1,20 @@
 #include "MapSystem.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
+
+#include <fstream>
+#include <nlohmann/json.hpp>
 #include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "Config.h"
+#include "Coordinator.h"
 #include "DoorComponent.h"
+#include "EnemySystem.h"
 #include "MapParser.h"
 #include "PlayerComponent.h"
+#include "SpawnerComponent.h"
+#include "SpawnerSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -31,22 +39,19 @@ void MapSystem::loadMap(std::string& path)
         static constexpr std::uint32_t mask = 0xf0000000;
         int index = {};
 
-        for (uint32_t i : processDataString(layer.data, layer.width * layer.height, 0))
+        for (uint32_t tile : processDataString(layer.data, static_cast<size_t>(layer.width) * layer.height, 0))
         {
-            uint32_t flipFlags = (i & mask) >> 28;
-            uint32_t tileID = i & ~mask;
+            uint32_t flipFlags = (tile & mask) >> 28;
+            uint32_t tileID = tile & ~mask;
 
-            int x_position = index % (static_cast<int>(layer.width));
-            int y_position = index / (static_cast<int>(layer.width));
+            int x_position = index % layer.width;
+            int y_position = index / layer.width;
 
             if (tileID < 1)
             {
                 index++;
                 continue;
             }
-
-            auto& tile_component = gCoordinator.getComponent<TileComponent>(*start_iterator);
-            auto& transform_component = gCoordinator.getComponent<TransformComponent>(*start_iterator);
 
             processTile(start_iterator, tileID, flipFlags, layer.id, x_position, y_position, parsed_map);
 
@@ -132,25 +137,41 @@ void MapSystem::processTile(auto& entityIterator, uint32_t tileID, const uint32_
             auto& doorComponent = gCoordinator.getComponent<DoorComponent>(*entityIterator);
 
             if (yPos == 0)
+            {
                 doorComponent.entrance = GameType::DoorEntraces::NORTH;
+            }
             else if (yPos == parsed_map.height - 1)
+            {
                 doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+            }
             if (xPos == 0)
+            {
                 doorComponent.entrance = GameType::DoorEntraces::WEST;
+            }
             else if (xPos == parsed_map.width - 1)
+            {
                 doorComponent.entrance = GameType::DoorEntraces::EAST;
+            }
+        }
+
+        else if (tileID == static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK) + 1 && tileset_name == "SpecialBlocks")
+        {
+            if (!gCoordinator.hasComponent<SpawnerComponent>(*entityIterator))
+            {
+                gCoordinator.addComponent(*entityIterator, SpawnerComponent{});
+            }
         }
     }
 }
 
-std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long i)
+std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long value)
 {
     std::string result;
     long act = 0;
 
     for (const auto& pair : atlas_sets)
     {
-        if (pair.second <= i && pair.second >= act)
+        if (pair.second <= value && pair.second >= act)
         {
             result = pair.first;
             act = pair.second;
@@ -162,8 +183,9 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
 void MapSystem::resetMap()
 {
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+    gCoordinator.getRegisterSystem<EnemySystem>()->deleteEnemies();
 
-    for (auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);

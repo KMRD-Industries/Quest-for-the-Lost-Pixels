@@ -20,6 +20,12 @@
 #include "TravellingDungeonComponent.h"
 #include "TravellingSystem.h"
 
+#include "EnemyComponent.h"
+#include "EnemySystem.h"
+#include "Paths.h"
+#include "SpawnerComponent.h"
+#include "SpawnerSystem.h"
+
 extern Coordinator gCoordinator;
 
 void Dungeon::init()
@@ -27,6 +33,10 @@ void Dungeon::init()
     setECS();
 
     m_entities[0] = gCoordinator.createEntity();
+    m_entities[1] = gCoordinator.createEntity();
+    const auto texture = new sf::Texture();
+    const std::string PathToAssets{ASSET_PATH};
+    texture->loadFromFile(PathToAssets + "/knight/knight.png");
 
     constexpr int playerAnimationTile = 243;
 
@@ -69,11 +79,6 @@ void Dungeon::init()
         },
         false, false);
 
-    m_entities[1] = gCoordinator.createEntity();
-    const auto texture = new sf::Texture();
-    const std::string PathToAssets{ASSET_PATH};
-    texture->loadFromFile(PathToAssets + "/knight/knight.png");
-
     gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
     gCoordinator.addComponent(m_entities[1],
                               TransformComponent(sf::Vector2f(250.f, 250.f), 0.f, sf::Vector2f(1.f, 1.f)));
@@ -101,6 +106,8 @@ void Dungeon::draw() const
 void Dungeon::update()
 {
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
+    gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
+    gCoordinator.getRegisterSystem<EnemySystem>()->update();
     gCoordinator.getRegisterSystem<TravellingSystem>()->update();
     gCoordinator.getRegisterSystem<CharacterSystem>()->update();
     gCoordinator.getRegisterSystem<AnimationSystem>()->updateFrames();
@@ -116,6 +123,8 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<AnimationComponent>();
     gCoordinator.registerComponent<DoorComponent>();
     gCoordinator.registerComponent<TravellingDungeonComponent>();
+    gCoordinator.registerComponent<SpawnerComponent>();
+    gCoordinator.registerComponent<EnemyComponent>();
     gCoordinator.registerComponent<CharacterComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
@@ -177,9 +186,26 @@ void Dungeon::setECS()
     }
 
 
+    const auto enemySystem = gCoordinator.getRegisterSystem<EnemySystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<EnemyComponent>());
+        gCoordinator.setSystemSignature<EnemySystem>(signature);
+    }
+
+    const auto spawnerSystem = gCoordinator.getRegisterSystem<SpawnerSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TileComponent>());
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<SpawnerComponent>());
+        gCoordinator.setSystemSignature<SpawnerSystem>(signature);
+    }
+
+
     textureSystem->loadTexturesFromFiles();
 
-    for (int i = 1000; i < 1500; i++)
+    for (int i = config::mapFirstEntity; i < config::mapFirstEntity + config::numberOfMapEntities; i++)
     {
         m_entities[i] = gCoordinator.createEntity();
         gCoordinator.addComponent(m_entities[i], RenderComponent{});
@@ -188,6 +214,18 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], AnimationComponent{});
         gCoordinator.addComponent(m_entities[i], ColliderComponent{});
         gCoordinator.addComponent(m_entities[i], MapComponent{});
+    }
+
+    for (int i = config::enemyFirstEntity; i < config::enemyFirstEntity + config::numberOfEnemyEntities; i++)
+    {
+        m_entities[i] = gCoordinator.createEntity();
+        gCoordinator.addComponent(m_entities[i], RenderComponent{});
+        gCoordinator.addComponent(m_entities[i], TileComponent{});
+        gCoordinator.addComponent(m_entities[i], TransformComponent{});
+        gCoordinator.addComponent(m_entities[i], AnimationComponent{});
+        gCoordinator.addComponent(m_entities[i], ColliderComponent{});
+        gCoordinator.addComponent(m_entities[i], EnemyComponent{});
+        gCoordinator.addComponent(m_entities[i], CharacterComponent{.hp = 10.f});
     }
 }
 
@@ -212,6 +250,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         m_currentPlayerPos += dir;
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
         gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
+        gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
         gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 

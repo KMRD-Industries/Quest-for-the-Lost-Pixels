@@ -142,6 +142,11 @@ void TextureSystem::loadTextures()
             continue;
         }
 
+        if (std::find(texture_files.begin(), texture_files.end(), tile_component.tileset) == texture_files.end())
+        {
+            continue;
+        }
+
         auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
         auto& render_component = gCoordinator.getComponent<RenderComponent>(entity);
         auto& collider_component = gCoordinator.getComponent<ColliderComponent>(entity);

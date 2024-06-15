@@ -8,6 +8,7 @@
 #include "InputHandler.h"
 #include "MapSystem.h"
 #include "RenderSystem.h"
+#include "SpawnerSystem.h"
 
 Coordinator gCoordinator;
 

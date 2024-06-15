@@ -16,4 +16,14 @@ namespace config
     static constexpr float playerAttackRange{100.f};
     static constexpr float playerAttackDamage{100.f};
     static constexpr float playerAttackAngle{0.785f};
+
+    static constexpr int mapFirstEntity{1000};
+    static constexpr int numberOfMapEntities{500};
+    static constexpr int enemyFirstEntity{2000};
+    static constexpr int numberOfEnemyEntities{100};
+    static constexpr int playerEntity{numberOfEnemyEntities + numberOfMapEntities};
+
+    static constexpr int playerAcc = 300;
+    static constexpr int enemyAcc = 25;
+
 } // namespace config

@@ -40,6 +40,8 @@ set(COMPONENTS
         Components/AnimationFrame.h
         Components/DoorComponent.h
         Components/TravellingDungeonComponent.h
+        Components/SpawnerComponent.h
+        Components/EnemyComponent.h
 )
 
 set(MAP
@@ -70,6 +72,8 @@ set(SYSTEMS
         Systems/DoorSystem.h
         Systems/TravellingSystem.cpp
         Systems/TravellingSystem.h
+        Systems/EnemySystem.cpp
+        Systems/SpawnerSystem.cpp
         Systems/AnimationSystem.h
 )
 

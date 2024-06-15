@@ -58,10 +58,10 @@ void RenderSystem::draw(sf::RenderWindow& window) const
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 {
-    auto renderComponent = gCoordinator.getComponent<RenderComponent>(500);
+    auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     const auto bounds = renderComponent.sprite.getGlobalBounds();
 
-    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(500);
+    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
     const auto center = GameType::MyVec2{
         transformComponent.position.x + bounds.width / 2 - renderComponent.sprite.getLocalBounds().width - 7,
         transformComponent.position.y + bounds.height / 2 - renderComponent.sprite.getLocalBounds().height + 4};
