@@ -70,6 +70,7 @@ set(SYSTEMS
         Systems/DoorSystem.h
         Systems/TravellingSystem.cpp
         Systems/TravellingSystem.h
+        Systems/AnimationSystem.h
 )
 
 set(ATLAS_COMPONENTS
@@ -82,8 +83,8 @@ set(UTILS
         Utils/Paths.h
         Utils/Helpers.h
         Utils/GameTypes.h
-        Utils/Config.h
         Utils/MapParser.h
+        Utils/Config.h
         Utils/TextureParser.h
 )
 

@@ -7,7 +7,7 @@ public:
     void init();
     void draw() const;
     void update();
-    void handleCollision();
+    static void handleCollision();
 
 private:
     Dungeon m_dungeon;
