@@ -3,6 +3,7 @@
 
 #include <boost/asio.hpp>
 #include <comm.pb.h>
+#include <vector>
 
 #include "Coordinator.h"
 #include "MultiplayerSystem.h"
@@ -58,9 +59,13 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
     comm::StateUpdate state;
     if (available > 0)
     {
-        std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
+        // temporary solution - msg length should always be 4
+        // reading all available bytes will cause ignoring of all but 1 messages
+        std::vector<char> buf(4);
+        std::size_t received = m_tcp_socket.read_some(boost::asio::buffer(buf));
 
-        state.ParseFromArray(&m_buf, received);
+        state.ParseFromArray(buf.data(), received);
+        std::cout << state.ShortDebugString() << '\n';
     }
     else
     {
@@ -79,25 +84,26 @@ void MultiplayerSystem::update()
     std::size_t available = 0;
 
     available = m_udp_socket.available();
-    // while (available > 0)
     if (available > 0)
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
         m_position.ParseFromArray(&m_buf, received);
         std::uint32_t id = m_position.entity_id();
 
-        if (m_entity_map.contains(id)) {
-            std::cout << m_position.ShortDebugString() << '\n';
+        if (m_entity_map.contains(id))
+        {
             Entity& target = m_entity_map[id];
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
 
             transformComponent.position = {m_position.x(), m_position.y()};
         }
-        // available = m_udp_socket.available();
     }
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
 
+    if (m_last_sent == transformComponent.position) return;
+
+    m_last_sent = transformComponent.position;
     m_position.set_entity_id(m_player_id);
     m_position.set_x(transformComponent.position.x);
     m_position.set_y(transformComponent.position.y);

@@ -1,6 +1,5 @@
 #include <comm.pb.h>
 #include <format>
-#include <ostream>
 #include <print>
 
 #include "Dungeon.h"
@@ -15,7 +14,6 @@
 #include "DoorComponent.h"
 #include "DoorSystem.h"
 #include "Helpers.h"
-#include "InputHandler.h"
 #include "MapComponent.h"
 #include "MultiplayerSystem.h"
 #include "PlayerComponent.h"
@@ -29,23 +27,21 @@
 #include "TextureSystem.h"
 #include "TravellingSystem.h"
 
-#include "Paths.h"
-
 extern Coordinator gCoordinator;
 
 void Dungeon::init()
 {
     setECS();
 
-    std::uint32_t id = 0;
+    m_id = 0;
     Entity player = gCoordinator.createEntity();
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     multiplayerSystem->setup("127.0.0.1", "9001");
 
     if (multiplayerSystem->isConnected())
     {
-        id = multiplayerSystem->registerPlayer(player);
-        std::println("Connected to server with id: {}", id);
+        m_id = multiplayerSystem->registerPlayer(player);
+        std::println("Connected to server with id: {}", m_id);
     }
     else
     {
@@ -53,29 +49,30 @@ void Dungeon::init()
     }
 
 
-    m_entities[id] = player;
+    m_entities[m_id] = player;
     const auto texture = new sf::Texture();
     texture->loadFromFile(m_asset_path + "/knight/knight.png");
 
-    gCoordinator.addComponent(m_entities[id], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
-    gCoordinator.addComponent(m_entities[id], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
-    gCoordinator.addComponent(m_entities[id], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = 100.f});
-    gCoordinator.addComponent(m_entities[id], PlayerComponent{});
-    gCoordinator.addComponent(m_entities[id], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[id], TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) {
-                                  moveInDungeon(dir);
-                              }});
+    gCoordinator.addComponent(m_entities[m_id], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
+    gCoordinator.addComponent(m_entities[m_id],
+                              TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
+    gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = 100.f});
+    gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
+    gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
+    gCoordinator.addComponent(
+        m_entities[m_id],
+        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        m_entities[id], "Player 1", {},
+        m_entities[m_id], "Player 1", {},
         [&](const GameType::CollisionData& entityT)
         {
             if (entityT.tag == "Door")
             {
                 const auto& doorComponent = gCoordinator.getComponent<DoorComponent>(entityT.entityID);
                 auto& travellingDungeonComponent =
-                    gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[id]);
+                    gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[m_id]);
 
                 if (travellingDungeonComponent.doorsPassed == 0)
                     travellingDungeonComponent.moveInDungeon.emplace_back(
@@ -88,7 +85,7 @@ void Dungeon::init()
             if (entityT.tag == "Door")
             {
                 auto& travellingDungeonComponent =
-                    gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[id]);
+                    gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[m_id]);
                 --travellingDungeonComponent.doorsPassed;
             }
         },
@@ -118,7 +115,6 @@ void Dungeon::update()
 
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
 
-    // if (false)
     if (multiplayerSystem->isConnected())
     {
         const auto texture = new sf::Texture();
@@ -136,7 +132,6 @@ void Dungeon::update()
         case comm::CONNECTED:
             texture->loadFromFile(m_asset_path + "/knight/knight.png");
 
-            std::cout << stateUpdate.ShortDebugString() << '\n';
             m_entities[id] = gCoordinator.createEntity();
 
             gCoordinator.addComponent(m_entities[id],

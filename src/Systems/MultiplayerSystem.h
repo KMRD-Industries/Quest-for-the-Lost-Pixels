@@ -1,8 +1,9 @@
 #pragma once
+#include <unordered_map>
 
+#include <SFML/System/Vector2.hpp>
 #include <boost/asio.hpp>
 #include <comm.pb.h>
-#include <unordered_map>
 
 #include "System.h"
 #include "Types.h"
@@ -19,12 +20,13 @@ private:
     tcp::socket m_tcp_socket;
     udp::socket m_udp_socket;
     std::array<char, 4096> m_buf{};
-    comm::PositionUpdate m_position;
-    comm::StateUpdate m_state;
-    std::unordered_map<std::uint32_t, Entity> m_entity_map;
+    sf::Vector2<float> m_last_sent{};
+    comm::PositionUpdate m_position{};
+    comm::StateUpdate m_state{};
+    std::unordered_map<std::uint32_t, Entity> m_entity_map{};
 
 public:
-    MultiplayerSystem() : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
+    MultiplayerSystem() : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
     void setup(const std::string& ip, const std::string& port);
     void entityConnected(std::uint32_t id, Entity entity);
     void entityDisconnected(std::uint32_t id);
