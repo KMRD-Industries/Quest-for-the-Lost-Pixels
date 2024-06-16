@@ -3,10 +3,11 @@
 #include <SFML/Window/Event.hpp>
 #include <imgui-SFML.h>
 
+#include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
-#include "MapSystem.h"
+#include "MultiplayerSystem.h"
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
 
@@ -75,4 +76,8 @@ int main()
         window.display();
         handleInput(window);
     }
+
+    gCoordinator.getRegisterSystem<MultiplayerSystem>()->disconnect();
+    ImGui::SFML::Shutdown();
+    return 0;
 }
