@@ -1,7 +1,8 @@
 #pragma once
+
 #include <unordered_map>
 #include <unordered_set>
-
+#include "Helpers.h"
 #include "SFML/Window/Keyboard.hpp"
 
 enum class InputType
