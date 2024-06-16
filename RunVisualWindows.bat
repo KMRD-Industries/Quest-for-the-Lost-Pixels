@@ -1,2 +1,2 @@
-cmake . --preset=VS-release
+cmake . --preset=VS
 pause

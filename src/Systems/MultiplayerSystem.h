@@ -26,15 +26,15 @@ private:
     std::unordered_map<std::uint32_t, Entity> m_entity_map{};
 
 public:
-    MultiplayerSystem() : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
-    void setup(const std::string& ip, const std::string& port);
-    void entityConnected(std::uint32_t id, Entity entity);
-    void entityDisconnected(std::uint32_t id);
+    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
+    void setup(const std::string& ip, const std::string& port) noexcept;
+    void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
+    void entityDisconnected(const std::uint32_t id) noexcept;
     void update();
     void disconnect();
 
-    std::uint32_t registerPlayer(Entity player);
-    std::uint32_t playerID() const;
+    std::uint32_t registerPlayer(const Entity player);
+    std::uint32_t playerID() const noexcept;
     comm::StateUpdate pollStateUpdates();
-    bool isConnected() const;
+    bool isConnected() const noexcept;
 };

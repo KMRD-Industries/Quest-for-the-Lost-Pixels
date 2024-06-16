@@ -15,7 +15,7 @@ extern Coordinator gCoordinator;
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
-void MultiplayerSystem::setup(const std::string& ip, const std::string& port)
+void MultiplayerSystem::setup(const std::string& ip, const std::string& port) noexcept
 {
     try
     {
@@ -37,10 +37,10 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port)
     }
 }
 
-bool MultiplayerSystem::isConnected() const { return m_connected; }
-std::uint32_t MultiplayerSystem::playerID() const { return m_player_id; }
+bool MultiplayerSystem::isConnected() const noexcept { return m_connected; }
+std::uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
 
-std::uint32_t MultiplayerSystem::registerPlayer(Entity player)
+std::uint32_t MultiplayerSystem::registerPlayer(const Entity player)
 {
     std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
 
@@ -55,7 +55,7 @@ std::uint32_t MultiplayerSystem::registerPlayer(Entity player)
 
 comm::StateUpdate MultiplayerSystem::pollStateUpdates()
 {
-    std::size_t available = m_tcp_socket.available();
+    const std::size_t available = m_tcp_socket.available();
     comm::StateUpdate state;
     if (available > 0)
     {
@@ -75,15 +75,14 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
     return state;
 }
 
-void MultiplayerSystem::entityConnected(uint32_t id, Entity entity) { m_entity_map[id] = entity; }
-void MultiplayerSystem::entityDisconnected(uint32_t id) { m_entity_map.erase(id); }
+void MultiplayerSystem::entityConnected(const uint32_t id, const Entity entity) noexcept { m_entity_map[id] = entity; }
+void MultiplayerSystem::entityDisconnected(const uint32_t id) noexcept { m_entity_map.erase(id); }
 
 void MultiplayerSystem::update()
 {
     std::size_t received = 0;
-    std::size_t available = 0;
+    const std::size_t available = m_udp_socket.available();
 
-    available = m_udp_socket.available();
     if (available > 0)
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
