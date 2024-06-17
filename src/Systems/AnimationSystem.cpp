@@ -46,7 +46,7 @@ void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& ani
 {
     auto& tile = gCoordinator.getComponent<TileComponent>(entity);
 
-    if (++animation.it == animation.frames.end())
+    if (++animation.it >= animation.frames.end())
     {
         animation.it = animation.frames.begin();
     }
