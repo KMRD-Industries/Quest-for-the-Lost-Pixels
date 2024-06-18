@@ -41,7 +41,8 @@ public:
 
     uint32_t registerPlayer(const Entity player);
     uint32_t playerID() const noexcept;
-    glm::ivec2 getEntityRoom(const Entity entity) const noexcept;
+    glm::ivec2 getCurrentRoom() const noexcept;
+    std::optional<glm::ivec2> getEntityRoom(const Entity entity) const noexcept;
     comm::StateUpdate pollStateUpdates();
     bool isConnected() const noexcept;
 };

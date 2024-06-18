@@ -10,6 +10,7 @@
 #include "TransformComponent.h"
 #include "Types.h"
 #include "boost/system/system_error.hpp"
+#include "glm/ext/vector_int2.hpp"
 
 extern Coordinator gCoordinator;
 
@@ -93,7 +94,13 @@ void MultiplayerSystem::roomChanged(const int x, const int y) noexcept
     m_position.set_allocated_room(r);
 }
 
-glm::ivec2 MultiplayerSystem::getEntityRoom(const Entity entity) const noexcept { return m_entity_rooms.at(entity); }
+glm::ivec2 MultiplayerSystem::getCurrentRoom() const noexcept { return m_current_room; }
+
+std::optional<glm::ivec2> MultiplayerSystem::getEntityRoom(const Entity entity) const noexcept
+{
+    if (m_entity_rooms.contains(entity)) return m_entity_rooms.at(entity);
+    return {};
+}
 
 void MultiplayerSystem::update()
 {
@@ -116,6 +123,7 @@ void MultiplayerSystem::update()
             if (m_incomming_pos.has_room())
             {
                 auto room = m_incomming_pos.room();
+                std::cout << room.x() << ' ' << room.y() << '\n';
                 m_entity_rooms[target].x = room.x();
                 m_entity_rooms[target].y = room.y();
             }

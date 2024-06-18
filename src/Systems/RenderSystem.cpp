@@ -3,6 +3,7 @@
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
+#include "MultiplayerSystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/RenderWindow.hpp"
@@ -21,8 +22,15 @@ void RenderSystem::draw(sf::RenderWindow& window) const
     float max_x = 0;
     float max_y = 0;
 
+    auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     for (const auto& entity : m_entities)
     {
+        // if entity is managed by multiplayer system, check if it's room is currently displayed 
+        if (auto room = multiplayerSystem->getEntityRoom(entity))
+        {
+            if (*room != multiplayerSystem->getCurrentRoom()) continue;
+        }
+
         if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
             layer > 0 && layer < config::maximumNumberOfLayers)
         {

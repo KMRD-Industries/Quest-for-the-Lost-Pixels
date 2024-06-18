@@ -1,15 +1,16 @@
-#include "TextureSystem.h"
 #include <iostream>
-#include "ColliderComponent.h"
-#include "CollisionSystem.h"
+
+#include <SFML/Graphics/Image.hpp>
+
 #include "Coordinator.h"
-#include "DoorComponent.h"
+#include "MultiplayerSystem.h"
 #include "Paths.h"
-#include "RenderComponent.h"
-#include "SFML/Graphics/Image.hpp"
 #include "TextureParser.h"
+#include "TextureSystem.h"
+
+#include "ColliderComponent.h"
+#include "RenderComponent.h"
 #include "TileComponent.h"
-#include "Utils/Helpers.h"
 
 extern Coordinator gCoordinator;
 
@@ -132,8 +133,15 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
  */
 void TextureSystem::loadTextures()
 {
+    auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     for (const auto& entity : m_entities)
     {
+        // if entity is managed by multiplayer system, check if it's room is currently displayed 
+        if (auto room = multiplayerSystem->getEntityRoom(entity))
+        {
+            if (*room != multiplayerSystem->getCurrentRoom()) continue;
+        }
+
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
 
         // Ignore invalid values
