@@ -299,21 +299,21 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 {
     if (m_roomMap.contains(m_currentPlayerPos + dir))
     {
-        std::uint32_t id = gCoordinator.getRegisterSystem<MultiplayerSystem>()->playerID();
         m_currentPlayerPos += dir;
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
         gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
         gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
         gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
+        gCoordinator.getRegisterSystem<MultiplayerSystem>()->roomChanged(m_currentPlayerPos.x, m_currentPlayerPos.y);
 
         const auto newDoor = dir * -1;
         const auto doorType = GameType::geoToMapDoors.at(newDoor);
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
         const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
         const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
-        gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
-        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+        gCoordinator.getComponent<TransformComponent>(m_entities[m_id]).position = newPosition;
+        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]);
         colliderComponent.body->SetTransform(
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
             colliderComponent.body->GetAngle());

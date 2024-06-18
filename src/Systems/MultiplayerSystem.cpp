@@ -31,6 +31,9 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port) no
         m_udp_socket.wait(udp::socket::wait_write);
         m_tcp_socket.wait(tcp::socket::wait_write);
         m_connected = true;
+
+        auto r = new comm::Room();
+        m_position.set_allocated_room(r);
     }
     catch (boost::system::system_error)
     {
@@ -38,31 +41,32 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port) no
 }
 
 bool MultiplayerSystem::isConnected() const noexcept { return m_connected; }
-std::uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
+uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
 
-std::uint32_t MultiplayerSystem::registerPlayer(const Entity player)
+uint32_t MultiplayerSystem::registerPlayer(const Entity player)
 {
-    std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
+    size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
 
     m_state.ParseFromArray(&m_buf, received);
-    std::uint32_t id = m_state.id();
+    uint32_t id = m_state.id();
     m_entity_map[id] = player;
     m_player_entity = player;
     m_player_id = id;
+    m_position.set_entity_id(id);
 
     return id;
 }
 
 comm::StateUpdate MultiplayerSystem::pollStateUpdates()
 {
-    const std::size_t available = m_tcp_socket.available();
+    const size_t available = m_tcp_socket.available();
     comm::StateUpdate state;
     if (available > 0)
     {
         // temporary solution - msg length should always be 4
         // reading all available bytes will cause ignoring of all but 1 messages
         std::vector<char> buf(4);
-        std::size_t received = m_tcp_socket.read_some(boost::asio::buffer(buf));
+        size_t received = m_tcp_socket.read_some(boost::asio::buffer(buf));
 
         state.ParseFromArray(buf.data(), received);
         std::cout << state.ShortDebugString() << '\n';
@@ -78,23 +82,43 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
 void MultiplayerSystem::entityConnected(const uint32_t id, const Entity entity) noexcept { m_entity_map[id] = entity; }
 void MultiplayerSystem::entityDisconnected(const uint32_t id) noexcept { m_entity_map.erase(id); }
 
+void MultiplayerSystem::roomChanged(const int x, const int y) noexcept
+{
+    m_current_room.x = x;
+    m_current_room.y = y;
+
+    auto r = m_position.release_room();
+    r->set_x(x);
+    r->set_y(y);
+    m_position.set_allocated_room(r);
+}
+
+glm::ivec2 MultiplayerSystem::getEntityRoom(const Entity entity) const noexcept { return m_entity_rooms.at(entity); }
+
 void MultiplayerSystem::update()
 {
-    std::size_t received = 0;
-    const std::size_t available = m_udp_socket.available();
+    size_t received = 0;
+    const size_t available = m_udp_socket.available();
 
     if (available > 0)
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
-        m_position.ParseFromArray(&m_buf, received);
-        std::uint32_t id = m_position.entity_id();
+        m_incomming_pos.ParseFromArray(&m_buf, received);
+        uint32_t id = m_incomming_pos.entity_id();
 
         if (m_entity_map.contains(id))
         {
             Entity& target = m_entity_map[id];
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
 
-            transformComponent.position = {m_position.x(), m_position.y()};
+            transformComponent.position = {m_incomming_pos.x(), m_incomming_pos.y()};
+
+            if (m_incomming_pos.has_room())
+            {
+                auto room = m_incomming_pos.room();
+                m_entity_rooms[target].x = room.x();
+                m_entity_rooms[target].y = room.y();
+            }
         }
     }
 
@@ -103,7 +127,6 @@ void MultiplayerSystem::update()
     if (m_last_sent == transformComponent.position) return;
 
     m_last_sent = transformComponent.position;
-    m_position.set_entity_id(m_player_id);
     m_position.set_x(transformComponent.position.x);
     m_position.set_y(transformComponent.position.y);
 
@@ -114,6 +137,7 @@ void MultiplayerSystem::update()
 void MultiplayerSystem::disconnect()
 {
     if (!m_connected) return;
+    delete m_position.release_room();
     m_tcp_socket.close();
     m_udp_socket.close();
 }
