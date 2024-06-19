@@ -6,6 +6,7 @@
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
+#include "Paths.h"
 #include "RenderSystem.h"
 
 Coordinator gCoordinator;
@@ -72,6 +73,22 @@ int main()
 
     sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
 
+    sf::Font font;
+    if (!font.loadFromFile(std::string(ASSET_PATH) + "/fonts/Bentinck-Regular.ttf"))
+    {
+        std::cerr << "Failed to load font file!" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    sf::Text fpsText;
+    fpsText.setFont(font);
+    fpsText.setCharacterSize(20);
+    fpsText.setFillColor(sf::Color::White);
+    fpsText.setPosition(10.f, 10.f);
+
+    sf::Time currentTime;
+    sf::Time lastTime = deltaClock.getElapsedTime();
+
     while (window.isOpen())
     {
         // Clear the window before drawing
@@ -82,12 +99,18 @@ int main()
         game.handleCollision();
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
 
+        window.draw(fpsText);
+
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        // Render ImGui
         ImGui::SFML::Render(window);
-        // Display the rendered frame
         window.display();
         handleInput(window);
+
+        currentTime = deltaClock.getElapsedTime();
+        float fps = 1.f / (currentTime.asSeconds() - lastTime.asSeconds());
+        lastTime = currentTime;
+
+        fpsText.setString(std::to_string(fps));
     }
 }

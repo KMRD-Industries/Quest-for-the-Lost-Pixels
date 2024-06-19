@@ -113,7 +113,7 @@ void Dungeon::update()
     gCoordinator.getRegisterSystem<TravellingSystem>()->update();
     gCoordinator.getRegisterSystem<CharacterSystem>()->update();
     gCoordinator.getRegisterSystem<AnimationSystem>()->updateFrames();
-
+    
     m_roomMap.at(m_currentPlayerPos).update();
 }
 

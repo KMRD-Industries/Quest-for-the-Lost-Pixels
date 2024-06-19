@@ -35,20 +35,16 @@ void RenderSystem::draw(sf::RenderWindow& window)
 
             sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
 
-            if (collisionComponent.body != nullptr && gCoordinator.hasComponent<PlayerComponent>(entity))
+            if (collisionComponent.collision.height == 0 || collisionComponent.collision.width == 0)
             {
-                Collision cc = collisionComponent.collision;
-
-                if (cc.height == 0 || cc.width == 0)
-                {
-                    cc.height = std::max(spriteBounds.height, 16.f);
-                    cc.width = std::max(spriteBounds.width, 16.f);
-                    cc.x = 0;
-                    cc.y = 0;
-                }
-
-                sprite.setOrigin(cc.x + cc.width / 2, cc.y + cc.height / 2);
+                collisionComponent.collision.height = std::max(spriteBounds.height, 16.f);
+                collisionComponent.collision.width = std::max(spriteBounds.width, 16.f);
+                collisionComponent.collision.x = 0;
+                collisionComponent.collision.y = 0;
             }
+
+            sprite.setOrigin(collisionComponent.collision.x + collisionComponent.collision.width / 2,
+                             collisionComponent.collision.y + collisionComponent.collision.height / 2);
 
             sprite.setScale(transformComponent.scale * config::gameScale);
             sprite.setPosition(transformComponent.position);
