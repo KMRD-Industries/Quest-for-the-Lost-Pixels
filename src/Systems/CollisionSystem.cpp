@@ -1,5 +1,7 @@
 #include "CollisionSystem.h"
+
 #include <iostream>
+#include <math.h>
 #include "ColliderComponent.h"
 #include "DoorComponent.h"
 #include "PlayerComponent.h"
@@ -48,46 +50,47 @@ void CollisionSystem::createMapCollision() const
 {
     for (const auto& entity : m_entities)
     {
-        if (!gCoordinator.hasComponent<TileComponent>(entity) || gCoordinator.hasComponent<PlayerComponent>(entity) ||
-            gCoordinator.hasComponent<DoorComponent>(entity))
+        if (gCoordinator.hasComponent<TileComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity) &&
+            !gCoordinator.hasComponent<DoorComponent>(entity))
+        {
+            deleteBody(entity);
+        }
+    }
+
+    auto createCollisionBody = [](const Entity entity, const std::string type, const glm::vec2& size,
+                                  const bool isStatic, const bool useTexture, const glm::vec2& offset = {0, 0})
+    {
+        createBody(
+            entity, type, size, [](const GameType::CollisionData& entityT) {},
+            [](const GameType::CollisionData& entityT) {}, isStatic, useTexture, offset);
+    };
+
+    for (const auto& entity : m_entities)
+    {
+        const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+
+        if (tileComponent.id == 0 || tileComponent.tileset.empty() ||
+            gCoordinator.hasComponent<PlayerComponent>(entity))
         {
             continue;
         }
 
-        deleteBody(entity);
-    }
-
-    for (const auto& entity : m_entities)
-    {
-        if (gCoordinator.hasComponent<PlayerComponent>(entity)) continue;
-
-        if (auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-            tileComponent.tileset == "SpecialBlocks")
-            if (!gCoordinator.hasComponent<TileComponent>(entity)) continue;
-
-        if (auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-            tileComponent.tileset == "SpecialBlocks")
+        if (tileComponent.tileset == "SpecialBlocks")
         {
             if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER) + 1)
-                createBody(
-                    entity, "Wall", {config::tileHeight, config::tileHeight},
-                    [](const GameType::CollisionData& entityT) {}, [](const GameType::CollisionData& entityT) {}, true,
-                    true);
+                createCollisionBody(entity, "Wall", {config::tileHeight, config::tileHeight}, true, true);
+
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
-            {
-                createBody(
-                    entity, "Door", {config::tileHeight, config::tileHeight},
-                    [](const GameType::CollisionData& entityT) {}, [](const GameType::CollisionData& entityT) {}, true,
-                    false);
-            }
+                createCollisionBody(entity, "Door", {config::tileHeight, config::tileHeight}, true, false);
         }
-        else if (Collision collision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
-                     tileComponent.tileset, tileComponent.id);
-                 collision.width > 0 && collision.height > 0)
+        else
         {
-            createBody(
-                entity, "Wall", {collision.width, collision.height}, [](const GameType::CollisionData& entityT) {},
-                [](const GameType::CollisionData& entityT) {}, true, false, {collision.x, collision.y});
+            Collision collision =
+                gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
+
+            if (collision.width > 0 && collision.height > 0)
+                createCollisionBody(entity, "Wall", {collision.width, collision.height}, true, false,
+                                    {collision.x, collision.y});
         }
     }
 }
@@ -97,14 +100,12 @@ void CollisionSystem::updateCollision() const
     for (const auto& entity : m_entities)
     {
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (!transformComponent.velocity.IsValid()) continue;
 
-        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
-
-        //        correctPosition(entity, body, transformComponent);
 
         body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
                                  convertPixelsToMeters(transformComponent.velocity.y)});
@@ -115,36 +116,31 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
                                        const int32 positionIterations) const
 {
     Physics::getWorld()->Step(timeStep, velocityIterations, positionIterations);
+
     for (const auto& entity : m_entities)
     {
-        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-
-        Collision collision = colliderComponent.collision;
-        //            gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset,
-        //            tileComponent.id);
+        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
         const b2Body* body = colliderComponent.body;
         if (body == nullptr || transformComponent.velocity == b2Vec2{}) continue;
 
         const auto position = body->GetPosition();
-        const auto [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
-        const auto spriteBounds = sprite.getGlobalBounds();
-        int mulForBlocks = 1;
+        const auto spriteBounds = renderComponent.sprite.getGlobalBounds();
 
-        if (collision.height == 0 || collision.width == 0)
+        if (colliderComponent.collision.height == 0 || colliderComponent.collision.width == 0)
         {
-            collision.height = std::max(spriteBounds.height, 16.f);
-            collision.width = std::max(spriteBounds.width, 16.f);
-            collision.x = 0;
-            collision.y = 0;
+            colliderComponent.collision.height = std::max(spriteBounds.height, config::tileHeight);
+            colliderComponent.collision.width = std::max(spriteBounds.width, config::tileHeight);
+            colliderComponent.collision.x = 0;
+            colliderComponent.collision.y = 0;
         }
-
-        if (gCoordinator.hasComponent<TileComponent>(entity)) mulForBlocks = config::gameScale;
 
         transformComponent.position = {static_cast<float>(convertMetersToPixel(position.x)),
                                        static_cast<float>(convertMetersToPixel(position.y))};
+
+        renderComponent.sprite.setPosition(position.x, position.y);
     }
 }
 
@@ -166,68 +162,53 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
     const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-    b2BodyDef bodyDef;
+    auto* collisionData = new GameType::CollisionData{.entityID = entity, .tag = tag};
 
+    b2BodyDef bodyDef;
     sf::Sprite sprite =
         gCoordinator.getRegisterSystem<TextureSystem>().get()->getTile(tileComponent.tileset, tileComponent.id);
+    const auto spriteBounds = sprite.getGlobalBounds();
+
+    float xPosition = {};
+    float yPosition = {};
+    float boxWidth = {};
+    float boxHeight = {};
 
     if (useTextureSize)
     {
-        float xPosition = convertPixelsToMeters(transformComponent.position.x);
-        float yPosition = convertPixelsToMeters(transformComponent.position.y);
-
-
-        //        float xPosition = convertPixelsToMeters(transformComponent.position.x +
-        //                                                (sprite.getTextureRect().width - 16) * config::gameScale);
-        //
-        //        float yPosition = convertPixelsToMeters(transformComponent.position.y +
-        //                                                (sprite.getTextureRect().height - 16) * config::gameScale);
-
-        bodyDef.position.Set(xPosition, yPosition);
+        xPosition = convertPixelsToMeters(transformComponent.position.x);
+        yPosition = convertPixelsToMeters(transformComponent.position.y);
     }
     else
     {
-        //        float xPosition =
-        //            convertPixelsToMeters(transformComponent.position.x + (offset.x - colliderSize.x / 2) *
-        //            config::gameScale);
-        //
-        //        float yPosition = convertPixelsToMeters(transformComponent.position.y + (offset.y) * config::gameScale
-        //        / 2);
-
-        float xPosition = convertPixelsToMeters(transformComponent.position.x -
-                                                (sprite.getGlobalBounds().width / 2 - (offset.x + colliderSize.x / 2)) *
-                                                    config::gameScale);
-        float yPosition = convertPixelsToMeters(
-            transformComponent.position.y -
-            (sprite.getGlobalBounds().height / 2 - (offset.y + colliderSize.y / 2)) * config::gameScale);
-
-        bodyDef.position.Set(xPosition, yPosition);
+        xPosition = convertPixelsToMeters(transformComponent.position.x -
+                                          (sprite.getGlobalBounds().width / 2 - (offset.x + colliderSize.x / 2)) *
+                                              config::gameScale);
+        yPosition = convertPixelsToMeters(transformComponent.position.y -
+                                          (sprite.getGlobalBounds().height / 2 - (offset.y + colliderSize.y / 2)) *
+                                              config::gameScale);
     }
 
+    bodyDef.position.Set(xPosition, yPosition);
     bodyDef.angle = transformComponent.rotation;
     bodyDef.type = (isStatic) ? b2_staticBody : b2_dynamicBody;
-
-    auto* collisionData = new GameType::CollisionData{.entityID = entity, .tag = tag};
     bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(collisionData);
-    b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
 
+    b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
     b2PolygonShape boxShape;
 
     if (useTextureSize)
     {
-        //        const auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
-        const auto spriteBounds = sprite.getGlobalBounds();
-        boxShape.SetAsBox(convertPixelsToMeters(spriteBounds.width * config::gameScale) / 2,
-                          convertPixelsToMeters(spriteBounds.height * config::gameScale) / 2);
+        boxWidth = convertPixelsToMeters(spriteBounds.width * config::gameScale) / 2;
+        boxHeight = convertPixelsToMeters(spriteBounds.height * config::gameScale) / 2;
     }
     else
     {
-        // Set the collision box size
-        float boxWidth = convertPixelsToMeters(colliderSize.x * config::gameScale) / 2.f;
-        float boxHeight = convertPixelsToMeters(colliderSize.y * config::gameScale) / 2.f;
-
-        boxShape.SetAsBox(boxWidth, boxHeight);
+        boxWidth = convertPixelsToMeters(colliderSize.x * config::gameScale) / 2;
+        boxHeight = convertPixelsToMeters(colliderSize.y * config::gameScale) / 2;
     }
+
+    boxShape.SetAsBox(boxWidth, boxHeight);
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &boxShape;

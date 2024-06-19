@@ -86,14 +86,34 @@ int TextureSystem::loadFromFile(const std::string& path)
     }
     catch (const std::exception& e)
     {
-        std::cout << "Caught an exception: " << e.what() << std::endl;
+        std::cout << "Caught an exception: " << e.what() << '\n';
         return 0;
     }
     catch (...)
     {
-        std::cout << "Caught an unknown exception" << std::endl;
+        std::cout << "Caught an unknown exception" << '\n';
         return 1;
     }
+}
+
+template <typename T>
+T TextureSystem::getLoadedValue(const std::unordered_map<long, T>& myMap, const long tileID, const std::string& tileset)
+{
+    if (texture_indexes.find(tileset) == texture_indexes.end())
+    {
+        return T{};
+    }
+
+    long adjustedID = tileID + texture_indexes.at(tileset);
+
+    auto mapIterator = myMap.find(adjustedID);
+
+    if (mapIterator != myMap.end())
+    {
+        return mapIterator->second;
+    }
+
+    return T{};
 }
 
 void TextureSystem::loadTexturesFromFiles()
@@ -106,48 +126,24 @@ void TextureSystem::loadTexturesFromFiles()
     }
 }
 
-sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
+sf::Sprite TextureSystem::getTile(const std::string& tileset_name, const long& tile_id)
 {
-    try
+    if (textures.find(tileset_name) == textures.end())
     {
-        sf::Sprite s(textures.at(tileset_name), texture_map.at(id + texture_indexes.at(tileset_name)));
-        return s;
+        return sf::Sprite{};
     }
-    catch (...)
-    {
-        std::cout << "Texture ID out of range";
-        return {};
-    }
+
+    return sf::Sprite{textures.at(tileset_name), getLoadedValue(this->texture_map, tile_id, tileset_name)};
 }
 
-Collision TextureSystem::getCollision(const std::string& tileset_name, const long id)
+Collision TextureSystem::getCollision(const std::string& tileset_name, const long& tile_id)
 {
-    if (texture_indexes.find(tileset_name) == texture_indexes.end())
-    {
-        return Collision{};
-    }
-
-    long ad = id + texture_indexes.at(tileset_name);
-
-    if (map_collisions.find(ad) != map_collisions.end())
-    {
-        return map_collisions.at(ad);
-    }
-
-    return Collision{};
+    return getLoadedValue(this->map_collisions, tile_id, tileset_name);
 }
 
-std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileset_name, long id)
+std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileset_name, const long& tile_id)
 {
-    try
-    {
-        return map_animations.at(id + texture_indexes.at(tileset_name));
-    }
-    catch (...)
-    {
-        std::cout << "Texture ID out of range";
-        return {};
-    }
+    return getLoadedValue(this->map_animations, tile_id, tileset_name);
 }
 
 /**
@@ -186,7 +182,7 @@ void TextureSystem::loadTextures()
 
         if (map_collisions.contains(adjusted_id))
         {
-            //            collider_component.
+            collider_component.collision = getCollision(tile_component.tileset, tile_component.id);
         }
 
         // Load texture of tile with that id to render component

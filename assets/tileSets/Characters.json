@@ -87,7 +87,7 @@
              "name":"",
              "objects":[
                     {
-                     "height":12.7272727272727,
+                     "height":5.7272727272727,
                      "id":12,
                      "name":"",
                      "properties":[
@@ -101,7 +101,7 @@
                      "visible":true,
                      "width":12.5,
                      "x":2.59090909090909,
-                     "y":16.7272727272727
+                     "y":23.7272727272727
                     }],
              "opacity":1,
              "type":"objectgroup",

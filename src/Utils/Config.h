@@ -5,7 +5,7 @@
 
 namespace config
 {
-    static constexpr bool debugMode{true};
+    static constexpr bool debugMode{false};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};
@@ -25,5 +25,7 @@ namespace config
 
     static constexpr int playerAcc = 300;
     static constexpr int enemyAcc = 25;
+
+    static constexpr std::string backgroundColor{"#17205C"};
 
 } // namespace config

@@ -34,7 +34,8 @@ void Game::init()
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
     m_dungeon.init();
-};
+}
+
 void Game::draw() const { m_dungeon.draw(); };
 
 void Game::update()

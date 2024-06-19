@@ -251,6 +251,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
     {
         m_currentPlayerPos += dir;
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
+
         gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
         gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
@@ -263,6 +264,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
         gCoordinator.getComponent<TransformComponent>(m_entities[0]).position = newPosition;
         auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[0]);
+
         colliderComponent.body->SetTransform(
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
             colliderComponent.body->GetAngle());

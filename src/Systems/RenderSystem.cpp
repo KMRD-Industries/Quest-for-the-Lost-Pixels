@@ -13,12 +13,13 @@
 
 extern Coordinator gCoordinator;
 
-void RenderSystem::draw(sf::RenderWindow& window) const
+void RenderSystem::draw(sf::RenderWindow& window)
 {
     std::vector<std::vector<sf::Sprite>> tiles(config::maximumNumberOfLayers);
     sf::Vector2<unsigned int> windowSize = window.getSize();
-    float max_x = 0;
-    float max_y = 0;
+
+    mapRenderOffsetX = 0;
+    mapRenderOffsetY = 0;
 
     for (const auto& entity : m_entities)
     {
@@ -29,8 +30,8 @@ void RenderSystem::draw(sf::RenderWindow& window) const
             auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
             sf::FloatRect spriteBounds = sprite.getGlobalBounds();
-            max_x = std::max(max_x, transformComponent.position.x);
-            max_y = std::max(max_y, transformComponent.position.y);
+            mapRenderOffsetX = std::max(mapRenderOffsetX, transformComponent.position.x);
+            mapRenderOffsetY = std::max(mapRenderOffsetY, transformComponent.position.y);
 
             sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
 
@@ -56,11 +57,14 @@ void RenderSystem::draw(sf::RenderWindow& window) const
         }
     }
 
+    mapRenderOffsetX = (windowSize.x - mapRenderOffsetX) * 0.5f;
+    mapRenderOffsetY = (windowSize.y - mapRenderOffsetY) * 0.5f;
+
     for (auto& layer : tiles)
     {
         for (auto& sprite : layer)
         {
-            sprite.setPosition({sprite.getPosition().x, sprite.getPosition().y});
+            sprite.setPosition({sprite.getPosition().x + mapRenderOffsetX, sprite.getPosition().y + mapRenderOffsetY});
             window.draw(sprite);
         }
     }
@@ -85,7 +89,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     float xPosCenter = transformComponent.position.x;
     float yPosCenter = transformComponent.position.y;
 
-    const auto center = GameType::MyVec2{xPosCenter, yPosCenter};
+    const auto center = GameType::MyVec2{xPosCenter + mapRenderOffsetX, yPosCenter + mapRenderOffsetY};
 
     sf::CircleShape centerPoint(5);
     centerPoint.setFillColor(sf::Color::Red);
@@ -95,7 +99,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     sf::VertexArray line(sf::Lines, 2);
     line[0].position = center;
     line[0].color = sf::Color::Red;
-    line[1].position = {center.x + config::playerAttackRange, center.y};
+    line[1].position = {center.x + config::playerAttackRange * transformComponent.scale.x, center.y};
     line[1].color = sf::Color::Red;
     window.draw(line);
 
@@ -106,7 +110,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     circle.m_radius = newRadius;
     circle.m_p = newCenter;
 
-    ////    sf::CircleShape collision(convertMetersToPixel(newRadius));
+    //    sf::CircleShape collision(convertMetersToPixel(newRadius));
     //    collision.setOrigin(convertMetersToPixel(newRadius), convertMetersToPixel(newRadius));
     //    collision.setPosition({convertMetersToPixel(newCenter.x), convertMetersToPixel(newCenter.y)});
     //    window.draw(collision);
@@ -147,8 +151,9 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
                 convex.setFillColor(sf::Color::Transparent);
                 convex.setOutlineThickness(1.f);
                 convex.setOutlineColor(sf::Color::Green);
-                convex.setPosition(colliderComponent.body->GetPosition().x * config::meterToPixelRatio,
-                                   colliderComponent.body->GetPosition().y * config::meterToPixelRatio);
+                convex.setPosition(
+                    colliderComponent.body->GetPosition().x * config::meterToPixelRatio + mapRenderOffsetX,
+                    colliderComponent.body->GetPosition().y * config::meterToPixelRatio + mapRenderOffsetY);
 
                 convex.setRotation(colliderComponent.body->GetAngle() * 180 / b2_pi);
                 window.draw(convex);

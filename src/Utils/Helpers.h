@@ -3,12 +3,12 @@
 #include <cstdint>
 #include <functional>
 #include <glm/glm.hpp>
+#include <imgui-SFML.h>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
 #include <unordered_map>
-
 #include "Config.h"
 #include "glm/gtx/hash.hpp"
 
