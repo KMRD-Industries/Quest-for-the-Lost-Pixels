@@ -1,18 +1,15 @@
 #include "RenderSystem.h"
 #include "AnimationComponent.h"
 #include "ColliderComponent.h"
-#include "Config.h"
-#include "Coordinator.h"
-#include "Physics.h"
+#include "CollisionSystem.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
 #include "SFML/Graphics/ConvexShape.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
+#include "TextureSystem.h"
+#include "TileComponent.h"
 #include "TransformComponent.h"
-#include "box2d/b2_api.h"
-#include "box2d/b2_fixture.h"
-#include "box2d/b2_polygon_shape.h"
-#include "box2d/b2_shape.h"
 
 extern Coordinator gCoordinator;
 
@@ -28,14 +25,30 @@ void RenderSystem::draw(sf::RenderWindow& window) const
         if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
             layer > 0 && layer < config::maximumNumberOfLayers)
         {
-            const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            const auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-            sf::FloatRect spriteBounds = sprite.getLocalBounds();
+            sf::FloatRect spriteBounds = sprite.getGlobalBounds();
             max_x = std::max(max_x, transformComponent.position.x);
             max_y = std::max(max_y, transformComponent.position.y);
 
             sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+
+            if (collisionComponent.body != nullptr && gCoordinator.hasComponent<PlayerComponent>(entity))
+            {
+                Collision cc = collisionComponent.collision;
+
+                if (cc.height == 0 || cc.width == 0)
+                {
+                    cc.height = std::max(spriteBounds.height, 16.f);
+                    cc.width = std::max(spriteBounds.width, 16.f);
+                    cc.x = 0;
+                    cc.y = 0;
+                }
+
+                sprite.setOrigin(cc.x + cc.width / 2, cc.y + cc.height / 2);
+            }
+
             sprite.setScale(transformComponent.scale * config::gameScale);
             sprite.setPosition(transformComponent.position);
             sprite.setRotation(transformComponent.rotation);
@@ -61,12 +74,19 @@ void RenderSystem::draw(sf::RenderWindow& window) const
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 {
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
+    auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
     const auto bounds = renderComponent.sprite.getGlobalBounds();
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
-    const auto center = GameType::MyVec2{
-        transformComponent.position.x + bounds.width / 2 - renderComponent.sprite.getLocalBounds().width - 7,
-        transformComponent.position.y + bounds.height / 2 - renderComponent.sprite.getLocalBounds().height + 4};
+
+    Collision cc =
+        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
+
+    float xPosCenter = transformComponent.position.x;
+    float yPosCenter = transformComponent.position.y;
+
+    const auto center = GameType::MyVec2{xPosCenter, yPosCenter};
+
     sf::CircleShape centerPoint(5);
     centerPoint.setFillColor(sf::Color::Red);
     centerPoint.setPosition(center.x, center.y);
@@ -86,19 +106,35 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     circle.m_radius = newRadius;
     circle.m_p = newCenter;
 
-    sf::CircleShape collision(convertMetersToPixel(newRadius));
-    collision.setOrigin(convertMetersToPixel(newRadius), convertMetersToPixel(newRadius));
-    collision.setPosition({convertMetersToPixel(newCenter.x), convertMetersToPixel(newCenter.y)});
-    window.draw(collision);
+    ////    sf::CircleShape collision(convertMetersToPixel(newRadius));
+    //    collision.setOrigin(convertMetersToPixel(newRadius), convertMetersToPixel(newRadius));
+    //    collision.setPosition({convertMetersToPixel(newCenter.x), convertMetersToPixel(newCenter.y)});
+    //    window.draw(collision);
 
-    for (b2Body* body = Physics::getWorld()->GetBodyList(); body; body = body->GetNext())
+    for (const auto& entity : gCoordinator.getRegisterSystem<CollisionSystem>()->m_entities)
     {
-        for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext())
+        if (!gCoordinator.hasComponent<ColliderComponent>(entity) ||
+            !gCoordinator.hasComponent<TransformComponent>(entity) ||
+            !gCoordinator.hasComponent<RenderComponent>(entity))
+        {
+            continue;
+        };
+
+        const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+
+        if (colliderComponent.body == nullptr)
+        {
+            continue;
+        }
+
+        for (b2Fixture* fixture = colliderComponent.body->GetFixtureList(); fixture; fixture = fixture->GetNext())
         {
             b2Shape* shape = fixture->GetShape();
             if (shape->GetType() == b2Shape::e_polygon)
             {
-                const auto polygonShape = reinterpret_cast<b2PolygonShape*>(shape);
+                auto* const polygonShape = dynamic_cast<b2PolygonShape*>(shape);
                 const int32 count = polygonShape->m_count;
                 sf::ConvexShape convex;
                 convex.setPointCount(count);
@@ -111,11 +147,10 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
                 convex.setFillColor(sf::Color::Transparent);
                 convex.setOutlineThickness(1.f);
                 convex.setOutlineColor(sf::Color::Green);
-                convex.setPosition(body->GetPosition().x * config::meterToPixelRatio -
-                                       renderComponent.sprite.getLocalBounds().height + 7,
-                                   body->GetPosition().y * config::meterToPixelRatio -
-                                       renderComponent.sprite.getLocalBounds().width - 10);
-                convex.setRotation(body->GetAngle() * 180 / b2_pi);
+                convex.setPosition(colliderComponent.body->GetPosition().x * config::meterToPixelRatio,
+                                   colliderComponent.body->GetPosition().y * config::meterToPixelRatio);
+
+                convex.setRotation(colliderComponent.body->GetAngle() * 180 / b2_pi);
                 window.draw(convex);
             }
         }

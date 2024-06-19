@@ -64,7 +64,7 @@ int main()
 
         game.update();
         game.draw();
-        Game::handleCollision();
+        game.handleCollision();
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
 
         ImGui::SFML::Update(window, deltaClock.restart());

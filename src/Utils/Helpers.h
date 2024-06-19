@@ -206,5 +206,5 @@ template <typename T>
 inline static T convertPixelsToMeters(const T pixelValue)
 {
     T result = pixelValue * config::pixelToMeterRatio;
-    return roundTo(result, 5);
+    return roundTo(result, 10);
 }

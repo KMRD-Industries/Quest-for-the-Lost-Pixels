@@ -48,6 +48,8 @@ void PlayerMovementSystem::handleMovement()
         const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
         const auto playerSpeed = glm::vec2{normalizedDir.x * config::playerAcc, normalizedDir.y * config::playerAcc};
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+        transformComponent.scale = {(flip) ? -1.f : 1.f, transformComponent.scale.y};
         transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
     }
 }

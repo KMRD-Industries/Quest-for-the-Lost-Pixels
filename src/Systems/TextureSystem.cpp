@@ -122,25 +122,19 @@ sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
 
 Collision TextureSystem::getCollision(const std::string& tileset_name, const long id)
 {
-    try
-    {
-        if (!texture_indexes.contains(tileset_name))
-        {
-            return Collision{};
-        }
-
-        long ad = id + texture_indexes.at(tileset_name);
-
-        if (map_collisions.contains(ad))
-        {
-            return map_collisions.at(ad);
-        }
-        return Collision{};
-    }
-    catch (...)
+    if (texture_indexes.find(tileset_name) == texture_indexes.end())
     {
         return Collision{};
     }
+
+    long ad = id + texture_indexes.at(tileset_name);
+
+    if (map_collisions.find(ad) != map_collisions.end())
+    {
+        return map_collisions.at(ad);
+    }
+
+    return Collision{};
 }
 
 std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileset_name, long id)
@@ -187,7 +181,12 @@ void TextureSystem::loadTextures()
         if (map_animations.contains(adjusted_id))
         {
             animation_component.frames = getAnimations(tile_component.tileset, tile_component.id);
-            animation_component.it = animation_component.frames.begin();
+            animation_component.it = animation_component.frames.begin() + 1;
+        }
+
+        if (map_collisions.contains(adjusted_id))
+        {
+            //            collider_component.
         }
 
         // Load texture of tile with that id to render component

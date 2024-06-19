@@ -1,6 +1,5 @@
 #include "AnimationSystem.h"
 #include "Config.h"
-#include "RenderComponent.h"
 #include "TileComponent.h"
 
 void AnimationSystem::updateFrames()
@@ -46,7 +45,7 @@ void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& ani
 {
     auto& tile = gCoordinator.getComponent<TileComponent>(entity);
 
-    if (++animation.it == animation.frames.end())
+    if (++animation.it >= animation.frames.end())
     {
         animation.it = animation.frames.begin();
     }

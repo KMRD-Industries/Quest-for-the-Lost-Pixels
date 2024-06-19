@@ -269,7 +269,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -409,6 +408,70 @@
                  "tileid":42
                 }],
          "id":36
+        }, 
+        {
+         "id":37,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":11.75,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"37"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":14.625,
+                     "x":8.875,
+                     "y":10
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "id":38,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":24,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"38"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":22,
+                     "x":5,
+                     "y":4.5
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
         }, 
         {
          "animation":[

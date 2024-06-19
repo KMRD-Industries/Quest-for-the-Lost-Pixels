@@ -22,7 +22,6 @@
 
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
-#include "Paths.h"
 #include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
 
@@ -38,12 +37,12 @@ void Dungeon::init()
     const std::string PathToAssets{ASSET_PATH};
     texture->loadFromFile(PathToAssets + "/knight/knight.png");
 
-    constexpr int playerAnimationTile = 243;
+    constexpr int playerAnimationTile = 185;
 
     gCoordinator.addComponent(m_entities[0], TileComponent{playerAnimationTile, "Characters", 4});
     gCoordinator.addComponent(m_entities[0], RenderComponent{});
     gCoordinator.addComponent(m_entities[0],
-                              TransformComponent(sf::Vector2f(100.f, 100.f), 0.f, sf::Vector2f(1.f, 1.f)));
+                              TransformComponent(sf::Vector2f(100.f, 100.f), 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
     gCoordinator.addComponent(m_entities[0], AnimationComponent{});
     gCoordinator.addComponent(m_entities[0], PlayerComponent{});
     gCoordinator.addComponent(m_entities[0], ColliderComponent{});
@@ -52,8 +51,11 @@ void Dungeon::init()
                                   moveInDungeon(dir);
                               }});
 
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", playerAnimationTile);
+    gCoordinator.getComponent<ColliderComponent>(m_entities[0]).collision = cc;
+
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        m_entities[0], "FirstPlayer", {16., 16.},
+        m_entities[0], "FirstPlayer", {cc.width, cc.height},
         [&](const GameType::CollisionData& entityT)
         {
             if (entityT.tag == "Door")
@@ -77,11 +79,10 @@ void Dungeon::init()
                 --travellingDungeonComponent.doorsPassed;
             }
         },
-        false, false);
+        false, false, {cc.x, cc.y});
 
     gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
-    gCoordinator.addComponent(m_entities[1],
-                              TransformComponent(sf::Vector2f(250.f, 250.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(250.f, 250.f), 0.f, {1.f, 1.f}));
     gCoordinator.addComponent(m_entities[1], AnimationComponent{});
     gCoordinator.addComponent(m_entities[1], ColliderComponent{});
     gCoordinator.addComponent(m_entities[1], CharacterComponent{.hp = 10.f});

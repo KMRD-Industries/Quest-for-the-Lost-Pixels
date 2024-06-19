@@ -7,8 +7,8 @@ namespace config
 {
     static constexpr bool debugMode{true};
     static constexpr float gameScale{3.f};
-    static constexpr double meterToPixelRatio{25.};
-    static constexpr double pixelToMeterRatio{0.04};
+    static constexpr double meterToPixelRatio{30.f};
+    static constexpr double pixelToMeterRatio{1 / 30.f};
     static constexpr float tileHeight{16.f};
     static constexpr float oneFrameTime{16.67};
     static constexpr int frameCycle{60};

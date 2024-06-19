@@ -52,25 +52,25 @@ void SpawnerSystem::spawnEnemy(const Entity entity)
 
     auto& enemyTileComponent = gCoordinator.getComponent<TileComponent>(new_monster);
     auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(new_monster);
-    auto& enemyAnimationComponent = gCoordinator.getComponent<AnimationComponent>(new_monster);
-    auto& enemyCollisionComponent = gCoordinator.getComponent<ColliderComponent>(new_monster);
     auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(new_monster);
+    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(new_monster);
 
+    enemyTransformComponent = TransformComponent(spawnerTransform.position, 0., sf::Vector2f(1., 1.), {0.f, 0.f});
     characterComponent.hp = 10.f;
     enemyTileComponent = {19, "AnimSlimes", 4};
+    colliderComponent.collision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
+        enemyTileComponent.tileset, enemyTileComponent.id);
 
-    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(enemyTileComponent.tileset,
-                                                                                 enemyTileComponent.id);
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        new_monster, "SecondPlayer", {cc.width, cc.height}, [&](const GameType::CollisionData& entityT) {},
-        [&](const GameType::CollisionData& entityT) {}, false, false, {cc.x, cc.y});
-
-    enemyTransformComponent = TransformComponent(spawnerTransform.position, 0., sf::Vector2f(1., 1.));
+        new_monster, "SecondPlayer", {colliderComponent.collision.width, colliderComponent.collision.height},
+        [&](const GameType::CollisionData& entityT) {}, [&](const GameType::CollisionData& entityT) {}, false, false,
+        {colliderComponent.collision.x, colliderComponent.collision.y});
 }
 
 void SpawnerSystem::clearSpawners() const
 {
     std::deque<Entity> entityToRemove;
+
     for (const auto& entity : m_entities)
     {
         entityToRemove.push_back(entity);
