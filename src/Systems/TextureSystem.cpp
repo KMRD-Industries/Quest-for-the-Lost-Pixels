@@ -96,26 +96,6 @@ int TextureSystem::loadFromFile(const std::string& path)
     }
 }
 
-template <typename T>
-T TextureSystem::getLoadedValue(const std::unordered_map<long, T>& myMap, const long tileID, const std::string& tileset)
-{
-    if (texture_indexes.find(tileset) == texture_indexes.end())
-    {
-        return T{};
-    }
-
-    long adjustedID = tileID + texture_indexes.at(tileset);
-
-    auto mapIterator = myMap.find(adjustedID);
-
-    if (mapIterator != myMap.end())
-    {
-        return mapIterator->second;
-    }
-
-    return T{};
-}
-
 void TextureSystem::loadTexturesFromFiles()
 {
     const auto prefix = std::string(ASSET_PATH) + "/tileSets/";
@@ -126,26 +106,49 @@ void TextureSystem::loadTexturesFromFiles()
     }
 }
 
-sf::Sprite TextureSystem::getTile(const std::string& tileset_name, const long& tile_id)
+sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
 {
-    if (textures.find(tileset_name) == textures.end())
+    try
     {
-        return sf::Sprite{};
+        sf::Sprite s(textures.at(tileset_name), texture_map.at(id + texture_indexes.at(tileset_name)));
+        return s;
+    }
+    catch (...)
+    {
+        std::cout << "Texture ID out of range";
+        return {};
+    }
+}
+
+Collision TextureSystem::getCollision(const std::string& tileset_name, const long id)
+{
+    if (texture_indexes.find(tileset_name) == texture_indexes.end())
+    {
+        return Collision{};
     }
 
-    return sf::Sprite{textures.at(tileset_name), getLoadedValue(this->texture_map, tile_id, tileset_name)};
+    long ad = id + texture_indexes.at(tileset_name);
+
+    if (map_collisions.find(ad) != map_collisions.end())
+    {
+        return map_collisions.at(ad);
+    }
+
+    return Collision{};
 }
 
-Collision TextureSystem::getCollision(const std::string& tileset_name, const long& tile_id)
+std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileset_name, long id)
 {
-    return getLoadedValue(this->map_collisions, tile_id, tileset_name);
+    try
+    {
+        return map_animations.at(id + texture_indexes.at(tileset_name));
+    }
+    catch (...)
+    {
+        std::cout << "Texture ID out of range";
+        return {};
+    }
 }
-
-std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileset_name, const long& tile_id)
-{
-    return getLoadedValue(this->map_animations, tile_id, tileset_name);
-}
-
 /**
  * Load textures into tiles.
  */

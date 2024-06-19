@@ -28,10 +28,7 @@ public:
     void loadTexturesFromFiles();
     void loadTextures();
 
-    sf::Sprite getTile(const std::string&, const long&);
-    std::vector<AnimationFrame> getAnimations(const std::string&, const long&);
-    Collision getCollision(const std::string&, const long&);
-
-    template <typename T>
-    T getLoadedValue(const std::unordered_map<long, T>&, const long, const std::string&);
+    sf::Sprite getTile(const std::string&, const long);
+    std::vector<AnimationFrame> getAnimations(const std::string&, const long);
+    Collision getCollision(const std::string& tileset_name, long id);
 };
