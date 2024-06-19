@@ -83,6 +83,7 @@
          "objectgroup":
             {
              "draworder":"index",
+             "id":2,
              "name":"",
              "objects":[
                     {
@@ -99,8 +100,8 @@
                      "type":"",
                      "visible":true,
                      "width":12.5,
-                     "x":3.5,
-                     "y":16
+                     "x":2.59090909090909,
+                     "y":16.7272727272727
                     }],
              "opacity":1,
              "type":"objectgroup",

@@ -65,11 +65,13 @@ void PlayerMovementSystem::handleAttack()
         const auto bounds = renderComponent.sprite.getGlobalBounds();
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto center = glm::vec2{transformComponent.position.x + bounds.width / 2,
-                                      transformComponent.position.y + bounds.height / 2};
+
+        const auto center = glm::vec2{transformComponent.position.x, transformComponent.position.y};
+
         const auto range = glm::vec2{center.x * config::playerAttackRange * transformComponent.scale.x, center.y};
 
         const auto targetInBox = Physics::rayCast(center, range, entity);
+
         if (targetInBox.tag == "SecondPlayer")
             gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID).hp -= config::playerAttackDamage;
     }
