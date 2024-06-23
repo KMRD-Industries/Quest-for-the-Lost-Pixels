@@ -3,11 +3,14 @@
 #include <SFML/Window/Event.hpp>
 #include <imgui-SFML.h>
 
+#include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
+#include "MultiplayerSystem.h"
 #include "Paths.h"
 #include "RenderSystem.h"
+#include "SpawnerSystem.h"
 
 Coordinator gCoordinator;
 
@@ -72,7 +75,7 @@ int main()
     game.init();
 
     sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
-    
+
     while (window.isOpen())
     {
         // Clear the window before drawing
@@ -90,4 +93,8 @@ int main()
         window.display();
         handleInput(window);
     }
+
+    gCoordinator.getRegisterSystem<MultiplayerSystem>()->disconnect();
+    ImGui::SFML::Shutdown();
+    return 0;
 }

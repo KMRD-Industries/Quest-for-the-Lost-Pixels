@@ -39,7 +39,7 @@ struct Map
     std::string renderorder;
     std::string tiledversion;
     int tileheight;
-    std::unordered_map<std::string, std::int64_t> tilesets;
+    std::unordered_map<std::string, long> tilesets;
     int tilewidth;
     std::string type;
     std::string version;

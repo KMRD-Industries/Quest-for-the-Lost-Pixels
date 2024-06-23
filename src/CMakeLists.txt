@@ -1,6 +1,6 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 set(SOURCES
         main.cpp
@@ -62,6 +62,8 @@ set(SYSTEMS
         Systems/CharacterSystem.h
         Systems/PlayerMovementSystem.cpp
         Systems/PlayerMovementSystem.h
+        Systems/MultiplayerSystem.cpp
+        Systems/MultiplayerSystem.h
         Systems/CollisionSystem.cpp
         Systems/CollisionSystem.h
         Systems/MapSystem.cpp
@@ -103,15 +105,36 @@ add_definitions(-D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(sf ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
-target_link_libraries(sf PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d)
-target_compile_features(sf PRIVATE cxx_std_23)
+add_executable(qlp ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
+target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
+target_compile_features(qlp PRIVATE cxx_std_23)
 
 if (WIN32)
+    set(BOX2D_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/box2d-build/bin/${CMAKE_BUILD_TYPE}")
+	set(ADDITIONAL_DLL_DIR "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
     add_custom_command(
-            TARGET sf
-            COMMENT "Copy OpenAL DLL"
-            PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:sf>
+            TARGET qlp
+            COMMENT "Copy OpenAL and Box2D DLLs"
+            PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:qlp>
+            COMMAND ${CMAKE_COMMAND} -E copy ${BOX2D_SOURCE_DIR}/box2d.dll $<TARGET_FILE_DIR:qlp>
+            COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/abseil_dll.dll $<TARGET_FILE_DIR:qlp>
             VERBATIM
     )
+    # Dodanie komendy do kopiowania libprotobufd.dll, jeśli istnieje
+    if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobufd.dll)
+        add_custom_command(
+			TARGET qlp
+			PRE_BUILD 
+			COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobufd.dll $<TARGET_FILE_DIR:qlp>
+			VERBATIM
+        )
+    endif ()
+	if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobuf.dll)
+        add_custom_command(
+			TARGET qlp
+			PRE_BUILD 
+			COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobuf.dll $<TARGET_FILE_DIR:qlp>
+			VERBATIM
+        )
+    endif ()
 endif ()
