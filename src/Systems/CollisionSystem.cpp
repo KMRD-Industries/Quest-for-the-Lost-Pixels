@@ -218,6 +218,7 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
     fixtureDef.friction = defaultFriction;
     fixtureDef.filter.categoryBits = 0x0002;
     fixtureDef.filter.maskBits = 0x0002;
+    fixtureDef.restitution = {0.05f};
 
     body->CreateFixture(&fixtureDef);
     body->SetFixedRotation(true);
