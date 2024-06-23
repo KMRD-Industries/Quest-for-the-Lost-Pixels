@@ -53,23 +53,11 @@ void Dungeon::init()
     constexpr int playerAnimationTile = 185;
 
     m_entities[m_id] = player;
-    constexpr int playerAnimationTile = 243;
 
-    gCoordinator.addComponent(m_entities[0], TileComponent{playerAnimationTile, "Characters", 4});
-    gCoordinator.addComponent(m_entities[0], RenderComponent{});
-    gCoordinator.addComponent(m_entities[0],
-                              TransformComponent(sf::Vector2f(100.f, 100.f), 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
-    gCoordinator.addComponent(m_entities[0], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[0], PlayerComponent{});
-    gCoordinator.addComponent(m_entities[0], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[0], CharacterComponent{.hp = 100.f});
-    gCoordinator.addComponent(m_entities[0], TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) {
-                                  moveInDungeon(dir);
-                              }});
     gCoordinator.addComponent(m_entities[m_id], TileComponent{playerAnimationTile, "Characters", 4});
     gCoordinator.addComponent(m_entities[m_id], RenderComponent{});
     gCoordinator.addComponent(m_entities[m_id],
-                              TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+                              TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
     gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
     gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = 100.f});
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
@@ -82,8 +70,7 @@ void Dungeon::init()
     gCoordinator.getComponent<ColliderComponent>(m_entities[0]).collision = cc;
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        m_entities[0], "FirstPlayer", {cc.width, cc.height},
-        m_entities[m_id], "Player 1", {16., 16.},
+        m_entities[m_id], "Player 1", {cc.width, cc.height},
         [&](const GameType::CollisionData& entityT)
         {
             if (entityT.tag == "Door")
@@ -110,14 +97,6 @@ void Dungeon::init()
             }
         },
         false, false, {cc.x, cc.y});
-
-    gCoordinator.addComponent(m_entities[1], RenderComponent{.sprite = std::move(sf::Sprite(*texture)), .layer = 4});
-    gCoordinator.addComponent(m_entities[1], TransformComponent(sf::Vector2f(250.f, 250.f), 0.f, {1.f, 1.f}));
-    gCoordinator.addComponent(m_entities[1], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[1], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[1], CharacterComponent{.hp = 10.f});
-    gCoordinator.addComponent(m_entities[1], TileComponent{});
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[1], "SecondPlayer");
 
     makeSimpleFloor();
 
@@ -338,8 +317,6 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
         const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
         const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
-        gCoordinator.getComponent<TransformComponent>(m_entities[0]).position = newPosition;
-        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[0]);
 
         gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
         auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
