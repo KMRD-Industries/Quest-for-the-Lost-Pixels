@@ -40,17 +40,19 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port) no
 bool MultiplayerSystem::isConnected() const noexcept { return m_connected; }
 std::uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
 
-std::uint32_t MultiplayerSystem::registerPlayer(const Entity player)
+comm::GameState MultiplayerSystem::registerPlayer(const Entity player)
 {
     std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
 
-    m_state.ParseFromArray(&m_buf, received);
-    std::uint32_t id = m_state.id();
+    comm::GameState gameState;
+    gameState.ParseFromArray(&m_buf, received);
+
+    std::uint32_t id = gameState.player_id();
     m_entity_map[id] = player;
     m_player_entity = player;
     m_player_id = id;
 
-    return id;
+    return gameState;
 }
 
 comm::StateUpdate MultiplayerSystem::pollStateUpdates()

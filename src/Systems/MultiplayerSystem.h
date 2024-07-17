@@ -33,7 +33,7 @@ public:
     void update();
     void disconnect();
 
-    std::uint32_t registerPlayer(const Entity player);
+    comm::GameState registerPlayer(const Entity player);
     std::uint32_t playerID() const noexcept;
     comm::StateUpdate pollStateUpdates();
     bool isConnected() const noexcept;

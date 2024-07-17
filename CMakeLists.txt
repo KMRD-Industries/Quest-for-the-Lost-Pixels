@@ -60,7 +60,7 @@ FetchContent_MakeAvailable(Boost)
 
 FetchContent_Declare(qlp-proto
     GIT_REPOSITORY https://github.com/kmrd-industries/qlp-proto-bindings
-    GIT_TAG f5a5ac1)
+    GIT_TAG room-support)
 FetchContent_MakeAvailable(qlp-proto)
 
 add_subdirectory(src)
