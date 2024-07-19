@@ -79,7 +79,7 @@ void from_json(const json& json, Tileset& tileset)
         json.at("tiles").get_to(tileset.tiles);
     }
 
-    auto image = json.at("image");
+    const auto& image = json.at("image");
     tileset.image = extractFileName(image.get<std::string>(), "/", ".");
 }
 
@@ -91,11 +91,12 @@ Tileset parseTileset(const std::string& path)
         json j;
         file >> j;
 
-        Tileset tileset = j.get<Tileset>();
+        const Tileset& tileset = j.get<Tileset>();
         return tileset;
     }
     catch (...)
     {
         std::cerr << "Caught an unknown exception" << std::endl;
+        return {};
     }
 }

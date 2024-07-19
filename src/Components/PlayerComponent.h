@@ -3,4 +3,5 @@
 struct PlayerComponent
 {
     int collidedDoors;
+    Entity weaponEntity;
 };

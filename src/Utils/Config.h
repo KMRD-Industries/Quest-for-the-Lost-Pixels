@@ -7,25 +7,27 @@ namespace config
 {
     static constexpr bool debugMode{true};
     static constexpr float gameScale{3.f};
-    static constexpr double meterToPixelRatio{30.f};
-    static constexpr double pixelToMeterRatio{1 / 30.f};
+
+    static constexpr double meterToPixelRatio{100.f};
+    static constexpr double pixelToMeterRatio{0.01f};
     static constexpr float tileHeight{16.f};
+
     static constexpr float oneFrameTime{16.67};
     static constexpr int frameCycle{60};
-    static constexpr int maximumNumberOfLayers{5};
+
+    static constexpr int maximumNumberOfLayers{10};
+
     static constexpr float playerAttackRange{100.f};
     static constexpr float playerAttackDamage{100.f};
     static constexpr float playerAttackAngle{0.785f};
 
-    static constexpr int mapFirstEntity{1000};
-    static constexpr int numberOfMapEntities{500};
-    static constexpr int enemyFirstEntity{2000};
-    static constexpr int numberOfEnemyEntities{100};
-    static constexpr int playerEntity{numberOfEnemyEntities + numberOfMapEntities};
+    static constexpr int playerEntity{0};
+    static constexpr int playerAnimation{184};
 
-    static constexpr int playerAcc = 300;
-    static constexpr int enemyAcc = 25;
+    static constexpr int playerAcc{300};
+    static constexpr int enemyAcc{25};
 
-    static constexpr std::string backgroundColor{"#17205C"};
+    static constexpr int startingRoomId{0};
 
 } // namespace config
+

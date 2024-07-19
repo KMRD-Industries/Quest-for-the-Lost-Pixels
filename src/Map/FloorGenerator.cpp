@@ -7,6 +7,7 @@
 
 #include "Utils/Helpers.h"
 #include "Utils/Paths.h"
+#include "Utils/GameUtility.h"
 
 void FloorGenerator::generateFloor(const int h, const int w) { m_generator = DungeonGenerator(h, w); }
 
@@ -73,7 +74,7 @@ std::vector<GameType::MapInfo> FloorGenerator::getMapInfo()
     namespace fs = std::filesystem;
     using json = nlohmann::json;
 
-    const std::string path = std::string(ASSET_PATH) + "/maps/";
+    const std::string path = std::string(ASSET_PATH) + "/maps/floor_0" + std::to_string(floorId) + "/";
 
     std::vector<GameType::MapInfo> mapInfo{};
 
@@ -123,7 +124,7 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     const size_t dotPos = filename.find_last_of('.');
     const std::string numberStr = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
     const int mapID = std::stoi(numberStr);
-    //    const int mapID = 110;
+    // const int mapID = 110;
 
     if (!std::regex_match(filename, pattern)) return;
 

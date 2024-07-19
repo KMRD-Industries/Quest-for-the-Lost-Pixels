@@ -3,6 +3,7 @@
 #include "Coordinator.h"
 #include "InputHandler.h"
 #include "Physics.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "glm/vec2.hpp"
@@ -66,10 +67,10 @@ void PlayerMovementSystem::handleAttack()
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
+        if(transformComponent.position.x == 0 && transformComponent.position.y ==0) continue;
+
         const auto center = glm::vec2{transformComponent.position.x, transformComponent.position.y};
-
         const auto range = glm::vec2{center.x * config::playerAttackRange * transformComponent.scale.x, center.y};
-
         const auto targetInBox = Physics::rayCast(center, range, entity);
 
         if (targetInBox.tag == "SecondPlayer")

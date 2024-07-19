@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
+#include "GameUtility.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
 #include "Paths.h"
@@ -47,15 +48,15 @@ void handleInput(sf::RenderWindow& window)
 
 sf::Color hexStringToSfmlColor(const std::string& hexColor)
 {
-    std::string hex = (hexColor[0] == '#') ? hexColor.substr(1) : hexColor;
+    const std::string& hex = (hexColor[0] == '#') ? hexColor.substr(1) : hexColor;
 
     std::istringstream iss(hex);
     int rgbValue = 0;
     iss >> std::hex >> rgbValue;
 
-    int red = (rgbValue >> 16) & 0xFF;
-    int green = (rgbValue >> 8) & 0xFF;
-    int blue = rgbValue & 0xFF;
+    const int red = (rgbValue >> 16) & 0xFF;
+    const int green = (rgbValue >> 8) & 0xFF;
+    const int blue = rgbValue & 0xFF;
 
     return sf::Color(red, green, blue);
 }
@@ -74,23 +75,29 @@ int main()
     Game game;
     game.init();
 
-    sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
 
-    while (window.isOpen())
-    {
-        // Clear the window before drawing
-        window.clear(customColor);
-
+    while (window.isOpen()) {
+        // Update game logic
         game.update();
-        game.draw();
         game.handleCollision();
+
+        // Clear the window
+        window.clear(hexStringToSfmlColor(colorToString()));
+
+        // Draw game elements
+        game.draw();
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
 
-
+        // Update ImGui
         ImGui::SFML::Update(window, deltaClock.restart());
 
+        // Draw ImGui elements
         ImGui::SFML::Render(window);
+
+        // Display the window contents
         window.display();
+
+        // Handle additional input processing if needed
         handleInput(window);
     }
 

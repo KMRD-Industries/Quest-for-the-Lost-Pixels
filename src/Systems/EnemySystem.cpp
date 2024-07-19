@@ -1,11 +1,15 @@
 #include "EnemySystem.h"
 #include <random>
+
+#include "ColliderComponent.h"
 #include "Config.h"
+#include "EnemyComponent.h"
+#include "Physics.h"
 #include "RenderComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
-void EnemySystem::update()
+void EnemySystem::update() const
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -24,34 +28,21 @@ void EnemySystem::update()
     }
 }
 
-Entity EnemySystem::getFirstUnused()
-{
-    for (const auto entity : m_entities)
-    {
-        if (gCoordinator.hasComponent<TileComponent>(entity))
-        {
-            auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-            if (tileComponent.id == 0)
-            {
-                return entity;
-            }
-        }
-    }
-    return {}; // Return a null entity if none found
-}
-void EnemySystem::deleteEnemies()
-{
-    for (const auto entity : m_entities)
-    {
-        if (gCoordinator.hasComponent<TileComponent>(entity))
-        {
-            auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-            tileComponent = {};
-            transformComponent = {};
-            renderComponent = {};
-        }
+void EnemySystem::deleteEnemies() const
+{
+    std::deque<Entity> entityToRemove;
+
+    for (const auto& entity : m_entities)
+    {
+        if (gCoordinator.hasComponent<EnemyComponent>(entity) )
+            entityToRemove.push_back(entity);
+    }
+
+    while (!entityToRemove.empty())
+    {
+        Physics::getWorld()->DestroyBody(gCoordinator.getComponent<ColliderComponent>(entityToRemove.front()).body);
+        gCoordinator.destroyEntity(entityToRemove.front());
+        entityToRemove.pop_front();
     }
 }

@@ -11,7 +11,7 @@ void CharacterSystem::update() const { cleanUpDeadEntities(); }
 void CharacterSystem::cleanUpDeadEntities() const
 {
     std::unordered_set<Entity> entityToKill{};
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         if (gCoordinator.getComponent<CharacterComponent>(entity).hp > 0) continue;
         if (gCoordinator.hasComponent<ColliderComponent>(entity))
@@ -19,6 +19,6 @@ void CharacterSystem::cleanUpDeadEntities() const
         else
             entityToKill.insert(entity);
     }
-    for (const auto& entity : entityToKill) gCoordinator.destroyEntity(entity);
+    for (const auto entity : entityToKill) gCoordinator.destroyEntity(entity);
     entityToKill.clear();
 }

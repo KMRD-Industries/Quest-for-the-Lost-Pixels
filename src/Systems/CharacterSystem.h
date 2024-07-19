@@ -6,8 +6,7 @@ class CharacterSystem : public System
 {
 public:
     explicit CharacterSystem()
-    {
-    }
+    = default;
 
     void update() const;
 

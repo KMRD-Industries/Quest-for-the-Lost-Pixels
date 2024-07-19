@@ -13,7 +13,9 @@ namespace SpecialBlocks
     {
         DOORSCOLLIDER = 0,
         STATICWALLCOLLIDER = 1,
-        SPAWNERBLOCK = 2
+        SPAWNERBLOCK = 2,
+        STARTINGPOINT = 3,
+        DOWNDOOR = 4
     };
 } // namespace SpecialBlocks
 
@@ -97,3 +99,5 @@ namespace std
         size_t operator()(const GameType::MapInfo& mapInfo) const { return hash<int>()(mapInfo.mapID); }
     };
 } // namespace std
+
+

@@ -14,6 +14,6 @@ public:
 
 private:
     void debugBoundingBoxes(sf::RenderWindow& window) const;
-    float mapRenderOffsetY = 0.f;
-    float mapRenderOffsetX = 0.f;
+    float m_mapRenderOffsetY = 0.f;
+    float m_mapRenderOffsetX = 0.f;
 };

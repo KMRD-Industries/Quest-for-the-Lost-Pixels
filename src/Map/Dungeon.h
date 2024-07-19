@@ -20,7 +20,9 @@ public:
 private:
     void setECS();
     void makeSimpleFloor();
+    void makeStartFloor();
     void moveInDungeon(const glm::ivec2& dir);
+    void moveDownDungeon();
 
     std::string m_asset_path{ASSET_PATH};
     FloorGenerator m_floorGenerator{};
@@ -31,4 +33,5 @@ private:
     std::deque<glm::ivec2> m_moveInDungeon{};
     float counter = 0;
     bool m_passedBy = false;
+    bool m_startingRoom = true;
 };

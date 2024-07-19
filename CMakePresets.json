@@ -33,8 +33,8 @@
             "inherits": "default",
             "generator": "Visual Studio 17 2022",
             "binaryDir": "${sourceDir}/build/debug/VS",
-			"cacheVariables": {
-				"CMAKE_CXX_FLAGS": "/MP /EHsc"
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "/MP /EHsc"
             }
         },
         {
@@ -43,8 +43,28 @@
             "binaryDir": "${sourceDir}/build/release/VS",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-				"CMAKE_CXX_FLAGS": "/MP /EHsc"
+                "CMAKE_CXX_FLAGS": "/MP /EHsc"
             }
+        },
+        {
+            "name": "gcc",
+            "displayName": "GCC 13.2.0 x86_64-linux-gnu",
+            "description": "Using compilers: C = /usr/bin/gcc, CXX = /usr/bin/g++",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++",
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "gcc",
+            "description": "",
+            "displayName": "",
+            "configurePreset": "gcc"
         }
     ]
 }

@@ -42,6 +42,7 @@ set(COMPONENTS
         Components/TravellingDungeonComponent.h
         Components/SpawnerComponent.h
         Components/EnemyComponent.h
+        Components/PassageComponent.h
 )
 
 set(MAP
@@ -77,6 +78,8 @@ set(SYSTEMS
         Systems/EnemySystem.cpp
         Systems/SpawnerSystem.cpp
         Systems/AnimationSystem.h
+        Systems/PassageSystem.cpp
+        Systems/PassageSystem.h
 )
 
 set(ATLAS_COMPONENTS
@@ -92,6 +95,8 @@ set(UTILS
         Utils/MapParser.h
         Utils/Config.h
         Utils/TextureParser.h
+        Utils/CircularIterator.h
+        Utils/GameUtility.h
 )
 
 source_group("Core" FILES ${CORE})

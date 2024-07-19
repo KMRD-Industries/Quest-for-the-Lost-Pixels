@@ -7,7 +7,7 @@
 
 struct Texture : sf::Texture
 {
-    explicit Texture(std::shared_ptr<sf::Texture> texture = nullptr, sf::IntRect rect = sf::IntRect()) :
+    explicit Texture(std::shared_ptr<sf::Texture> texture = nullptr, const sf::IntRect rect = sf::IntRect()) :
         m_texture{std::move(texture)}, m_rect{rect}
     {
     }

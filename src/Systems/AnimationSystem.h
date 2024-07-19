@@ -7,12 +7,11 @@ class AnimationSystem : public System
 {
 public:
     void updateFrames();
-    void updateFrameTime();
-    void updateEntityAnimation(const Entity) const;
-    static int calculateFrameDuration(const AnimationComponent&);
-    bool isTimeForNextFrame(const int frameDuration) const;
-    static void loadNextFrame(const Entity, AnimationComponent&);
+    void updateEntityAnimation(Entity) const;
+    static int calculateFrameDuration(AnimationComponent&);
+    inline bool isTimeForNextFrame(int frameDuration) const;
+    static void loadNextFrame(Entity, AnimationComponent&);
 
 private:
-    long frame_time{};
+    long m_frameTime{};
 };
