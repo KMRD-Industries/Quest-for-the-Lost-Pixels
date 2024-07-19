@@ -49,7 +49,7 @@ void MyContactListener::EndContact(b2Contact* contact)
 
 void CollisionSystem::createMapCollision() const
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TileComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity) &&
             !gCoordinator.hasComponent<DoorComponent>(entity))

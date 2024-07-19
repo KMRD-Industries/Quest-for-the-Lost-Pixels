@@ -3,6 +3,7 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
+#include "FloorComponent.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
 #include "TransformComponent.h"
@@ -55,3 +56,8 @@ void Game::handleCollision()
     constexpr auto timeStep = 1.f / 60.f;
     collisionSystem->updateSimulation(timeStep, 8, 3);
 };
+
+std::string Game::getBackground() const
+{
+    return config::colorToString(gCoordinator.getComponent<FloorComponent>(config::playerEntity).currentPlayerFloor);
+}

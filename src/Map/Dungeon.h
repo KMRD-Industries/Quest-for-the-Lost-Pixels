@@ -34,4 +34,5 @@ private:
     float counter = 0;
     bool m_passedBy = false;
     bool m_startingRoom = true;
+    std::uint32_t floor_id{};
 };

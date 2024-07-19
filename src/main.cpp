@@ -82,7 +82,7 @@ int main()
         game.handleCollision();
 
         // Clear the window
-        window.clear(hexStringToSfmlColor(colorToString()));
+        window.clear(hexStringToSfmlColor(game.getBackground()));
 
         // Draw game elements
         game.draw();

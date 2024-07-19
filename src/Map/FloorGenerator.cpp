@@ -5,9 +5,11 @@
 #include <iostream>
 #include <regex>
 
+#include "AnimationSystem.h"
+#include "FloorComponent.h"
+#include "Utils/GameUtility.h"
 #include "Utils/Helpers.h"
 #include "Utils/Paths.h"
-#include "Utils/GameUtility.h"
 
 void FloorGenerator::generateFloor(const int h, const int w) { m_generator = DungeonGenerator(h, w); }
 
@@ -64,6 +66,7 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
         auto selectedMap = mapToChoose.front();
         choosesMap[selectedMap]++;
         m_floorMap[nodePosition] = Room(selectedMap.mapID);
+        m_floorMap[nodePosition].setFloorID(m_floorID);
     }
 
     return m_floorMap;
@@ -74,7 +77,7 @@ std::vector<GameType::MapInfo> FloorGenerator::getMapInfo()
     namespace fs = std::filesystem;
     using json = nlohmann::json;
 
-    const std::string path = std::string(ASSET_PATH) + "/maps/floor_0" + std::to_string(floorId) + "/";
+    const std::string path = std::string(ASSET_PATH) + "/maps/floor_0" + std::to_string(m_floorID) + "/";
 
     std::vector<GameType::MapInfo> mapInfo{};
 

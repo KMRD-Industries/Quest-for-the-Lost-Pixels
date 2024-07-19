@@ -23,6 +23,7 @@
 
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
+#include "FloorComponent.h"
 #include "GameUtility.h"
 #include "PassageComponent.h"
 #include "PassageSystem.h"
@@ -67,6 +68,7 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = 100.f});
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
+    gCoordinator.addComponent(m_entities[m_id], FloorComponent{});
     gCoordinator.addComponent(
         m_entities[m_id],
         TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
@@ -96,9 +98,9 @@ void Dungeon::init()
 
             if(entityT.tag == "Passage")
             {
-                floorId++;
+                gCoordinator.getComponent<FloorComponent>(config::playerEntity).currentPlayerFloor += 1;
                 auto& [moveInDungeon, moveCallback] = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
-                moveInDungeon.emplace_back(floorId + 1);
+                moveInDungeon.emplace_back(true);
             }
         },
         [&](const GameType::CollisionData& entityT)
@@ -183,6 +185,7 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<EnemyComponent>();
     gCoordinator.registerComponent<CharacterComponent>();
     gCoordinator.registerComponent<PassageComponent>();
+    gCoordinator.registerComponent<FloorComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -283,6 +286,8 @@ void Dungeon::makeStartFloor()
 
 void Dungeon::makeSimpleFloor()
 {
+    m_floorGenerator.setFloorID(gCoordinator.getComponent<FloorComponent>(config::playerEntity).currentPlayerFloor);
+
     m_floorGenerator.generateFloor(5, 6);
     m_floorGenerator.generateMainPath(11);
     m_floorGenerator.generateSidePath(

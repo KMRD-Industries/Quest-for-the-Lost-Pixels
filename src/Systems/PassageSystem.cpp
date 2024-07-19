@@ -6,17 +6,15 @@
 
 extern Coordinator gCoordinator;
 
-void PassageSystem::update()
+void PassageSystem::update() const
 {
     for (const auto entity : m_entities)
     {
-         auto& passageComponent = gCoordinator.getComponent<PassageComponent>(entity);
-         auto& movesInDungeon = passageComponent.moveInDungeon;
-
-        if (!movesInDungeon.empty())
+        if (auto& [moveInDungeon, moveCallback] = gCoordinator.getComponent<PassageComponent>(entity);
+            !moveInDungeon.empty())
         {
-            movesInDungeon.clear();
-            passageComponent.moveCallback();
+            moveInDungeon.clear();
+            moveCallback();
         }
     }
 }

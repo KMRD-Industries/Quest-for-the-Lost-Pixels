@@ -43,6 +43,7 @@ set(COMPONENTS
         Components/SpawnerComponent.h
         Components/EnemyComponent.h
         Components/PassageComponent.h
+        Components/FloorComponent.h
 )
 
 set(MAP

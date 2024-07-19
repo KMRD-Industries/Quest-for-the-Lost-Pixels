@@ -9,7 +9,7 @@
 
 struct AnimationComponent
 {
-    std::vector<AnimationFrame> frames;
+    std::vector<AnimationFrame> frames {};
     CircularIterator<std::vector<AnimationFrame>::iterator> it;
     [[maybe_unused]] bool loop_animation = true;
 

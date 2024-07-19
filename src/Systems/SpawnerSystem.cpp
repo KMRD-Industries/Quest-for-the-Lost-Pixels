@@ -14,7 +14,7 @@ constexpr int SPAWN_RATE = 3600;
 
 void SpawnerSystem::update()
 {
-    incrementSpawnTimer();
+    spawnTime = (spawnTime + 1) % SPAWN_RATE;
 
     for (const auto entity : m_entities)
     {
@@ -22,14 +22,11 @@ void SpawnerSystem::update()
     }
 }
 
-void SpawnerSystem::incrementSpawnTimer() { spawnTime = (spawnTime + 1) % SPAWN_RATE; }
-
 void SpawnerSystem::processSpawner(const Entity entity) const
 {
-    auto& spawner = gCoordinator.getComponent<SpawnerComponent>(entity);
-    const auto spawnCooldown = spawner.spawnCooldown;
+    auto& [spawnCooldown, loopSpawn, noSpawns] = gCoordinator.getComponent<SpawnerComponent>(entity);
 
-    if (!spawner.loopSpawn && spawner.noSpawns >= 1)
+    if (!loopSpawn && noSpawns >= 1)
     {
         return;
     }
@@ -40,7 +37,7 @@ void SpawnerSystem::processSpawner(const Entity entity) const
     }
 
     spawnEnemy(entity);
-    spawner.noSpawns++;
+    noSpawns++;
 }
 
 bool SpawnerSystem::isReadyToSpawn(const int cooldown) const { return spawnTime % cooldown == 0; }
