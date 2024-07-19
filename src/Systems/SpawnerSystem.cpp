@@ -71,7 +71,7 @@ void SpawnerSystem::clearSpawners() const
 {
     std::deque<Entity> entityToRemove;
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         entityToRemove.push_back(entity);
     }

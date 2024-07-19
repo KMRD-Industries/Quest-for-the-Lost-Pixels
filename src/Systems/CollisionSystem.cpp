@@ -48,7 +48,7 @@ void MyContactListener::EndContact(b2Contact* contact)
 
 void CollisionSystem::createMapCollision() const
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TileComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity) &&
             !gCoordinator.hasComponent<DoorComponent>(entity))
@@ -65,7 +65,7 @@ void CollisionSystem::createMapCollision() const
             [](const GameType::CollisionData& entityT) {}, isStatic, useTexture, offset);
     };
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
@@ -97,7 +97,7 @@ void CollisionSystem::createMapCollision() const
 
 void CollisionSystem::updateCollision() const
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
@@ -117,7 +117,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 {
     Physics::getWorld()->Step(timeStep, velocityIterations, positionIterations);
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);

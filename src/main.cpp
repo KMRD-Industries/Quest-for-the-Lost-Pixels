@@ -53,9 +53,9 @@ sf::Color hexStringToSfmlColor(const std::string& hexColor)
     int rgbValue = 0;
     iss >> std::hex >> rgbValue;
 
-    int red = (rgbValue >> 16) & 0xFF;
-    int green = (rgbValue >> 8) & 0xFF;
-    int blue = rgbValue & 0xFF;
+    const int red = (rgbValue >> 16) & 0xFF;
+    const int green = (rgbValue >> 8) & 0xFF;
+    const int blue = rgbValue & 0xFF;
 
     return sf::Color(red, green, blue);
 }

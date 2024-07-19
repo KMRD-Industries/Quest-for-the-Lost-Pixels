@@ -154,7 +154,7 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
  */
 void TextureSystem::loadTextures()
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
 

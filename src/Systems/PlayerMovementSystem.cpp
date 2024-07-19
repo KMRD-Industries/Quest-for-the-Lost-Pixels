@@ -43,7 +43,7 @@ void PlayerMovementSystem::handleMovement()
         dir.x -= 1;
     }
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
         const auto playerSpeed = glm::vec2{normalizedDir.x * config::playerAcc, normalizedDir.y * config::playerAcc};

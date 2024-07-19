@@ -1,5 +1,4 @@
 #include <format>
-#include <print>
 
 #include <comm.pb.h>
 
@@ -36,18 +35,18 @@ void Dungeon::init()
     setECS();
 
     m_id = 0;
-    Entity player = gCoordinator.createEntity();
+    const Entity player = gCoordinator.createEntity();
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     multiplayerSystem->setup("127.0.0.1", "9001");
 
     if (multiplayerSystem->isConnected())
     {
         m_id = multiplayerSystem->registerPlayer(player);
-        std::println("Connected to server with id: {}", m_id);
+        std::cout << "Connected to server with id: {" <<  m_id << "}";
     }
     else
     {
-        std::println("Starting in single-player mode");
+        std::cout << "Starting in single-player mode";
     }
 
     constexpr int playerAnimationTile = 185;

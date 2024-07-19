@@ -21,7 +21,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
     mapRenderOffsetX = 0;
     mapRenderOffsetY = 0;
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
             layer > 0 && layer < config::maximumNumberOfLayers)
@@ -111,7 +111,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     //    collision.setPosition({convertMetersToPixel(newCenter.x), convertMetersToPixel(newCenter.y)});
     //    window.draw(collision);
 
-    for (const auto& entity : gCoordinator.getRegisterSystem<CollisionSystem>()->m_entities)
+    for (const auto entity : gCoordinator.getRegisterSystem<CollisionSystem>()->m_entities)
     {
         if (!gCoordinator.hasComponent<ColliderComponent>(entity) ||
             !gCoordinator.hasComponent<TransformComponent>(entity) ||
