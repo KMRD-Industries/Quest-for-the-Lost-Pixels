@@ -1,5 +1,4 @@
 #include <format>
-#include <print>
 
 #include <comm.pb.h>
 
@@ -36,28 +35,28 @@ void Dungeon::init()
     setECS();
 
     m_id = 0;
-    Entity player = gCoordinator.createEntity();
+    const Entity player = gCoordinator.createEntity();
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     multiplayerSystem->setup("127.0.0.1", "9001");
 
     if (multiplayerSystem->isConnected())
     {
         m_id = multiplayerSystem->registerPlayer(player);
-        std::println("Connected to server with id: {}", m_id);
+        std::cout << "Connected to server with id: {" <<  m_id << "}";
     }
     else
     {
-        std::println("Starting in single-player mode");
+        std::cout << "Starting in single-player mode";
     }
 
+    constexpr int playerAnimationTile = 185;
 
     m_entities[m_id] = player;
-    constexpr int playerAnimationTile = 243;
 
     gCoordinator.addComponent(m_entities[m_id], TileComponent{playerAnimationTile, "Characters", 4});
     gCoordinator.addComponent(m_entities[m_id], RenderComponent{});
     gCoordinator.addComponent(m_entities[m_id],
-                              TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+                              TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
     gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
     gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = 100.f});
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
@@ -66,8 +65,11 @@ void Dungeon::init()
         m_entities[m_id],
         TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
 
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", playerAnimationTile);
+    gCoordinator.getComponent<ColliderComponent>(m_entities[0]).collision = cc;
+
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        m_entities[m_id], "Player 1", {16., 16.},
+        m_entities[m_id], "Player 1", {cc.width, cc.height},
         [&](const GameType::CollisionData& entityT)
         {
             if (entityT.tag == "Door")
@@ -93,7 +95,7 @@ void Dungeon::init()
                 --travellingDungeonComponent.doorsPassed;
             }
         },
-        false, false);
+        false, false, {cc.x, cc.y});
 
     makeSimpleFloor();
 
@@ -156,6 +158,7 @@ void Dungeon::update()
 
         multiplayerSystem->update();
     }
+
 
     m_roomMap.at(m_currentPlayerPos).update();
 }
@@ -302,6 +305,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         std::uint32_t id = gCoordinator.getRegisterSystem<MultiplayerSystem>()->playerID();
         m_currentPlayerPos += dir;
         std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
+
         gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
         gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
@@ -312,6 +316,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
         const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
         const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
+
         gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
         auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
         colliderComponent.body->SetTransform(

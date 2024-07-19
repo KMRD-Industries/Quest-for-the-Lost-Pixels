@@ -9,6 +9,7 @@
 #include "SFML/Graphics/Image.hpp"
 #include "TextureParser.h"
 #include "TileComponent.h"
+#include "Tileset.h"
 #include "Utils/Helpers.h"
 
 extern Coordinator gCoordinator;
@@ -74,18 +75,23 @@ int TextureSystem::loadFromFile(const std::string& path)
 
                 map_animations.emplace(adjusted_id, frames);
             }
+
+            if (!tile.objects.empty())
+            {
+                map_collisions.emplace(adjusted_id, tile.objects.at(0));
+            }
         }
 
         return 1;
     }
     catch (const std::exception& e)
     {
-        std::cout << "Caught an exception: " << e.what() << std::endl;
+        std::cout << "Caught an exception: " << e.what() << '\n';
         return 0;
     }
     catch (...)
     {
-        std::cout << "Caught an unknown exception" << std::endl;
+        std::cout << "Caught an unknown exception" << '\n';
         return 1;
     }
 }
@@ -114,6 +120,23 @@ sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
     }
 }
 
+Collision TextureSystem::getCollision(const std::string& tileset_name, const long id)
+{
+    if (texture_indexes.find(tileset_name) == texture_indexes.end())
+    {
+        return Collision{};
+    }
+
+    long ad = id + texture_indexes.at(tileset_name);
+
+    if (map_collisions.find(ad) != map_collisions.end())
+    {
+        return map_collisions.at(ad);
+    }
+
+    return Collision{};
+}
+
 std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileset_name, long id)
 {
     try
@@ -126,13 +149,12 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
         return {};
     }
 }
-
 /**
  * Load textures into tiles.
  */
 void TextureSystem::loadTextures()
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
 
@@ -158,7 +180,12 @@ void TextureSystem::loadTextures()
         if (map_animations.contains(adjusted_id))
         {
             animation_component.frames = getAnimations(tile_component.tileset, tile_component.id);
-            animation_component.it = animation_component.frames.begin();
+            animation_component.it = animation_component.frames.begin() + 1;
+        }
+
+        if (map_collisions.contains(adjusted_id))
+        {
+            collider_component.collision = getCollision(tile_component.tileset, tile_component.id);
         }
 
         // Load texture of tile with that id to render component

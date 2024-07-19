@@ -1,6 +1,5 @@
 #include "AnimationSystem.h"
 #include "Config.h"
-#include "RenderComponent.h"
 #include "TileComponent.h"
 
 void AnimationSystem::updateFrames()
