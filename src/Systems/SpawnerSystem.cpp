@@ -26,18 +26,11 @@ void SpawnerSystem::processSpawner(const Entity entity) const
 {
     auto& [spawnCooldown, loopSpawn, noSpawns] = gCoordinator.getComponent<SpawnerComponent>(entity);
 
-    if (!loopSpawn && noSpawns >= 1)
+    if (isReadyToSpawn(static_cast<int>(spawnCooldown)) && !(!loopSpawn && noSpawns >= 1))
     {
-        return;
+        spawnEnemy(entity);
+        noSpawns++;
     }
-
-    if (!isReadyToSpawn(static_cast<int>(spawnCooldown)))
-    {
-        return;
-    }
-
-    spawnEnemy(entity);
-    noSpawns++;
 }
 
 bool SpawnerSystem::isReadyToSpawn(const int cooldown) const { return spawnTime % cooldown == 0; }
@@ -45,21 +38,20 @@ bool SpawnerSystem::isReadyToSpawn(const int cooldown) const { return spawnTime 
 void SpawnerSystem::spawnEnemy(const Entity entity)
 {
     const auto& spawnerTransform = gCoordinator.getComponent<TransformComponent>(entity);
+    const Entity newMonsterEntity = gCoordinator.createEntity();
 
-    const Entity new_monster = gCoordinator.createEntity();
+    gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
+    gCoordinator.addComponent(newMonsterEntity, TileComponent{});
+    gCoordinator.addComponent(newMonsterEntity, TransformComponent{});
+    gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
+    gCoordinator.addComponent(newMonsterEntity, ColliderComponent{});
+    gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
+    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = 10.f});
 
-    gCoordinator.addComponent(new_monster, RenderComponent{});
-    gCoordinator.addComponent(new_monster, TileComponent{});
-    gCoordinator.addComponent(new_monster, TransformComponent{});
-    gCoordinator.addComponent(new_monster, AnimationComponent{});
-    gCoordinator.addComponent(new_monster, ColliderComponent{});
-    gCoordinator.addComponent(new_monster, EnemyComponent{});
-    gCoordinator.addComponent(new_monster, CharacterComponent{.hp = 10.f});
-
-    auto& enemyTileComponent = gCoordinator.getComponent<TileComponent>(new_monster);
-    auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(new_monster);
-    auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(new_monster);
-    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(new_monster);
+    auto& enemyTileComponent = gCoordinator.getComponent<TileComponent>(newMonsterEntity);
+    auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(newMonsterEntity);
+    auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(newMonsterEntity);
+    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(newMonsterEntity);
 
     enemyTransformComponent = TransformComponent(spawnerTransform.position, 0., sf::Vector2f(1., 1.), {0.f, 0.f});
     characterComponent.hp = 10.f;
@@ -68,7 +60,7 @@ void SpawnerSystem::spawnEnemy(const Entity entity)
         enemyTileComponent.tileset, enemyTileComponent.id);
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        new_monster, "SecondPlayer", {colliderComponent.collision.width, colliderComponent.collision.height},
+        newMonsterEntity, "SecondPlayer", {colliderComponent.collision.width, colliderComponent.collision.height},
         [&](const GameType::CollisionData& entityT) {}, [&](const GameType::CollisionData& entityT) {}, false, false,
         {colliderComponent.collision.x, colliderComponent.collision.y});
 }
