@@ -17,7 +17,7 @@ class FloorGenerator
 
 public:
     FloorGenerator() = default;
-    void generateFloor(int h, int w);
+    void generateFloor(const int height, const int width, const int64_t seed);
     void generateMainPath(const int mainPathLen) { m_generator.generateMainPath(mainPathLen); }
     void generateSidePath(const DungeonGenerator::sidePathConfig& path) { m_generator.generateSidePath(path); }
     void makeLockAndKey() { m_generator.makeLockAndKey(); }

@@ -5,11 +5,6 @@
 
 using randInt = std::uniform_int_distribution<int>;
 
-DungeonGenerator::DungeonGenerator(const int height, const int width) :
-    m_height(height), m_width(width), gen(std::chrono::system_clock::now().time_since_epoch().count())
-{
-}
-
 void DungeonGenerator::generateMainPath(const int pathLength)
 {
     const glm::ivec2 start{randInt(0, m_width - 1)(gen), randInt(0, m_height - 1)(gen)};

@@ -8,7 +8,10 @@
 #include "Utils/Helpers.h"
 #include "Utils/Paths.h"
 
-void FloorGenerator::generateFloor(const int h, const int w) { m_generator = DungeonGenerator(h, w); }
+void FloorGenerator::generateFloor(const int height, const int width, const int64_t seed)
+{
+    m_generator = DungeonGenerator(height, width, seed);
+}
 
 bool FloorGenerator::isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const
 {

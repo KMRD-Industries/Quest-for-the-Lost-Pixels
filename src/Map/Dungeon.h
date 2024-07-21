@@ -28,7 +28,8 @@ private:
     std::unordered_map<glm::ivec2, Room> m_roomMap{};
     glm::ivec2 m_currentPlayerPos{};
     std::vector<Entity> m_entities{};
-    std::uint32_t m_id{};
+    uint32_t m_id{};
+    int64_t m_seed{};
     std::deque<glm::ivec2> m_moveInDungeon{};
     float counter = 0;
     bool m_passedBy = false;

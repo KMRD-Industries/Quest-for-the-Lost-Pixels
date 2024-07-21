@@ -36,6 +36,7 @@ void Dungeon::init()
     setECS();
 
     m_id = 0;
+    m_seed = 0;
     Entity player = gCoordinator.createEntity();
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     multiplayerSystem->setup("127.0.0.1", "9001");
@@ -44,6 +45,7 @@ void Dungeon::init()
     {
         auto gameState = multiplayerSystem->registerPlayer(player);
         m_id = gameState.player_id();
+        m_seed = gameState.seed();
 
         std::println("Connected to server with id: {}", m_id);
 
@@ -299,7 +301,7 @@ void Dungeon::setECS()
 
 void Dungeon::makeSimpleFloor()
 {
-    m_floorGenerator.generateFloor(5, 6);
+    m_floorGenerator.generateFloor(5, 6, m_seed);
     m_floorGenerator.generateMainPath(11);
     m_floorGenerator.generateSidePath(
         {.pathName{"FirstC"}, .startingPathName{"Main"}, .endPathName{"Main"}, .minPathLength{3}, .maxPathLength{5}});
