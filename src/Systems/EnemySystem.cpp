@@ -28,15 +28,13 @@ void EnemySystem::update() const
     }
 }
 
-
 void EnemySystem::deleteEnemies() const
 {
     std::deque<Entity> entityToRemove;
 
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.hasComponent<EnemyComponent>(entity) )
-            entityToRemove.push_back(entity);
+        if (gCoordinator.hasComponent<EnemyComponent>(entity)) entityToRemove.push_back(entity);
     }
 
     while (!entityToRemove.empty())

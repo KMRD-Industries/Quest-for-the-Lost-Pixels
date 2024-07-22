@@ -1,5 +1,6 @@
 #include "Room.h"
 
+#include <RenderSystem.h>
 #include <string>
 
 #include "AnimationSystem.h"
@@ -7,22 +8,13 @@
 #include "GameUtility.h"
 #include "Paths.h"
 
-void Room::init()
-{
-}
+void Room::init() {}
 
-void Room::draw() const
-{
-}
+void Room::draw() const {}
 
-void Room::update()
-{
-}
+void Room::update() {}
 
-int Room::getFloorID() const
-{
-    return m_floorID;
-}
+int Room::getFloorID() const { return m_floorID; }
 
 
 std::string Room::getMap() const

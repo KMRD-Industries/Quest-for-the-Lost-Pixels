@@ -2,6 +2,8 @@
 #include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "PassageComponent.h"
+#include "PassageSystem.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
@@ -29,6 +31,14 @@ void RenderSystem::draw(sf::RenderWindow& window)
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
+            if (collisionComponent.body != nullptr)
+            {
+                transformComponent.position.x =
+                    static_cast<float>(collisionComponent.body->GetPosition().x * config::meterToPixelRatio);
+                transformComponent.position.y =
+                    static_cast<float>(collisionComponent.body->GetPosition().y * config::meterToPixelRatio);
+            }
+
             sf::FloatRect spriteBounds = sprite.getGlobalBounds();
             m_mapRenderOffsetX = std::max(m_mapRenderOffsetX, transformComponent.position.x);
             m_mapRenderOffsetY = std::max(m_mapRenderOffsetY, transformComponent.position.y);
@@ -43,32 +53,45 @@ void RenderSystem::draw(sf::RenderWindow& window)
                 collisionComponent.collision.y = 0;
             }
 
-            if(gCoordinator.getComponent<TileComponent>(entity).tileset == "Weapons")
             {
-                sprite.setOrigin(collisionComponent.collision.height * 0.25, collisionComponent.collision.width/2);
-            }
-            else
-            {
-                sprite.setOrigin(collisionComponent.collision.x + collisionComponent.collision.width / 2,
-                                 collisionComponent.collision.y + collisionComponent.collision.height / 2);
+                sprite.setOrigin(
+                    static_cast<float>(collisionComponent.collision.x + collisionComponent.collision.width / 2),
+                    static_cast<float>(collisionComponent.collision.y + collisionComponent.collision.height / 2));
             }
 
             sprite.setScale(transformComponent.scale * config::gameScale);
             sprite.setPosition(transformComponent.position);
             sprite.setRotation(transformComponent.rotation);
 
+            if (gCoordinator.hasComponent<PassageComponent>(entity))
+            {
+                if (gCoordinator.getComponent<PassageComponent>(entity).activePassage &&
+                    !gCoordinator.hasComponent<PlayerComponent>(entity))
+                {
+                    sf::Sprite portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0);
+                    sf::Vector2f portalPosition = {};
+                    portalPosition.x = sprite.getPosition().x - 3.75f * sprite.getLocalBounds().width;
+                    portalPosition.y = sprite.getPosition().y - 3.75f * sprite.getLocalBounds().height;
+                    portalSprite.setPosition(portalPosition);
+                    portalSprite.setScale(sprite.getScale());
+
+                    tiles[config::maximumNumberOfLayers - 1].push_back(portalSprite);
+                }
+            }
+
             tiles[layer].push_back(sprite);
         }
     }
 
-    m_mapRenderOffsetX = (windowSize.x - m_mapRenderOffsetX) * 0.5f;
-    m_mapRenderOffsetY = (windowSize.y - m_mapRenderOffsetY) * 0.5f;
+    m_mapRenderOffsetX = (static_cast<float>(windowSize.x) - m_mapRenderOffsetX) * 0.5f;
+    m_mapRenderOffsetY = (static_cast<float>(windowSize.y) - m_mapRenderOffsetY) * 0.5f;
 
     for (auto& layer : tiles)
     {
         for (auto& sprite : layer)
         {
-            sprite.setPosition({sprite.getPosition().x + m_mapRenderOffsetX, sprite.getPosition().y + m_mapRenderOffsetY});
+            sprite.setPosition(
+                {sprite.getPosition().x + m_mapRenderOffsetX, sprite.getPosition().y + m_mapRenderOffsetY});
             window.draw(sprite);
         }
     }
@@ -78,6 +101,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
         debugBoundingBoxes(window);
     }
 }
+
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 {

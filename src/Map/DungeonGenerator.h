@@ -46,6 +46,7 @@ public:
     [[nodiscard]] std::optional<char> getLock(const glm::ivec2& node) const;
     [[nodiscard]] std::optional<char> getKey(const glm::ivec2& node) const;
     [[nodiscard]] glm::ivec2 getStartingRoom() const;
+    [[nodiscard]] glm::ivec2 getEndingRoom() const;
     [[nodiscard]] bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
 
 private:
@@ -68,6 +69,8 @@ private:
     RoomCount m_roomCount{};
     int m_freeKey{};
     glm::ivec2 m_startingRoom{};
+    glm::ivec2 m_endingRoom{};
+
     std::unordered_map<glm::ivec2, int> m_locks{};
     std::unordered_map<glm::ivec2, int> m_keys{};
     NodeOutEdgesCount m_nodeOutEdgesCount;

@@ -22,10 +22,11 @@ public:
     void generateSidePath(const DungeonGenerator::sidePathConfig& path) { m_generator.generateSidePath(path); }
     void makeLockAndKey() { m_generator.makeLockAndKey(); }
     bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
-    void setFloorID(const int id){m_floorID = id;};
+    void setFloorID(const int id) { m_floorID = id; };
 
     std::unordered_map<glm::ivec2, Room> getFloor(bool generate);
     glm::ivec2 getStartingRoom() const { return m_generator.getStartingRoom(); }
+    glm::ivec2 getEndingRoom() const { return m_generator.getEndingRoom(); }
 
 private:
     std::vector<GameType::MapInfo> getMapInfo();

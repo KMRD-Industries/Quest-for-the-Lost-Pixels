@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "GameUtility.h"
+#include "SFML/Graphics/RenderWindow.hpp"
 #include "glm/vec2.hpp"
 
 namespace GameType
@@ -16,17 +17,14 @@ class Room
 public:
     Room() = default;
 
-    explicit Room(const int id) :
-        m_mapID(id)
-    {
-    }
+    explicit Room(const int id) : m_mapID(id) {}
 
     void init();
     void draw() const;
     void update();
     [[nodiscard]] std::string getMap() const;
     void setMapID(const int id) { m_mapID = id; }
-    void setFloorID(const int id){m_floorID = id;};
+    void setFloorID(const int id) { m_floorID = id; };
     int getFloorID() const;
 
     std::unordered_map<GameType::DoorEntraces, glm::vec2> m_doorPosition;

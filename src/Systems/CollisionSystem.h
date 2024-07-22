@@ -25,7 +25,7 @@ public:
     explicit CollisionSystem() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
 
     void createMapCollision() const;
-    void updateCollision();
+    void updateCollision() const;
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations) const;
     static void createBody(
         Entity entity, const std::string& tag, const glm::vec2& colliderSize = {},

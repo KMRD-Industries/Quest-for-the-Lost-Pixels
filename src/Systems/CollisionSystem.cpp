@@ -5,6 +5,7 @@
 #include "ColliderComponent.h"
 #include "DoorComponent.h"
 #include "MultiplayerSystem.h"
+#include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
@@ -70,8 +71,7 @@ void CollisionSystem::createMapCollision() const
     {
         const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
-        if (tileComponent.id < 0 || tileComponent.tileset.empty() ||
-            gCoordinator.hasComponent<PlayerComponent>(entity))
+        if (tileComponent.id < 0 || tileComponent.tileset.empty() || gCoordinator.hasComponent<PlayerComponent>(entity))
         {
             continue;
         }
@@ -85,7 +85,13 @@ void CollisionSystem::createMapCollision() const
                 createCollisionBody(entity, "Door", {config::tileHeight, config::tileHeight}, true, false);
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
-                createCollisionBody(entity, "Passage", {config::tileHeight, config::tileHeight}, true, true);
+            {
+                if (gCoordinator.hasComponent<PassageComponent>(entity))
+                {
+                    if (gCoordinator.getComponent<PassageComponent>(entity).activePassage)
+                        createCollisionBody(entity, "Passage", {config::tileHeight, config::tileHeight}, true, true);
+                }
+            }
         }
         else
         {
@@ -99,12 +105,11 @@ void CollisionSystem::createMapCollision() const
     }
 }
 
-void CollisionSystem::updateCollision()
+void CollisionSystem::updateCollision() const
 {
     for (const auto& entity : m_entities)
     {
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (!transformComponent.velocity.IsValid()) continue;
@@ -131,7 +136,6 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         const b2Body* body = colliderComponent.body;
         if (body == nullptr || transformComponent.velocity == b2Vec2{}) continue;
 
-        const auto position = body->GetPosition();
         const auto spriteBounds = renderComponent.sprite.getGlobalBounds();
 
         if (colliderComponent.collision.height == 0 || colliderComponent.collision.width == 0)
@@ -141,11 +145,6 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
             colliderComponent.collision.x = 0;
             colliderComponent.collision.y = 0;
         }
-
-        transformComponent.position = {static_cast<float>(convertMetersToPixel(position.x)),
-                                       static_cast<float>(convertMetersToPixel(position.y))};
-
-        renderComponent.sprite.setPosition(position.x, position.y);
     }
 }
 
@@ -170,7 +169,8 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
     auto* collisionData = new GameType::CollisionData{.entityID = entity, .tag = tag};
 
     b2BodyDef bodyDef;
-    const sf::Sprite sprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile(tileComponent.tileset, tileComponent.id);
+    const sf::Sprite sprite =
+        gCoordinator.getRegisterSystem<TextureSystem>()->getTile(tileComponent.tileset, tileComponent.id);
     const auto spriteBounds = sprite.getGlobalBounds();
 
     float xPosition = {};

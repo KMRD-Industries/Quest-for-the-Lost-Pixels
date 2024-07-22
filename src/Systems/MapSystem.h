@@ -34,6 +34,5 @@ private:
     static constexpr float ROTATION_270 = 270.0f;
 
     static void processTile(uint32_t tileID, uint32_t flipFlags, int layerID, int xPos, int yPos,
-                     const Map& parsed_map);
-
+                            const Map& parsed_map);
 };

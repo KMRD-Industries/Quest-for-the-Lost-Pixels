@@ -76,7 +76,8 @@ int main()
     game.init();
 
 
-    while (window.isOpen()) {
+    while (window.isOpen())
+    {
         // Update game logic
         game.update();
         game.handleCollision();

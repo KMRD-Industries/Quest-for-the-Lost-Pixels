@@ -1,5 +1,7 @@
 #pragma once
 #include "Dungeon.h"
+#include "SFML/Graphics/RenderWindow.hpp"
+
 
 class Game
 {

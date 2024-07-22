@@ -12,7 +12,8 @@ class TextureSystem : public System
 {
 private:
     std::vector<std::string> m_vecTextureFiles{"CosmicLilac", "Decorative",    "DungeonWalls", "Jungle",
-                                           "Graveyard",   "SpecialBlocks", "AnimSlimes",   "Characters", "Weapons", "CosmicLegacy"};
+                                               "Graveyard",   "SpecialBlocks", "AnimSlimes",   "Characters",
+                                               "Weapons",     "CosmicLegacy",  "Portal"};
     std::unordered_map<std::string, sf::Texture> m_mapTextures;
     std::unordered_map<long, sf::IntRect> m_mapTextureRects;
     std::unordered_map<std::string, long> m_mapTextureIndexes;

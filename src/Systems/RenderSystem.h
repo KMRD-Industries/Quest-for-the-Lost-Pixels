@@ -2,6 +2,8 @@
 
 #include "System.h"
 
+
+struct TransformComponent;
 namespace sf
 {
     class RenderWindow;

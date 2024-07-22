@@ -41,7 +41,8 @@ void MapSystem::loadMap(const std::string& path) const
         // and with number of tiles in rows and cols we can model room layout.
         int index{};
 
-        // Tiles info is stored in 32 bits format where first 4 bits describe flips of tile, and the rest stands for tile id
+        // Tiles info is stored in 32 bits format where first 4 bits describe flips of tile, and the rest stands for
+        // tile id
         static constexpr std::uint32_t mask = 0xf0000000;
 
         // Process base64 layer data into vector of tiles
@@ -57,7 +58,8 @@ void MapSystem::loadMap(const std::string& path) const
 
             if (tileID < 1)
             {
-                index++; continue;
+                index++;
+                continue;
             }
 
             processTile(tileID, flipFlags, layer.id, x_position, y_position, parsedMap);
@@ -89,38 +91,38 @@ void MapSystem::doFlips(const std::uint8_t& flags, float& rotation, sf::Vector2f
 
     switch (flags)
     {
-        case VerticalFlip:
-            scale.y *= -1;
-            break;
+    case VerticalFlip:
+        scale.y *= -1;
+        break;
 
-        case HorizontalFlip:
-            scale.x *= -1;
-            break;
+    case HorizontalFlip:
+        scale.x *= -1;
+        break;
 
-        case HorizontalVerticalFlip:
-            scale = -scale;
-            break;
+    case HorizontalVerticalFlip:
+        scale = -scale;
+        break;
 
-        case DiagonalFlip:
-            scale.x *= -1;
-            rotation += ROTATION_90;
-            break;
+    case DiagonalFlip:
+        scale.x *= -1;
+        rotation += ROTATION_90;
+        break;
 
-        case DiagonalVerticalFlip:
-            rotation += ROTATION_270;
-            break;
+    case DiagonalVerticalFlip:
+        rotation += ROTATION_270;
+        break;
 
-        case DiagonalHorizontalFlip:
-            rotation += ROTATION_90;
-            break;
+    case DiagonalHorizontalFlip:
+        rotation += ROTATION_90;
+        break;
 
-        case AllFlips:
-            rotation += ROTATION_90;
-            scale.x *= -1;
-            break;
-        default:
-            // No flip, do nothing
-            break;
+    case AllFlips:
+        rotation += ROTATION_90;
+        scale.x *= -1;
+        break;
+    default:
+        // No flip, do nothing
+        break;
     }
 }
 
@@ -132,9 +134,9 @@ void MapSystem::doFlips(const std::uint8_t& flags, float& rotation, sf::Vector2f
  * @param xPos The position of tile in map.
  * @param yPos The position of tile in mao.
  * @param parsedMap The full map info.
-*/
-void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, const int layerID,
-                            const int xPos, const int yPos, const Map& parsedMap)
+ */
+void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, const int layerID, const int xPos,
+                            const int yPos, const Map& parsedMap)
 {
     // Create new Entity which will describe Tile of map
     const Entity mapEntity = gCoordinator.createEntity();
@@ -144,8 +146,8 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     gCoordinator.addComponent(mapEntity, ColliderComponent{});
     gCoordinator.addComponent(mapEntity, MapComponent{});
 
-    TileComponent tile_component {};
-    TransformComponent transform_component {};
+    TileComponent tile_component{};
+    TransformComponent transform_component{};
 
     // Set up Tile Component
     tile_component.tileset = findKeyLessThan(parsedMap.tilesets, tileID);
@@ -166,54 +168,57 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     {
         switch (tile_component.id)
         {
-        case (static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER)): {
-            gCoordinator.addComponent(mapEntity, DoorComponent{});
-            auto& doorComponent = gCoordinator.getComponent<DoorComponent>(mapEntity);
+        case (static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER)):
+            {
+                gCoordinator.addComponent(mapEntity, DoorComponent{});
+                auto& doorComponent = gCoordinator.getComponent<DoorComponent>(mapEntity);
 
-            if (yPos == 0)
-            {
-                doorComponent.entrance = GameType::DoorEntraces::NORTH;
-            }
-            else if (yPos == parsedMap.height - 1)
-            {
-                doorComponent.entrance = GameType::DoorEntraces::SOUTH;
-            }
-            else if (xPos == 0)
-            {
-                doorComponent.entrance = GameType::DoorEntraces::WEST;
-            }
-            else if (xPos == parsedMap.width - 1)
-            {
-                doorComponent.entrance = GameType::DoorEntraces::EAST;
-            }
+                if (yPos == 0)
+                {
+                    doorComponent.entrance = GameType::DoorEntraces::NORTH;
+                }
+                else if (yPos == parsedMap.height - 1)
+                {
+                    doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+                }
+                else if (xPos == 0)
+                {
+                    doorComponent.entrance = GameType::DoorEntraces::WEST;
+                }
+                else if (xPos == parsedMap.width - 1)
+                {
+                    doorComponent.entrance = GameType::DoorEntraces::EAST;
+                }
 
-            break;
-        }
+                break;
+            }
 
         case (static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK)):
-        {
-            if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
             {
-                gCoordinator.addComponent(mapEntity, SpawnerComponent{});
-            }
+                if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
+                {
+                    gCoordinator.addComponent(mapEntity, SpawnerComponent{});
+                }
 
-            break;
-        }
+                break;
+            }
 
         case (static_cast<int>(SpecialBlocks::Blocks::STARTINGPOINT)):
-        {
-            const sf::Vector2f pos = getPosition(xPos, yPos, parsedMap.tileheight);
-            startingPosition = pos;
-            break;
-        }
+            {
+                const sf::Vector2f pos = getPosition(xPos, yPos, parsedMap.tileheight);
+                startingPosition = pos;
+                break;
+            }
 
         case (static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR)):
-        {
-            gCoordinator.addComponent(mapEntity, PassageComponent{});
-            break;
-        }
-            default: {}
+            {
+                gCoordinator.addComponent(mapEntity, PassageComponent{});
+                break;
             }
+        default:
+            {
+            }
+        }
     }
 }
 
