@@ -127,7 +127,35 @@
                  "duration":100,
                  "tileid":6
                 }],
-         "id":0
+         "id":0,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":8.5227,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"0"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":16.375,
+                     "x":7.64772727272727,
+                     "y":12.3295590909091
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
         }, 
         {
          "animation":[
@@ -251,19 +279,24 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
-                     "height":16.5,
+                     "height":8.5227,
                      "id":1,
                      "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"18"
+                            }],
                      "rotation":0,
                      "type":"",
                      "visible":true,
-                     "width":22,
-                     "x":5,
-                     "y":7.5
+                     "width":16.375,
+                     "x":8.5625,
+                     "y":13.23865
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -390,7 +423,129 @@
                  "duration":100,
                  "tileid":42
                 }],
-         "id":36
+         "id":36,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":8.5227,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"36"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":16.375,
+                     "x":7.9375,
+                     "y":13.11365
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "id":37,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":7.2727,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"37"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":16,
+                     "x":8,
+                     "y":9.98865
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "id":38,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":24,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"38"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":22,
+                     "x":5,
+                     "y":3.75
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "id":43,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":6.45454545454545,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"43"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":22,
+                     "x":5,
+                     "y":5
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
         }, 
         {
          "animation":[
@@ -510,7 +665,35 @@
                  "duration":100,
                  "tileid":60
                 }],
-         "id":54
+         "id":54,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":8.5227,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"0"
+                            }],
+                     "rotation":0,
+                     "type":"54",
+                     "visible":true,
+                     "width":16.375,
+                     "x":8.4375,
+                     "y":12.73865
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
         }],
  "tilewidth":32,
  "type":"tileset",

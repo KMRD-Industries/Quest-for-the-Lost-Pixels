@@ -7,7 +7,7 @@ extern Coordinator gCoordinator;
 
 void TravellingSystem::update()
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         auto& travellingComponent = gCoordinator.getComponent<TravellingDungeonComponent>(entity);
         auto& movesInDungeon = travellingComponent.moveInDungeon;

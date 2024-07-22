@@ -3,12 +3,12 @@
 #include <cstdint>
 #include <functional>
 #include <glm/glm.hpp>
+#include <imgui-SFML.h>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
 #include <unordered_map>
-
 #include "Config.h"
 #include "glm/gtx/hash.hpp"
 
@@ -20,9 +20,7 @@ static inline std::string base64_decode(const std::string& encoded_string)
         "0123456789+/";
 
     std::function<bool(unsigned char)> is_base64 = [](unsigned char c) -> bool
-    {
-        return (isalnum(c) || (c == '+') || (c == '/'));
-    };
+    { return (isalnum(c) || (c == '+') || (c == '/')); };
 
     auto in_len = encoded_string.size();
     int i = 0;
@@ -208,5 +206,5 @@ template <typename T>
 inline static T convertPixelsToMeters(const T pixelValue)
 {
     T result = pixelValue * config::pixelToMeterRatio;
-    return roundTo(result, 2);
+    return roundTo(result, 10);
 }
