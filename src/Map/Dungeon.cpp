@@ -1,3 +1,4 @@
+#include <chrono>
 #include <format>
 #include <print>
 
@@ -28,6 +29,7 @@
 #include "EnemySystem.h"
 #include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
+#include "glm/ext/vector_int2.hpp"
 
 extern Coordinator gCoordinator;
 
@@ -36,7 +38,7 @@ void Dungeon::init()
     setECS();
 
     m_id = 0;
-    m_seed = 0;
+    m_seed = std::chrono::system_clock::now().time_since_epoch().count();
     Entity player = gCoordinator.createEntity();
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     multiplayerSystem->setup("127.0.0.1", "9001");
@@ -108,6 +110,7 @@ void Dungeon::init()
     makeSimpleFloor();
 
     m_roomMap.at(m_currentPlayerPos).init();
+    multiplayerSystem->setRoom(m_currentPlayerPos);
 
     auto mapPath = m_roomMap.at(m_currentPlayerPos).getMap();
     gCoordinator.getRegisterSystem<MapSystem>()->loadMap(mapPath);
@@ -147,6 +150,7 @@ void Dungeon::update()
             createEntity(id);
             break;
         case comm::ROOM_CHANGED:
+            changeRoom(multiplayerSystem->getRoom());
             break;
         default:
             break;
@@ -334,5 +338,28 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         colliderComponent.body->SetTransform(
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
             colliderComponent.body->GetAngle());
+
+        gCoordinator.getRegisterSystem<MultiplayerSystem>()->roomChanged(m_currentPlayerPos);
     }
+}
+
+void Dungeon::changeRoom(const glm::ivec2& room)
+{
+    auto dir = room - m_currentPlayerPos;
+    m_currentPlayerPos = room;
+    std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
+    gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
+    gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
+    gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
+
+    const auto newDoor = dir * -1;
+    const auto doorType = GameType::geoToMapDoors.at(newDoor);
+    const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
+    const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
+    const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
+    gCoordinator.getComponent<TransformComponent>(m_entities[m_id]).position = newPosition;
+    auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]);
+    colliderComponent.body->SetTransform({convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
+                                         colliderComponent.body->GetAngle());
 }

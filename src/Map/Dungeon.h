@@ -22,6 +22,7 @@ private:
     void makeSimpleFloor();
     void createEntity(uint32_t id);
     void moveInDungeon(const glm::ivec2& dir);
+    void changeRoom(const glm::ivec2& dir);
 
     std::string m_asset_path{ASSET_PATH};
     FloorGenerator m_floorGenerator{};
