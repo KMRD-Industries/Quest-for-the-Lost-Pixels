@@ -10,6 +10,7 @@
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
+#include "WeaponComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -49,7 +50,33 @@ void RenderSystem::draw(sf::RenderWindow& window)
             sprite.setScale(transformComponent.scale * config::gameScale);
             sprite.setPosition(transformComponent.position);
             sprite.setRotation(transformComponent.rotation);
+
             tiles[layer].push_back(sprite);
+
+            if (gCoordinator.hasComponent<WeaponComponent>(entity))
+            {
+                auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
+
+                sf::Sprite weaponSprite =
+                    gCoordinator.getRegisterSystem<TextureSystem>()->getTile("Weapons", weaponComponent.weaponID);
+
+                auto cc =
+                    gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Weapons", weaponComponent.weaponID);
+
+                weaponSprite.setOrigin(weaponSprite.getGlobalBounds().width / 2,
+                                       weaponSprite.getGlobalBounds().height / 2);
+
+                weaponSprite.setScale(sprite.getScale() * 0.8f);
+
+                sf::Vector2f spriteCenter = sprite.getPosition();
+                spriteCenter.x += weaponSprite.getLocalBounds().width;
+                spriteCenter.y -= weaponSprite.getLocalBounds().height * 0.6f;
+
+                weaponSprite.setPosition(spriteCenter);
+                weaponSprite.setRotation(60.f);
+
+                tiles[layer].push_back(weaponSprite);
+            }
         }
     }
 

@@ -27,6 +27,7 @@
 #include "EnemySystem.h"
 #include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
+#include "WeaponComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -42,14 +43,14 @@ void Dungeon::init()
     if (multiplayerSystem->isConnected())
     {
         m_id = multiplayerSystem->registerPlayer(player);
-        std::cout << "Connected to server with id: {" <<  m_id << "}";
+        std::cout << "Connected to server with id: {" << m_id << "}";
     }
     else
     {
         std::cout << "Starting in single-player mode";
     }
 
-    constexpr int playerAnimationTile = 185;
+    constexpr int playerAnimationTile = 243;
 
     m_entities[m_id] = player;
 
@@ -64,8 +65,9 @@ void Dungeon::init()
     gCoordinator.addComponent(
         m_entities[m_id],
         TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
+    gCoordinator.addComponent(m_entities[m_id], WeaponComponent{.weaponID = 20});
 
-    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", playerAnimationTile);
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", 185);
     gCoordinator.getComponent<ColliderComponent>(m_entities[0]).collision = cc;
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
@@ -174,6 +176,7 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<SpawnerComponent>();
     gCoordinator.registerComponent<EnemyComponent>();
     gCoordinator.registerComponent<CharacterComponent>();
+    gCoordinator.registerComponent<WeaponComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -240,7 +243,6 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<TextureSystem>(signature);
     }
 
-
     const auto enemySystem = gCoordinator.getRegisterSystem<EnemySystem>();
     {
         Signature signature;
@@ -256,7 +258,6 @@ void Dungeon::setECS()
         signature.set(gCoordinator.getComponentType<SpawnerComponent>());
         gCoordinator.setSystemSignature<SpawnerSystem>(signature);
     }
-
 
     textureSystem->loadTexturesFromFiles();
 

@@ -42,6 +42,7 @@ set(COMPONENTS
         Components/TravellingDungeonComponent.h
         Components/SpawnerComponent.h
         Components/EnemyComponent.h
+        Components/WeaponComponent.h
 )
 
 set(MAP
@@ -77,6 +78,8 @@ set(SYSTEMS
         Systems/EnemySystem.cpp
         Systems/SpawnerSystem.cpp
         Systems/AnimationSystem.h
+        Systems/WeaponsSystem.cpp
+        Systems/WeaponsSystem.h
 )
 
 set(ATLAS_COMPONENTS
