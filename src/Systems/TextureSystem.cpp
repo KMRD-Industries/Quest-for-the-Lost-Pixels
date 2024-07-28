@@ -1,5 +1,7 @@
 #include "TextureSystem.h"
 #include <iostream>
+#include <sys/stat.h>
+
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
@@ -10,6 +12,7 @@
 #include "TextureParser.h"
 #include "TileComponent.h"
 #include "Tileset.h"
+#include "TransformComponent.h"
 #include "Utils/Helpers.h"
 
 extern Coordinator gCoordinator;
@@ -17,7 +20,7 @@ extern Coordinator gCoordinator;
 /**
  * This is to load TileSet from json file to atlas.
 
- * @param file_path path to TileSet
+ * @param path path to TileSet
  * @return success or fail
  */
 int TextureSystem::loadFromFile(const std::string& path)
@@ -78,7 +81,21 @@ int TextureSystem::loadFromFile(const std::string& path)
 
             if (!tile.objects.empty())
             {
-                map_collisions.emplace(adjusted_id, tile.objects.at(0));
+                for (const auto& object : tile.objects)
+                {
+                    if (object.type == "WeaponPlacement")
+                    {
+                        weapon_placements.emplace(adjusted_id, object);
+                    }
+                    else if (object.type == "Collision")
+                    {
+                        map_collisions.emplace(adjusted_id, object);
+                    }
+                    else
+                    {
+                        map_collisions.emplace(adjusted_id, object);
+                    }
+                }
             }
         }
 
@@ -185,7 +202,28 @@ void TextureSystem::loadTextures()
 
         if (map_collisions.contains(adjusted_id))
         {
+            auto& cc = map_collisions.at(adjusted_id);
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+            if (collider_component.body != nullptr && collider_component.collision != cc)
+            {
+                b2Vec2 offset = {static_cast<float>(cc.x - collider_component.collision.x),
+                                 static_cast<float>(cc.y - collider_component.collision.y)};
+
+                offset.x = convertPixelsToMeters(offset.x);
+                offset.y = convertPixelsToMeters(-offset.y);
+
+                collider_component.body->SetTransform(collider_component.body->GetPosition() + offset,
+                                                      collider_component.body->GetAngle());
+
+                transformComponent.position.x += convertMetersToPixel(offset.x);
+                transformComponent.position.y += convertMetersToPixel(offset.y);
+            }
             collider_component.collision = getCollision(tile_component.tileset, tile_component.id);
+        }
+
+        if (weapon_placements.contains(adjusted_id))
+        {
         }
 
         // Load texture of tile with that id to render component

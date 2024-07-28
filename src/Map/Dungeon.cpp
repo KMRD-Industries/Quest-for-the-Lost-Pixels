@@ -11,22 +11,25 @@
 #include "DoorComponent.h"
 #include "DoorSystem.h"
 #include "Dungeon.h"
+#include "EnemyComponent.h"
+#include "EnemySystem.h"
+#include "EquipWeaponSystem.h"
+#include "EquippedWeaponComponent.h"
+#include "InventoryComponent.h"
+#include "InventorySystem.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
+#include "SpawnerComponent.h"
+#include "SpawnerSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 #include "TravellingDungeonComponent.h"
 #include "TravellingSystem.h"
-
-#include "EnemyComponent.h"
-#include "EnemySystem.h"
-#include "SpawnerComponent.h"
-#include "SpawnerSystem.h"
 #include "WeaponComponent.h"
 
 extern Coordinator gCoordinator;
@@ -65,7 +68,10 @@ void Dungeon::init()
     gCoordinator.addComponent(
         m_entities[m_id],
         TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
-    gCoordinator.addComponent(m_entities[m_id], WeaponComponent{.weaponID = 20});
+    gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
+    gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
+
+    // gCoordinator.addComponent(m_entities[m_id], WeaponComponent{.weaponID = 20});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", 185);
     gCoordinator.getComponent<ColliderComponent>(m_entities[0]).collision = cc;
@@ -98,6 +104,12 @@ void Dungeon::init()
             }
         },
         false, false, {cc.x, cc.y});
+
+    const Entity weaponEntity = gCoordinator.createEntity();
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.weaponID = 20});
+
+    gCoordinator.getRegisterSystem<InventorySystem>()->pickUpWeapon(m_entities[m_id], weaponEntity);
+    gCoordinator.getRegisterSystem<EquipWeaponSystem>()->equipWeapon(m_entities[m_id], weaponEntity);
 
     makeSimpleFloor();
 
@@ -177,6 +189,8 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<EnemyComponent>();
     gCoordinator.registerComponent<CharacterComponent>();
     gCoordinator.registerComponent<WeaponComponent>();
+    gCoordinator.registerComponent<InventoryComponent>();
+    gCoordinator.registerComponent<EquippedWeaponComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -258,6 +272,15 @@ void Dungeon::setECS()
         signature.set(gCoordinator.getComponentType<SpawnerComponent>());
         gCoordinator.setSystemSignature<SpawnerSystem>(signature);
     }
+
+    const auto equipWeaponSystem = gCoordinator.getRegisterSystem<EquipWeaponSystem>();
+    {
+    }
+
+    const auto inventorySystem = gCoordinator.getRegisterSystem<InventorySystem>();
+    {
+    }
+
 
     textureSystem->loadTexturesFromFiles();
 

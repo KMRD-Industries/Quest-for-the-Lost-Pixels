@@ -43,6 +43,8 @@ set(COMPONENTS
         Components/SpawnerComponent.h
         Components/EnemyComponent.h
         Components/WeaponComponent.h
+        Components/InventoryComponent.h
+        Components/EquippedWeaponComponent.h
 )
 
 set(MAP
@@ -80,6 +82,10 @@ set(SYSTEMS
         Systems/AnimationSystem.h
         Systems/WeaponsSystem.cpp
         Systems/WeaponsSystem.h
+        Systems/InventorySystem.cpp
+        Systems/InventorySystem.h
+        Systems/EquipWeaponSystem.cpp
+        Systems/EquipWeaponSystem.h
 )
 
 set(ATLAS_COMPONENTS

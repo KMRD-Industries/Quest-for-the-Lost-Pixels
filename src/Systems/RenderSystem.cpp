@@ -2,6 +2,7 @@
 #include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "EnemyComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
@@ -52,31 +53,6 @@ void RenderSystem::draw(sf::RenderWindow& window)
             sprite.setRotation(transformComponent.rotation);
 
             tiles[layer].push_back(sprite);
-
-            if (gCoordinator.hasComponent<WeaponComponent>(entity))
-            {
-                auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
-
-                sf::Sprite weaponSprite =
-                    gCoordinator.getRegisterSystem<TextureSystem>()->getTile("Weapons", weaponComponent.weaponID);
-
-                auto cc =
-                    gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Weapons", weaponComponent.weaponID);
-
-                weaponSprite.setOrigin(weaponSprite.getGlobalBounds().width / 2,
-                                       weaponSprite.getGlobalBounds().height / 2);
-
-                weaponSprite.setScale(sprite.getScale() * 0.8f);
-
-                sf::Vector2f spriteCenter = sprite.getPosition();
-                spriteCenter.x += weaponSprite.getLocalBounds().width;
-                spriteCenter.y -= weaponSprite.getLocalBounds().height * 0.6f;
-
-                weaponSprite.setPosition(spriteCenter);
-                weaponSprite.setRotation(60.f);
-
-                tiles[layer].push_back(weaponSprite);
-            }
         }
     }
 
@@ -102,9 +78,33 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 {
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
-    const auto bounds = renderComponent.sprite.getGlobalBounds();
+    auto transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
 
-    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
+    auto drawSprite = [&](Entity entity)
+    {
+        auto renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        auto tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        const auto bounds = renderComponent.sprite.getGlobalBounds();
+
+        sf::ConvexShape convex;
+        convex.setPointCount(4);
+        convex.setPoint(0, {0, 0});
+        convex.setPoint(1, {bounds.width, 0});
+        convex.setPoint(2, {bounds.width, bounds.height});
+        convex.setPoint(3, {0, bounds.height});
+
+        convex.setFillColor(sf::Color::Transparent);
+        convex.setOutlineThickness(1.f);
+        convex.setOutlineColor(sf::Color::Yellow);
+
+        const auto spriteCenter =
+            GameType::MyVec2{transformComponent.position.x + mapRenderOffsetX - bounds.width / 2,
+                             transformComponent.position.y + mapRenderOffsetY - bounds.height / 2};
+        convex.setPosition(spriteCenter);
+
+        window.draw(convex);
+    };
 
     Collision cc =
         gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
@@ -146,6 +146,11 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
         {
             continue;
         };
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<EnemyComponent>(entity))
+        {
+            drawSprite(entity);
+        }
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);

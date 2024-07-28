@@ -21,6 +21,8 @@ private:
     std::unordered_map<std::string, long> texture_indexes;
     std::unordered_map<long, std::vector<AnimationFrame>> map_animations;
     std::unordered_map<long, Collision> map_collisions;
+    std::unordered_map<long, Collision> weapon_placements;
+
     long no_textures = 0;
 
 public:

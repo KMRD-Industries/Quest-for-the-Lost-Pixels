@@ -188,22 +188,23 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
     return result;
 }
 
+
 template <typename T>
-inline static T roundTo(T value, int places)
+static T roundTo(T value, int places)
 {
     T factor = std::pow(10.0, places);
     return std::round(value * factor) / factor;
 }
 
 template <typename T>
-inline static T convertMetersToPixel(const T meterValue)
+static T convertMetersToPixel(const T meterValue)
 {
     T result = meterValue * config::meterToPixelRatio;
     return roundTo(result, 2);
 }
 
 template <typename T>
-inline static T convertPixelsToMeters(const T pixelValue)
+static T convertPixelsToMeters(const T pixelValue)
 {
     T result = pixelValue * config::pixelToMeterRatio;
     return roundTo(result, 10);

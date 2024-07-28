@@ -16,6 +16,7 @@ void AnimationSystem::updateFrameTime() { frame_time = (frame_time + 1) % config
 
 void AnimationSystem::updateEntityAnimation(const Entity entity) const
 {
+    if (!gCoordinator.hasComponent<AnimationComponent>(entity)) return;
     auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
 
     if (animation.frames.empty())

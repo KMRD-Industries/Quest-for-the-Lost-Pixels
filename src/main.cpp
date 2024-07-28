@@ -81,11 +81,11 @@ int main()
         // Clear the window before drawing
         window.clear(customColor);
 
+        game.handleCollision();
         game.update();
         game.draw();
-        game.handleCollision();
-        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
 
+        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
