@@ -83,13 +83,9 @@ int TextureSystem::loadFromFile(const std::string& path)
             {
                 for (const auto& object : tile.objects)
                 {
-                    if (object.type == "WeaponPlacement")
+                    if (object.properties.size() >= 2)
                     {
                         weapon_placements.emplace(adjusted_id, object);
-                    }
-                    else if (object.type == "Collision")
-                    {
-                        map_collisions.emplace(adjusted_id, object);
                     }
                     else
                     {
@@ -210,8 +206,8 @@ void TextureSystem::loadTextures()
                 b2Vec2 offset = {static_cast<float>(cc.x - collider_component.collision.x),
                                  static_cast<float>(cc.y - collider_component.collision.y)};
 
-                offset.x = convertPixelsToMeters(offset.x);
-                offset.y = convertPixelsToMeters(-offset.y);
+                offset.x = convertPixelsToMeters(offset.x * config::gameScale);
+                offset.y = convertPixelsToMeters(-offset.y * config::gameScale);
 
                 collider_component.body->SetTransform(collider_component.body->GetPosition() + offset,
                                                       collider_component.body->GetAngle());
@@ -219,11 +215,13 @@ void TextureSystem::loadTextures()
                 transformComponent.position.x += convertMetersToPixel(offset.x);
                 transformComponent.position.y += convertMetersToPixel(offset.y);
             }
+
             collider_component.collision = getCollision(tile_component.tileset, tile_component.id);
         }
 
         if (weapon_placements.contains(adjusted_id))
         {
+            collider_component.specialCollision = weapon_placements.at(adjusted_id);
         }
 
         // Load texture of tile with that id to render component

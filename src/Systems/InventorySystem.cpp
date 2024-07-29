@@ -9,6 +9,6 @@
 
 void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon)
 {
-    auto &inventory = gCoordinator.getComponent<InventoryComponent>(player);
+    auto& inventory = gCoordinator.getComponent<InventoryComponent>(player);
     inventory.weapons.push_back(weapon);
 }

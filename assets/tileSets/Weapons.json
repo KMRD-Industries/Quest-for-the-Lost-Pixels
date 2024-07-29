@@ -18,22 +18,56 @@
              "name":"",
              "objects":[
                     {
-                     "height":14.3636363636364,
-                     "id":1,
+                     "height":17.4545454545455,
+                     "id":5,
                      "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"19"
+                            }],
                      "rotation":0,
-                     "type":"",
+                     "type":"Collision",
                      "visible":true,
-                     "width":9.81818181818182,
-                     "x":3,
-                     "y":8.63636363636364
+                     "width":6.45454545454546,
+                     "x":4.63636363636364,
+                     "y":5.63636363636364
+                    }, 
+                    {
+                     "height":1,
+                     "id":7,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"19"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":7.5,
+                     "y":26
                     }],
              "opacity":1,
              "type":"objectgroup",
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"tileID",
+                 "type":"string",
+                 "value":"19"
+                }]
         }],
  "tilewidth":16,
  "type":"tileset",

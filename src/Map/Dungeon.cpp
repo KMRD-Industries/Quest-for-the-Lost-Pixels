@@ -71,8 +71,6 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
 
-    // gCoordinator.addComponent(m_entities[m_id], WeaponComponent{.weaponID = 20});
-
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", 185);
     gCoordinator.getComponent<ColliderComponent>(m_entities[0]).collision = cc;
 
@@ -106,7 +104,12 @@ void Dungeon::init()
         false, false, {cc.x, cc.y});
 
     const Entity weaponEntity = gCoordinator.createEntity();
-    gCoordinator.addComponent(weaponEntity, WeaponComponent{.weaponID = 20});
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.weaponID = 19});
+    gCoordinator.addComponent(weaponEntity, TileComponent{20, "Weapons", 4});
+    gCoordinator.addComponent(weaponEntity, TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(weaponEntity, RenderComponent{});
+    gCoordinator.addComponent(weaponEntity, ColliderComponent{});
+    gCoordinator.addComponent(weaponEntity, AnimationComponent{});
 
     gCoordinator.getRegisterSystem<InventorySystem>()->pickUpWeapon(m_entities[m_id], weaponEntity);
     gCoordinator.getRegisterSystem<EquipWeaponSystem>()->equipWeapon(m_entities[m_id], weaponEntity);
@@ -172,7 +175,6 @@ void Dungeon::update()
 
         multiplayerSystem->update();
     }
-
 
     m_roomMap.at(m_currentPlayerPos).update();
 }
@@ -343,6 +345,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 
         gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
         auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+
         colliderComponent.body->SetTransform(
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
             colliderComponent.body->GetAngle());

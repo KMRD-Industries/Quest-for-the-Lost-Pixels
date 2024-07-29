@@ -9,6 +9,6 @@
 
 void EquipWeaponSystem::equipWeapon(const Entity player, const Entity weapon)
 {
-    auto &equipped = gCoordinator.getComponent<EquippedWeaponComponent>(player);
+    auto& equipped = gCoordinator.getComponent<EquippedWeaponComponent>(player);
     equipped.currentWeapon = weapon;
 }

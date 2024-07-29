@@ -19,7 +19,6 @@ struct Collision
     double y{};
     double width{};
     double height{};
-    std::string type{};
     std::vector<ObjectProperty> properties;
 
     // Equality operator

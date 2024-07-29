@@ -4,11 +4,13 @@
 #include <math.h>
 #include "ColliderComponent.h"
 #include "DoorComponent.h"
+#include "EquippedWeaponComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
+#include "WeaponComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -75,6 +77,9 @@ void CollisionSystem::createMapCollision() const
             continue;
         }
 
+        const Collision& collision =
+            gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
+
         if (tileComponent.tileset == "SpecialBlocks")
         {
             if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER) + 1)
@@ -85,9 +90,6 @@ void CollisionSystem::createMapCollision() const
         }
         else
         {
-            Collision collision =
-                gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
-
             if (collision.width > 0 && collision.height > 0)
                 createCollisionBody(entity, "Wall", {collision.width, collision.height}, true, false,
                                     {collision.x, collision.y});
@@ -137,8 +139,11 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
             colliderComponent.collision.y = 0;
         }
 
-        transformComponent.position = {static_cast<float>(convertMetersToPixel(position.x)),
-                                       static_cast<float>(convertMetersToPixel(position.y))};
+        transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity))
+        {
+        }
 
         renderComponent.sprite.setPosition(position.x, position.y);
     }

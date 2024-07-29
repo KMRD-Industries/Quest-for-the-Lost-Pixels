@@ -106,6 +106,35 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
         window.draw(convex);
     };
 
+    auto drawSpecialCollision = [&](Entity entity)
+    {
+        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        auto weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+        sf::ConvexShape convex;
+        convex.setPointCount(4);
+
+        const auto& specialCollider = colliderComponent.specialCollision;
+        const sf::Vector2f normalizedPos = {static_cast<float>(specialCollider.x),
+                                            static_cast<float>(specialCollider.y)};
+
+        convex.setPoint(0, {normalizedPos.x, normalizedPos.y});
+        convex.setPoint(1, {static_cast<float>(normalizedPos.x + specialCollider.width), normalizedPos.y});
+        convex.setPoint(2,
+                        {static_cast<float>(normalizedPos.x + specialCollider.width),
+                         static_cast<float>(normalizedPos.y + specialCollider.height)});
+        convex.setPoint(3, {normalizedPos.x, static_cast<float>(normalizedPos.y + specialCollider.height)});
+
+        convex.setFillColor(sf::Color::Transparent);
+        convex.setOutlineThickness(1.f);
+        convex.setOutlineColor(sf::Color::Red);
+
+        const auto spriteCenter = GameType::MyVec2{transformComponent.position.x, transformComponent.position.y};
+
+        convex.setPosition(spriteCenter);
+        window.draw(convex);
+    };
+
     Collision cc =
         gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
 
@@ -150,6 +179,12 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
         if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<EnemyComponent>(entity))
         {
             drawSprite(entity);
+        }
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
+        {
+            drawSprite(entity);
+            drawSpecialCollision(entity);
         }
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);

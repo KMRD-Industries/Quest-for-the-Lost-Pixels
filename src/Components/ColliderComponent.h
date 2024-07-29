@@ -14,6 +14,7 @@ struct ColliderComponent
     std::function<void(GameType::CollisionData)> onCollisionEnter;
     std::function<void(GameType::CollisionData)> onCollisionOut;
     Collision collision;
+    Collision specialCollision;
     bool toDestroy{false};
 
     ColliderComponent() = default;
