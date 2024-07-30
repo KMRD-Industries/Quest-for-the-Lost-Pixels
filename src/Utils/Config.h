@@ -12,7 +12,7 @@ namespace config
     static constexpr float tileHeight{16.f};
     static constexpr float oneFrameTime{16.67};
     static constexpr int frameCycle{60};
-    static constexpr int maximumNumberOfLayers{5};
+    static constexpr int maximumNumberOfLayers{10};
     static constexpr float playerAttackRange{100.f};
     static constexpr float playerAttackDamage{100.f};
     static constexpr float playerAttackAngle{0.785f};

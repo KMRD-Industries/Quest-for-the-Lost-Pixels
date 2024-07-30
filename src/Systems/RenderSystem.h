@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SFML/System/Vector2.hpp"
 #include "System.h"
 
 namespace sf
@@ -14,6 +15,9 @@ public:
 
 private:
     void debugBoundingBoxes(sf::RenderWindow& window) const;
-    float mapRenderOffsetY = 0.f;
-    float mapRenderOffsetX = 0.f;
+    void drawEquipment(Entity) const;
+    void setOrigin(Entity) const;
+    void setPosition(Entity) const;
+
+    sf::Vector2f mapOffset = {};
 };
