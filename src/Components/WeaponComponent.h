@@ -9,4 +9,5 @@ struct WeaponComponent
     float rotationSpeed = 35.f;
     float maxAngle = 120.f;
     bool swingingForward = true;
+    float recoil = 10.f;
 };

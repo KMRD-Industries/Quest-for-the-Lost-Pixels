@@ -1,5 +1,6 @@
 #include "PlayerMovementSystem.h"
 #include "CharacterComponent.h"
+#include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "EquippedWeaponComponent.h"
 #include "InputHandler.h"
@@ -77,8 +78,25 @@ void PlayerMovementSystem::handleAttack()
         if (targetInBox.tag == "SecondPlayer")
         {
             auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
+            const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(targetInBox.entityID);
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(targetInBox.entityID);
+
             characterComponent.attacked = true;
             characterComponent.hp -= config::playerAttackDamage;
+
+            const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(entity).body->GetPosition();
+            const b2Vec2& targetPos = colliderComponent.body->GetPosition();
+
+            b2Vec2 recoilDirection = targetPos - attackerPos;
+            recoilDirection.Normalize(); // Normalize to get a unit vector for consistent recoil magnitude
+
+            const float& recoilMagnitude = 200.0f;
+            b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
+
+            transformComponent.velocity += {recoilVelocity.x, recoilVelocity.y};
+
+            b2Vec2 newPosition = colliderComponent.body->GetPosition() + 0.25 * recoilDirection;
+            colliderComponent.body->SetTransform(newPosition, colliderComponent.body->GetAngle());
         }
     }
 }

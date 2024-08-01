@@ -146,6 +146,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         }
 
         renderComponent.sprite.setPosition(position.x, position.y);
+        transformComponent.velocity = {};
     }
 }
 

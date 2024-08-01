@@ -41,6 +41,7 @@ void Dungeon::init()
 
     m_id = 0;
     const Entity player = gCoordinator.createEntity();
+
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     multiplayerSystem->setup("127.0.0.1", "9001");
 

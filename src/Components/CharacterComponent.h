@@ -6,8 +6,7 @@
 
 struct CharacterComponent
 {
-    float hp{};
-    bool attacked;
-
-    CharacterComponent() : hp(100.0f), attacked(false) {}
+    float hp{100};
+    bool attacked{};
+    int timeSinceAttacked{};
 };

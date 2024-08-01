@@ -185,8 +185,13 @@ void RenderSystem::displayDamageTaken(const Entity entity) const
     }
     else
     {
+        characterComponent.timeSinceAttacked++;
         renderComponent.sprite.setColor(sf::Color::Red);
-        characterComponent.attacked = false;
+        if (characterComponent.timeSinceAttacked >= 5)
+        {
+            characterComponent.attacked = false;
+            characterComponent.timeSinceAttacked = 0;
+        }
     }
 }
 
