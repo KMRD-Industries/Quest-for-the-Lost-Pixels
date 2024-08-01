@@ -18,6 +18,7 @@ private:
     void drawEquipment(Entity) const;
     void setOrigin(Entity) const;
     void setPosition(Entity) const;
+    void displayDamageTaken(Entity) const;
 
     sf::Vector2f mapOffset = {};
 };

@@ -234,8 +234,7 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
     colliderComponent.tag = tag;
 }
 
-
-void CollisionSystem::deleteBody(Entity entity)
+void CollisionSystem::deleteBody(const Entity entity)
 {
     if (!gCoordinator.hasComponent<ColliderComponent>(entity)) return;
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);

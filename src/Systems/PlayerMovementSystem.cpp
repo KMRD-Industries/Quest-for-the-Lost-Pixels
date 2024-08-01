@@ -1,10 +1,12 @@
 #include "PlayerMovementSystem.h"
 #include "CharacterComponent.h"
 #include "Coordinator.h"
+#include "EquippedWeaponComponent.h"
 #include "InputHandler.h"
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
+#include "WeaponComponent.h"
 #include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;
@@ -61,18 +63,22 @@ void PlayerMovementSystem::handleAttack()
     {
         if (!inputHandler->isPressed(InputType::Attack)) continue;
 
-        auto renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-        const auto bounds = renderComponent.sprite.getGlobalBounds();
+        // Start attack animation
+        const auto& equippedWeapone = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+        auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapone.currentWeapon);
+        weaponComponent.isAttacking = true;
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
         const auto center = glm::vec2{transformComponent.position.x, transformComponent.position.y};
-
         const auto range = glm::vec2{center.x * config::playerAttackRange * transformComponent.scale.x, center.y};
 
         const auto targetInBox = Physics::rayCast(center, range, entity);
 
         if (targetInBox.tag == "SecondPlayer")
-            gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID).hp -= config::playerAttackDamage;
+        {
+            auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
+            characterComponent.attacked = true;
+            characterComponent.hp -= config::playerAttackDamage;
+        }
     }
 }

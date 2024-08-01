@@ -1,5 +1,6 @@
 #include "RenderSystem.h"
 #include "AnimationComponent.h"
+#include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "EnemyComponent.h"
@@ -46,6 +47,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
 
             setOrigin(entity);
             setPosition(entity);
+            displayDamageTaken(entity);
 
             tiles[renderComponent.layer].push_back(&gCoordinator.getComponent<RenderComponent>(entity).sprite);
         }
@@ -81,7 +83,6 @@ void RenderSystem::setOrigin(const Entity entity) const
     // Get all necessary components
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
     const auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-    const auto& transferComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
     // Calculate the center of the collision component from top left corner.
     // X & Y are collision offset from top left corner of sprite tile.
@@ -131,6 +132,7 @@ void RenderSystem::setPosition(const Entity entity) const
         // Get all necessary Components
         const auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         const auto& weaponColliderComponent = gCoordinator.getComponent<ColliderComponent>(weaponEntity);
+        const auto& weaponComponenet = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
         auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
         auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
 
@@ -157,7 +159,7 @@ void RenderSystem::setPosition(const Entity entity) const
 
         // Update the weapon sprite's position and scale according to the transform component and game scale
         weaponTransformComponent.position = weaponPosition - weaponPlacement;
-        weaponTransformComponent.rotation = 30.f;
+        weaponTransformComponent.rotation = weaponComponenet.angle;
 
         weaponRenderComponent.sprite.setPosition(weaponTransformComponent.position);
 
@@ -167,6 +169,24 @@ void RenderSystem::setPosition(const Entity entity) const
         }
 
         weaponRenderComponent.sprite.setRotation(weaponTransformComponent.rotation);
+    }
+}
+
+void RenderSystem::displayDamageTaken(const Entity entity) const
+{
+    if (!gCoordinator.hasComponent<CharacterComponent>(entity)) return;
+
+    auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
+    auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+
+    if (!characterComponent.attacked)
+    {
+        renderComponent.sprite.setColor(sf::Color::White);
+    }
+    else
+    {
+        renderComponent.sprite.setColor(sf::Color::Red);
+        characterComponent.attacked = false;
     }
 }
 

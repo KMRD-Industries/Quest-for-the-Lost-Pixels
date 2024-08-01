@@ -56,7 +56,7 @@ void SpawnerSystem::spawnEnemy(const Entity entity)
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(new_monster);
 
     enemyTransformComponent = TransformComponent(spawnerTransform.position, 0., sf::Vector2f(1., 1.), {0.f, 0.f});
-    characterComponent.hp = 10.f;
+    characterComponent.hp = 89.f;
     enemyTileComponent = {19, "AnimSlimes", 4};
     colliderComponent.collision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
         enemyTileComponent.tileset, enemyTileComponent.id);

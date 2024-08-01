@@ -31,6 +31,7 @@
 #include "TravellingDungeonComponent.h"
 #include "TravellingSystem.h"
 #include "WeaponComponent.h"
+#include "WeaponsSystem.h"
 
 extern Coordinator gCoordinator;
 
@@ -62,7 +63,7 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id],
                               TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
     gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = 100.f});
+    gCoordinator.addComponent(m_entities[m_id], CharacterComponent{});
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(
@@ -133,6 +134,7 @@ void Dungeon::draw() const
 void Dungeon::update()
 {
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
+    gCoordinator.getRegisterSystem<WeaponSystem>()->update();
     gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
     gCoordinator.getRegisterSystem<EnemySystem>()->update();
     gCoordinator.getRegisterSystem<TravellingSystem>()->update();
@@ -163,7 +165,7 @@ void Dungeon::update()
                                       TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
             gCoordinator.addComponent(m_entities[id], AnimationComponent{});
             gCoordinator.addComponent(m_entities[id], ColliderComponent{});
-            gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = 100.f});
+            gCoordinator.addComponent(m_entities[id], CharacterComponent{});
 
             gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[id], tag);
 
@@ -275,6 +277,13 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<SpawnerSystem>(signature);
     }
 
+    const auto weaponSystem = gCoordinator.getRegisterSystem<WeaponSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<WeaponComponent>());
+        gCoordinator.setSystemSignature<WeaponSystem>(signature);
+    }
+
     const auto equipWeaponSystem = gCoordinator.getRegisterSystem<EquipWeaponSystem>();
     {
     }
@@ -306,7 +315,7 @@ void Dungeon::setECS()
         gCoordinator.addComponent(m_entities[i], AnimationComponent{});
         gCoordinator.addComponent(m_entities[i], ColliderComponent{});
         gCoordinator.addComponent(m_entities[i], EnemyComponent{});
-        gCoordinator.addComponent(m_entities[i], CharacterComponent{.hp = 10.f});
+        gCoordinator.addComponent(m_entities[i], CharacterComponent{});
     }
 }
 
