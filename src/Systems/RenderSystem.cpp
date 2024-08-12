@@ -10,6 +10,8 @@
 #include "SFML/Graphics/CircleShape.hpp"
 #include "SFML/Graphics/ConvexShape.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
+#include "TextTagComponent.h"
+#include "TextTagSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -63,6 +65,22 @@ void RenderSystem::draw(sf::RenderWindow& window)
             sprite->setPosition(sprite->getPosition() + mapOffset);
             window.draw(*sprite);
         }
+    }
+
+    for (const auto& entity : gCoordinator.getRegisterSystem<TextTagSystem>()->m_entities)
+    {
+        auto& textTag = gCoordinator.getComponent<TextTagComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+        textTag.text.setPosition(transformComponent.position.x + mapOffset.x,
+                                 transformComponent.position.y + mapOffset.y);
+
+        textTag.text.setString(std::to_string(config::playerAttackDamage));
+        textTag.text.setColor(textTag.color);
+        textTag.text.setScale(config::gameScale, config::gameScale);
+        textTag.text.setCharacterSize(15);
+
+        window.draw(textTag.text);
     }
 
     if (config::debugMode)
@@ -272,6 +290,21 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
         {
             drawSprite(entity);
         }
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) &&
+            gCoordinator.hasComponent<EquippedWeaponComponent>(entity))
+        {
+            auto& weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+
+            sf::VertexArray swordLine(sf::Lines, 2);
+            swordLine[0].position = center;
+            swordLine[0].color = sf::Color::Red;
+            swordLine[1].position = static_cast<sf::Vector2f>(
+                gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon).pivot);
+            swordLine[1].color = sf::Color::Blue;
+            window.draw(swordLine);
+        }
+
 
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 

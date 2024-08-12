@@ -5,9 +5,12 @@ struct WeaponComponent
     int weaponID{};
     int damage{};
     bool isAttacking{};
-    float angle = 30.f;
-    float rotationSpeed = 35.f;
-    float maxAngle = 120.f;
-    bool swingingForward = true;
-    float recoil = 10.f;
+    bool swingingForward{true};
+    bool isFacingLeftToRight{true};
+    float angle{30.f};
+    float startingAngle{30.f};
+    float rotationSpeed{15.f};
+    float maxAngle{120.f};
+    float recoil{10.f};
+    sf::Vector2i pivot{};
 };

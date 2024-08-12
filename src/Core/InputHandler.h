@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include "Helpers.h"
 #include "SFML/Window/Keyboard.hpp"
+#include "SFML/Window/Mouse.hpp"
 
 enum class InputType
 {
@@ -24,6 +25,7 @@ class InputHandler
                                                                      {sf::Keyboard::Key::D, InputType::MoveRight},
                                                                      {sf::Keyboard::Key::Space, InputType::Attack}};
     inline static InputHandler* m_instance{};
+    sf::Vector2i m_mousePosition = {};
     InputHandler() = default;
 
 public:
@@ -37,7 +39,9 @@ public:
     };
     [[nodiscard]] bool isHeld(InputType input) const;
     [[nodiscard]] bool isPressed(InputType input) const;
+    sf::Vector2i getMousePosition() const;
     void handleKeyboardInput(sf::Keyboard::Key key, bool isPressed);
+    void updateMousePosition(sf::Vector2i);
     void clearPressedInputs();
     void update();
 

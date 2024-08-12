@@ -11,7 +11,10 @@
 #include "Paths.h"
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
+#include "TextTagSystem.h"
 
+
+class TextTagSystem;
 Coordinator gCoordinator;
 
 void handleInput(sf::RenderWindow& window)
@@ -35,8 +38,9 @@ void handleInput(sf::RenderWindow& window)
         }
         else if (event.type == sf::Event::MouseMoved && config::debugMode)
         {
-            sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+            const sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
             std::cout << "Pozycja myszki: x=" << mousePosition.x << " y=" << mousePosition.y << std::endl;
+            InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
         if (event.type == sf::Event::Closed)
         {
@@ -86,6 +90,7 @@ int main()
         game.draw();
 
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
+        gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
 
         ImGui::SFML::Update(window, deltaClock.restart());
 

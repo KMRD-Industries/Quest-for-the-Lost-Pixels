@@ -45,6 +45,7 @@ set(COMPONENTS
         Components/WeaponComponent.h
         Components/InventoryComponent.h
         Components/EquippedWeaponComponent.h
+        Components/TextTagComponent.h
 )
 
 set(MAP
@@ -86,6 +87,8 @@ set(SYSTEMS
         Systems/InventorySystem.h
         Systems/EquipWeaponSystem.cpp
         Systems/EquipWeaponSystem.h
+        Systems/TextTagSystem.cpp
+        Systems/TextTagSystem.h
 )
 
 set(ATLAS_COMPONENTS
@@ -101,6 +104,8 @@ set(UTILS
         Utils/MapParser.h
         Utils/Config.h
         Utils/TextureParser.h
+        Utils/CircularIterator.h
+        Utils/TextTag.h
 )
 
 source_group("Core" FILES ${CORE})
@@ -120,7 +125,7 @@ target_compile_features(qlp PRIVATE cxx_std_23)
 
 if (WIN32)
     set(BOX2D_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/box2d-build/bin/${CMAKE_BUILD_TYPE}")
-	set(ADDITIONAL_DLL_DIR "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
+    set(ADDITIONAL_DLL_DIR "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
     add_custom_command(
             TARGET qlp
             COMMENT "Copy OpenAL and Box2D DLLs"
@@ -132,18 +137,18 @@ if (WIN32)
     # Dodanie komendy do kopiowania libprotobufd.dll, jeśli istnieje
     if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobufd.dll)
         add_custom_command(
-			TARGET qlp
-			PRE_BUILD 
-			COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobufd.dll $<TARGET_FILE_DIR:qlp>
-			VERBATIM
+                TARGET qlp
+                PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobufd.dll $<TARGET_FILE_DIR:qlp>
+                VERBATIM
         )
     endif ()
-	if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobuf.dll)
+    if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobuf.dll)
         add_custom_command(
-			TARGET qlp
-			PRE_BUILD 
-			COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobuf.dll $<TARGET_FILE_DIR:qlp>
-			VERBATIM
+                TARGET qlp
+                PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobuf.dll $<TARGET_FILE_DIR:qlp>
+                VERBATIM
         )
     endif ()
 endif ()

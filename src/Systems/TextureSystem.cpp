@@ -27,7 +27,7 @@ int TextureSystem::loadFromFile(const std::string& path)
 {
     try
     {
-        Tileset parsed_tileset = parseTileset(path); // Parse Tileset to struct
+        const Tileset parsed_tileset = parseTileset(path); // Parse Tileset to struct
         sf::Image image;
         long gid = static_cast<long>(texture_map.size()); // Get id first unused tile id
 
@@ -43,7 +43,7 @@ int TextureSystem::loadFromFile(const std::string& path)
         texture_indexes.emplace(parsed_tileset.name, gid);
 
         gid += 1; // First unused ID
-        long first_gid_copy = gid;
+        const long first_gid_copy = gid;
 
         sf::Texture tex;
         tex.loadFromImage(image);
@@ -61,7 +61,7 @@ int TextureSystem::loadFromFile(const std::string& path)
         no_textures = static_cast<long>(texture_map.size());
 
         // Animations are also stored in TilesetFormat
-        for (auto& tile : parsed_tileset.tiles)
+        for (const auto& tile : parsed_tileset.tiles)
         {
             long adjusted_id = first_gid_copy + tile.id;
 
@@ -69,10 +69,10 @@ int TextureSystem::loadFromFile(const std::string& path)
             {
                 std::vector<AnimationFrame> frames;
 
-                for (auto& frame : tile.animation)
+                for (const auto& frame : tile.animation)
                 {
-                    long id = frame.tileid + 1;
-                    long duration = frame.duration;
+                    const long id = frame.tileid + 1;
+                    const long duration = frame.duration;
                     frames.push_back({id, duration});
                 }
 
@@ -193,7 +193,7 @@ void TextureSystem::loadTextures()
         if (map_animations.contains(adjusted_id))
         {
             animation_component.frames = getAnimations(tile_component.tileset, tile_component.id);
-            animation_component.it = animation_component.frames.begin() + 1;
+            animation_component.it = {animation_component.frames.begin(), animation_component.frames.end()};
         }
 
         if (map_collisions.contains(adjusted_id))

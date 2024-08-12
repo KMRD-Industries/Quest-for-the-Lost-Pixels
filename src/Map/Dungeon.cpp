@@ -25,6 +25,8 @@
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
+#include "TextTagComponent.h"
+#include "TextTagSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -128,7 +130,6 @@ void Dungeon::init()
 void Dungeon::draw() const
 {
     gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
-
     m_roomMap.at(m_currentPlayerPos).draw();
 }
 
@@ -141,6 +142,7 @@ void Dungeon::update()
     gCoordinator.getRegisterSystem<TravellingSystem>()->update();
     gCoordinator.getRegisterSystem<CharacterSystem>()->update();
     gCoordinator.getRegisterSystem<AnimationSystem>()->updateFrames();
+    gCoordinator.getRegisterSystem<TextTagSystem>()->update();
 
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
 
@@ -196,6 +198,7 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<WeaponComponent>();
     gCoordinator.registerComponent<InventoryComponent>();
     gCoordinator.registerComponent<EquippedWeaponComponent>();
+    gCoordinator.registerComponent<TextTagComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -259,7 +262,7 @@ void Dungeon::setECS()
         Signature signature;
         signature.set(gCoordinator.getComponentType<AnimationComponent>());
         signature.set(gCoordinator.getComponentType<TileComponent>());
-        gCoordinator.setSystemSignature<TextureSystem>(signature);
+        gCoordinator.setSystemSignature<AnimationSystem>(signature);
     }
 
     const auto enemySystem = gCoordinator.getRegisterSystem<EnemySystem>();
@@ -285,6 +288,14 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<WeaponSystem>(signature);
     }
 
+    const auto textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TextTagComponent>());
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        gCoordinator.setSystemSignature<TextTagSystem>(signature);
+    }
+
     const auto equipWeaponSystem = gCoordinator.getRegisterSystem<EquipWeaponSystem>();
     {
     }
@@ -293,8 +304,8 @@ void Dungeon::setECS()
     {
     }
 
-
     textureSystem->loadTexturesFromFiles();
+    textTagSystem->init();
 
     for (int i = config::mapFirstEntity; i < config::mapFirstEntity + config::numberOfMapEntities; i++)
     {

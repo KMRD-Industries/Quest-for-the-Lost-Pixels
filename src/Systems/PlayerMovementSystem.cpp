@@ -5,7 +5,9 @@
 #include "EquippedWeaponComponent.h"
 #include "InputHandler.h"
 #include "Physics.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
+#include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 #include "glm/vec2.hpp"
@@ -14,6 +16,7 @@ extern Coordinator gCoordinator;
 
 void PlayerMovementSystem::update()
 {
+    handleMousePositionUpdate();
     handleMovement();
     handleAttack();
 }
@@ -57,6 +60,19 @@ void PlayerMovementSystem::handleMovement()
     }
 }
 
+void PlayerMovementSystem::handleMousePositionUpdate() const
+{
+    const auto inputHandler{InputHandler::getInstance()};
+
+    for (const auto entity : m_entities)
+    {
+        const auto& equippedWeapone = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+        auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapone.currentWeapon);
+
+        weaponComponent.pivot = inputHandler->getMousePosition();
+    }
+}
+
 void PlayerMovementSystem::handleAttack()
 {
     const auto inputHandler{InputHandler::getInstance()};
@@ -66,8 +82,11 @@ void PlayerMovementSystem::handleAttack()
 
         // Start attack animation
         const auto& equippedWeapone = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+        const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapone.currentWeapon);
         weaponComponent.isAttacking = true;
+        weaponComponent.isFacingLeftToRight = renderComponent.sprite.getScale().x > 0;
+        weaponComponent.angle = weaponComponent.startingAngle;
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         const auto center = glm::vec2{transformComponent.position.x, transformComponent.position.y};
@@ -79,7 +98,11 @@ void PlayerMovementSystem::handleAttack()
         {
             auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
             const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(targetInBox.entityID);
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(targetInBox.entityID);
+            auto& secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(targetInBox.entityID);
+
+            const Entity tag = gCoordinator.createEntity();
+            gCoordinator.addComponent(tag, TextTagComponent{});
+            gCoordinator.addComponent(tag, TransformComponent{secondPlayertransformComponent});
 
             characterComponent.attacked = true;
             characterComponent.hp -= config::playerAttackDamage;
@@ -88,12 +111,15 @@ void PlayerMovementSystem::handleAttack()
             const b2Vec2& targetPos = colliderComponent.body->GetPosition();
 
             b2Vec2 recoilDirection = targetPos - attackerPos;
-            recoilDirection.Normalize(); // Normalize to get a unit vector for consistent recoil magnitude
+            recoilDirection.Normalize();
 
-            const float& recoilMagnitude = 200.0f;
-            b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
+            const float& recoilMagnitude = 20.0f;
+            const b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
 
-            transformComponent.velocity += {recoilVelocity.x, recoilVelocity.y};
+            secondPlayertransformComponent.velocity.x +=
+                static_cast<float>(recoilVelocity.x * config::meterToPixelRatio);
+            secondPlayertransformComponent.velocity.y +=
+                static_cast<float>(recoilVelocity.y * config::meterToPixelRatio);
 
             b2Vec2 newPosition = colliderComponent.body->GetPosition() + 0.25 * recoilDirection;
             colliderComponent.body->SetTransform(newPosition, colliderComponent.body->GetAngle());

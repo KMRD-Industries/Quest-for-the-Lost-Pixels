@@ -1,10 +1,11 @@
 #include "AnimationSystem.h"
 #include "Config.h"
 #include "TileComponent.h"
+#include "TransformComponent.h"
 
 void AnimationSystem::updateFrames()
 {
-    updateFrameTime();
+    m_frameTime = (m_frameTime + 1) % config::frameCycle;
 
     for (const auto entity : m_entities)
     {
@@ -12,44 +13,33 @@ void AnimationSystem::updateFrames()
     }
 }
 
-void AnimationSystem::updateFrameTime() { frame_time = (frame_time + 1) % config::frameCycle; }
-
 void AnimationSystem::updateEntityAnimation(const Entity entity) const
 {
-    if (!gCoordinator.hasComponent<AnimationComponent>(entity)) return;
-    auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
-
-    if (animation.frames.empty())
+    if (auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
+        !animation.frames.empty() && isTimeForNextFrame(calculateFrameDuration(animation)))
     {
-        return;
+        loadNextFrame(entity, animation);
     }
-
-    const int frameDuration = calculateFrameDuration(animation);
-
-    if (!isTimeForNextFrame(frameDuration))
-    {
-        return;
-    }
-
-    loadNextFrame(entity, animation);
 }
 
-int AnimationSystem::calculateFrameDuration(const AnimationComponent& animation)
+inline int AnimationSystem::calculateFrameDuration(AnimationComponent& animation)
 {
     const auto duration = static_cast<float>(animation.it->duration);
     return static_cast<int>(duration / config::oneFrameTime) + 1;
 }
 
-bool AnimationSystem::isTimeForNextFrame(const int frameDuration) const { return frame_time % frameDuration == 0; }
+inline bool AnimationSystem::isTimeForNextFrame(const int frameDuration) const
+{
+    return m_frameTime % frameDuration == 0;
+}
 
 void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& animation)
 {
-    auto& tile = gCoordinator.getComponent<TileComponent>(entity);
+    auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
-    if (++animation.it >= animation.frames.end())
-    {
-        animation.it = animation.frames.begin();
-    }
+    ++animation.it;
 
-    tile.id = animation.it->tileid;
+    tileComponent.id = animation.it->tileid;
+    transformComponent.rotation = animation.it->rotation;
 }
