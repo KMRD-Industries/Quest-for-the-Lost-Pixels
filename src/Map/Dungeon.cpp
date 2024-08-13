@@ -108,8 +108,8 @@ void Dungeon::init()
         false, false, {cc.x, cc.y});
 
     const Entity weaponEntity = gCoordinator.createEntity();
-    gCoordinator.addComponent(weaponEntity, WeaponComponent{.weaponID = 147});
-    gCoordinator.addComponent(weaponEntity, TileComponent{148, "Weapons", 5});
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.weaponID = 19});
+    gCoordinator.addComponent(weaponEntity, TileComponent{20, "Weapons", 5});
     gCoordinator.addComponent(weaponEntity, TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
     gCoordinator.addComponent(weaponEntity, ColliderComponent{});

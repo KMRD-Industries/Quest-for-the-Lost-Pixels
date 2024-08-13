@@ -1,7 +1,9 @@
 #include "WeaponsSystem.h"
 
-#include <math.h>
+#include <RenderSystem.h>
+#include <cmath>
 #include "AnimationSystem.h"
+#include "RenderComponent.h"
 #include "WeaponComponent.h"
 
 void WeaponSystem::update()
@@ -65,9 +67,20 @@ void WeaponSystem::rotateForward(const Entity entity)
 void WeaponSystem::updateStartingAngle(const Entity entity)
 {
     auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
+    const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+
     if (weaponComponent.isAttacking) return;
+
+    const auto& origin = renderComponent.sprite.getPosition();
+
+    weaponComponent.atan = {weaponComponent.pivot.x - static_cast<int>(origin.x),
+                            weaponComponent.pivot.y - static_cast<int>(origin.y)};
+
+    const float angle = std::atan2(weaponComponent.atan.y, weaponComponent.atan.x);
+
+    auto angleInDegrees = static_cast<float>(angle * (180.0f / M_PI));
 
     // Adjust the angle to the mirrored starting position if the weapon is facing left to right
     weaponComponent.angle =
-        (weaponComponent.isFacingLeftToRight) ? weaponComponent.startingAngle : 420 - weaponComponent.startingAngle;
+        (weaponComponent.isFacingLeftToRight) ? (weaponComponent.startingAngle + angleInDegrees + 30) : angleInDegrees;
 }

@@ -89,10 +89,10 @@ int main()
         game.update();
         game.draw();
 
+        ImGui::SFML::Update(window, deltaClock.restart());
+
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
-
-        ImGui::SFML::Update(window, deltaClock.restart());
 
         ImGui::SFML::Render(window);
         window.display();

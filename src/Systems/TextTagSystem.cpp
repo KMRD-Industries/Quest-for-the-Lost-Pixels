@@ -20,6 +20,8 @@ void TextTagSystem::update()
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         textTagComponent.text.setFont(this->font);
+        textTagComponent.text.setOutlineColor(sf::Color(0, 0, 0, 128));
+        textTagComponent.text.setOutlineThickness(1);
         textTagComponent.lifetime--;
         transformComponent.position.y += textTagComponent.speed;
     }

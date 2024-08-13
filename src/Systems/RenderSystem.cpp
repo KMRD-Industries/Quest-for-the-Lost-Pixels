@@ -17,6 +17,8 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
+#include "imgui.h"
+
 extern Coordinator gCoordinator;
 
 void RenderSystem::draw(sf::RenderWindow& window)
@@ -180,12 +182,6 @@ void RenderSystem::setPosition(const Entity entity) const
         weaponTransformComponent.rotation = weaponComponenet.angle;
 
         weaponRenderComponent.sprite.setPosition(weaponTransformComponent.position);
-
-        if (renderComponent.sprite.getScale().x < 0)
-        {
-            weaponTransformComponent.rotation -= 60;
-        }
-
         weaponRenderComponent.sprite.setRotation(weaponTransformComponent.rotation);
     }
 }
@@ -289,6 +285,38 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
             gCoordinator.hasComponent<WeaponComponent>(entity))
         {
             drawSprite(entity);
+        }
+
+        if (gCoordinator.hasComponent<EquippedWeaponComponent>(entity))
+        {
+            auto& weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+            auto& weapon = gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon);
+
+            // Display the table in the top-right corner
+            ImGui::SetNextWindowPos(ImVec2(window.getSize().x - 250, 10), ImGuiCond_Always);
+            ImGui::Begin("Weapon Stats", nullptr,
+                         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
+                             ImGuiWindowFlags_NoTitleBar);
+
+            ImGui::Text("Weapon ID: %d", weapon.weaponID);
+            ImGui::Text("Damage: %d", weapon.damage);
+            ImGui::Text("Is Attacking: %s", weapon.isAttacking ? "True" : "False");
+            ImGui::Text("Swinging Forward: %s", weapon.swingingForward ? "True" : "False");
+            ImGui::Text("Facing Left to Right: %s", weapon.isFacingLeftToRight ? "True" : "False");
+            ImGui::Text("Angle: %.2f", weapon.angle);
+            ImGui::Text("Starting Angle: %.2f", weapon.startingAngle);
+            ImGui::Text("Rotation Speed: %.2f", weapon.rotationSpeed);
+            ImGui::Text("Max Angle: %.2f", weapon.maxAngle);
+            ImGui::Text("Recoil: %.2f", weapon.recoil);
+            ImGui::Text("Pivot: (%d, %d)", weapon.pivot.x, weapon.pivot.y);
+            ImGui::Text("Atan: (%d, %d)", weapon.atan.x, weapon.atan.y);
+
+            const auto pos = gCoordinator.getComponent<TransformComponent>(entity);
+
+            ImGui::Text("Player position: (%.2f, %.2f)", pos.position.x, pos.position.y);
+            ImGui::Text("Player velocity: (%.2f, %.2f)", pos.velocity.x, pos.velocity.y);
+
+            ImGui::End();
         }
 
         if (gCoordinator.hasComponent<PlayerComponent>(entity) &&

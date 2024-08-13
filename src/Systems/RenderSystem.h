@@ -12,6 +12,7 @@ class RenderSystem : public System
 {
 public:
     void draw(sf::RenderWindow& window);
+    sf::Vector2f mapOffset = {};
 
 private:
     void debugBoundingBoxes(sf::RenderWindow& window) const;
@@ -19,6 +20,4 @@ private:
     void setOrigin(Entity) const;
     void setPosition(Entity) const;
     void displayDamageTaken(Entity) const;
-
-    sf::Vector2f mapOffset = {};
 };

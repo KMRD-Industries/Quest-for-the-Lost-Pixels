@@ -37,7 +37,7 @@
                      "visible":true,
                      "width":1,
                      "x":7.5,
-                     "y":26
+                     "y":28
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -57,7 +57,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
