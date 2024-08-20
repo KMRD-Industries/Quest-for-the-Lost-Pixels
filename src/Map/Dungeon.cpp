@@ -1,6 +1,7 @@
 #include <format>
 
 #include <comm.pb.h>
+#include <ctime>
 
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
@@ -157,8 +158,46 @@ void Dungeon::update()
         }
 
         multiplayerSystem->update();
-    }
 
+        clock_t lastUpdatedTime = 0;
+        if (((clock() - lastUpdatedTime) / CLOCKS_PER_SEC) % 5 == 0)
+        {
+//            std::cout << (clock() - lastUpdatedTime) / CLOCKS_PER_SEC << "\n";
+            lastUpdatedTime = clock();
+            for (const auto entity : m_entities)
+            {
+                if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
+
+                auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
+                if (position.x != 0 && position.y != 0)
+                {
+                    if (gCoordinator.hasComponent<EnemyComponent>(entity))
+                    {
+//                        std::cout << "enemy: x " << position.x << " y : " << position.y << "\n";
+                        m_enemyPositions.insert({entity, {static_cast<int>(position.x), static_cast<int>(position.y)}});
+                    }
+//                    else if (gCoordinator.hasComponent<PlayerComponent>(entity))
+//                    {
+//                        std::cout << "player: x " << position.x << " y : " << position.y << "\n";
+//
+//                    }
+                    else if (gCoordinator.hasComponent<ColliderComponent>(entity))
+                    {
+                        auto collider = gCoordinator.getComponent<ColliderComponent>(entity);
+                        if (collider.body != nullptr)
+                        {
+                            auto renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+                            auto sprite = renderComponent.sprite.getGlobalBounds();
+                            ObstacleData obstacle{sprite.height, sprite.width, position.x, position.y};
+                            m_obstaclePositions.insert({entity, obstacle});
+                        }
+                    }
+                }
+
+            }
+            multiplayerSystem->updateMap(m_enemyPositions, m_obstaclePositions);
+        }
+    }
 
     m_roomMap.at(m_currentPlayerPos).update();
 }

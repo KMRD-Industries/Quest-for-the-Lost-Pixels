@@ -97,3 +97,16 @@ namespace std
         size_t operator()(const GameType::MapInfo& mapInfo) const { return hash<int>()(mapInfo.mapID); }
     };
 } // namespace std
+
+struct ObstacleData
+{
+    int height{}, width{}, left{}, top{}; // where x and y are the left top position
+
+    ObstacleData() = default;
+
+    ObstacleData(const float height, const float width, const float left, const float top):
+    height{static_cast<int>(height)}, width{static_cast<int>(width)}, left{static_cast<int>(left)}, top{static_cast<int>(top)}
+    {
+    }
+
+};

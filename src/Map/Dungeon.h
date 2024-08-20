@@ -7,6 +7,7 @@
 #include "Paths.h"
 #include "Room.h"
 #include "Types.h"
+#include <map>
 
 class Dungeon
 {
@@ -29,6 +30,8 @@ private:
     std::vector<Entity> m_entities{};
     std::uint32_t m_id{};
     std::deque<glm::ivec2> m_moveInDungeon{};
+    std::map<Entity, sf::Vector2<int>> m_enemyPositions;
+    std::map<Entity, ObstacleData> m_obstaclePositions;
     float counter = 0;
     bool m_passedBy = false;
 };

@@ -8,8 +8,8 @@
 #include "Coordinator.h"
 #include "MultiplayerSystem.h"
 #include "TransformComponent.h"
-#include "Types.h"
 #include "boost/system/system_error.hpp"
+#include "EnemyComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -57,15 +57,17 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
 {
     const std::size_t available = m_tcp_socket.available();
     comm::StateUpdate state;
+//    std::cout << "[pollStateUpdate] Bytes available: " << available << std::endl;
     if (available > 0)
     {
         // temporary solution - msg length should always be 4
         // reading all available bytes will cause ignoring of all but 1 messages
-        std::vector<char> buf(4);
+        std::vector<char> buf(available);
         std::size_t received = m_tcp_socket.read_some(boost::asio::buffer(buf));
 
         state.ParseFromArray(buf.data(), received);
         std::cout << state.ShortDebugString() << '\n';
+        std::cout << "halo\n";
     }
     else
     {
@@ -83,18 +85,30 @@ void MultiplayerSystem::update()
     std::size_t received = 0;
     const std::size_t available = m_udp_socket.available();
 
+//    std::cout << "[update] Bytes available: " << available << std::endl;
     if (available > 0)
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
-        m_position.ParseFromArray(&m_buf, received);
-        std::uint32_t id = m_position.entity_id();
+        comm::WrapperMessage wrappedMessage;
+        wrappedMessage.ParseFromArray(&m_buf, received);
+//        m_position.ParseFromArray(&m_buf, received);
+        std::cout << "Received message...";
+        switch(wrappedMessage.type()) {
+            case comm::MessageType::MAP_UPDATE:
+                std::cout << "Map update...\n";
+            case comm::MessageType::POSITION_UPDATE:
+                m_position.ParseFromString(wrappedMessage.payload());
+                std::uint32_t id = m_position.entity_id();
+                std::cout << "Position update from: " << "id\n";
 
-        if (m_entity_map.contains(id))
-        {
-            Entity& target = m_entity_map[id];
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
+                if (m_entity_map.contains(id))
+                {
+                    Entity& target = m_entity_map[id];
+                    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
 
-            transformComponent.position = {m_position.x(), m_position.y()};
+                    transformComponent.position = {m_position.x(), m_position.y()};
+                }
+                break;
         }
     }
 
@@ -107,8 +121,14 @@ void MultiplayerSystem::update()
     m_position.set_x(transformComponent.position.x);
     m_position.set_y(transformComponent.position.y);
 
-    auto serialized = m_position.SerializeAsString();
-    m_udp_socket.send(boost::asio::buffer(serialized));
+    std::cout << "Player: " << m_player_id << " is moving to: " << m_position.x() << ", " << m_position.y() << "\n";
+
+    comm::WrapperMessage message;
+    message.set_type(comm::MessageType::POSITION_UPDATE);
+    message.set_payload(m_position.SerializeAsString());
+
+    auto serializedMessage = message.SerializeAsString();
+    m_udp_socket.send(boost::asio::buffer(serializedMessage));
 }
 
 void MultiplayerSystem::disconnect()
@@ -116,4 +136,18 @@ void MultiplayerSystem::disconnect()
     if (!m_connected) return;
     m_tcp_socket.close();
     m_udp_socket.close();
+}
+
+void MultiplayerSystem::updateMap(std::map<Entity, sf::Vector2<int>> enemies, std::map<Entity, ObstacleData> obstacles)
+{
+//    std::cout << "another update!!!!\n";
+//    for (const auto& enemy : enemies) {
+//        std::cout << "enemy's position: x: " << enemy.second.x << " y: " << enemy.second.y << "\n";
+//    }
+//
+//    for (const auto& obstacle : obstacles) {
+//       std::cout << "obstacle's position left: " << obstacle.second.left << " top: " << obstacle.second.top << "\n";
+//    }
+    const std::size_t available = m_udp_socket.available();
+//    if (available > 0)
 }

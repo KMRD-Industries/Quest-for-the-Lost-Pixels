@@ -7,6 +7,7 @@
 
 #include "System.h"
 #include "Types.h"
+#include "GameTypes.h"
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
@@ -31,6 +32,7 @@ public:
     void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
     void entityDisconnected(const std::uint32_t id) noexcept;
     void update();
+    void updateMap(std::map<Entity, sf::Vector2<int>> enemies, std::map<Entity, ObstacleData> obstacles);
     void disconnect();
 
     std::uint32_t registerPlayer(const Entity player);
