@@ -55,7 +55,7 @@ void PlayerMovementSystem::handleMovement()
         const auto playerSpeed = glm::vec2{normalizedDir.x * config::playerAcc, normalizedDir.y * config::playerAcc};
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
-        transformComponent.scale = {(flip) ? -1.f : 1.f, transformComponent.scale.y};
+        // transformComponent.scale = {(flip) ? -1.f : 1.f, transformComponent.scale.y};
         transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
     }
 }
@@ -66,10 +66,11 @@ void PlayerMovementSystem::handleMousePositionUpdate() const
 
     for (const auto entity : m_entities)
     {
-        const auto& equippedWeapone = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
-        auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapone.currentWeapon);
-
+        const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
         weaponComponent.pivot = inputHandler->getMousePosition();
+        transformComponent.scale = {(weaponComponent.atan.x <= 0) ? -1.f : 1.f, transformComponent.scale.y};
     }
 }
 

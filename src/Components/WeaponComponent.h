@@ -9,7 +9,7 @@ struct WeaponComponent
     bool isFacingLeftToRight{true};
     float angle{0.f};
     float startingAngle{30.f};
-    float rotationSpeed{15.f};
+    float rotationSpeed{10.f};
     float maxAngle{120.f};
     float recoil{10.f};
     sf::Vector2i pivot{};

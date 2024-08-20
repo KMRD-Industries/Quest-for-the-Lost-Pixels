@@ -5,6 +5,7 @@
 #include "CollisionSystem.h"
 #include "EnemyComponent.h"
 #include "EquippedWeaponComponent.h"
+#include "Paths.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
@@ -38,7 +39,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
             mapOffset.x = std::max(mapOffset.x, transformComponent.position.x);
             mapOffset.y = std::max(mapOffset.y, transformComponent.position.y);
 
-            // Ensure collision component have valid dimenstions
+            // Ensure collision component have valid dimensions
             if (collisionComponent.collision.height == 0 || collisionComponent.collision.width == 0)
             {
                 collisionComponent.collision.height = std::max(spriteBounds.height, config::tileHeight);
@@ -50,7 +51,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
             renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
 
             setOrigin(entity);
-            setPosition(entity);
+            setSpritePosition(entity);
             displayDamageTaken(entity);
 
             tiles[renderComponent.layer].push_back(&gCoordinator.getComponent<RenderComponent>(entity).sprite);
@@ -60,25 +61,44 @@ void RenderSystem::draw(sf::RenderWindow& window)
     mapOffset.x = (static_cast<float>(windowSize.x) - mapOffset.x) * 0.5f;
     mapOffset.y = (static_cast<float>(windowSize.y) - mapOffset.y) * 0.5f;
 
+    sf::Shader shader;
+    if (!shader.loadFromFile(std::string(ASSET_PATH) + "/shaders/vertex_shader.vert",
+                             std::string(ASSET_PATH) + "/shaders/fragment_shader.frag"))
+    {
+        std::cerr << "Failed to load shaders!" << std::endl;
+        return;
+    }
+
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
+
     for (auto& layer : tiles)
     {
         for (const auto& sprite : layer)
         {
             sprite->setPosition(sprite->getPosition() + mapOffset);
-            window.draw(*sprite);
+
+            const float shadeFactor = calculateShade(sprite->getPosition(), transformComponent.position + mapOffset);
+            shader.setUniform("shadeFactor", shadeFactor);
+            shader.setUniform("texture", sf::Shader::CurrentTexture); // Bind the sprite's texture
+
+            sf::RenderStates states;
+            states.shader = &shader;
+
+            // Draw the sprite with the shader
+            window.draw(*sprite, states);
         }
     }
 
     for (const auto& entity : gCoordinator.getRegisterSystem<TextTagSystem>()->m_entities)
     {
         auto& textTag = gCoordinator.getComponent<TextTagComponent>(entity);
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         textTag.text.setPosition(transformComponent.position.x + mapOffset.x,
                                  transformComponent.position.y + mapOffset.y);
 
         textTag.text.setString(std::to_string(config::playerAttackDamage));
-        textTag.text.setColor(textTag.color);
+        textTag.text.setFillColor(textTag.color);
         textTag.text.setScale(config::gameScale, config::gameScale);
         textTag.text.setCharacterSize(15);
 
@@ -89,6 +109,14 @@ void RenderSystem::draw(sf::RenderWindow& window)
     {
         debugBoundingBoxes(window);
     }
+}
+
+float RenderSystem::calculateShade(const sf::Vector2f& position, const sf::Vector2f source)
+{
+    // Example shading calculation (simple distance-based shading)
+    sf::Vector2f lightSource(source); // Example light source position
+    float distance = std::sqrt(std::pow(position.x - lightSource.x, 2) + std::pow(position.y - lightSource.y, 2));
+    return std::max(0.f, 1.f - distance / 1500.f); // Normalize and clamp
 }
 
 /**
@@ -129,10 +157,10 @@ void RenderSystem::setOrigin(const Entity entity) const
 
 /**
  * \brief Set up Sprite Position for Render System entity.
- * In addition process all entities connected to entity if possible.
+ * In addition, process all entities connected to entity if possible.
  * \param entity The entity currently processed.
  * */
-void RenderSystem::setPosition(const Entity entity) const
+void RenderSystem::setSpritePosition(const Entity entity)
 {
     if (gCoordinator.hasComponent<WeaponComponent>(entity)) return;
 
@@ -152,7 +180,7 @@ void RenderSystem::setPosition(const Entity entity) const
         // Get all necessary Components
         const auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         const auto& weaponColliderComponent = gCoordinator.getComponent<ColliderComponent>(weaponEntity);
-        const auto& weaponComponenet = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
+        const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
         auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
         auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
 
@@ -179,14 +207,14 @@ void RenderSystem::setPosition(const Entity entity) const
 
         // Update the weapon sprite's position and scale according to the transform component and game scale
         weaponTransformComponent.position = weaponPosition - weaponPlacement;
-        weaponTransformComponent.rotation = weaponComponenet.angle;
+        weaponTransformComponent.rotation = weaponComponent.angle;
 
         weaponRenderComponent.sprite.setPosition(weaponTransformComponent.position);
         weaponRenderComponent.sprite.setRotation(weaponTransformComponent.rotation);
     }
 }
 
-void RenderSystem::displayDamageTaken(const Entity entity) const
+void RenderSystem::displayDamageTaken(const Entity entity)
 {
     if (!gCoordinator.hasComponent<CharacterComponent>(entity)) return;
 
@@ -208,6 +236,49 @@ void RenderSystem::displayDamageTaken(const Entity entity) const
         }
     }
 }
+
+void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const Entity entity)
+{
+    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 250, 240), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always); // Set the width to 250, height is auto
+    ImGui::Begin("abc", nullptr,
+                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_NoTitleBar);
+
+    const auto pos = gCoordinator.getComponent<TransformComponent>(entity);
+
+    ImGui::Text("Player position: (%.2f, %.2f)", pos.position.x, pos.position.y);
+    ImGui::Text("Player velocity: (%.2f, %.2f)", pos.velocity.x, pos.velocity.y);
+    ImGui::End();
+}
+
+void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const Entity entity)
+{
+    const auto& weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+    const auto& weapon = gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon);
+
+    // Display the Weapon Stats table in the top-right corner
+    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 250, 10), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always); // Set the width to 250, height is auto
+    ImGui::Begin("Weapon Stats", nullptr,
+                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_NoTitleBar);
+
+    ImGui::Text("Weapon ID: %d", weapon.weaponID);
+    ImGui::Text("Damage: %d", weapon.damage);
+    ImGui::Text("Is Attacking: %s", weapon.isAttacking ? "True" : "False");
+    ImGui::Text("Swinging Forward: %s", weapon.swingingForward ? "True" : "False");
+    ImGui::Text("Facing Left to Right: %s", weapon.isFacingLeftToRight ? "True" : "False");
+    ImGui::Text("Angle: %.2f", weapon.angle);
+    ImGui::Text("Starting Angle: %.2f", weapon.startingAngle);
+    ImGui::Text("Rotation Speed: %.2f", weapon.rotationSpeed);
+    ImGui::Text("Max Angle: %.2f", weapon.maxAngle);
+    ImGui::Text("Recoil: %.2f", weapon.recoil);
+    ImGui::Text("Pivot: (%d, %d)", weapon.pivot.x, weapon.pivot.y);
+    ImGui::Text("Atan: (%d, %d)", weapon.atan.x, weapon.atan.y);
+    ImGui::End();
+}
+
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 {
@@ -289,34 +360,8 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 
         if (gCoordinator.hasComponent<EquippedWeaponComponent>(entity))
         {
-            auto& weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
-            auto& weapon = gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon);
-
-            // Display the table in the top-right corner
-            ImGui::SetNextWindowPos(ImVec2(window.getSize().x - 250, 10), ImGuiCond_Always);
-            ImGui::Begin("Weapon Stats", nullptr,
-                         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
-                             ImGuiWindowFlags_NoTitleBar);
-
-            ImGui::Text("Weapon ID: %d", weapon.weaponID);
-            ImGui::Text("Damage: %d", weapon.damage);
-            ImGui::Text("Is Attacking: %s", weapon.isAttacking ? "True" : "False");
-            ImGui::Text("Swinging Forward: %s", weapon.swingingForward ? "True" : "False");
-            ImGui::Text("Facing Left to Right: %s", weapon.isFacingLeftToRight ? "True" : "False");
-            ImGui::Text("Angle: %.2f", weapon.angle);
-            ImGui::Text("Starting Angle: %.2f", weapon.startingAngle);
-            ImGui::Text("Rotation Speed: %.2f", weapon.rotationSpeed);
-            ImGui::Text("Max Angle: %.2f", weapon.maxAngle);
-            ImGui::Text("Recoil: %.2f", weapon.recoil);
-            ImGui::Text("Pivot: (%d, %d)", weapon.pivot.x, weapon.pivot.y);
-            ImGui::Text("Atan: (%d, %d)", weapon.atan.x, weapon.atan.y);
-
-            const auto pos = gCoordinator.getComponent<TransformComponent>(entity);
-
-            ImGui::Text("Player position: (%.2f, %.2f)", pos.position.x, pos.position.y);
-            ImGui::Text("Player velocity: (%.2f, %.2f)", pos.velocity.x, pos.velocity.y);
-
-            ImGui::End();
+            displayWeaponStatsTable(window, entity);
+            displayPlayerStatsTable(window, entity);
         }
 
         if (gCoordinator.hasComponent<PlayerComponent>(entity) &&
