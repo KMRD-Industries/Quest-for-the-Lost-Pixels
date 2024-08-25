@@ -5,6 +5,7 @@
 #include "ColliderComponent.h"
 #include "DoorComponent.h"
 #include "PlayerComponent.h"
+#include "MultiplayerComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
@@ -51,7 +52,7 @@ void CollisionSystem::createMapCollision() const
     for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TileComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity) &&
-            !gCoordinator.hasComponent<DoorComponent>(entity))
+            !gCoordinator.hasComponent<DoorComponent>(entity) && !gCoordinator.hasComponent<MultiplayerComponent>(entity))
         {
             deleteBody(entity);
         }

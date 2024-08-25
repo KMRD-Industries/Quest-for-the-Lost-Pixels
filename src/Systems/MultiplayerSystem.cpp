@@ -156,7 +156,8 @@ void MultiplayerSystem::update()
 
             transformComponent.position.x = x;
             transformComponent.position.y = y;
-            colliderComponent.body->SetTransform({x, y}, colliderComponent.body->GetAngle());
+            colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
+                                                 colliderComponent.body->GetAngle());
         }
     }
 

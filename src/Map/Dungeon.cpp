@@ -15,6 +15,7 @@
 #include "Dungeon.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
+#include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
@@ -24,12 +25,10 @@
 #include "TransformComponent.h"
 #include "TravellingDungeonComponent.h"
 #include "TravellingSystem.h"
-
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
-#include "glm/ext/vector_int2.hpp"
 
 extern Coordinator gCoordinator;
 
@@ -184,6 +183,7 @@ void Dungeon::createRemotePlayer(uint32_t id)
     gCoordinator.addComponent(m_entities[id], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[id], AnimationComponent{});
     gCoordinator.addComponent(m_entities[id], ColliderComponent{});
+    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
     gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = 100.f});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", playerAnimationTile);
@@ -200,6 +200,7 @@ void Dungeon::setECS()
 {
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
+    gCoordinator.registerComponent<MultiplayerComponent>();
     gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
     gCoordinator.registerComponent<DoorComponent>();
@@ -220,6 +221,7 @@ void Dungeon::setECS()
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<MultiplayerComponent>());
         signature.set(gCoordinator.getComponentType<ColliderComponent>());
         gCoordinator.setSystemSignature<MultiplayerSystem>(signature);
     }
@@ -353,7 +355,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         for (auto id : m_players)
         {
             gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
-            auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
             colliderComponent.body->SetTransform(
                 {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
                 colliderComponent.body->GetAngle());
@@ -384,7 +386,7 @@ void Dungeon::changeRoom(const glm::ivec2& room)
     for (auto id : m_players)
     {
         gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
-        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
         colliderComponent.body->SetTransform(
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
             colliderComponent.body->GetAngle());
