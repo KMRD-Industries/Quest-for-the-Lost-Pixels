@@ -17,7 +17,7 @@
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_CXX_COMPILER": "clang++-18",
                 "CMAKE_C_COMPILER": "clang-18",
-                "CMAKE_CXX_FLAGS": "-stdlib=libc++"
+                "CMAKE_CXX_FLAGS": "-fsanitize=address -stdlib=libc++"
             }
         },
         {

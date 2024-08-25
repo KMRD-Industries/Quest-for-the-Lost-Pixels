@@ -5,11 +5,16 @@
 #include <comm.pb.h>
 #include <vector>
 
+#include "ColliderComponent.h"
+#include "Config.h"
 #include "Coordinator.h"
+#include "Helpers.h"
 #include "MultiplayerSystem.h"
 #include "TransformComponent.h"
 #include "Types.h"
+
 #include "boost/system/system_error.hpp"
+#include "box2d/b2_body.h"
 #include "glm/ext/vector_int2.hpp"
 
 extern Coordinator gCoordinator;
@@ -33,26 +38,37 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port) no
         m_tcp_socket.wait(tcp::socket::wait_write);
         m_connected = true;
 
-        auto r = new comm::Room();
-        m_state.set_allocated_room(r);
+        auto r1 = new comm::Room();
+        m_state.set_allocated_room(r1);
+
+        auto r2 = new comm::Room();
+        m_position.set_allocated_curr_room(r2);
     }
     catch (boost::system::system_error)
     {
     }
 }
 
-void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept { m_current_room = room; }
+void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
+{
+    m_current_room = room;
+
+    auto r1 = m_state.release_room();
+    r1->set_x(room.x);
+    r1->set_y(room.y);
+    m_state.set_allocated_room(r1);
+
+    auto r2 = m_position.release_curr_room();
+    r2->set_x(room.x);
+    r2->set_y(room.y);
+    m_position.set_allocated_curr_room(r2);
+}
+
 glm::ivec2& MultiplayerSystem::getRoom() noexcept { return m_current_room; }
 
 void MultiplayerSystem::roomChanged(const glm::ivec2& room)
 {
-    m_current_room = room;
-
-    auto r = m_state.release_room();
-    r->set_x(room.x);
-    r->set_y(room.y);
-
-    m_state.set_allocated_room(r);
+    setRoom(room);
 
     m_state.set_variant(comm::ROOM_CHANGED);
     auto serialized = m_state.SerializeAsString();
@@ -127,13 +143,20 @@ void MultiplayerSystem::update()
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
         m_position.ParseFromArray(&m_buf, int(received));
         std::uint32_t id = m_position.entity_id();
+        auto r = m_position.curr_room();
 
-        if (m_entity_map.contains(id))
+        if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
         {
             Entity& target = m_entity_map[id];
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
 
-            transformComponent.position = {m_position.x(), m_position.y()};
+            auto x = m_position.x();
+            auto y = m_position.y();
+
+            transformComponent.position.x = x;
+            transformComponent.position.y = y;
+            colliderComponent.body->SetTransform({x, y}, colliderComponent.body->GetAngle());
         }
     }
 

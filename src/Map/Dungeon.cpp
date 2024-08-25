@@ -54,7 +54,7 @@ void Dungeon::init()
 
         for (uint32_t id : gameState.connected_players())
         {
-            createEntity(id);
+            createRemotePlayer(id);
             std::println("Connected remote player {}", id);
         }
     }
@@ -64,6 +64,7 @@ void Dungeon::init()
     }
 
     constexpr int playerAnimationTile = 185;
+    const std::string tag = std::format("Player {}", m_id);
 
     m_entities[m_id] = player;
 
@@ -83,7 +84,7 @@ void Dungeon::init()
     gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]).collision = cc;
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        m_entities[m_id], "Player 1", {cc.width, cc.height},
+        m_entities[m_id], tag, {cc.width, cc.height},
         [&](const GameType::CollisionData& entityT)
         {
             if (entityT.tag == "Door")
@@ -115,6 +116,7 @@ void Dungeon::init()
 
     m_roomMap.at(m_currentPlayerPos).init();
     multiplayerSystem->setRoom(m_currentPlayerPos);
+    m_players.insert(m_id);
 
     auto mapPath = m_roomMap.at(m_currentPlayerPos).getMap();
     gCoordinator.getRegisterSystem<MapSystem>()->loadMap(mapPath);
@@ -142,16 +144,18 @@ void Dungeon::update()
     if (multiplayerSystem->isConnected())
     {
         auto stateUpdate = multiplayerSystem->pollStateUpdates();
-        std::uint32_t id = stateUpdate.id();
+        uint32_t id = stateUpdate.id();
 
         switch (stateUpdate.variant())
         {
         case comm::DISCONNECTED:
             gCoordinator.destroyEntity(m_entities[id]);
             multiplayerSystem->entityDisconnected(id);
+            m_players.erase(id);
             break;
         case comm::CONNECTED:
-            createEntity(id);
+            createRemotePlayer(id);
+            m_players.insert(id);
             break;
         case comm::ROOM_CHANGED:
             changeRoom(multiplayerSystem->getRoom());
@@ -167,7 +171,7 @@ void Dungeon::update()
     m_roomMap.at(m_currentPlayerPos).update();
 }
 
-void Dungeon::createEntity(uint32_t id)
+void Dungeon::createRemotePlayer(uint32_t id)
 {
     constexpr int playerAnimationTile = 185;
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
@@ -182,7 +186,12 @@ void Dungeon::createEntity(uint32_t id)
     gCoordinator.addComponent(m_entities[id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = 100.f});
 
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[id], tag);
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", playerAnimationTile);
+    gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
+
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
+        m_entities[id], tag, {cc.width, cc.height}, [&](const GameType::CollisionData& entityT) {},
+        [&](const GameType::CollisionData& entityT) {}, false, false, {cc.x, cc.y});
 
     multiplayerSystem->entityConnected(id, m_entities[id]);
 }
@@ -211,6 +220,7 @@ void Dungeon::setECS()
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<ColliderComponent>());
         gCoordinator.setSystemSignature<MultiplayerSystem>(signature);
     }
 
@@ -339,11 +349,16 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
         const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
         const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
-        gCoordinator.getComponent<TransformComponent>(m_entities[m_id]).position = newPosition;
-        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]);
-        colliderComponent.body->SetTransform(
-            {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
-            colliderComponent.body->GetAngle());
+
+        for (auto id : m_players)
+        {
+            gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
+            auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+            colliderComponent.body->SetTransform(
+                {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
+                colliderComponent.body->GetAngle());
+        }
+
 
         auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
         if (multiplayerSystem->isConnected()) multiplayerSystem->roomChanged(m_currentPlayerPos);
@@ -365,8 +380,13 @@ void Dungeon::changeRoom(const glm::ivec2& room)
     const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
     const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
     const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
-    gCoordinator.getComponent<TransformComponent>(m_entities[m_id]).position = newPosition;
-    auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]);
-    colliderComponent.body->SetTransform({convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
-                                         colliderComponent.body->GetAngle());
+
+    for (auto id : m_players)
+    {
+        gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
+        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+        colliderComponent.body->SetTransform(
+            {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
+            colliderComponent.body->GetAngle());
+    }
 }
