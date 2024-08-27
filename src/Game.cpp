@@ -17,6 +17,7 @@ void Game::init()
     gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TransformComponent>();
 
+
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     {
         Signature signature;

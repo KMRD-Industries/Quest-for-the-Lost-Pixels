@@ -2,16 +2,24 @@
 
 struct WeaponComponent
 {
-    int weaponID{};
-    int damage{};
+    int id{};
+    int damageAmount{};
     bool isAttacking{};
-    bool swingingForward{true};
-    bool isFacingLeftToRight{true};
-    float angle{0.f};
-    float startingAngle{30.f};
-    float rotationSpeed{10.f};
-    float maxAngle{120.f};
-    float recoil{10.f};
-    sf::Vector2i pivot{};
-    sf::Vector2i atan{};
+    bool queuedAttack{false};
+    bool queuedAttackFlag{false};
+
+    bool isSwingingForward{true};
+    bool isFacingRight{true};
+
+    float currentAngle{0.f};
+    float initialAngle{30.f};
+    float rotationSpeed{15.f};
+
+    float swingDistance{90.f};
+    float remainingDistance{0};
+    float recoilAmount{10.f};
+
+    sf::Vector2i pivotPoint{};
+    sf::Vector2i targetPoint{};
+    float targetAngleDegrees{};
 };

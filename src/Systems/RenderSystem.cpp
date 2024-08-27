@@ -1,11 +1,9 @@
 #include "RenderSystem.h"
-#include "AnimationComponent.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "EnemyComponent.h"
 #include "EquippedWeaponComponent.h"
-#include "Paths.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
@@ -61,31 +59,12 @@ void RenderSystem::draw(sf::RenderWindow& window)
     mapOffset.x = (static_cast<float>(windowSize.x) - mapOffset.x) * 0.5f;
     mapOffset.y = (static_cast<float>(windowSize.y) - mapOffset.y) * 0.5f;
 
-    sf::Shader shader;
-    if (!shader.loadFromFile(std::string(ASSET_PATH) + "/shaders/vertex_shader.vert",
-                             std::string(ASSET_PATH) + "/shaders/fragment_shader.frag"))
-    {
-        std::cerr << "Failed to load shaders!" << std::endl;
-        return;
-    }
-
-    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
-
     for (auto& layer : tiles)
     {
         for (const auto& sprite : layer)
         {
             sprite->setPosition(sprite->getPosition() + mapOffset);
-
-            const float shadeFactor = calculateShade(sprite->getPosition(), transformComponent.position + mapOffset);
-            shader.setUniform("shadeFactor", shadeFactor);
-            shader.setUniform("texture", sf::Shader::CurrentTexture); // Bind the sprite's texture
-
-            sf::RenderStates states;
-            states.shader = &shader;
-
-            // Draw the sprite with the shader
-            window.draw(*sprite, states);
+            window.draw(*sprite);
         }
     }
 
@@ -111,20 +90,12 @@ void RenderSystem::draw(sf::RenderWindow& window)
     }
 }
 
-float RenderSystem::calculateShade(const sf::Vector2f& position, const sf::Vector2f source)
-{
-    // Example shading calculation (simple distance-based shading)
-    sf::Vector2f lightSource(source); // Example light source position
-    float distance = std::sqrt(std::pow(position.x - lightSource.x, 2) + std::pow(position.y - lightSource.y, 2));
-    return std::max(0.f, 1.f - distance / 1500.f); // Normalize and clamp
-}
-
 /**
  * \brief Sets the origin of the sprite for the given entity based on its collision component.
- * If the entity has an equipped weapon, also sets the origin for the weapon's sprite.
+ * If the entity has an equipped weapon, it also sets the origin for the weapon's sprite.
  * \param entity The entity to process.
  * */
-void RenderSystem::setOrigin(const Entity entity) const
+void RenderSystem::setOrigin(const Entity entity)
 {
     if (gCoordinator.hasComponent<WeaponComponent>(entity)) return;
 
@@ -164,7 +135,7 @@ void RenderSystem::setSpritePosition(const Entity entity)
 {
     if (gCoordinator.hasComponent<WeaponComponent>(entity)) return;
 
-    // Get all necessary components
+    // Get all necessary parts
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
@@ -207,7 +178,7 @@ void RenderSystem::setSpritePosition(const Entity entity)
 
         // Update the weapon sprite's position and scale according to the transform component and game scale
         weaponTransformComponent.position = weaponPosition - weaponPlacement;
-        weaponTransformComponent.rotation = weaponComponent.angle;
+        weaponTransformComponent.rotation = weaponComponent.currentAngle;
 
         weaponRenderComponent.sprite.setPosition(weaponTransformComponent.position);
         weaponRenderComponent.sprite.setRotation(weaponTransformComponent.rotation);
@@ -239,16 +210,30 @@ void RenderSystem::displayDamageTaken(const Entity entity)
 
 void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const Entity entity)
 {
-    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 250, 240), ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 250, 370), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always); // Set the width to 250, height is auto
     ImGui::Begin("abc", nullptr,
                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
                      ImGuiWindowFlags_NoTitleBar);
 
     const auto pos = gCoordinator.getComponent<TransformComponent>(entity);
+    const auto& render = gCoordinator.getComponent<RenderComponent>(entity);
 
-    ImGui::Text("Player position: (%.2f, %.2f)", pos.position.x, pos.position.y);
-    ImGui::Text("Player velocity: (%.2f, %.2f)", pos.velocity.x, pos.velocity.y);
+    ImGui::Separator();
+    ImGui::Text("Player Movement");
+    ImGui::Separator();
+
+    ImGui::Text("Position: (X: %.2f, Y: %.2f)", pos.position.x, pos.position.y);
+    ImGui::Text("Velocity: (X: %.2f, Y: %.2f)", pos.velocity.x, pos.velocity.y);
+
+    ImGui::Separator();
+    ImGui::Text("Sprite Information");
+    ImGui::Separator();
+
+    ImGui::Text("Sprite Position: (X: %.0f, Y: %.0f)", render.sprite.getGlobalBounds().left,
+                render.sprite.getGlobalBounds().top);
+    ImGui::Text("Sprite Size: Width: %.0f, Height: %.0f", render.sprite.getGlobalBounds().width,
+                render.sprite.getGlobalBounds().height);
     ImGui::End();
 }
 
@@ -264,18 +249,40 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
                      ImGuiWindowFlags_NoTitleBar);
 
-    ImGui::Text("Weapon ID: %d", weapon.weaponID);
-    ImGui::Text("Damage: %d", weapon.damage);
-    ImGui::Text("Is Attacking: %s", weapon.isAttacking ? "True" : "False");
-    ImGui::Text("Swinging Forward: %s", weapon.swingingForward ? "True" : "False");
-    ImGui::Text("Facing Left to Right: %s", weapon.isFacingLeftToRight ? "True" : "False");
-    ImGui::Text("Angle: %.2f", weapon.angle);
-    ImGui::Text("Starting Angle: %.2f", weapon.startingAngle);
-    ImGui::Text("Rotation Speed: %.2f", weapon.rotationSpeed);
-    ImGui::Text("Max Angle: %.2f", weapon.maxAngle);
-    ImGui::Text("Recoil: %.2f", weapon.recoil);
-    ImGui::Text("Pivot: (%d, %d)", weapon.pivot.x, weapon.pivot.y);
-    ImGui::Text("Atan: (%d, %d)", weapon.atan.x, weapon.atan.y);
+    ImGui::Separator();
+    ImGui::Text("Weapon Details");
+    ImGui::Separator();
+
+    ImGui::Text("ID: %d", weapon.id);
+    ImGui::Text("Damage: %d", weapon.damageAmount);
+
+    ImGui::Separator();
+    ImGui::Text("Status Flags");
+    ImGui::Separator();
+
+    ImGui::Text("Is Attacking: %s", weapon.isAttacking ? "Yes" : "No");
+    ImGui::Text("Attack Queued: %s", weapon.queuedAttack ? "Yes" : "No");
+    ImGui::Text("Swinging Forward: %s", weapon.isSwingingForward ? "Yes" : "No");
+    ImGui::Text("Facing Right: %s", weapon.isFacingRight ? "Yes" : "No");
+
+    ImGui::Separator();
+    ImGui::Text("Angles and Rotation");
+    ImGui::Separator();
+
+    ImGui::Text("Current Angle: %.2f degrees", weapon.currentAngle);
+    ImGui::Text("Starting Angle: %.2f degrees", weapon.initialAngle);
+    ImGui::Text("Rotation Speed: %.2f degrees/sec", weapon.rotationSpeed);
+    ImGui::Text("Recoil Amount: %.2f", weapon.recoilAmount);
+
+    ImGui::Separator();
+    ImGui::Text("Movement and Position");
+    ImGui::Separator();
+
+    ImGui::Text("Distance to Travel: %.2f units", weapon.remainingDistance);
+    ImGui::Text("Pivot Point: (%d, %d)", weapon.pivotPoint.x, weapon.pivotPoint.y);
+    ImGui::Text("Target Point: (%d, %d)", weapon.targetPoint.x, weapon.targetPoint.y);
+    ImGui::Text("Target Angle: %.2f degrees", weapon.targetAngleDegrees);
+
     ImGui::End();
 }
 
@@ -286,11 +293,10 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
     auto transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
 
-    auto drawSprite = [&](Entity entity)
+    auto drawSprite = [&](const Entity entity)
     {
-        auto renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-        auto tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-        const auto bounds = renderComponent.sprite.getGlobalBounds();
+        const auto& rComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        const auto bounds = rComponent.sprite.getGlobalBounds();
 
         sf::ConvexShape convex;
         convex.setPointCount(4);
@@ -304,14 +310,8 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
         convex.setOutlineColor(sf::Color::Yellow);
 
         const auto spriteCenter = GameType::MyVec2{bounds.left, bounds.top};
-
-        sf::CircleShape centerPoint(2);
-        centerPoint.setFillColor(sf::Color::Black);
-        centerPoint.setPosition(spriteCenter.x, spriteCenter.y);
-
         convex.setPosition(spriteCenter);
 
-        window.draw(centerPoint);
         window.draw(convex);
     };
 
@@ -327,13 +327,6 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     centerPoint.setFillColor(sf::Color::Red);
     centerPoint.setPosition(center.x, center.y);
     window.draw(centerPoint);
-
-    sf::VertexArray line(sf::Lines, 2);
-    line[0].position = center;
-    line[0].color = sf::Color::Red;
-    line[1].position = {center.x + config::playerAttackRange * transformComponent.scale.x, center.y};
-    line[1].color = sf::Color::Red;
-    window.draw(line);
 
     const b2Vec2 newCenter{convertPixelsToMeters(center.x) + mapOffset.x,
                            convertPixelsToMeters(center.y) + mapOffset.y};
@@ -373,7 +366,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
             swordLine[0].position = center;
             swordLine[0].color = sf::Color::Red;
             swordLine[1].position = static_cast<sf::Vector2f>(
-                gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon).pivot);
+                gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon).pivotPoint);
             swordLine[1].color = sf::Color::Blue;
             window.draw(swordLine);
         }

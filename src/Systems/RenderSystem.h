@@ -18,7 +18,7 @@ public:
 private:
     void debugBoundingBoxes(sf::RenderWindow& window) const;
     void drawEquipment(Entity) const;
-    void setOrigin(Entity) const;
+    static void setOrigin(Entity);
     static void setSpritePosition(Entity);
     static void displayDamageTaken(Entity);
     static void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);

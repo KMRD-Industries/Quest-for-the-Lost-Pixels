@@ -1,20 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-#include <imgui-SFML.h>
-
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
-#include "Paths.h"
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
 #include "TextTagSystem.h"
 
-
-class TextTagSystem;
 Coordinator gCoordinator;
 
 void handleInput(sf::RenderWindow& window)
@@ -31,15 +26,24 @@ void handleInput(sf::RenderWindow& window)
             const auto keyCode = event.key.code;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
         }
+        else if (event.type == sf::Event::MouseButtonPressed)
+        {
+            const auto keyCode = event.mouseButton.button;
+            InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+        }
         else if (event.type == sf::Event::KeyReleased)
         {
             const auto keyCode = event.key.code;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
         }
-        else if (event.type == sf::Event::MouseMoved && config::debugMode)
+        else if (event.type == sf::Event::MouseButtonReleased)
+        {
+            const auto keyCode = event.mouseButton.button;
+            InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+        }
+        else if (event.type == sf::Event::MouseMoved)
         {
             const sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-            std::cout << "Pozycja myszki: x=" << mousePosition.x << " y=" << mousePosition.y << std::endl;
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
         if (event.type == sf::Event::Closed)
@@ -51,28 +55,28 @@ void handleInput(sf::RenderWindow& window)
 
 sf::Color hexStringToSfmlColor(const std::string& hexColor)
 {
-    std::string hex = (hexColor[0] == '#') ? hexColor.substr(1) : hexColor;
+    const std::string hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
 
     std::istringstream iss(hex);
     int rgbValue = 0;
     iss >> std::hex >> rgbValue;
 
-    const int red = (rgbValue >> 16) & 0xFF;
-    const int green = (rgbValue >> 8) & 0xFF;
-    const int blue = rgbValue & 0xFF;
+    const uint8 red = rgbValue >> 16 & 0xFF;
+    const uint8 green = rgbValue >> 8 & 0xFF;
+    const uint8 blue = rgbValue & 0xFF;
 
-    return sf::Color(red, green, blue);
+    return {red, green, blue};
 }
 
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
+    sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!");
 
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(config::frameCycle);
 
     sf::Clock deltaClock;
     Game game;

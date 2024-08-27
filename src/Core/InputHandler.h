@@ -17,13 +17,34 @@ enum class InputType
 
 class InputHandler
 {
+    using InputKey = std::variant<sf::Keyboard::Key, sf::Mouse::Button>;
+
+    struct InputKeyHash
+    {
+        std::size_t operator()(const InputKey& key) const
+        {
+            return std::visit(
+                []<typename T0>(T0&& k) -> std::size_t
+                {
+                    return std::hash<std::underlying_type_t<std::decay_t<T0>>>{}(
+                        static_cast<std::underlying_type_t<std::decay_t<T0>>>(k));
+                },
+                key);
+        }
+    };
+
     std::unordered_set<InputType> m_keysHeld{};
     std::unordered_set<InputType> m_keysPressed{};
-    std::unordered_map<sf::Keyboard::Key, InputType> m_keyToMapInput{{sf::Keyboard::Key::W, InputType::MoveUp},
-                                                                     {sf::Keyboard::Key::A, InputType::MoveLeft},
-                                                                     {sf::Keyboard::Key::S, InputType::MoveDown},
-                                                                     {sf::Keyboard::Key::D, InputType::MoveRight},
-                                                                     {sf::Keyboard::Key::Space, InputType::Attack}};
+
+    std::unordered_map<InputKey, InputType, InputKeyHash> m_keyToMapInput{
+        {sf::Keyboard::Key::W, InputType::MoveUp},
+        {sf::Keyboard::Key::A, InputType::MoveLeft},
+        {sf::Keyboard::Key::S, InputType::MoveDown},
+        {sf::Keyboard::Key::D, InputType::MoveRight},
+        {sf::Keyboard::Key::Space, InputType::Attack},
+        {sf::Mouse::Left, InputType::Attack} // Handling for the right mouse button
+    };
+
     inline static InputHandler* m_instance{};
     sf::Vector2i m_mousePosition = {};
     InputHandler() = default;
@@ -40,7 +61,7 @@ public:
     [[nodiscard]] bool isHeld(InputType input) const;
     [[nodiscard]] bool isPressed(InputType input) const;
     sf::Vector2i getMousePosition() const;
-    void handleKeyboardInput(sf::Keyboard::Key key, bool isPressed);
+    void handleKeyboardInput(InputKey key, bool isPressed);
     void updateMousePosition(sf::Vector2i);
     void clearPressedInputs();
     void update();

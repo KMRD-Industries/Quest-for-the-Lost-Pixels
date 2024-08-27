@@ -1,16 +1,12 @@
 #include "CollisionSystem.h"
 
-#include <iostream>
-#include <math.h>
 #include "ColliderComponent.h"
 #include "DoorComponent.h"
-#include "EquippedWeaponComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
-#include "WeaponComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -22,7 +18,7 @@ void MyContactListener::BeginContact(b2Contact* contact)
     const auto bodyBData =
         reinterpret_cast<GameType::CollisionData*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
 
-    if ((bodyAData != nullptr) && (bodyBData != nullptr))
+    if (bodyAData != nullptr && bodyBData != nullptr)
     {
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
@@ -39,7 +35,7 @@ void MyContactListener::EndContact(b2Contact* contact)
     const auto bodyBData =
         reinterpret_cast<GameType::CollisionData*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
 
-    if ((bodyAData != nullptr) && (bodyBData != nullptr))
+    if (bodyAData != nullptr && bodyBData != nullptr)
     {
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
@@ -63,33 +59,32 @@ void CollisionSystem::createMapCollision() const
                                   const bool isStatic, const bool useTexture, const glm::vec2& offset = {0, 0})
     {
         createBody(
-            entity, type, size, [](const GameType::CollisionData& entityT) {},
-            [](const GameType::CollisionData& entityT) {}, isStatic, useTexture, offset);
+            entity, type, size, [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, isStatic,
+            useTexture, offset);
     };
 
     for (const auto entity : m_entities)
     {
         const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
-        if (tileComponent.id == 0 || tileComponent.tileset.empty() ||
-            gCoordinator.hasComponent<PlayerComponent>(entity))
+        if (tileComponent.id < 0 || tileComponent.tileset.empty() || gCoordinator.hasComponent<PlayerComponent>(entity))
         {
             continue;
         }
 
-        const Collision& collision =
-            gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
-
         if (tileComponent.tileset == "SpecialBlocks")
         {
-            if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER) + 1)
+            if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER))
                 createCollisionBody(entity, "Wall", {config::tileHeight, config::tileHeight}, true, true);
 
-            else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER) + 1)
+            else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER))
                 createCollisionBody(entity, "Door", {config::tileHeight, config::tileHeight}, true, false);
         }
         else
         {
+            const Collision& collision =
+                gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
+
             if (collision.width > 0 && collision.height > 0)
                 createCollisionBody(entity, "Wall", {collision.width, collision.height}, true, false,
                                     {collision.x, collision.y});
