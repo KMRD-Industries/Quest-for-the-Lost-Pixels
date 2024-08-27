@@ -75,6 +75,16 @@ int main()
     Game game;
     game.init();
 
+    sf::Font font;
+    font.loadFromFile(std::string(ASSET_PATH) + "/fonts/Bentinck-Regular.ttf");
+    std::vector<sf::RectangleShape> rectangles;
+    std::vector<sf::Text> texts;
+
+    FloorGenerator::previevGenerator(font, rectangles, texts);
+
+    for (const auto& rectangle : rectangles) window.draw(rectangle);
+    for (const auto& text : texts) window.draw(text);
+
 
     while (window.isOpen())
     {

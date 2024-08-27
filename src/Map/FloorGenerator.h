@@ -6,6 +6,8 @@
 #include "DungeonGenerator.h"
 #include "GameTypes.h"
 #include "Room.h"
+#include "SFML/Graphics/RectangleShape.hpp"
+#include "SFML/Graphics/Text.hpp"
 
 class FloorGenerator
 {
@@ -27,6 +29,8 @@ public:
     std::unordered_map<glm::ivec2, Room> getFloor(bool generate);
     glm::ivec2 getStartingRoom() const { return m_generator.getStartingRoom(); }
     glm::ivec2 getEndingRoom() const { return m_generator.getEndingRoom(); }
+    static void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangles,
+                                 std::vector<sf::Text>& texts);
 
 private:
     std::vector<GameType::MapInfo> getMapInfo();

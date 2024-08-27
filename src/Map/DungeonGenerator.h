@@ -49,6 +49,18 @@ public:
     [[nodiscard]] glm::ivec2 getEndingRoom() const;
     [[nodiscard]] bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
 
+    int getOutEdgesCount(int i, int j) const
+    {
+        try
+        {
+            return m_nodeOutEdgesCount.at({i, j});
+        }
+        catch (const std::out_of_range& e)
+        {
+            return {};
+        }
+    };
+
 private:
     void generateMainPath(const PathConfig& pathConfig);
     std::optional<glm::ivec2> getRandomNeighbor(
