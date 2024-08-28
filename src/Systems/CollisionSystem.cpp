@@ -122,8 +122,8 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         const b2Body* body = colliderComponent.body;
         if (body == nullptr || transformComponent.velocity == b2Vec2{}) continue;
+        if (colliderComponent.tag != "Player 1" && colliderComponent.tag != "SecondPlayer") continue;
 
-        const auto position = body->GetPosition();
         const auto spriteBounds = renderComponent.sprite.getGlobalBounds();
 
         if (colliderComponent.collision.height == 0 || colliderComponent.collision.width == 0)
@@ -134,12 +134,13 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
             colliderComponent.collision.y = 0;
         }
 
+        const auto position = body->GetPosition();
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
-
-        if (gCoordinator.hasComponent<PlayerComponent>(entity))
-        {
-        }
-
+        //
+        // if (gCoordinator.hasComponent<PlayerComponent>(entity))
+        // {
+        // }
+        //
         renderComponent.sprite.setPosition(position.x, position.y);
         transformComponent.velocity = {};
     }

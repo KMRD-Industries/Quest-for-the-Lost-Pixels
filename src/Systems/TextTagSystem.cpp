@@ -32,7 +32,7 @@ void TextTagSystem::update()
 void TextTagSystem::loadFont(const std::string& path)
 {
     if (!this->font.loadFromFile(path))
-        std::cout << "ERROR::TEXTTAGSYSTEM::CONSTRUCTOR::Failed to load font " << path << "\n";
+        std::cout << "ERROR::TEXT_TAG_SYSTEM::CONSTRUCTOR::Failed to load font " << path << "\n";
 }
 
 void TextTagSystem::initPresets() {}

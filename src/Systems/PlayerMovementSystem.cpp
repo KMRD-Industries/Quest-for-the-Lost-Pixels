@@ -21,7 +21,6 @@ extern Coordinator gCoordinator;
 
 void PlayerMovementSystem::update()
 {
-    handleMousePositionUpdate();
     handleMovement();
     handleAttack();
 }
@@ -61,20 +60,12 @@ void PlayerMovementSystem::handleMovement()
 
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
-    }
-}
 
-void PlayerMovementSystem::handleMousePositionUpdate() const
-{
-    const auto inputHandler{InputHandler::getInstance()};
+        if (!gCoordinator.hasComponent<EquippedWeaponComponent>(entity)) continue;
 
-    for (const auto entity : m_entities)
-    {
         const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
         auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
         weaponComponent.pivotPoint = inputHandler->getMousePosition();
-
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         transformComponent.scale = {weaponComponent.targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y};
     }
 }

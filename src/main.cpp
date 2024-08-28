@@ -79,8 +79,7 @@ int main()
     window.setFramerateLimit(config::frameCycle);
 
     sf::Clock deltaClock;
-    Game game;
-    game.init();
+    Game::init();
 
     sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
 
@@ -89,9 +88,9 @@ int main()
         // Clear the window before drawing
         window.clear(customColor);
 
-        game.handleCollision();
-        game.update();
-        game.draw();
+        Game::handleCollision();
+        Game::update();
+        Game::draw();
 
         ImGui::SFML::Update(window, deltaClock.restart());
 

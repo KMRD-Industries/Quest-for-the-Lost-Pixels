@@ -21,6 +21,8 @@ void SpawnerSystem::update()
     {
         processSpawner(entity);
     }
+
+    cleanUpUnnecessarySpawners();
 }
 
 void SpawnerSystem::incrementSpawnTimer() { spawnTime = (spawnTime + 1) % SPAWN_RATE; }
