@@ -9,22 +9,25 @@ void WeaponSystem::update() const
 {
     for (const auto entity : m_entities)
     {
-        updateStartingAngle(entity);
-        updateWeaponAngle(entity);
+        auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
+        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+
+        updateStartingAngle(weaponComponent, renderComponent);
+        updateWeaponAngle(weaponComponent, renderComponent);
     }
 }
 
 /**
  * Updates the weapon's angle during an attack.
  * If the weapon is attacking, the angle is adjusted by rotating forward or backward.
- * \param entity
+ * \param weaponComponent to modify.
+ * \param renderComponent to modify.
  */
-void WeaponSystem::updateWeaponAngle(const Entity entity)
+void WeaponSystem::updateWeaponAngle(WeaponComponent& weaponComponent, const RenderComponent& renderComponent)
 {
-    const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
-
     if (!weaponComponent.isAttacking) return;
-    weaponComponent.isSwingingForward ? rotateForward(entity) : rotateBackward(entity);
+    weaponComponent.isSwingingForward ? rotateForward(weaponComponent)
+                                      : rotateBackward(weaponComponent, renderComponent);
 }
 
 /**
@@ -33,12 +36,10 @@ void WeaponSystem::updateWeaponAngle(const Entity entity)
  * Remaining distance, by analogy, is described by remainingDistance.
  * When distance is less than 0 the flag isSwingForward is set to false
  * informing system to rotate back to base position.
- * \param entity
+ * \param weaponComponent to modify.
  * */
-void WeaponSystem::rotateForward(const Entity entity)
+void WeaponSystem::rotateForward(WeaponComponent& weaponComponent)
 {
-    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
-
     // Decrease the remaining distance by the rotation speed.
     // If the remaining distance is <, = 0, animation is stopped.
     weaponComponent.remainingDistance -= weaponComponent.rotationSpeed;
@@ -72,12 +73,10 @@ void WeaponSystem::rotateForward(const Entity entity)
  * Full distance the sword needs to travel is described by WeaponComponent.swingDistance.
  * Remaining distance, by analogy, is described by remainingDistance.
  * When distance is less than 0 the flag isSwingForward is set to true.
- * \param entity weaponComponent to modify.
- * */
-void WeaponSystem::rotateBackward(const Entity entity)
+ * \param weaponComponent to modify.
+ * \param renderComponent to modify. * */
+void WeaponSystem::rotateBackward(WeaponComponent& weaponComponent, const RenderComponent& renderComponent)
 {
-    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
-
     // Decrease the remaining distance by the rotation speed.
     weaponComponent.remainingDistance -= weaponComponent.rotationSpeed;
 
@@ -106,7 +105,7 @@ void WeaponSystem::rotateBackward(const Entity entity)
             weaponComponent.isAttacking = true;
             weaponComponent.queuedAttack = false;
 
-            setAngle(entity);
+            setAngle(weaponComponent, renderComponent);
         }
         else
         {
@@ -118,13 +117,11 @@ void WeaponSystem::rotateBackward(const Entity entity)
 /**
  * \brief Adjust the current angle based on the facing direction and the initial angle.
 
- * \param entity weaponComponent to modify.
+ * \param weaponComponent to modify.
+ * \param renderComponent to modify.
  * */
-void WeaponSystem::setAngle(const Entity entity)
+void WeaponSystem::setAngle(WeaponComponent& weaponComponent, const RenderComponent& renderComponent)
 {
-    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
-    const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-
     // Reset the remaining distance when not in animating state.
     weaponComponent.remainingDistance = weaponComponent.swingDistance;
 
@@ -132,39 +129,39 @@ void WeaponSystem::setAngle(const Entity entity)
     const auto& origin = renderComponent.sprite.getPosition();
 
     // Calculate the vector from the player position to the mouse position.
-    sf::Vector2i mousePositionFromPlayer{};
-    mousePositionFromPlayer.x = weaponComponent.pivotPoint.x - static_cast<int>(origin.x);
-    mousePositionFromPlayer.y = weaponComponent.pivotPoint.y - static_cast<int>(origin.y);
+    const sf::Vector2f mouseOffset = weaponComponent.pivotPoint - origin;
 
     // Update the target point and determine the facing direction.
-    weaponComponent.targetPoint = mousePositionFromPlayer;
-    weaponComponent.isFacingRight = weaponComponent.targetPoint.x >= 0;
+    weaponComponent.targetPoint = mouseOffset;
+    weaponComponent.isFacingRight = mouseOffset.x >= 0;
+    const double angleRad = std::atan2(mouseOffset.y, mouseOffset.x);
 
-    const double angle = std::atan2(mousePositionFromPlayer.y, mousePositionFromPlayer.x);
+    constexpr float radToDeg = -180.0f / M_PI;
 
     // Convert radians into an angle.
-    auto angleInDegrees = static_cast<float>(angle * (-180.0f / M_PI));
+    const auto angleInDegrees = static_cast<float>(angleRad * radToDeg);
     weaponComponent.targetAngleDegrees = angleInDegrees;
 
+    // Adjust the current angle based on the facing direction.
+    const float adjustedAngle = 90.f - angleInDegrees;
     if (weaponComponent.isFacingRight)
     {
-        weaponComponent.currentAngle = 90.f - angleInDegrees - weaponComponent.initialAngle;
+        weaponComponent.currentAngle = adjustedAngle - weaponComponent.initialAngle;
     }
     else
     {
-        weaponComponent.currentAngle = 90.f - angleInDegrees + weaponComponent.initialAngle;
+        weaponComponent.currentAngle = adjustedAngle + weaponComponent.initialAngle;
     }
 }
 
 /**
  * \brief Sets the weapon's starting angle when not attacking.
  * The starting angle is determined by the mouse position relative to the player and  initial angle.
- * \param entity
+ * \param weaponComponent to modify.
+ * \param renderComponent to modify.
  */
-void WeaponSystem::updateStartingAngle(const Entity entity)
+void WeaponSystem::updateStartingAngle(WeaponComponent& weaponComponent, const RenderComponent& renderComponent)
 {
-    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
-
     if (weaponComponent.queuedAttack && !weaponComponent.isAttacking)
     {
         weaponComponent.isAttacking = true;
@@ -177,6 +174,5 @@ void WeaponSystem::updateStartingAngle(const Entity entity)
         return;
     }
 
-    if (weaponComponent.isAttacking) return;
-    setAngle(entity);
+    setAngle(weaponComponent, renderComponent);
 }

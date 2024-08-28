@@ -43,7 +43,7 @@ void handleInput(sf::RenderWindow& window)
         }
         else if (event.type == sf::Event::MouseMoved)
         {
-            const sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+            const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
         if (event.type == sf::Event::Closed)

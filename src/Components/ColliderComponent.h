@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <string>
+#include <utility>
 #include "GameTypes.h"
 #include "Tileset.h"
 
@@ -18,6 +19,8 @@ struct ColliderComponent
     bool toDestroy{false};
 
     ColliderComponent() = default;
+
+    explicit ColliderComponent(Collision collision) : collision(std::move(collision)) {}
 
     explicit ColliderComponent(b2Body* body, const std::string& tag,
                                const std::function<void(GameType::CollisionData)>& onCollisionEnter,

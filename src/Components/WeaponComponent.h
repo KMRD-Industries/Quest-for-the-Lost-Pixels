@@ -19,7 +19,7 @@ struct WeaponComponent
     float remainingDistance{0};
     float recoilAmount{10.f};
 
-    sf::Vector2i pivotPoint{};
-    sf::Vector2i targetPoint{};
+    sf::Vector2f pivotPoint{};
+    sf::Vector2f targetPoint{};
     float targetAngleDegrees{};
 };

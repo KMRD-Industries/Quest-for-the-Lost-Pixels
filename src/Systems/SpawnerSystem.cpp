@@ -19,7 +19,10 @@ void SpawnerSystem::update()
 
     for (const auto entity : m_entities)
     {
-        processSpawner(entity);
+        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
+        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+        processSpawner(spawnerComponent, spawnerTransformComponent);
     }
 
     cleanUpUnnecessarySpawners();
@@ -27,26 +30,26 @@ void SpawnerSystem::update()
 
 void SpawnerSystem::incrementSpawnTimer() { spawnTime = (spawnTime + 1) % SPAWN_RATE; }
 
-void SpawnerSystem::processSpawner(const Entity entity)
+void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
+                                   const TransformComponent& spawnerTransformComponent) const
 {
-    auto& spawner = gCoordinator.getComponent<SpawnerComponent>(entity);
-    auto spawnCooldown = spawner.spawnCooldown;
-
-    if (!spawner.loopSpawn && spawner.noSpawns >= 1)
+    if (!spawnerComponent.loopSpawn && spawnerComponent.noSpawns >= 1)
     {
         return;
     }
 
-    if (!isReadyToSpawn(static_cast<int>(spawnCooldown)))
+    // Check if the spawner is ready to spawn the enemy.
+    if (!isReadyToSpawn(static_cast<int>(spawnerComponent.spawnCooldown)))
     {
         return;
     }
 
-    spawnEnemy(entity);
-    spawner.noSpawns++;
+    // Spawn the enemy and increment the spawn count.
+    spawnerComponent.noSpawns++;
+    spawnEnemy(spawnerTransformComponent);
 }
 
-void SpawnerSystem::cleanUpUnnecessarySpawners()
+void SpawnerSystem::cleanUpUnnecessarySpawners() const
 {
     std::unordered_set<Entity> entityToKill{};
 
@@ -64,31 +67,23 @@ void SpawnerSystem::cleanUpUnnecessarySpawners()
 
 bool SpawnerSystem::isReadyToSpawn(const int cooldown) const { return spawnTime % cooldown == 0; }
 
-void SpawnerSystem::spawnEnemy(const Entity entity)
+void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent)
 {
-    const auto& spawnerTransform = gCoordinator.getComponent<TransformComponent>(entity);
     const Entity newMonsterEntity = gCoordinator.createEntity();
 
+    const TileComponent tileComponent{18, "AnimSlimes", 4};
+    const ColliderComponent colliderComponent{
+        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id)};
+
+    gCoordinator.addComponent(newMonsterEntity, tileComponent);
+    gCoordinator.addComponent(newMonsterEntity, spawnerTransformComponent);
+    gCoordinator.addComponent(newMonsterEntity, colliderComponent);
     gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
-    gCoordinator.addComponent(newMonsterEntity, TileComponent{});
-    gCoordinator.addComponent(newMonsterEntity, TransformComponent{});
     gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
-    gCoordinator.addComponent(newMonsterEntity, ColliderComponent{});
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
-    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = 10.f});
+    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = 89.f});
 
-    auto& enemyTileComponent = gCoordinator.getComponent<TileComponent>(newMonsterEntity);
-    auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(newMonsterEntity);
-    auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(newMonsterEntity);
-    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(newMonsterEntity);
-
-    enemyTransformComponent = TransformComponent(spawnerTransform.position, 0., sf::Vector2f(1., 1.), {0.f, 0.f});
-    characterComponent.hp = 89.f;
-    enemyTileComponent = {18, "AnimSlimes", 4};
-    colliderComponent.collision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
-        enemyTileComponent.tileset, enemyTileComponent.id);
-
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
+    CollisionSystem::createBody(
         newMonsterEntity, "SecondPlayer", {colliderComponent.collision.width, colliderComponent.collision.height},
         [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false, false,
         {colliderComponent.collision.x, colliderComponent.collision.y});
