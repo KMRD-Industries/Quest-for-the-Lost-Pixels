@@ -217,6 +217,7 @@ void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const
                      ImGuiWindowFlags_NoTitleBar);
 
     const auto pos = gCoordinator.getComponent<TransformComponent>(entity);
+    const auto& tile = gCoordinator.getComponent<TileComponent>(entity);
     const auto& render = gCoordinator.getComponent<RenderComponent>(entity);
 
     ImGui::Separator();
@@ -234,6 +235,7 @@ void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const
                 render.sprite.getGlobalBounds().top);
     ImGui::Text("Sprite Size: Width: %.0f, Height: %.0f", render.sprite.getGlobalBounds().width,
                 render.sprite.getGlobalBounds().height);
+    ImGui::Text("Tile ID: %.0f", tile.id);
     ImGui::End();
 }
 
@@ -365,8 +367,8 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
             sf::VertexArray swordLine(sf::Lines, 2);
             swordLine[0].position = center;
             swordLine[0].color = sf::Color::Red;
-            swordLine[1].position = static_cast<sf::Vector2f>(
-                gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon).pivotPoint);
+            swordLine[1].position =
+                gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon).pivotPoint;
             swordLine[1].color = sf::Color::Blue;
             window.draw(swordLine);
         }
