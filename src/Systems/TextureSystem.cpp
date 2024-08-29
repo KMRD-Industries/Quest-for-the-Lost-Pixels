@@ -44,6 +44,7 @@ int TextureSystem::loadFromFile(const std::string& path)
 
         sf::Texture tex;
         tex.loadFromImage(image);
+
         m_mapTextures.emplace(parsed_tileset.name, tex);
 
         // Calculate no Tiles to read from file
@@ -55,7 +56,9 @@ int TextureSystem::loadFromFile(const std::string& path)
         {
             for (int x = 0; x < numTilesHorizontaly; x += 1)
             {
-                m_mapTextureRects.emplace(gid++, sf::IntRect(x * parsed_tileset.tilewidth, y*parsed_tileset.tileheight, parsed_tileset.tilewidth, parsed_tileset.tileheight));
+                m_mapTextureRects.emplace(gid++,
+                                          sf::IntRect(x * parsed_tileset.tilewidth, y * parsed_tileset.tileheight,
+                                                      parsed_tileset.tilewidth, parsed_tileset.tileheight));
             }
         }
 
@@ -70,7 +73,7 @@ int TextureSystem::loadFromFile(const std::string& path)
             {
                 std::vector<AnimationFrame> frames;
 
-                for (const auto& [tileid, duration, rotation]  : animation)
+                for (const auto& [tileid, duration, rotation] : animation)
                 {
                     frames.push_back({tileid, duration});
                 }
@@ -169,7 +172,8 @@ void TextureSystem::loadTextures()
             continue;
         }
 
-        if (std::find(m_vecTextureFiles.begin(), m_vecTextureFiles.end(), tile_component.tileset) == m_vecTextureFiles.end())
+        if (std::find(m_vecTextureFiles.begin(), m_vecTextureFiles.end(), tile_component.tileset) ==
+            m_vecTextureFiles.end())
         {
             continue;
         }
@@ -193,4 +197,40 @@ void TextureSystem::loadTextures()
         render_component.sprite = getTile(tile_component.tileset, tile_component.id);
         render_component.layer = tile_component.layer;
     }
+}
+
+void TextureSystem::modifyColorScheme(int playerFloor)
+{
+    const int floorId = m_mapDungeonLevelToFloorInfo.at(playerFloor);
+    const std::string& tileSet = m_mapFloorToTextureFile.at(floorId);
+
+    sf::Image image = m_mapTextures.at(tileSet).copyToImage();
+    sf::Vector2u size = image.getSize();
+
+    ColorBalance balance = m_mapColorScheme.at(playerFloor);
+
+    auto applySemitoneFilter = [](int value, int shift) -> int
+    {
+        return std::min(255, std::max(0, value + shift * 2)); // Simplified approximation for semitone effect
+    };
+
+    for (unsigned int x = 0; x < size.x; ++x)
+    {
+        for (unsigned int y = 0; y < size.y; ++y)
+        {
+            sf::Color pixel = image.getPixel(x, y);
+
+            int r = applySemitoneFilter(pixel.r, balance.redBalance);
+            int g = applySemitoneFilter(pixel.g, balance.greenBalance);
+            int b = applySemitoneFilter(pixel.b, balance.blueBalance);
+
+            pixel.r = static_cast<sf::Uint8>(r);
+            pixel.g = static_cast<sf::Uint8>(g);
+            pixel.b = static_cast<sf::Uint8>(b);
+
+            image.setPixel(x, y, pixel);
+        }
+    }
+
+    m_mapTextures.at(tileSet).loadFromImage(image);
 }

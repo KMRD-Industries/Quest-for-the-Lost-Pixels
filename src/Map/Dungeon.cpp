@@ -72,7 +72,7 @@ void Dungeon::init()
     gCoordinator.addComponent(
         m_entities[m_id],
         TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
-    gCoordinator.addComponent(m_entities[m_id], PassageComponent{.moveCallback = [this]() { moveDownDungeon(); }});
+    gCoordinator.addComponent(m_entities[m_id], PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
     ;
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
@@ -290,7 +290,12 @@ void Dungeon::makeStartFloor()
 
 void Dungeon::makeSimpleFloor()
 {
-    m_floorGenerator.setFloorID(gCoordinator.getComponent<FloorComponent>(config::playerEntity).currentPlayerFloor);
+    const int playerFloor = gCoordinator.getComponent<FloorComponent>(config::playerEntity).currentPlayerFloor;
+    const int floorID = m_mapDungeonLevelToFloorInfo.at(playerFloor);
+
+    m_floorGenerator.setFloorID(floorID);
+
+    gCoordinator.getRegisterSystem<TextureSystem>()->modifyColorScheme(playerFloor);
 
     m_floorGenerator.generateFloor(5, 6);
     m_floorGenerator.generateMainPath(11);
