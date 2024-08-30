@@ -46,6 +46,7 @@ int TextureSystem::loadFromFile(const std::string& path)
         tex.loadFromImage(image);
 
         m_mapTextures.emplace(parsed_tileset.name, tex);
+        m_mapTexturesWithColorSchemeApplied.emplace(parsed_tileset.name, tex);
 
         // Calculate no Tiles to read from file
         const int numTilesHorizontaly = parsed_tileset.imagewidth / parsed_tileset.tilewidth;
@@ -115,7 +116,8 @@ sf::Sprite TextureSystem::getTile(const std::string& tileset_name, long id)
 {
     try
     {
-        sf::Sprite s(m_mapTextures.at(tileset_name), m_mapTextureRects.at(id + m_mapTextureIndexes.at(tileset_name)));
+        sf::Sprite s(m_mapTexturesWithColorSchemeApplied.at(tileset_name),
+                     m_mapTextureRects.at(id + m_mapTextureIndexes.at(tileset_name)));
         return s;
     }
     catch (...)
@@ -199,30 +201,33 @@ void TextureSystem::loadTextures()
     }
 }
 
-void TextureSystem::modifyColorScheme(int playerFloor)
+void TextureSystem::modifyColorScheme(const int playerFloor)
 {
-    const int floorId = m_mapDungeonLevelToFloorInfo.at(playerFloor);
+    // One floor layout can be used for multiple levels
+    const auto floorId = m_mapDungeonLevelToFloorInfo.at(playerFloor);
     const std::string& tileSet = m_mapFloorToTextureFile.at(floorId);
 
+    // Copy image to apply color scheme
     sf::Image image = m_mapTextures.at(tileSet).copyToImage();
-    sf::Vector2u size = image.getSize();
 
-    ColorBalance balance = m_mapColorScheme.at(playerFloor);
+    const sf::Vector2u size = image.getSize();
+    const ColorBalance& balance = m_mapColorScheme.at(playerFloor);
 
-    auto applySemitoneFilter = [](int value, int shift) -> int
+    auto applySemitoneFilter = [](const int value, const int shift) -> int
     {
         return std::min(255, std::max(0, value + shift * 2)); // Simplified approximation for semitone effect
     };
 
+    // Apply semitone filter for each pixel
     for (unsigned int x = 0; x < size.x; ++x)
     {
         for (unsigned int y = 0; y < size.y; ++y)
         {
             sf::Color pixel = image.getPixel(x, y);
 
-            int r = applySemitoneFilter(pixel.r, balance.redBalance);
-            int g = applySemitoneFilter(pixel.g, balance.greenBalance);
-            int b = applySemitoneFilter(pixel.b, balance.blueBalance);
+            const int r = applySemitoneFilter(pixel.r, balance.redBalance);
+            const int g = applySemitoneFilter(pixel.g, balance.greenBalance);
+            const int b = applySemitoneFilter(pixel.b, balance.blueBalance);
 
             pixel.r = static_cast<sf::Uint8>(r);
             pixel.g = static_cast<sf::Uint8>(g);
@@ -232,5 +237,33 @@ void TextureSystem::modifyColorScheme(int playerFloor)
         }
     }
 
-    m_mapTextures.at(tileSet).loadFromImage(image);
+    // Replace texture with applied filter
+    m_mapTexturesWithColorSchemeApplied.at(tileSet).loadFromImage(image);
+
+    // Change bg color
+    std::string hexColor = colorToString(floorId);
+    hexColor = hexColor.substr(1);
+
+    int hexValue;
+    std::stringstream ss;
+    ss << std::hex << hexColor;
+    ss >> hexValue;
+
+    // Read rbg values and apply same filter
+    int red = hexValue >> 16 & 0xFF;
+    int green = hexValue >> 8 & 0xFF;
+    int blue = hexValue & 0xFF;
+
+    red = applySemitoneFilter(red, balance.redBalance);
+    green = applySemitoneFilter(green, balance.greenBalance);
+    blue = applySemitoneFilter(blue, balance.blueBalance);
+
+    std::stringstream stringHex;
+    stringHex << "#" << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << red << std::setw(2)
+              << std::setfill('0') << std::hex << std::uppercase << green << std::setw(2) << std::setfill('0')
+              << std::hex << std::uppercase << blue;
+
+    m_currentBackgroundColor = stringHex.str();
 }
+
+std::string TextureSystem::getBackgroundColor() { return m_currentBackgroundColor; }

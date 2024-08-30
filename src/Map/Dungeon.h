@@ -36,5 +36,5 @@ private:
     bool m_startingRoom = true;
     bool m_endingRoom = false;
     std::uint32_t floor_id{};
-    std::unordered_map<long, long> m_mapDungeonLevelToFloorInfo{{1, 1}, {2, 1}, {3, 2}, {4, 2}, {5, 2}};
+    std::unordered_map<long, long> m_mapDungeonLevelToFloorInfo{{1, 1}, {2, 1}, {3, 1}, {4, 2}, {5, 2}};
 };

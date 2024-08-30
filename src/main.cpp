@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <TextureSystem.h>
 #include <imgui-SFML.h>
 
 #include "Config.h"
@@ -93,7 +94,7 @@ int main()
         game.handleCollision();
 
         // Clear the window
-        window.clear(hexStringToSfmlColor(game.getBackground()));
+        window.clear(hexStringToSfmlColor(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor()));
 
         // Draw game elements
         game.draw();

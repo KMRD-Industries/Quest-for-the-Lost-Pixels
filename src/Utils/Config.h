@@ -29,16 +29,5 @@ namespace config
 
     static constexpr int startingRoomId{0};
 
-    inline std::string colorToString(const int floorID)
-    {
-        switch (floorID)
-        {
-            case 0: return "#331541";
-            case 1: return "#18215d";
-            case 2: return "#25392e";
-            default: return "#17205C";
-        }
-    }
 
 } // namespace config
-

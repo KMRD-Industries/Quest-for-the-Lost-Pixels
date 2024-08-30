@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include <TextureSystem.h>
+
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
@@ -56,5 +58,5 @@ void Game::handleCollision()
 
 std::string Game::getBackground() const
 {
-    return config::colorToString(gCoordinator.getComponent<FloorComponent>(config::playerEntity).currentPlayerFloor);
+    return gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor();
 }
