@@ -1,4 +1,5 @@
 #pragma once
+#include "glm/vec2.hpp"
 // Every variable should be inline constexpr as it is file scope
 // https://www.youtube.com/watch?v=QVHwOOrSh3w
 // Remember that in the game we use units in pixels, and the collision and physics system takes meters
@@ -26,6 +27,8 @@ namespace config
     static constexpr int playerAcc = 300;
     static constexpr int enemyAcc = 25;
 
-    static constexpr std::string backgroundColor{"#17205C"};
+    static const std::string backgroundColor{"#17205C"};
 
+    static constexpr glm::vec2 startingPosition{325.f, 325.f};
+    static constexpr float spawnOffset{25};
 } // namespace config

@@ -17,7 +17,10 @@ bool FloorGenerator::isConnected(const glm::ivec2& firstNode, const glm::ivec2& 
 
 std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generate)
 {
-    if (!generate) return m_floorMap;
+    const auto firstRoom = getStartingRoom();
+
+    if (!generate)
+        return m_floorMap;
 
     m_floorMap.clear();
 
@@ -31,28 +34,37 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
     {
         std::unordered_set<GameType::DoorEntraces> doorsForRoom;
         for (const auto& neighbor : nodeNeighbors)
-        {
             if (const auto dir = neighbor - nodePosition; m_mapDirOnGraphToEntrance.contains(dir))
                 doorsForRoom.insert(m_mapDirOnGraphToEntrance.at(dir));
-        }
         std::vector<GameType::MapInfo> availableMapsForRoom;
-        const auto haveSameDoorsPlacement = [&doorsForRoom](const GameType::MapInfo& mapInfo)
+        const auto haveSameDoorsPlacement = [&doorsForRoom, &nodePosition, &firstRoom](const GameType::MapInfo& mapInfo)
         {
+            bool isFirstRoomCorrect = true;
             const std::unordered_set<GameType::DoorEntraces> mapDoors(mapInfo.doorsLoc.begin(), mapInfo.doorsLoc.end());
-            return mapDoors == doorsForRoom;
+            if (nodePosition == firstRoom)
+            {
+                if (mapInfo.mapID[0] != 's')
+                    isFirstRoomCorrect = false;
+            }
+            else
+            {
+                if (mapInfo.mapID[0] == 's')
+                    isFirstRoomCorrect = false;
+            }
+            return mapDoors == doorsForRoom && isFirstRoomCorrect;
         };
         std::ranges::copy_if(availableMaps, std::back_inserter(availableMapsForRoom), haveSameDoorsPlacement);
 
         int minVal = std::numeric_limits<int>::max();
 
         for (const auto& mapInfo : availableMapsForRoom)
-        {
             minVal = choosesMap[mapInfo];
-        }
 
         std::vector<GameType::MapInfo> mapToChoose;
         const auto haveMinimalValueOfDoors = [&choosesMap, &minVal](const GameType::MapInfo& mapInfo)
-        { return choosesMap[mapInfo] == minVal; };
+        {
+            return choosesMap[mapInfo] == minVal;
+        };
         std::ranges::copy_if(availableMapsForRoom, std::back_inserter(mapToChoose), haveMinimalValueOfDoors);
 
         std::random_device rd;
@@ -86,9 +98,7 @@ std::vector<GameType::MapInfo> FloorGenerator::getMapInfo()
         }
 
         for (const auto& entry : fs::directory_iterator(path))
-        {
             checkSingleFile(entry, mapInfo);
-        }
     }
     catch (const fs::filesystem_error& e)
     {
@@ -115,17 +125,17 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     namespace fs = std::filesystem;
     using json = nlohmann::json;
 
-    if (!entry.is_regular_file()) return;
+    if (!entry.is_regular_file())
+        return;
 
-    const std::regex pattern(R"(map_\d+\.json)");
+    const std::regex pattern(R"(map_.*\.json)");
     const std::string filename = entry.path().filename().string();
     const size_t underscorePos = filename.find_last_of('_');
     const size_t dotPos = filename.find_last_of('.');
-    const std::string numberStr = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
-    const int mapID = std::stoi(numberStr);
-    //    const int mapID = 110;
+    const std::string mapID = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
 
-    if (!std::regex_match(filename, pattern)) return;
+    if (!std::regex_match(filename, pattern))
+        return;
 
     std::cout << "Found matching file: " << filename << std::endl;
 
@@ -148,7 +158,8 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
 
     for (const auto& [doorPosition, blockType] : doorData)
     {
-        if (blockType != static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER)) continue;
+        if (blockType != static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER))
+            continue;
         doorsPositions.push_back(doorPosition);
     }
 

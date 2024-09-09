@@ -1,14 +1,13 @@
+#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-#include <imgui-SFML.h>
 
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
-#include "Paths.h"
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
 
@@ -39,9 +38,7 @@ void handleInput(sf::RenderWindow& window)
             std::cout << "Pozycja myszki: x=" << mousePosition.x << " y=" << mousePosition.y << std::endl;
         }
         if (event.type == sf::Event::Closed)
-        {
             window.close();
-        }
     }
 }
 
@@ -63,7 +60,7 @@ sf::Color hexStringToSfmlColor(const std::string& hexColor)
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
+    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!");
 
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 

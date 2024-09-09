@@ -11,7 +11,9 @@
 class Dungeon
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1) {}
+    Dungeon() : m_entities(MAX_ENTITIES - 1)
+    {
+    }
 
     void init();
     void draw() const;
@@ -21,6 +23,7 @@ private:
     void setECS();
     void makeSimpleFloor();
     void moveInDungeon(const glm::ivec2& dir);
+    static float getSpawnOffset(float position, int id);
 
     std::string m_asset_path{ASSET_PATH};
     FloorGenerator m_floorGenerator{};

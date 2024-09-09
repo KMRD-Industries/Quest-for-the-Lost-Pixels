@@ -15,7 +15,7 @@ class Room
 public:
     Room() = default;
 
-    explicit Room(const int id) :
+    explicit Room(const std::string& id) :
         m_mapID(id)
     {
     }
@@ -29,5 +29,5 @@ public:
     std::unordered_map<GameType::DoorEntraces, glm::vec2> m_doorPosition;
 
 private:
-    int m_mapID{};
+    std::string m_mapID{};
 };
