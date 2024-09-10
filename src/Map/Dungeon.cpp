@@ -328,8 +328,6 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 
 float Dungeon::getSpawnOffset(const float position, const int id)
 {
-    const auto newPosition = position + id * config::spawnOffset;
-    if (id % 2 == 0)
-        return newPosition;
-    return -newPosition;
+    if (id % 2 == 0) return position + id * config::spawnOffset;
+    return position - id * config::spawnOffset;
 }
