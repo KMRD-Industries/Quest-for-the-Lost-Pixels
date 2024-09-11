@@ -9,6 +9,8 @@
 
 extern Coordinator gCoordinator;
 
+Dungeon Game::m_dungeon;
+
 void Game::init()
 {
     gCoordinator.init();
@@ -33,14 +35,15 @@ void Game::init()
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
-    m_dungeon.init();
+
+    Dungeon::init();
 }
 
-void Game::draw() const { m_dungeon.draw(); };
+void Game::draw() { Dungeon::draw(); }
 
 void Game::update()
 {
-    m_dungeon.update();
+    Dungeon::update();
     gCoordinator.getRegisterSystem<CollisionSystem>()->deleteMarkedBodies();
 }
 

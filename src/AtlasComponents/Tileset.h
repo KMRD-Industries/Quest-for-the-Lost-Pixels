@@ -20,6 +20,12 @@ struct Collision
     double width{};
     double height{};
     std::vector<ObjectProperty> properties;
+
+    // Equality operator
+    bool operator==(const Collision& other) const
+    {
+        return x == other.x && y == other.y && width == other.width && height == other.height;
+    }
 };
 
 struct Tile
