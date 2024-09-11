@@ -11,26 +11,26 @@
 class Dungeon
 {
 public:
-    Dungeon() = default;
+    Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
-    static void init();
-    static void draw();
-    static void update();
+    void init();
+    void draw();
+    void update();
 
 private:
-    static void setECS();
-    static void makeSimpleFloor();
-    static void moveInDungeon(const glm::ivec2& dir);
-    static void clearDungeon();
-	static float getSpawnOffset(float position, int id);
+    void setECS();
+    void makeSimpleFloor();
+    void moveInDungeon(const glm::ivec2& dir);
+    void clearDungeon();
+    float getSpawnOffset(float position, int id);
 
-    static std::string m_asset_path;
-    static FloorGenerator m_floorGenerator;
-    static std::unordered_map<glm::ivec2, Room> m_roomMap;
-    static glm::ivec2 m_currentPlayerPos;
-    static std::vector<Entity> m_entities;
-    static std::uint32_t m_id;
-    static std::deque<glm::ivec2> m_moveInDungeon;
-    static float counter;
-    static bool m_passedBy;
+    std::string m_asset_path;
+    FloorGenerator m_floorGenerator;
+    std::unordered_map<glm::ivec2, Room> m_roomMap;
+    glm::ivec2 m_currentPlayerPos;
+    std::vector<Entity> m_entities;
+    std::uint32_t m_id;
+    std::deque<glm::ivec2> m_moveInDungeon;
+    float counter;
+    bool m_passedBy;
 };
