@@ -1,13 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-#include <TextureSystem.h>
 #include <imgui-SFML.h>
 
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
-#include "GameUtility.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
 #include "RenderSystem.h"

@@ -23,8 +23,9 @@ private:
     static void makeStartFloor();
     static void moveInDungeon(const glm::ivec2& dir);
     static void moveDownDungeon();
+    static void clearDungeon();
 
-    static  std::string m_asset_path;
+    static std::string m_asset_path;
     static FloorGenerator m_floorGenerator;
     static std::unordered_map<glm::ivec2, Room> m_roomMap;
     static glm::ivec2 m_currentPlayerPos;

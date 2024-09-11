@@ -24,7 +24,7 @@ namespace config
     static constexpr int numberOfMapEntities{500};
     static constexpr int enemyFirstEntity{2000};
     static constexpr int numberOfEnemyEntities{100};
-    static constexpr int playerEntity{0};
+    static Entity playerEntity{1};
     static constexpr int playerAnimation{184};
 
     static constexpr int playerAcc{300};
@@ -36,9 +36,6 @@ namespace config
     static constexpr int initHeight = {1080};
 
     static const std::string backgroundColor{"#17205C"};
-
-    inline Entity playerEntity = {};
-    static constexpr int playerAnimation{184};
 
     static constexpr float defaultCharacterHP{100};
     static constexpr float defaultEnemyHP{89};

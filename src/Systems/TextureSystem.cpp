@@ -75,6 +75,7 @@ long TextureSystem::initializeTileSet(const Tileset& parsedTileSet)
     // Load the image to Texture, and store it in a map.
     tex.loadFromImage(image);
     m_mapTextures.emplace(parsedTileSet.name, tex);
+    m_mapTexturesWithColorSchemeApplied.emplace(parsedTileSet.name, tex);
 
     return gid;
 }
@@ -157,8 +158,8 @@ sf::Sprite TextureSystem::getTile(const std::string& tileSetName, const long id)
 {
     try
     {
-        sf::Sprite s(m_mapTexturesWithColorSchemeApplied.at(tileset_name),
-                     m_mapTextureRects.at(id + m_mapTextureIndexes.at(tileset_name)));
+        sf::Sprite s(m_mapTexturesWithColorSchemeApplied.at(tileSetName),
+                     m_mapTextureRects.at(id + m_mapTextureIndexes.at(tileSetName)));
         return s;
     }
     catch (...)

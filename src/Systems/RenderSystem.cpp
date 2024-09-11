@@ -4,6 +4,7 @@
 #include "CollisionSystem.h"
 #include "EnemyComponent.h"
 #include "EquippedWeaponComponent.h"
+#include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
@@ -24,18 +25,19 @@ void RenderSystem::draw(sf::RenderWindow& window)
 {
     std::vector<std::vector<sf::Sprite*>> tiles(config::maximumNumberOfLayers);
     const sf::Vector2<unsigned int> windowSize = window.getSize();
+    sf::Sprite portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0);
 
     for (const auto entity : m_entities)
     {
-        if (auto& [sprite, layer] = gCoordinator.getComponent<RenderComponent>(entity);
-            layer > 0 && layer < config::maximumNumberOfLayers)
+        if (auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+            renderComponent.layer > 0 && renderComponent.layer < config::maximumNumberOfLayers)
         {
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-            sf::FloatRect spriteBounds = sprite.getGlobalBounds();
-            mapOffset.x = std::max(mapOffset.x, transformComponent.position.x);
-            mapOffset.y = std::max(mapOffset.y, transformComponent.position.y);
+            sf::FloatRect spriteBounds = renderComponent.sprite.getGlobalBounds();
+            m_mapOffset.x = std::max(m_mapOffset.x, transformComponent.position.x);
+            m_mapOffset.y = std::max(m_mapOffset.y, transformComponent.position.y);
 
             // Ensure collision component have valid dimensions
             if (collisionComponent.collision.height == 0 || collisionComponent.collision.width == 0)
@@ -46,49 +48,41 @@ void RenderSystem::draw(sf::RenderWindow& window)
                 collisionComponent.collision.y = {};
             }
 
-            {
-                sprite.setOrigin(
-                    static_cast<float>(collisionComponent.collision.x + collisionComponent.collision.width / 2),
-                    static_cast<float>(collisionComponent.collision.y + collisionComponent.collision.height / 2));
-            }
+            renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
 
-            sprite.setScale(transformComponent.scale * config::gameScale);
-            sprite.setPosition(transformComponent.position);
-            sprite.setRotation(transformComponent.rotation);
+            setOrigin(entity);
+            setSpritePosition(entity);
+            displayDamageTaken(entity);
 
             if (gCoordinator.hasComponent<PassageComponent>(entity))
             {
                 if (gCoordinator.getComponent<PassageComponent>(entity).activePassage &&
                     !gCoordinator.hasComponent<PlayerComponent>(entity))
                 {
-                    sf::Sprite portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0);
                     sf::Vector2f portalPosition = {};
-                    portalPosition.x = sprite.getPosition().x - 3.75f * sprite.getLocalBounds().width;
-                    portalPosition.y = sprite.getPosition().y - 3.75f * sprite.getLocalBounds().height;
+                    portalPosition.x =
+                        renderComponent.sprite.getPosition().x - 3.75f * renderComponent.sprite.getLocalBounds().width;
+                    portalPosition.y =
+                        renderComponent.sprite.getPosition().y - 3.75f * renderComponent.sprite.getLocalBounds().height;
                     portalSprite.setPosition(portalPosition);
-                    portalSprite.setScale(sprite.getScale());
+                    portalSprite.setScale(renderComponent.sprite.getScale());
 
-                    tiles[config::maximumNumberOfLayers - 1].push_back(portalSprite);
+                    tiles[config::maximumNumberOfLayers - 1].push_back(&portalSprite);
                 }
             }
 
-            tiles[layer].push_back(sprite);
+            tiles[renderComponent.layer].push_back(&renderComponent.sprite);
         }
     }
 
-    m_mapRenderOffsetX = (static_cast<float>(windowSize.x) - m_mapRenderOffsetX) * 0.5f;
-    m_mapRenderOffsetY = (static_cast<float>(windowSize.y) - m_mapRenderOffsetY) * 0.5f;
-    mapOffset.x = (static_cast<float>(windowSize.x) - mapOffset.x) * 0.5f;
-    mapOffset.y = (static_cast<float>(windowSize.y) - mapOffset.y) * 0.5f;
+    m_mapOffset.x = (static_cast<float>(windowSize.x) - m_mapOffset.x) * 0.5f;
+    m_mapOffset.y = (static_cast<float>(windowSize.y) - m_mapOffset.y) * 0.5f;
 
     for (auto& layer : tiles)
     {
         for (const auto& sprite : layer)
         {
-            sprite.setPosition(
-                {sprite.getPosition().x + m_mapRenderOffsetX, sprite.getPosition().y + m_mapRenderOffsetY});
-            window.draw(sprite);
-            sprite->setPosition(sprite->getPosition() + mapOffset);
+            sprite->setPosition(sprite->getPosition() + m_mapOffset);
             window.draw(*sprite);
         }
     }
@@ -98,8 +92,8 @@ void RenderSystem::draw(sf::RenderWindow& window)
         auto& textTag = gCoordinator.getComponent<TextTagComponent>(entity);
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
-        textTag.text.setPosition(transformComponent.position.x + mapOffset.x,
-                                 transformComponent.position.y + mapOffset.y);
+        textTag.text.setPosition(transformComponent.position.x + m_mapOffset.x,
+                                 transformComponent.position.y + m_mapOffset.y);
 
         textTag.text.setString(std::to_string(config::playerAttackDamage));
         textTag.text.setFillColor(textTag.color);
@@ -348,15 +342,15 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
     float xPosCenter = transformComponent.position.x;
     float yPosCenter = transformComponent.position.y;
 
-    const auto center = GameType::MyVec2{xPosCenter + mapOffset.x, yPosCenter + mapOffset.y};
+    const auto center = GameType::MyVec2{xPosCenter + m_mapOffset.x, yPosCenter + m_mapOffset.y};
 
     sf::CircleShape centerPoint(5);
     centerPoint.setFillColor(sf::Color::Red);
     centerPoint.setPosition(center.x, center.y);
     window.draw(centerPoint);
 
-    const b2Vec2 newCenter{convertPixelsToMeters(center.x) + mapOffset.x,
-                           convertPixelsToMeters(center.y) + mapOffset.y};
+    const b2Vec2 newCenter{convertPixelsToMeters(center.x) + m_mapOffset.x,
+                           convertPixelsToMeters(center.y) + m_mapOffset.y};
     const float newRadius = convertPixelsToMeters(config::playerAttackRange);
 
     b2CircleShape circle;
@@ -424,8 +418,8 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
                 convex.setFillColor(sf::Color::Transparent);
                 convex.setOutlineThickness(1.f);
                 convex.setOutlineColor(sf::Color::Green);
-                    colliderComponent.body->GetPosition().x * config::meterToPixelRatio + m_mapRenderOffsetX,
-                    colliderComponent.body->GetPosition().y * config::meterToPixelRatio + m_mapRenderOffsetY);
+                convex.setPosition(colliderComponent.body->GetPosition().x * config::meterToPixelRatio + m_mapOffset.x,
+                                   colliderComponent.body->GetPosition().y * config::meterToPixelRatio + m_mapOffset.y);
 
                 convex.setRotation(colliderComponent.body->GetAngle() * 180 / b2_pi);
                 window.draw(convex);

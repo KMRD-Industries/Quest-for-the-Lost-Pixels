@@ -11,7 +11,6 @@
 #include "Coordinator.h"
 #include "DoorComponent.h"
 #include "EnemySystem.h"
-#include "MapComponent.h"
 #include "GameUtility.h"
 #include "MapComponent.h"
 #include "MapParser.h"
@@ -202,7 +201,6 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 
                 break;
             }
-        default:
         case (static_cast<int>(SpecialBlocks::Blocks::STARTINGPOINT)):
             {
                 const sf::Vector2f pos = getPosition(xPos, yPos, parsedMap.tileheight);
@@ -257,6 +255,7 @@ void MapSystem::resetMap() const
         CollisionSystem::deleteBody(entityToRemove.front());
         gCoordinator.destroyEntity(entityToRemove.front());
         entityToRemove.pop_front();
+    }
 
     entityToRemove.clear();
 }

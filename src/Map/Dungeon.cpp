@@ -15,11 +15,14 @@
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
 #include "EquippedWeaponComponent.h"
+#include "FloorComponent.h"
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
+#include "PassageComponent.h"
+#include "PassageSystem.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
@@ -35,20 +38,31 @@
 #include "WeaponComponent.h"
 #include "WeaponsSystem.h"
 
-#include "EnemyComponent.h"
-#include "EnemySystem.h"
-#include "SpawnerComponent.h"
-#include "SpawnerSystem.h"
+std::string Dungeon::m_asset_path;
+FloorGenerator Dungeon::m_floorGenerator;
+std::unordered_map<glm::ivec2, Room> Dungeon::m_roomMap;
+glm::ivec2 Dungeon::m_currentPlayerPos;
+std::vector<Entity> Dungeon::m_entities;
+std::uint32_t Dungeon::m_id;
+std::deque<glm::ivec2> Dungeon::m_moveInDungeon;
+float Dungeon::counter;
+bool Dungeon::m_passedBy;
+std::unordered_map<long, long> Dungeon::m_mapDungeonLevelToFloorInfo;
 
 extern Coordinator gCoordinator;
 
 void Dungeon::init()
 {
+    m_entities = std::vector<Entity>(MAX_ENTITIES - 1);
+    m_mapDungeonLevelToFloorInfo = {{1, 1}, {2, 1}, {3, 1}, {4, 2}, {5, 2}};
     setECS();
+    gCoordinator.createEntity();
     gCoordinator.getRegisterSystem<TextureSystem>()->loadTexturesFromFiles();
 
-    m_id = config::playerEntity;
     const Entity player = gCoordinator.createEntity();
+    config::playerEntity = player;
+    m_id = config::playerEntity;
+
     const auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     multiplayerSystem->setup("127.0.0.1", "9001");
 
@@ -65,13 +79,12 @@ void Dungeon::init()
     makeStartFloor();
     m_roomMap.at(m_currentPlayerPos).init();
 
-    auto mapPath = m_roomMap.at(m_currentPlayerPos).getMap();
+    const auto mapPath = m_roomMap.at(m_currentPlayerPos).getMap();
     gCoordinator.getRegisterSystem<MapSystem>()->loadMap(mapPath);
     gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 
-    m_entities[m_id] = player;
+    m_entities[m_id] = config::playerEntity;
 
-    gCoordinator.addComponent(m_entities[m_id], TileComponent{config::playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[m_id], TileComponent{config::playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[m_id], RenderComponent{});
     gCoordinator.addComponent(m_entities[m_id], TransformComponent{startingPosition});
@@ -81,19 +94,14 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
+    gCoordinator.addComponent(m_entities[m_id], FloorComponent{});
     gCoordinator.addComponent(m_entities[m_id], TravellingDungeonComponent{.moveCallback = [](const glm::ivec2& dir) {
                                   moveInDungeon(dir);
                               }});
-    gCoordinator.addComponent(m_entities[m_id], FloorComponent{});
-    gCoordinator.addComponent(
-        m_entities[m_id],
-        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
-    gCoordinator.addComponent(m_entities[m_id], PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
-    ;
+    gCoordinator.addComponent(m_entities[m_id], PassageComponent{.moveCallback = [] { moveDownDungeon(); }});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]).collision = cc;
-
 
     CollisionSystem::createBody(
         m_entities[m_id], "Player 1", {cc.width, cc.height},
@@ -149,13 +157,9 @@ void Dungeon::init()
     InventorySystem::pickUpWeapon(m_entities[m_id], weaponEntity);
     EquipWeaponSystem::equipWeapon(m_entities[m_id], weaponEntity);
 
-    makeSimpleFloor();
+    makeStartFloor();
 
     m_roomMap.at(m_currentPlayerPos).init();
-
-    const auto mapPath = m_roomMap.at(m_currentPlayerPos).getMap();
-    gCoordinator.getRegisterSystem<MapSystem>()->loadMap(mapPath);
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 }
 
 void Dungeon::draw()
@@ -356,7 +360,6 @@ void Dungeon::makeStartFloor()
     {
     }
 
-    textureSystem->loadTexturesFromFiles();
     textTagSystem->init();
 }
 
@@ -395,14 +398,15 @@ void Dungeon::moveDownDungeon()
     gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
     gCoordinator.getRegisterSystem<PassageSystem>()->setPassages(false);
 
-    gCoordinator.getComponent<TransformComponent>(m_entities[0]).position = startingPosition;
-    gCoordinator.getComponent<TransformComponent>(m_entities[0]).velocity = {};
+    gCoordinator.getComponent<TransformComponent>(m_entities[config::playerEntity]).position = startingPosition;
+    gCoordinator.getComponent<TransformComponent>(m_entities[config::playerEntity]).velocity = {};
 
-    b2Vec2 position = gCoordinator.getComponent<ColliderComponent>(m_entities[0]).body->GetPosition();
+    b2Vec2 position =
+        gCoordinator.getComponent<ColliderComponent>(m_entities[config::playerEntity]).body->GetPosition();
     position.x = startingPosition.x * static_cast<float>(config::pixelToMeterRatio);
     position.y = startingPosition.y * static_cast<float>(config::pixelToMeterRatio);
 
-    gCoordinator.getComponent<ColliderComponent>(m_entities[0]).body->SetTransform(position, 0);
+    gCoordinator.getComponent<ColliderComponent>(m_entities[config::playerEntity]).body->SetTransform(position, 0);
     gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 }
 
@@ -419,7 +423,6 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
     {
         clearDungeon();
 
-        const std::uint32_t id = gCoordinator.getRegisterSystem<MultiplayerSystem>()->playerID();
         const std::uint32_t id = gCoordinator.getRegisterSystem<MultiplayerSystem>()->playerID();
         m_currentPlayerPos += dir;
         const std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
