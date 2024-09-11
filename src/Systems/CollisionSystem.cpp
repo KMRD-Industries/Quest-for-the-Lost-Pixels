@@ -136,11 +136,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         const auto position = body->GetPosition();
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
-        //
-        // if (gCoordinator.hasComponent<PlayerComponent>(entity))
-        // {
-        // }
-        //
+
         renderComponent.sprite.setPosition(position.x, position.y);
         transformComponent.velocity = {};
     }

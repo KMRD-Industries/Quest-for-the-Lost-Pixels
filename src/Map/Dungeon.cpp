@@ -73,7 +73,7 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id],
                               TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
     gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = 100.f});
+    gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = config::defaultEnemyHP});
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});

@@ -3,8 +3,8 @@
 // https://www.youtube.com/watch?v=QVHwOOrSh3w
 // Remember that in the game we use units in pixels, and the collision and physics system takes meters
 
+#include <SFML/Graphics.hpp>
 #include <string>
-
 #include "Types.h"
 namespace config
 {
@@ -36,4 +36,30 @@ namespace config
     inline Entity playerEntity = {};
     static constexpr int playerAnimation{184};
 
+    static constexpr float defaultCharacterHP{100};
+    static constexpr float defaultEnemyHP{89};
+
+    // Text tag defaults
+    static constexpr int textTagDefaultSize{20};
+    static constexpr float textTagDefaultLifetime{60.0f};
+    static constexpr float textTagDefaultSpeed{1.0f};
+    static constexpr float textTagDefaultAcceleration{10.0f};
+    static constexpr int textTagDefaultFadeValue{20};
+
+    // Weapon component defaults
+    static constexpr int weaponComponentDefaultDamageAmount{0};
+    static constexpr bool weaponComponentDefaultIsAttacking{false};
+    static constexpr bool weaponComponentDefaultQueuedAttack{false};
+    static constexpr bool weaponComponentDefaultQueuedAttackFlag{false};
+
+    static constexpr bool weaponComponentDefaultIsSwingingForward{true};
+    static constexpr bool weaponComponentDefaultIsFacingRight{true};
+
+    static constexpr float weaponComponentDefaultCurrentAngle{0.0f};
+    static constexpr float weaponComponentDefaultInitialAngle{30.0f};
+    static constexpr float weaponComponentDefaultRotationSpeed{15.0f};
+
+    static constexpr float weaponComponentDefaultSwingDistance{90.0f};
+    static constexpr float weaponComponentDefaultRemainingDistance{0.0f};
+    static constexpr float weaponComponentDefaultRecoilAmount{10.0f};
 } // namespace config

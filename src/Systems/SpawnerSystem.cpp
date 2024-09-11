@@ -81,7 +81,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
     gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
-    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = 89.f});
+    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = config::defaultCharacterHP});
 
     CollisionSystem::createBody(
         newMonsterEntity, "SecondPlayer", {colliderComponent.collision.width, colliderComponent.collision.height},

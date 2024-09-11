@@ -82,6 +82,8 @@ void PlayerMovementSystem::handleAttack() const
         const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
 
+        if (weaponComponent.isAttacking) continue;
+
         weaponComponent.isFacingRight = renderComponent.sprite.getScale().x > 0;
         weaponComponent.queuedAttack = true;
 

@@ -1,6 +1,7 @@
 #include "WeaponsSystem.h"
 #include <RenderSystem.h>
 #include <cmath>
+#include <math.h>
 #include "AnimationSystem.h"
 #include "RenderComponent.h"
 #include "WeaponComponent.h"
