@@ -2,6 +2,7 @@
 
 #include <comm.pb.h>
 
+#include "Dungeon.h"
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
 #include "CharacterComponent.h"
@@ -10,7 +11,6 @@
 #include "CollisionSystem.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
-#include "Dungeon.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -64,23 +64,27 @@ void Dungeon::init()
         std::cout << "Connected to server with id: {" << m_id << "}";
     }
     else
-    {
         std::cout << "Starting in single-player mode";
-    }
 
+    constexpr int playerAnimationTile = 185;
+
+    gCoordinator.addComponent(m_entities[m_id],
+                              TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, m_id),
+                                                              getSpawnOffset(config::startingPosition.y, m_id)),
+                                                 0.f, sf::Vector2f(1.f, 1.f),
+                                                 {0.f, 0.f}));
     gCoordinator.addComponent(m_entities[m_id], TileComponent{config::playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[m_id], RenderComponent{});
-    gCoordinator.addComponent(m_entities[m_id],
-                              TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
     gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
     gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = config::defaultEnemyHP});
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
-    gCoordinator.addComponent(m_entities[m_id], TravellingDungeonComponent{.moveCallback = [](const glm::ivec2& dir) {
-                                  moveInDungeon(dir);
-                              }});
+    gCoordinator.addComponent(m_entities[m_id], TravellingDungeonComponent{.moveCallback = [](const glm::ivec2& dir)
+    {
+        moveInDungeon(dir);
+    }});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]).collision = cc;
@@ -362,4 +366,11 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
             colliderComponent.body->GetAngle());
     }
+}
+
+float Dungeon::getSpawnOffset(const float position, const int id)
+{
+    if (id % 2 == 0)
+        return position + id * config::spawnOffset;
+    return position - id * config::spawnOffset;
 }

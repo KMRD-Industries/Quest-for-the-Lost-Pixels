@@ -22,6 +22,7 @@ private:
     static void makeSimpleFloor();
     static void moveInDungeon(const glm::ivec2& dir);
     static void clearDungeon();
+	static float getSpawnOffset(float position, int id);
 
     static std::string m_asset_path;
     static FloorGenerator m_floorGenerator;

@@ -1,3 +1,4 @@
+#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
@@ -47,9 +48,7 @@ void handleInput(sf::RenderWindow& window)
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
         if (event.type == sf::Event::Closed)
-        {
             window.close();
-        }
     }
 }
 
