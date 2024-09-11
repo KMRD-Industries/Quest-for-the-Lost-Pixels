@@ -6,12 +6,11 @@
 class Game
 {
 public:
-    void init();
-    void draw() const;
-    void update();
-    void handleCollision();
-    std::string getBackground() const;
+    static void init();
+    static void draw();
+    static void update();
+    static void handleCollision();
 
 private:
-    Dungeon m_dungeon;
+    static Dungeon m_dungeon;
 };

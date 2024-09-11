@@ -11,6 +11,7 @@
 #include "Coordinator.h"
 #include "DoorComponent.h"
 #include "EnemySystem.h"
+#include "MapComponent.h"
 #include "GameUtility.h"
 #include "MapComponent.h"
 #include "MapParser.h"
@@ -18,7 +19,6 @@
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
-#include "SpawnerSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -77,13 +77,13 @@ void MapSystem::loadMap(const std::string& path) const
 void MapSystem::doFlips(const std::uint8_t& flags, float& rotation, sf::Vector2f& scale)
 {
     // 0000 = no change
-    // 0100 = vertical = swap y axis
-    // 1000 = horizontal = swap x axis
+    // 0100 = vertical = swap y-axis
+    // 1000 = horizontal = swap x-axis
     // 1100 = horiz + vert = swap both axes = horiz+vert = rotate 180 degrees
-    // 0010 = diag = rotate 90 degrees right and swap x axis
+    // 0010 = diag = rotate 90 degrees right and swap x-axis
     // 0110 = diag+vert = rotate 270 degrees right
     // 1010 = horiz+diag = rotate 90 degrees right
-    // 1110 = horiz+vert+diag = rotate 90 degrees right and swap y axis
+    // 1110 = horiz+vert+diag = rotate 90 degrees right and swap y-axis
 
     // Horizontal = 0x8;
     // Vertical = 0x4;
@@ -193,7 +193,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
                 break;
             }
 
-        case (static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK)):
+        case static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK):
             {
                 if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
                 {
@@ -202,7 +202,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 
                 break;
             }
-
+        default:
         case (static_cast<int>(SpecialBlocks::Blocks::STARTINGPOINT)):
             {
                 const sf::Vector2f pos = getPosition(xPos, yPos, parsedMap.tileheight);
@@ -222,14 +222,14 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     }
 }
 
-std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, const long value)
+std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, const long i)
 {
     std::string result;
     long act = 0;
 
     for (const auto& [first, second] : atlas_sets)
     {
-        if (second <= value && second >= act)
+        if (second <= i && second >= act)
         {
             result = first;
             act = second;
@@ -254,10 +254,9 @@ void MapSystem::resetMap() const
 
     while (!entityToRemove.empty())
     {
-        collisionSystem->deleteBody(entityToRemove.front());
+        CollisionSystem::deleteBody(entityToRemove.front());
         gCoordinator.destroyEntity(entityToRemove.front());
         entityToRemove.pop_front();
-    }
 
     entityToRemove.clear();
 }

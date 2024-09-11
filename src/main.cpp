@@ -10,9 +10,9 @@
 #include "GameUtility.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
-#include "Paths.h"
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
+#include "TextTagSystem.h"
 
 Coordinator gCoordinator;
 
@@ -30,15 +30,25 @@ void handleInput(sf::RenderWindow& window)
             const auto keyCode = event.key.code;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
         }
+        else if (event.type == sf::Event::MouseButtonPressed)
+        {
+            const auto keyCode = event.mouseButton.button;
+            InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+        }
         else if (event.type == sf::Event::KeyReleased)
         {
             const auto keyCode = event.key.code;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
         }
-        else if (event.type == sf::Event::MouseMoved && config::debugMode)
+        else if (event.type == sf::Event::MouseButtonReleased)
         {
-            sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-            std::cout << "Pozycja myszki: x=" << mousePosition.x << " y=" << mousePosition.y << std::endl;
+            const auto keyCode = event.mouseButton.button;
+            InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+        }
+        else if (event.type == sf::Event::MouseMoved)
+        {
+            const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+            InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
         if (event.type == sf::Event::Closed)
         {
@@ -55,61 +65,44 @@ sf::Color hexStringToSfmlColor(const std::string& hexColor)
     int rgbValue = 0;
     iss >> std::hex >> rgbValue;
 
-    const int red = (rgbValue >> 16) & 0xFF;
-    const int green = (rgbValue >> 8) & 0xFF;
-    const int blue = rgbValue & 0xFF;
+    const uint8 red = rgbValue >> 16 & 0xFF;
+    const uint8 green = rgbValue >> 8 & 0xFF;
+    const uint8 blue = rgbValue & 0xFF;
 
-    return sf::Color(red, green, blue);
+    return {red, green, blue};
 }
 
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
+    sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!");
 
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(config::frameCycle);
 
     sf::Clock deltaClock;
-    Game game;
-    game.init();
+    Game::init();
 
-    sf::Font font;
-    font.loadFromFile(std::string(ASSET_PATH) + "/fonts/Bentinck-Regular.ttf");
-    std::vector<sf::RectangleShape> rectangles;
-    std::vector<sf::Text> texts;
-
-    FloorGenerator::previevGenerator(font, rectangles, texts);
-
-    for (const auto& rectangle : rectangles) window.draw(rectangle);
-    for (const auto& text : texts) window.draw(text);
-
+    sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
 
     while (window.isOpen())
     {
-        // Update game logic
-        game.update();
-        game.handleCollision();
+        // Clear the window before drawing
+        window.clear(customColor);
 
-        // Clear the window
-        window.clear(hexStringToSfmlColor(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor()));
+        Game::handleCollision();
+        Game::update();
+        Game::draw();
 
-        // Draw game elements
-        game.draw();
-        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
-
-        // Update ImGui
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        // Draw ImGui elements
+        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
+        gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
+
         ImGui::SFML::Render(window);
-
-        // Display the window contents
         window.display();
-
-        // Handle additional input processing if needed
         handleInput(window);
     }
 

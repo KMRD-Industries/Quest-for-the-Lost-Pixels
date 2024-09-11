@@ -73,9 +73,7 @@ Map parseMap(const std::string& path)
         std::ifstream jsonFile(path);
 
         jsonFile >> parsed_file;
-        const Map map = parsed_file.get<Map>();
-
-        return map;
+        return parsed_file.get<Map>();
     }
     catch (...)
     {

@@ -11,17 +11,19 @@
 
 void EnemySystem::update() const
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dis(-1, 1); // Uniform distribution between -1 and 1
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<int> dis(-1, 1); // Uniform distribution between -1 and 1
 
     for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TransformComponent>(entity))
         {
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            float randX = dis(gen); // Generate random number for x between -1 and 1
-            float randY = dis(gen); // Generate random number for y between -1 and 1
+
+            // Generate random numbers and update velocity
+            const int randX = dis(gen); // Generate random number for x between -1 and 1
+            const int randY = dis(gen); // Generate random number for y between -1 and 1
             transformComponent.velocity.x += randX * config::enemyAcc;
             transformComponent.velocity.y += randY * config::enemyAcc;
         }

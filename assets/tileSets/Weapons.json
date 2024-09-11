@@ -14,25 +14,30 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":4,
+             "id":2,
              "name":"",
              "objects":[
                     {
-                     "height":17.4545454545455,
-                     "id":5,
+                     "height":1,
+                     "id":7,
                      "name":"",
                      "properties":[
                             {
                              "name":"tileID",
                              "type":"string",
                              "value":"19"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
                             }],
                      "rotation":0,
-                     "type":"",
+                     "type":"WeaponPlacement",
                      "visible":true,
-                     "width":6.45454545454546,
-                     "x":4.63636363636364,
-                     "y":5.63636363636364
+                     "width":1,
+                     "x":7.5,
+                     "y":28
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -45,6 +50,48 @@
                  "name":"tileID",
                  "type":"string",
                  "value":"19"
+                }]
+        }, 
+        {
+         "id":147,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":1,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"147"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":7.5,
+                     "y":27.5
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"tileID",
+                 "type":"string",
+                 "value":"147"
                 }]
         }],
  "tilewidth":16,

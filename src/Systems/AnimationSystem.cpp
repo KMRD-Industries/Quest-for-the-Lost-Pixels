@@ -24,8 +24,11 @@ void AnimationSystem::updateEntityAnimation(const Entity entity) const
 
 inline int AnimationSystem::calculateFrameDuration(AnimationComponent& animation)
 {
-    const auto duration = static_cast<float>(animation.it->duration);
-    return static_cast<int>(duration / config::oneFrameTime) + 1;
+    // Ensure that the division and the addition are done in long, then cast to int
+    const long duration = animation.it->duration;
+
+    // Explicitly cast to int after all calculations to avoid narrowing conversions
+    return static_cast<int>(duration / static_cast<long>(config::oneFrameTime) + 1);
 }
 
 inline bool AnimationSystem::isTimeForNextFrame(const int frameDuration) const
@@ -42,5 +45,4 @@ void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& ani
 
     tileComponent.id = animation.it->tileid;
     transformComponent.rotation = animation.it->rotation;
-;
 }
