@@ -11,7 +11,6 @@
 #include "CollisionSystem.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
-#include "Dungeon.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -69,8 +68,6 @@ void Dungeon::init()
 
     constexpr int playerAnimationTile = 185;
 
-    m_entities[m_id] = player;
-
     gCoordinator.addComponent(m_entities[m_id],
                               TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, m_id),
                                                               getSpawnOffset(config::startingPosition.y, m_id)),
@@ -84,9 +81,10 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
-    gCoordinator.addComponent(m_entities[m_id], TravellingDungeonComponent{.moveCallback = [](const glm::ivec2& dir) {
-                                  moveInDungeon(dir);
-                              }});
+    gCoordinator.addComponent(m_entities[m_id], TravellingDungeonComponent{.moveCallback = [](const glm::ivec2& dir)
+    {
+        moveInDungeon(dir);
+    }});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]).collision = cc;

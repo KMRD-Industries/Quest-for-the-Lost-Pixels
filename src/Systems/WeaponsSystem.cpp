@@ -6,6 +6,8 @@
 #include "RenderComponent.h"
 #include "WeaponComponent.h"
 
+#define M_PI 3.14159265358979323846
+
 void WeaponSystem::update() const
 {
     for (const auto entity : m_entities)
@@ -26,9 +28,11 @@ void WeaponSystem::update() const
  */
 void WeaponSystem::updateWeaponAngle(WeaponComponent& weaponComponent, const RenderComponent& renderComponent)
 {
-    if (!weaponComponent.isAttacking) return;
-    weaponComponent.isSwingingForward ? rotateForward(weaponComponent)
-                                      : rotateBackward(weaponComponent, renderComponent);
+    if (!weaponComponent.isAttacking)
+        return;
+    weaponComponent.isSwingingForward
+        ? rotateForward(weaponComponent)
+        : rotateBackward(weaponComponent, renderComponent);
 }
 
 /**
@@ -109,9 +113,7 @@ void WeaponSystem::rotateBackward(WeaponComponent& weaponComponent, const Render
             setAngle(weaponComponent, renderComponent);
         }
         else
-        {
             weaponComponent.isAttacking = false;
-        }
     }
 }
 
@@ -146,13 +148,9 @@ void WeaponSystem::setAngle(WeaponComponent& weaponComponent, const RenderCompon
     // Adjust the current angle based on the facing direction.
     const float adjustedAngle = 90.f - angleInDegrees;
     if (weaponComponent.isFacingRight)
-    {
         weaponComponent.currentAngle = adjustedAngle - weaponComponent.initialAngle;
-    }
     else
-    {
         weaponComponent.currentAngle = adjustedAngle + weaponComponent.initialAngle;
-    }
 }
 
 /**
@@ -171,9 +169,7 @@ void WeaponSystem::updateStartingAngle(WeaponComponent& weaponComponent, const R
     }
 
     if (weaponComponent.queuedAttack || weaponComponent.isAttacking)
-    {
         return;
-    }
 
     setAngle(weaponComponent, renderComponent);
 }
