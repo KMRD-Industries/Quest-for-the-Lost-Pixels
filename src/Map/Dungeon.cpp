@@ -38,19 +38,6 @@
 #include "WeaponComponent.h"
 #include "WeaponsSystem.h"
 
-std::string Dungeon::m_asset_path;
-FloorGenerator Dungeon::m_floorGenerator;
-std::unordered_map<glm::ivec2, Room> Dungeon::m_roomMap;
-glm::ivec2 Dungeon::m_currentPlayerPos;
-std::vector<Entity> Dungeon::m_entities;
-std::uint32_t Dungeon::m_id;
-std::deque<glm::ivec2> Dungeon::m_moveInDungeon;
-float Dungeon::counter;
-bool Dungeon::m_passedBy;
-std::unordered_map<long, long> Dungeon::m_mapDungeonLevelToFloorInfo;
-
-extern Coordinator gCoordinator;
-
 void Dungeon::init()
 {
     m_entities = std::vector<Entity>(MAX_ENTITIES - 1);
@@ -72,9 +59,7 @@ void Dungeon::init()
         std::cout << "Connected to server with id: {}" << m_id;
     }
     else
-    {
         std::cout << "Starting in single-player mode";
-    }
 
     makeStartFloor();
     m_roomMap.at(m_currentPlayerPos).init();
@@ -94,6 +79,9 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
+    gCoordinator.addComponent(
+        m_entities[m_id],
+        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
     gCoordinator.addComponent(m_entities[m_id], FloorComponent{});
     gCoordinator.addComponent(m_entities[m_id], TravellingDungeonComponent{.moveCallback = [](const glm::ivec2& dir) {
                                   moveInDungeon(dir);
@@ -449,4 +437,10 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
             colliderComponent.body->GetAngle());
     }
+}
+
+float Dungeon::getSpawnOffset(const float position, const int id)
+{
+    if (id % 2 == 0) return position + id * config::spawnOffset;
+    return position - id * config::spawnOffset;
 }

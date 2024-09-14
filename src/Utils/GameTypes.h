@@ -59,7 +59,7 @@ namespace GameType
 
     struct MapInfo
     {
-        int mapID{};
+        std::string mapID{};
         std::vector<DoorEntraces> doorsLoc{};
 
         bool operator==(const MapInfo& other) const { return mapID == other.mapID; }
@@ -85,8 +85,6 @@ namespace std
     template <>
     struct hash<GameType::MapInfo>
     {
-        size_t operator()(const GameType::MapInfo& mapInfo) const { return hash<int>()(mapInfo.mapID); }
+        size_t operator()(const GameType::MapInfo& mapInfo) const { return hash<std::string>()(mapInfo.mapID); }
     };
 } // namespace std
-
-

@@ -20,7 +20,10 @@ bool FloorGenerator::isConnected(const glm::ivec2& firstNode, const glm::ivec2& 
 
 std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generate)
 {
-    if (!generate) return m_floorMap;
+    const auto firstRoom = getStartingRoom();
+
+    if (!generate)
+        return m_floorMap;
 
     m_floorMap.clear();
 
@@ -34,28 +37,37 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
     {
         std::unordered_set<GameType::DoorEntraces> doorsForRoom;
         for (const auto& neighbor : nodeNeighbors)
-        {
             if (const auto dir = neighbor - nodePosition; m_mapDirOnGraphToEntrance.contains(dir))
                 doorsForRoom.insert(m_mapDirOnGraphToEntrance.at(dir));
-        }
         std::vector<GameType::MapInfo> availableMapsForRoom;
-        const auto haveSameDoorsPlacement = [&doorsForRoom](const GameType::MapInfo& mapInfo)
+        const auto haveSameDoorsPlacement = [&doorsForRoom, &nodePosition, &firstRoom](const GameType::MapInfo& mapInfo)
         {
+            bool isFirstRoomCorrect = true;
             const std::unordered_set<GameType::DoorEntraces> mapDoors(mapInfo.doorsLoc.begin(), mapInfo.doorsLoc.end());
-            return mapDoors == doorsForRoom;
+            if (nodePosition == firstRoom)
+            {
+                if (mapInfo.mapID[0] != 's')
+                    isFirstRoomCorrect = false;
+            }
+            else
+            {
+                if (mapInfo.mapID[0] == 's')
+                    isFirstRoomCorrect = false;
+            }
+            return mapDoors == doorsForRoom && isFirstRoomCorrect;
         };
         std::ranges::copy_if(availableMaps, std::back_inserter(availableMapsForRoom), haveSameDoorsPlacement);
 
         int minVal = std::numeric_limits<int>::max();
 
         for (const auto& mapInfo : availableMapsForRoom)
-        {
             minVal = choosesMap[mapInfo];
-        }
 
         std::vector<GameType::MapInfo> mapToChoose;
         const auto haveMinimalValueOfDoors = [&choosesMap, &minVal](const GameType::MapInfo& mapInfo)
-        { return choosesMap[mapInfo] == minVal; };
+        {
+            return choosesMap[mapInfo] == minVal;
+        };
         std::ranges::copy_if(availableMapsForRoom, std::back_inserter(mapToChoose), haveMinimalValueOfDoors);
 
         std::random_device rd;
@@ -90,9 +102,7 @@ std::vector<GameType::MapInfo> FloorGenerator::getMapInfo()
         }
 
         for (const auto& entry : fs::directory_iterator(path))
-        {
             checkSingleFile(entry, mapInfo);
-        }
     }
     catch (const fs::filesystem_error& e)
     {
@@ -119,17 +129,20 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     namespace fs = std::filesystem;
     using json = nlohmann::json;
 
-    if (!entry.is_regular_file()) return;
+    if (!entry.is_regular_file())
+        return;
 
-    const std::regex pattern(R"(map_\d+\.json)");
+    const std::regex pattern(R"(map_.*\.json)");
     const std::string filename = entry.path().filename().string();
     const size_t underscorePos = filename.find_last_of('_');
     const size_t dotPos = filename.find_last_of('.');
+    //const std::string mapID = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
     const std::string numberStr = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
     const int mapID = std::stoi(numberStr);
     // const int mapID = 110;
 
-    if (!std::regex_match(filename, pattern)) return;
+    if (!std::regex_match(filename, pattern))
+        return;
 
     std::cout << "Found matching file: " << filename << std::endl;
 
@@ -152,7 +165,8 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
 
     for (const auto& [doorPosition, blockType] : doorData)
     {
-        if (blockType != static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER)) continue;
+        if (blockType != static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER))
+            continue;
         doorsPositions.push_back(doorPosition);
     }
 
@@ -172,91 +186,4 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     }
 
     mapInfo.emplace_back(GameType::MapInfo{.mapID = mapID, .doorsLoc = {doorsLoc.begin(), doorsLoc.end()}});
-}
-
-void FloorGenerator::previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangles,
-                                      std::vector<sf::Text>& texts)
-{
-    int h = 5;
-    int w = 6;
-    DungeonGenerator generator(h, w);
-    generator.generateMainPath(11);
-    generator.generateSidePath(
-        {.pathName{"FirstC"}, .startingPathName{"Main"}, .endPathName{"Main"}, .minPathLength{3}, .maxPathLength{5}});
-    generator.generateSidePath(
-        {.pathName{"SecondC"}, .startingPathName{"Main"}, .endPathName{""}, .minPathLength{3}, .maxPathLength{5}});
-    const int rectWidth = 50;
-    const int rectHeight = 50;
-    const int gap = 20;
-
-    auto fullMap = generator.getNodes();
-    auto roomCount = generator.getCount();
-    generator.makeLockAndKey();
-
-    for (int i = 0; i < w; ++i)
-    {
-        for (int j = 0; j < h; ++j)
-        {
-            sf::RectangleShape rectangle(sf::Vector2f(rectWidth, rectHeight));
-            rectangle.setPosition(i * (rectWidth + gap), j * (rectHeight + gap));
-
-            if (fullMap[{i, j}] == "Main")
-            {
-                rectangle.setFillColor(sf::Color::Red);
-            }
-            else if (fullMap[{i, j}] == "FirstC")
-            {
-                rectangle.setFillColor(sf::Color::Blue);
-            }
-            else if (fullMap[{i, j}] == "SecondC")
-            {
-                rectangle.setFillColor(sf::Color::Green);
-            }
-            else
-            {
-                rectangle.setFillColor(sf::Color::Black);
-            }
-            rectangles.push_back(rectangle);
-
-            auto currentNodeVal = roomCount[{i, j}];
-            sf::Text text;
-            text.setFont(font);
-            text.setString(std::to_string(currentNodeVal));
-            text.setCharacterSize(14); // w pikselach
-            text.setFillColor(sf::Color::White);
-            text.setPosition(i * (rectWidth + gap), j * (rectHeight + gap));
-
-            texts.push_back(text);
-
-
-            sf::Text key;
-            key.setFont(font);
-            key.setString(std::to_string(generator.getOutEdgesCount(i, j)));
-            key.setCharacterSize(14); // w pikselach
-            key.setFillColor(sf::Color::Black);
-            key.setPosition(i * (rectWidth + gap) + 30, j * (rectHeight + gap) + 30);
-            texts.push_back(key);
-
-            if (const auto text = generator.getKey({i, j}))
-            {
-                sf::Text key;
-                key.setFont(font);
-                key.setString(text.value());
-                key.setCharacterSize(14); // w pikselach
-                key.setFillColor(sf::Color::Black);
-                key.setPosition(i * (rectWidth + gap) + 10, j * (rectHeight + gap) + 10);
-                texts.push_back(key);
-            }
-            if (const auto text = generator.getLock({i, j}))
-            {
-                sf::Text key;
-                key.setFont(font);
-                key.setString(text.value());
-                key.setCharacterSize(14); // w pikselach
-                key.setFillColor(sf::Color::Black);
-                key.setPosition(i * (rectWidth + gap) + 10, j * (rectHeight + gap) + 10);
-                texts.push_back(key);
-            }
-        }
-    }
 }

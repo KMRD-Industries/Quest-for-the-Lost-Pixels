@@ -1,4 +1,5 @@
 #pragma once
+#include "glm/vec2.hpp"
 // Every variable should be inline constexpr as it is file scope
 // https://www.youtube.com/watch?v=QVHwOOrSh3w
 // Remember that in the game we use units in pixels, and the collision and physics system takes meters
@@ -63,4 +64,7 @@ namespace config
     static constexpr float weaponComponentDefaultSwingDistance{90.0f};
     static constexpr float weaponComponentDefaultRemainingDistance{0.0f};
     static constexpr float weaponComponentDefaultRecoilAmount{10.0f};
+    
+    static constexpr glm::vec2 startingPosition{325.f, 325.f};
+    static constexpr float spawnOffset{25};
 } // namespace config

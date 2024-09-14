@@ -1,16 +1,14 @@
 #pragma once
 #include "Dungeon.h"
 
-
 class Game
 {
 public:
-    static void init();
-    static void draw();
-    static void update();
-    static void handleCollision();
-    static std::string getBackground();
+    void init();
+    void draw();
+    void update();
+    void handleCollision();
 
 private:
-    static Dungeon m_dungeon;
+    Dungeon m_dungeon;
 };
