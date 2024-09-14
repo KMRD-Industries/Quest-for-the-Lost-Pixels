@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-#include <imgui-SFML.h>
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
@@ -10,6 +9,7 @@
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
 #include "TextTagSystem.h"
+#include <imgui-SFML.h>
 
 Coordinator gCoordinator;
 
