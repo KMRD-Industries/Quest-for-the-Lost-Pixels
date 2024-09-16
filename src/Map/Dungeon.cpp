@@ -4,7 +4,6 @@
 
 #include <comm.pb.h>
 
-#include "Dungeon.h"
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
 #include "CharacterComponent.h"
@@ -14,6 +13,7 @@
 #include "Config.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
+#include "Dungeon.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -41,33 +41,21 @@
 
 extern Coordinator gCoordinator;
 
-std::string Dungeon::m_asset_path;
-FloorGenerator Dungeon::m_floorGenerator;
-std::unordered_map<glm::ivec2, Room> Dungeon::m_roomMap;
-glm::ivec2 Dungeon::m_currentPlayerPos;
-std::vector<Entity> Dungeon::m_entities;
-std::uint32_t Dungeon::m_id;
-std::deque<glm::ivec2> Dungeon::m_moveInDungeon;
-float Dungeon::counter;
-bool Dungeon::m_passedBy;
-
 void Dungeon::init()
 {
-    m_entities = std::vector<Entity>(MAX_ENTITIES - 1);
     setECS();
     gCoordinator.createEntity();
 
     config::playerEntity = gCoordinator.createEntity();
     m_id = 0;
     m_seed = std::chrono::system_clock::now().time_since_epoch().count();
-    config::playerEntity = gCoordinator.createEntity();
 
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     multiplayerSystem->setup("127.0.0.1", "9001");
 
     if (multiplayerSystem->isConnected())
     {
-        auto gameState = multiplayerSystem->registerPlayer(player);
+        auto gameState = multiplayerSystem->registerPlayer(config::playerEntity);
         m_id = gameState.player_id();
         m_seed = gameState.seed();
 
@@ -80,16 +68,16 @@ void Dungeon::init()
         }
     }
     else
-        std::cout << "Starting in single-player mode";
+        std::println("Starting in single-player mode");
 
-    constexpr int playerAnimationTile = 185;
     const std::string tag = std::format("Player {}", m_id);
+
+    m_entities[m_id] = config::playerEntity;
 
     gCoordinator.addComponent(m_entities[m_id],
                               TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, m_id),
                                                               getSpawnOffset(config::startingPosition.y, m_id)),
-                                                 0.f, sf::Vector2f(1.f, 1.f),
-                                                 {0.f, 0.f}));
+                                                 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
     gCoordinator.addComponent(m_entities[m_id], TileComponent{config::playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[m_id], RenderComponent{});
     gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
@@ -98,12 +86,11 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
-    gCoordinator.addComponent(m_entities[m_id], TravellingDungeonComponent{.moveCallback = [](const glm::ivec2& dir)
-    {
-        moveInDungeon(dir);
-    }});
+    gCoordinator.addComponent(
+        m_entities[m_id],
+        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
 
-    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", playerAnimationTile);
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]).collision = cc;
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
@@ -149,8 +136,7 @@ void Dungeon::init()
     makeSimpleFloor();
 
     m_roomMap.at(m_currentPlayerPos).init();
-    if (multiplayerSystem->isConnected())
-	    multiplayerSystem->setRoom(m_currentPlayerPos);
+    if (multiplayerSystem->isConnected()) multiplayerSystem->setRoom(m_currentPlayerPos);
 
     m_players.insert(m_id);
 
@@ -191,27 +177,11 @@ void Dungeon::update()
             m_players.erase(id);
             break;
         case comm::CONNECTED:
-<<<<<<< HEAD
             createRemotePlayer(id);
             m_players.insert(id);
             break;
         case comm::ROOM_CHANGED:
             changeRoom(multiplayerSystem->getRoom());
-=======
-            m_entities[id] = gCoordinator.createEntity();
-
-            gCoordinator.addComponent(m_entities[id], TileComponent{playerAnimationTile, "Characters", 4});
-            gCoordinator.addComponent(m_entities[id], RenderComponent{});
-            gCoordinator.addComponent(m_entities[id],
-                                      TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
-            gCoordinator.addComponent(m_entities[id], AnimationComponent{});
-            gCoordinator.addComponent(m_entities[id], ColliderComponent{});
-            gCoordinator.addComponent(m_entities[id], CharacterComponent{});
-
-            CollisionSystem::createBody(m_entities[id], tag);
-
-            multiplayerSystem->entityConnected(id, m_entities[id]);
->>>>>>> main
             break;
         default:
             break;
@@ -225,22 +195,26 @@ void Dungeon::update()
 
 void Dungeon::createRemotePlayer(uint32_t id)
 {
-    constexpr int playerAnimationTile = 185;
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     auto tag = std::format("Player {}", id);
 
     m_entities[id] = gCoordinator.createEntity();
 
-    gCoordinator.addComponent(m_entities[id], TileComponent{playerAnimationTile, "Characters", 4});
+    gCoordinator.addComponent(m_entities[id],
+                              TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, id),
+                                                              getSpawnOffset(config::startingPosition.y, id)),
+                                                 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
+    gCoordinator.addComponent(m_entities[id], TileComponent{config::playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[id], RenderComponent{});
-    gCoordinator.addComponent(m_entities[id], TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(m_entities[id], AnimationComponent{});
+    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = config::defaultEnemyHP});
+    gCoordinator.addComponent(m_entities[id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[id], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
-    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = 100.f});
+    gCoordinator.addComponent(m_entities[id], InventoryComponent{});
+    gCoordinator.addComponent(m_entities[id], EquippedWeaponComponent{});
 
-    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", playerAnimationTile);
-    gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
+    gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]).collision = cc;
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
         m_entities[id], tag, {cc.width, cc.height}, [&](const GameType::CollisionData& entityT) {},
@@ -459,7 +433,6 @@ void Dungeon::changeRoom(const glm::ivec2& room)
 
 float Dungeon::getSpawnOffset(const float position, const int id)
 {
-    if (id % 2 == 0)
-        return position + id * config::spawnOffset;
+    if (id % 2 == 0) return position + id * config::spawnOffset;
     return position - id * config::spawnOffset;
 }
