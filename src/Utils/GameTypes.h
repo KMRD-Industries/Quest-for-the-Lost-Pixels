@@ -23,29 +23,17 @@ namespace GameType
     {
         float x, y;
 
-        MyVec2(const float x, const float y):
-            x{x}, y{y}
-        {
-        }
+        MyVec2(const float x, const float y) : x{x}, y{y} {}
 
-        MyVec2(const glm::vec2& vec) :
-            x(vec.x), y(vec.y)
-        {
-        }
+        MyVec2(const glm::vec2& vec) : x(vec.x), y(vec.y) {}
 
         operator glm::vec2() const { return {x, y}; }
 
-        MyVec2(const sf::Vector2f& vec) :
-            x(vec.x), y(vec.y)
-        {
-        }
+        MyVec2(const sf::Vector2f& vec) : x(vec.x), y(vec.y) {}
 
         operator sf::Vector2f() const { return {x, y}; }
 
-        MyVec2(const b2Vec2& vec) :
-            x(vec.x), y(vec.y)
-        {
-        }
+        MyVec2(const b2Vec2& vec) : x(vec.x), y(vec.y) {}
 
         operator b2Vec2() const { return {x, y}; }
     };
@@ -69,7 +57,7 @@ namespace GameType
 
     struct MapInfo
     {
-        int mapID{};
+        std::string mapID{};
         std::vector<DoorEntraces> doorsLoc{};
 
         bool operator==(const MapInfo& other) const { return mapID == other.mapID; }
@@ -87,6 +75,7 @@ namespace GameType
         std::string tag;
         MyVec2 position;
     };
+
 } // namespace GameType
 
 namespace std
@@ -94,6 +83,6 @@ namespace std
     template <>
     struct hash<GameType::MapInfo>
     {
-        size_t operator()(const GameType::MapInfo& mapInfo) const { return hash<int>()(mapInfo.mapID); }
+        size_t operator()(const GameType::MapInfo& mapInfo) const { return hash<std::string>()(mapInfo.mapID); }
     };
 } // namespace std

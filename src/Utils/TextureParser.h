@@ -7,20 +7,20 @@
 
 using json = nlohmann::json;
 
-void from_json(const json& json, ObjectProperty& objectProperty)
+inline void from_json(const json& json, ObjectProperty& objectProperty)
 {
     json.at("name").get_to(objectProperty.name);
     json.at("type").get_to(objectProperty.type);
     json.at("value").get_to(objectProperty.value);
 }
 
-void from_json(const json& json, AnimationFrame& frame)
+inline void from_json(const json& json, AnimationFrame& frame)
 {
     json.at("duration").get_to(frame.duration);
     json.at("tileid").get_to(frame.tileid);
 }
 
-void from_json(const json& json, Collision& obj)
+inline void from_json(const json& json, Collision& obj)
 {
     json.at("id").get_to(obj.id);
     json.at("x").get_to(obj.x);
@@ -34,7 +34,7 @@ void from_json(const json& json, Collision& obj)
     }
 }
 
-void from_json(const json& json, Tile& tile)
+inline void from_json(const json& json, Tile& tile)
 {
     json.at("id").get_to(tile.id);
 
@@ -59,31 +59,30 @@ void from_json(const json& json, Tile& tile)
     };
 }
 
-void from_json(const json& json, Tileset& tileset)
+inline void from_json(const json& json, Tileset& tileSet)
 {
-    json.at("columns").get_to(tileset.columns);
-    json.at("imageheight").get_to(tileset.imageheight);
-    json.at("imagewidth").get_to(tileset.imagewidth);
-    json.at("margin").get_to(tileset.margin);
-    json.at("name").get_to(tileset.name);
-    json.at("spacing").get_to(tileset.spacing);
-    json.at("tilecount").get_to(tileset.tilecount);
-    json.at("tiledversion").get_to(tileset.tiledversion);
-    json.at("tileheight").get_to(tileset.tileheight);
-    json.at("tilewidth").get_to(tileset.tilewidth);
-    json.at("type").get_to(tileset.type);
-    json.at("version").get_to(tileset.version);
+    json.at("columns").get_to(tileSet.columns);
+    json.at("imageheight").get_to(tileSet.imageheight);
+    json.at("imagewidth").get_to(tileSet.imagewidth);
+    json.at("margin").get_to(tileSet.margin);
+    json.at("name").get_to(tileSet.name);
+    json.at("spacing").get_to(tileSet.spacing);
+    json.at("tilecount").get_to(tileSet.tilecount);
+    json.at("tiledversion").get_to(tileSet.tiledversion);
+    json.at("tileheight").get_to(tileSet.tileheight);
+    json.at("tilewidth").get_to(tileSet.tilewidth);
+    json.at("type").get_to(tileSet.type);
+    json.at("version").get_to(tileSet.version);
 
     if (json.find("tiles") != json.end())
     {
-        json.at("tiles").get_to(tileset.tiles);
+        json.at("tiles").get_to(tileSet.tiles);
     }
 
-    auto image = json.at("image");
-    tileset.image = extractFileName(image.get<std::string>(), "/", ".");
+    tileSet.image = extractFileName(json.at("image").get<std::string>(), "/", ".");
 }
 
-Tileset parseTileset(const std::string& path)
+inline Tileset parseTileSet(const std::string& path)
 {
     try
     {
@@ -91,11 +90,11 @@ Tileset parseTileset(const std::string& path)
         json j;
         file >> j;
 
-        Tileset tileset = j.get<Tileset>();
-        return tileset;
+        return j.get<Tileset>();
     }
     catch (...)
     {
         std::cerr << "Caught an unknown exception" << std::endl;
+        return {};
     }
 }
