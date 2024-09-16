@@ -1,6 +1,7 @@
 #include "CollisionSystem.h"
 
 #include "ColliderComponent.h"
+#include "Coordinator.h"
 #include "DoorComponent.h"
 #include "MultiplayerSystem.h"
 #include "PassageComponent.h"
@@ -46,7 +47,7 @@ void MyContactListener::EndContact(b2Contact* contact)
     }
 }
 
-void CollisionSystem::createMapCollision() const
+void CollisionSystem::createMapCollision()
 {
     for (const auto entity : m_entities)
     {
@@ -57,8 +58,8 @@ void CollisionSystem::createMapCollision() const
         }
     }
 
-    auto createCollisionBody = [](const Entity entity, const std::string type, const glm::vec2& size,
-                                  const bool isStatic, const bool useTexture, const glm::vec2& offset = {0, 0})
+    auto createCollisionBody = [this](const Entity entity, const std::string type, const glm::vec2& size,
+                                      const bool isStatic, const bool useTexture, const glm::vec2& offset = {0, 0})
     {
         createBody(
             entity, type, size, [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, isStatic,
@@ -161,6 +162,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
  * \param onCollisionOut Callback to function run on leave collision.
  * \param isStatic Specifies whether the body should be static (not moving) or dynamic (moving).
  * \param useTextureSize Specifies whether the collider size should be based on the entity's texture size.
+ * \param offset
  */
 void CollisionSystem::createBody(const Entity entity, const std::string& tag, const glm::vec2& colliderSize,
                                  const std::function<void(GameType::CollisionData)>& onCollisionEnter,
@@ -201,7 +203,7 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
 
     bodyDef.position.Set(xPosition, yPosition);
     bodyDef.angle = transformComponent.rotation;
-    bodyDef.type = (isStatic) ? b2_staticBody : b2_dynamicBody;
+    bodyDef.type = isStatic ? b2_staticBody : b2_dynamicBody;
     bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(collisionData);
 
     b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
@@ -248,7 +250,7 @@ void CollisionSystem::deleteBody(const Entity entity)
     colliderComponent.collision = {};
 }
 
-void CollisionSystem::deleteMarkedBodies() const
+void CollisionSystem::deleteMarkedBodies()
 {
     std::unordered_set<Entity> entityToKill{};
 

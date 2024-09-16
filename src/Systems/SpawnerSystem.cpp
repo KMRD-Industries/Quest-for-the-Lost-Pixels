@@ -29,7 +29,7 @@ void SpawnerSystem::update()
 }
 
 void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
-                                   const TransformComponent& spawnerTransformComponent) const
+                                   const TransformComponent& spawnerTransformComponent)
 {
     if (!spawnerComponent.loopSpawn && spawnerComponent.noSpawns >= 1)
     {
@@ -47,7 +47,7 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
     spawnEnemy(spawnerTransformComponent);
 }
 
-bool SpawnerSystem::isReadyToSpawn(const int cooldown) const { return spawnTime % cooldown == 0; }
+bool SpawnerSystem::isReadyToSpawn(const int cooldown) { return spawnTime % cooldown == 0; }
 
 void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent)
 {
@@ -65,13 +65,13 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
     gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = config::defaultCharacterHP});
 
-    CollisionSystem::createBody(
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
         newMonsterEntity, "SecondPlayer", {colliderComponent.collision.width, colliderComponent.collision.height},
         [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false, false,
         {colliderComponent.collision.x, colliderComponent.collision.y});
 }
 
-void SpawnerSystem::clearSpawners() const
+void SpawnerSystem::clearSpawners()
 {
     std::deque<Entity> entityToRemove;
 
@@ -88,7 +88,7 @@ void SpawnerSystem::clearSpawners() const
 }
 
 
-void SpawnerSystem::cleanUpUnnecessarySpawners() const
+void SpawnerSystem::cleanUpUnnecessarySpawners()
 {
     std::unordered_set<Entity> entityToKill{};
 

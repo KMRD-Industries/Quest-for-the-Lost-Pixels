@@ -24,7 +24,7 @@ public:
     void generateSidePath(const DungeonGenerator::sidePathConfig& path) { m_generator.generateSidePath(path); }
     void makeLockAndKey() { m_generator.makeLockAndKey(); }
     bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
-    void setFloorID(const int id) { m_floorID = id; };
+    void setFloorID(const int id) { m_floorID = id; }
 
     std::unordered_map<glm::ivec2, Room> getFloor(bool generate);
     glm::ivec2 getStartingRoom() const { return m_generator.getStartingRoom(); }
@@ -33,12 +33,12 @@ public:
                                  std::vector<sf::Text>& texts);
 
 private:
-    std::vector<GameType::MapInfo> getMapInfo();
+    std::vector<GameType::MapInfo> getMapInfo() const;
     static void checkSingleFile(const std::filesystem::directory_entry& entry, std::vector<GameType::MapInfo>& mapInfo);
 
     DungeonGenerator m_generator{};
     std::unordered_map<glm::ivec2, Room> m_floorMap{};
-    std::uint32_t m_floorID{0};
+    int m_floorID{0};
 
     /* This code will be used to show minimap of the dungeon
     void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangles, std::vector<sf::Text>& texts)

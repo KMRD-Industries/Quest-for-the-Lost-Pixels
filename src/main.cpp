@@ -1,8 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <TextureSystem.h>
 #include <imgui-SFML.h>
 
+#include <imgui-SFML.h>
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
@@ -11,7 +13,6 @@
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
 #include "TextTagSystem.h"
-#include <imgui-SFML.h>
 
 Coordinator gCoordinator;
 
@@ -22,7 +23,7 @@ void handleInput(sf::RenderWindow& window)
 
     while (window.pollEvent(event))
     {
-        ImGui::SFML::ProcessEvent(event);
+        ImGui::SFML::ProcessEvent(window, event);
 
         if (event.type == sf::Event::KeyPressed)
         {
@@ -55,7 +56,7 @@ void handleInput(sf::RenderWindow& window)
 
 sf::Color hexStringToSfmlColor(const std::string& hexColor)
 {
-    const std::string& hex = (hexColor[0] == '#') ? hexColor.substr(1) : hexColor;
+    const std::string& hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
 
     std::istringstream iss(hex);
     int rgbValue = 0;
@@ -82,12 +83,10 @@ int main()
     Game game;
     game.init();
 
-    sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
-
     while (window.isOpen())
     {
         // Clear the window before drawing
-        window.clear(customColor);
+        window.clear(hexStringToSfmlColor(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor()));
 
         game.handleCollision();
         game.update();

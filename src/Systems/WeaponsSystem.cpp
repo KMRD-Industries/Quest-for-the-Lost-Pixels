@@ -1,14 +1,13 @@
 #include "WeaponsSystem.h"
 #include <RenderSystem.h>
 #include <cmath>
-#include <math.h>
 #include "AnimationSystem.h"
 #include "RenderComponent.h"
 #include "WeaponComponent.h"
 
 #define M_PI 3.14159265358979323846
 
-void WeaponSystem::update() const
+void WeaponSystem::update()
 {
     for (const auto entity : m_entities)
     {

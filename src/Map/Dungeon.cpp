@@ -41,9 +41,8 @@
 void Dungeon::init()
 {
     m_entities = std::vector<Entity>(MAX_ENTITIES - 1);
-    m_mapDungeonLevelToFloorInfo = {{1, 1}, {2, 1}, {3, 1}, {4, 2}, {5, 2}};
     setECS();
-    gCoordinator.createEntity();
+    auto _ = gCoordinator.createEntity(); // To evade Entity with ID == 0;
     gCoordinator.getRegisterSystem<TextureSystem>()->loadTexturesFromFiles();
 
     const Entity player = gCoordinator.createEntity();
@@ -79,19 +78,16 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
+    gCoordinator.addComponent(m_entities[m_id], FloorComponent{});
     gCoordinator.addComponent(
         m_entities[m_id],
         TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
-    gCoordinator.addComponent(m_entities[m_id], FloorComponent{});
-    gCoordinator.addComponent(m_entities[m_id], TravellingDungeonComponent{.moveCallback = [](const glm::ivec2& dir) {
-                                  moveInDungeon(dir);
-                              }});
-    gCoordinator.addComponent(m_entities[m_id], PassageComponent{.moveCallback = [] { moveDownDungeon(); }});
+    gCoordinator.addComponent(m_entities[m_id], PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]).collision = cc;
 
-    CollisionSystem::createBody(
+    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
         m_entities[m_id], "Player 1", {cc.width, cc.height},
         [&](const GameType::CollisionData& entityT)
         {
@@ -142,8 +138,8 @@ void Dungeon::init()
     gCoordinator.addComponent(weaponEntity, ColliderComponent{});
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
 
-    InventorySystem::pickUpWeapon(m_entities[m_id], weaponEntity);
-    EquipWeaponSystem::equipWeapon(m_entities[m_id], weaponEntity);
+    gCoordinator.getRegisterSystem<InventorySystem>()->pickUpWeapon(m_entities[m_id], weaponEntity);
+    gCoordinator.getRegisterSystem<EquipWeaponSystem>()->equipWeapon(m_entities[m_id], weaponEntity);
 
     makeStartFloor();
 
@@ -195,7 +191,7 @@ void Dungeon::update()
             gCoordinator.addComponent(m_entities[id], ColliderComponent{});
             gCoordinator.addComponent(m_entities[id], CharacterComponent{});
 
-            CollisionSystem::createBody(m_entities[id], tag);
+            gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[id], tag);
 
             multiplayerSystem->entityConnected(id, m_entities[id]);
             break;
@@ -318,7 +314,7 @@ void Dungeon::setECS()
 
 void Dungeon::makeStartFloor()
 {
-    Room room{0};
+    Room room{"0", 0};
     m_roomMap.clear();
     m_roomMap.emplace(glm::ivec2{0, 0}, room);
     m_currentPlayerPos = {0.f, 0.f};
@@ -437,10 +433,4 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
             colliderComponent.body->GetAngle());
     }
-}
-
-float Dungeon::getSpawnOffset(const float position, const int id)
-{
-    if (id % 2 == 0) return position + id * config::spawnOffset;
-    return position - id * config::spawnOffset;
 }

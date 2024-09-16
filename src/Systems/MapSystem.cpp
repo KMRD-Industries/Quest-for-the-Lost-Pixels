@@ -28,7 +28,7 @@ extern Coordinator gCoordinator;
  * @brief Load room layout from given path of Tiled Json map format
  * @param path The path to JSON formatted Tiled map
  */
-void MapSystem::loadMap(const std::string& path) const
+void MapSystem::loadMap(const std::string& path)
 {
     // Remove old room entites before creating new ones
     resetMap();
@@ -71,7 +71,7 @@ void MapSystem::loadMap(const std::string& path) const
  * @brief tile according to given flag
  * @param flags - First 4 bits of tile description from Tiled Map
  * @param rotation - Tile rotation parameter from TransformComponent
- * @param scale - Tile scale parameter from Transformcomponent
+ * @param scale - Tile scale parameter from TransformComponent
  */
 void MapSystem::doFlips(const std::uint8_t& flags, float& rotation, sf::Vector2f& scale)
 {
@@ -201,14 +201,14 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 
                 break;
             }
-        case (static_cast<int>(SpecialBlocks::Blocks::STARTINGPOINT)):
+        case static_cast<int>(SpecialBlocks::Blocks::STARTINGPOINT):
             {
                 const sf::Vector2f pos = getPosition(xPos, yPos, parsedMap.tileheight);
                 startingPosition = pos;
                 break;
             }
 
-        case (static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR)):
+        case static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR):
             {
                 gCoordinator.addComponent(mapEntity, PassageComponent{});
                 break;
@@ -252,7 +252,7 @@ void MapSystem::resetMap() const
 
     while (!entityToRemove.empty())
     {
-        CollisionSystem::deleteBody(entityToRemove.front());
+        gCoordinator.getRegisterSystem<CollisionSystem>()->deleteBody(entityToRemove.front());
         gCoordinator.destroyEntity(entityToRemove.front());
         entityToRemove.pop_front();
     }

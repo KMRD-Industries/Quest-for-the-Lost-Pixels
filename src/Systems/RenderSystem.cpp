@@ -2,6 +2,7 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "Coordinator.h"
 #include "EnemyComponent.h"
 #include "EquippedWeaponComponent.h"
 #include "PassageComponent.h"
@@ -60,14 +61,14 @@ void RenderSystem::draw(sf::RenderWindow& window)
                     !gCoordinator.hasComponent<PlayerComponent>(entity))
                 {
                     sf::Vector2f portalPosition = {};
-                    portalPosition.x =
-                        renderComponent.sprite.getPosition().x - 3.75f * renderComponent.sprite.getLocalBounds().width;
-                    portalPosition.y =
-                        renderComponent.sprite.getPosition().y - 3.75f * renderComponent.sprite.getLocalBounds().height;
+                    portalPosition.x = renderComponent.sprite.getPosition().x -
+                        renderComponent.sprite.getLocalBounds().width - 9 * config::gameScale;
+                    portalPosition.y = renderComponent.sprite.getPosition().y -
+                        renderComponent.sprite.getLocalBounds().height - 8 * config::gameScale;
                     portalSprite.setPosition(portalPosition);
                     portalSprite.setScale(renderComponent.sprite.getScale());
 
-                    tiles[config::maximumNumberOfLayers - 1].push_back(&portalSprite);
+                    tiles[2].push_back(&portalSprite);
                 }
             }
 
@@ -308,7 +309,7 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
 }
 
 
-void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
+void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
 {
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);

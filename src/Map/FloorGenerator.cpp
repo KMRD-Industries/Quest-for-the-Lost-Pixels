@@ -6,8 +6,6 @@
 #include <regex>
 
 #include "AnimationSystem.h"
-#include "FloorComponent.h"
-#include "Utils/GameUtility.h"
 #include "Utils/Helpers.h"
 #include "Utils/Paths.h"
 
@@ -39,6 +37,7 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
         for (const auto& neighbor : nodeNeighbors)
             if (const auto dir = neighbor - nodePosition; m_mapDirOnGraphToEntrance.contains(dir))
                 doorsForRoom.insert(m_mapDirOnGraphToEntrance.at(dir));
+
         std::vector<GameType::MapInfo> availableMapsForRoom;
         const auto haveSameDoorsPlacement = [&doorsForRoom, &nodePosition, &firstRoom](const GameType::MapInfo& mapInfo)
         {
@@ -68,6 +67,7 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
         {
             return choosesMap[mapInfo] == minVal;
         };
+
         std::ranges::copy_if(availableMapsForRoom, std::back_inserter(mapToChoose), haveMinimalValueOfDoors);
 
         std::random_device rd;
@@ -77,18 +77,15 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
 
         auto selectedMap = mapToChoose.front();
         choosesMap[selectedMap]++;
-        m_floorMap[nodePosition] = Room(selectedMap.mapID);
-        m_floorMap[nodePosition].setFloorID(m_floorID);
+        m_floorMap[nodePosition] = Room(selectedMap.mapID, m_floorID);
     }
 
     return m_floorMap;
 }
 
-std::vector<GameType::MapInfo> FloorGenerator::getMapInfo()
+std::vector<GameType::MapInfo> FloorGenerator::getMapInfo() const
 {
     namespace fs = std::filesystem;
-    using json = nlohmann::json;
-
     const std::string path = std::string(ASSET_PATH) + "/maps/floor_0" + std::to_string(m_floorID) + "/";
 
     std::vector<GameType::MapInfo> mapInfo{};
@@ -136,9 +133,9 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     const std::string filename = entry.path().filename().string();
     const size_t underscorePos = filename.find_last_of('_');
     const size_t dotPos = filename.find_last_of('.');
-    //const std::string mapID = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
+    const std::string mapID = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
     const std::string numberStr = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
-    const int mapID = std::stoi(numberStr);
+    // const int mapID = std::stoi(numberStr);
     // const int mapID = 110;
 
     if (!std::regex_match(filename, pattern))

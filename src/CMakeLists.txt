@@ -128,9 +128,9 @@ add_executable(qlp ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} $
 
 target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
 
-if(WIN32)
+if (WIN32)
     target_link_libraries(qlp PRIVATE ws2_32)
-endif()
+endif ()
 
 target_compile_features(qlp PRIVATE cxx_std_23)
 
@@ -138,17 +138,17 @@ if (WIN32)
     set(BOX2D_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/box2d-build/bin")
     set(ADDITIONAL_DLL_DIR "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
 
-    if (EXISTS  ${BOX2D_SOURCE_DIR} )
+    if (EXISTS ${BOX2D_SOURCE_DIR})
         add_custom_command(
                 TARGET qlp
                 COMMENT "Copy box2d BLLS"
                 PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory  ${BOX2D_SOURCE_DIR} $<TARGET_FILE_DIR:qlp>
+                COMMAND ${CMAKE_COMMAND} -E copy_directory ${BOX2D_SOURCE_DIR} $<TARGET_FILE_DIR:qlp>
                 VERBATIM
         )
     endif ()
 
-    if(EXISTS  ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>)
+    if (EXISTS ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>)
         add_custom_command(
                 TARGET qlp
                 COMMENT "Copy box2d BLLS"
@@ -158,14 +158,14 @@ if (WIN32)
         )
     endif ()
 
-    if (EXISTS  ${ADDITIONAL_DLL_DIR} )
+    if (EXISTS ${ADDITIONAL_DLL_DIR})
         add_custom_command(
-            TARGET qlp
-            COMMENT "Copy abseil_dll DLLs"
-            PRE_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/abseil_dll.dll $<TARGET_FILE_DIR:qlp>
-            VERBATIM
-    )
+                TARGET qlp
+                COMMENT "Copy abseil_dll DLLs"
+                PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/abseil_dll.dll $<TARGET_FILE_DIR:qlp>
+                VERBATIM
+        )
     endif ()
 
     # Dodanie komendy do kopiowania libprotobufd.dll, jeśli istnieje

@@ -8,13 +8,15 @@
 class MapSystem : public System
 {
 public:
-    void loadMap(const std::string&) const;
+    void loadMap(const std::string&);
 
 private:
-    static void doFlips(const std::uint8_t&, float& rotation, sf::Vector2f& scale);
-    static std::string findKeyLessThan(const std::unordered_map<std::string, long>& atlas_sets, long i);
+    void doFlips(const std::uint8_t&, float&, sf::Vector2f&);
     void resetMap() const;
-    static sf::Vector2f getPosition(int, int, int);
+    void processTile(uint32_t, uint32_t, int, int, int, const Map&);
+
+    sf::Vector2f getPosition(int, int, int);
+    std::string findKeyLessThan(const std::unordered_map<std::string, long>&, long);
 
     enum FlipFlags : std::uint8_t
     {
@@ -31,7 +33,4 @@ private:
     static constexpr float ROTATION_90 = 90.0f;
     static constexpr float ROTATION_180 = 180.0f;
     static constexpr float ROTATION_270 = 270.0f;
-
-    static void processTile(uint32_t tileID, uint32_t flipFlags, int layerID, int xPos, int yPos,
-                            const Map& parsed_map);
 };

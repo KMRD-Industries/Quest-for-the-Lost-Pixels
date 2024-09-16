@@ -10,13 +10,13 @@ class SpawnerSystem : public System
 {
 public:
     void update();
-    void clearSpawners() const;
-    void cleanUpUnnecessarySpawners() const;
+    void clearSpawners();
+    void cleanUpUnnecessarySpawners();
 
 private:
     int spawnTime;
     void incrementSpawnTimer();
-    void processSpawner(SpawnerComponent &spawnerComponent, const TransformComponent &spawnerTransformComponent) const;
-    bool isReadyToSpawn(int cooldown) const;
-    static void spawnEnemy(const TransformComponent &);
+    void processSpawner(SpawnerComponent &spawnerComponent, const TransformComponent &spawnerTransformComponent);
+    bool isReadyToSpawn(int cooldown);
+    void spawnEnemy(const TransformComponent &);
 };

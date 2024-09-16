@@ -13,7 +13,7 @@ void AnimationSystem::updateFrames()
     }
 }
 
-void AnimationSystem::updateEntityAnimation(const Entity entity) const
+void AnimationSystem::updateEntityAnimation(const Entity entity)
 {
     if (auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
         !animation.frames.empty() && isTimeForNextFrame(calculateFrameDuration(animation)))
