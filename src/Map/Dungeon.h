@@ -1,7 +1,7 @@
 #pragma once
 #include <deque>
-#include <unordered_map>
 #include <set>
+#include <unordered_map>
 #include <vector>
 
 #include "FloorGenerator.h"
@@ -12,7 +12,7 @@
 class Dungeon
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1) {}
+    Dungeon() : m_entities(MAX_ENTITIES - 1) {};
 
     void init();
     void draw();
@@ -25,7 +25,7 @@ private:
     void moveInDungeon(const glm::ivec2& dir);
     void changeRoom(const glm::ivec2& dir);
     void clearDungeon();
-	float getSpawnOffset(float position, int id);
+    float getSpawnOffset(float position, int id);
 
     std::string m_asset_path{ASSET_PATH};
     FloorGenerator m_floorGenerator{};

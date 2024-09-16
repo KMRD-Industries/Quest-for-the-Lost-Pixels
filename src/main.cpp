@@ -1,4 +1,3 @@
-#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
@@ -10,6 +9,7 @@
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
 #include "TextTagSystem.h"
+#include <imgui-SFML.h>
 
 Coordinator gCoordinator;
 
@@ -47,8 +47,7 @@ void handleInput(sf::RenderWindow& window)
             const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
-        if (event.type == sf::Event::Closed)
-            window.close();
+        if (event.type == sf::Event::Closed) window.close();
     }
 }
 
