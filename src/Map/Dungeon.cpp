@@ -39,7 +39,7 @@
 #include "WeaponComponent.h"
 #include "WeaponsSystem.h"
 
-extern Coordinator gCoordinator;
+extern Coordinator Coordinator;
 
 void Dungeon::init()
 {
@@ -208,13 +208,13 @@ void Dungeon::createRemotePlayer(uint32_t id)
     gCoordinator.addComponent(m_entities[id], RenderComponent{});
     gCoordinator.addComponent(m_entities[id], AnimationComponent{});
     gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = config::defaultEnemyHP});
-    gCoordinator.addComponent(m_entities[id], PlayerComponent{});
+    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
     gCoordinator.addComponent(m_entities[id], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[id], InventoryComponent{});
-    gCoordinator.addComponent(m_entities[id], EquippedWeaponComponent{});
+    // gCoordinator.addComponent(m_entities[id], InventoryComponent{});
+    // gCoordinator.addComponent(m_entities[id], EquippedWeaponComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
-    gCoordinator.getComponent<ColliderComponent>(m_entities[m_id]).collision = cc;
+    gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
         m_entities[id], tag, {cc.width, cc.height}, [&](const GameType::CollisionData& entityT) {},

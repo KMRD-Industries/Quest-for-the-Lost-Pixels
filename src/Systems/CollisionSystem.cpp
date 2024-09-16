@@ -50,7 +50,7 @@ void CollisionSystem::createMapCollision() const
     for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TileComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity) &&
-            !gCoordinator.hasComponent<DoorComponent>(entity) && !gCoordinator.hasComponent<MultiplayerComponent>(entity))
+            !gCoordinator.hasComponent<DoorComponent>(entity))
         {
             deleteBody(entity);
         }
@@ -123,7 +123,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         const b2Body* body = colliderComponent.body;
         if (body == nullptr || transformComponent.velocity == b2Vec2{}) continue;
-        if (colliderComponent.tag != "Player 1" && colliderComponent.tag != "SecondPlayer") continue;
+        if (colliderComponent.tag.rfind("Player", 0) != 0) continue;
 
         const auto spriteBounds = renderComponent.sprite.getGlobalBounds();
 
