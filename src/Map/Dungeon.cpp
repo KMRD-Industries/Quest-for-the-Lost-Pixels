@@ -80,6 +80,7 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
+    //gCoordinator.addComponent(m_entities[m_id], TextTagComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
     gCoordinator.addComponent(m_entities[m_id], TravellingDungeonComponent{.moveCallback = [](const glm::ivec2& dir)
     {
@@ -160,9 +161,9 @@ void Dungeon::update()
     if (multiplayerSystem->isConnected())
     {
         constexpr int playerAnimationTile = 243;
-        auto stateUpdate = multiplayerSystem->pollStateUpdates();
+        const auto stateUpdate = multiplayerSystem->pollStateUpdates();
         std::uint32_t id = stateUpdate.id();
-        auto tag = std::format("Player {}", id);
+        const auto tag = std::format("Player {}", id);
 
         switch (stateUpdate.variant())
         {
@@ -180,6 +181,7 @@ void Dungeon::update()
             gCoordinator.addComponent(m_entities[id], AnimationComponent{});
             gCoordinator.addComponent(m_entities[id], ColliderComponent{});
             gCoordinator.addComponent(m_entities[id], CharacterComponent{});
+        //gCoordinator.addComponent(m_entities[id], TextTagComponent{});
 
             CollisionSystem::createBody(m_entities[id], tag);
 

@@ -1,4 +1,7 @@
 #include "SpawnerSystem.h"
+
+#include <regex>
+
 #include "AnimationComponent.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
@@ -34,15 +37,11 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
                                    const TransformComponent& spawnerTransformComponent) const
 {
     if (!spawnerComponent.loopSpawn && spawnerComponent.noSpawns >= 1)
-    {
         return;
-    }
 
     // Check if the spawner is ready to spawn the enemy.
     if (!isReadyToSpawn(static_cast<int>(spawnerComponent.spawnCooldown)))
-    {
         return;
-    }
 
     // Spawn the enemy and increment the spawn count.
     spawnerComponent.noSpawns++;
@@ -54,14 +53,11 @@ void SpawnerSystem::cleanUpUnnecessarySpawners() const
     std::unordered_set<Entity> entityToKill{};
 
     for (const auto entity : m_entities)
-    {
         if (const auto& spawner = gCoordinator.getComponent<SpawnerComponent>(entity);
             !spawner.loopSpawn && spawner.noSpawns >= 1)
-        {
             entityToKill.insert(entity);
-        }
-    }
-    for (const auto entity : entityToKill) gCoordinator.destroyEntity(entity);
+    for (const auto entity : entityToKill)
+        gCoordinator.destroyEntity(entity);
     entityToKill.clear();
 }
 
@@ -84,8 +80,18 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = config::defaultCharacterHP});
 
     CollisionSystem::createBody(
-        newMonsterEntity, "SecondPlayer", {colliderComponent.collision.width, colliderComponent.collision.height},
-        [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false, false,
+        newMonsterEntity, "Enemy", {colliderComponent.collision.width, colliderComponent.collision.height},
+        [&](const GameType::CollisionData& collisionData)
+        {
+            const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
+            if (!isCollidingWithPlayer)
+                return;
+            auto& playerCharacterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
+            playerCharacterComponent.attacked = true;
+            playerCharacterComponent.hp -= 50;
+        }, [&](const GameType::CollisionData&)
+        {
+        }, false, false,
         {colliderComponent.collision.x, colliderComponent.collision.y});
 }
 
@@ -94,9 +100,7 @@ void SpawnerSystem::clearSpawners() const
     std::deque<Entity> entityToRemove;
 
     for (const auto entity : m_entities)
-    {
         entityToRemove.push_back(entity);
-    }
 
     while (!entityToRemove.empty())
     {

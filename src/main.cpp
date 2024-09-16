@@ -1,4 +1,5 @@
 #include <imgui-SFML.h>
+#include <imgui.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
@@ -95,6 +96,14 @@ int main()
 
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
+
+        ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always);
+        ImGui::Begin("Player HP", nullptr,
+                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+                     ImGuiWindowFlags_NoTitleBar);
+        ImGui::ProgressBar(100, ImVec2(0.0f, 0.0f), "");
+        ImGui::End();
 
         ImGui::SFML::Render(window);
         window.display();

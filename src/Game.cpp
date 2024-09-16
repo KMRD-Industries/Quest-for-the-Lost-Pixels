@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include <imgui.h>
+
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"

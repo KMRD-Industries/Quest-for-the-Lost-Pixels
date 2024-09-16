@@ -4,12 +4,14 @@
 // https://www.youtube.com/watch?v=QVHwOOrSh3w
 // Remember that in the game we use units in pixels, and the collision and physics system takes meters
 
-#include <SFML/Graphics.hpp>
+#include <regex>
 #include <string>
+#include <SFML/Graphics.hpp>
 #include "Types.h"
+
 namespace config
 {
-    static constexpr bool debugMode{true};
+    static constexpr bool debugMode{false};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};
@@ -63,7 +65,11 @@ namespace config
     static constexpr float weaponComponentDefaultSwingDistance{90.0f};
     static constexpr float weaponComponentDefaultRemainingDistance{0.0f};
     static constexpr float weaponComponentDefaultRecoilAmount{10.0f};
-    
+
     static constexpr glm::vec2 startingPosition{325.f, 325.f};
     static constexpr float spawnOffset{25};
+
+    static const std::regex playerRegexTag{"^Player \\d+$"};
+    static constexpr float invulnerabilityTimeAfterDMG{30.f};
+    static constexpr float knockbackForce{10.f};
 } // namespace config
