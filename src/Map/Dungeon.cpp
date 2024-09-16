@@ -114,7 +114,9 @@ void Dungeon::init()
     makeSimpleFloor();
 
     m_roomMap.at(m_currentPlayerPos).init();
-    multiplayerSystem->setRoom(m_currentPlayerPos);
+    if (multiplayerSystem->isConnected())
+	    multiplayerSystem->setRoom(m_currentPlayerPos);
+
     m_players.insert(m_id);
 
     auto mapPath = m_roomMap.at(m_currentPlayerPos).getMap();
