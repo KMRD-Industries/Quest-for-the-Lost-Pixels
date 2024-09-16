@@ -27,7 +27,7 @@ struct ColliderComponent
     explicit ColliderComponent(b2Body* body, std::string tag,
                                const std::function<void(GameType::CollisionData)>& onCollisionEnter,
                                const std::function<void(GameType::CollisionData)>& onCollisionOut) :
-        body{body}, tag{std::move(tag)}, onCollisionEnter{onCollisionEnter}, onCollisionOut{onCollisionOut}, collision{}
+        body{body}, tag{std::move(tag)}, onCollisionEnter{onCollisionEnter}, onCollisionOut{onCollisionOut}
     {
     }
 };

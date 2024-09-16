@@ -4,7 +4,6 @@
 #include "Coordinator.h"
 #include "PassageComponent.h"
 #include "Physics.h"
-#include "TravellingDungeonComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -12,11 +11,11 @@ void PassageSystem::update() const
 {
     for (const auto entity : m_entities)
     {
-        if (auto& passageComponent = gCoordinator.getComponent<PassageComponent>(entity);
-            !passageComponent.moveInDungeon.empty())
+        if (auto& [moveInDungeon, moveCallback, activePassage] = gCoordinator.getComponent<PassageComponent>(entity);
+            !moveInDungeon.empty())
         {
-            passageComponent.moveInDungeon.clear();
-            passageComponent.moveCallback();
+            moveInDungeon.clear();
+            moveCallback();
         }
     }
 }

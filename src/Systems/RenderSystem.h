@@ -27,6 +27,4 @@ private:
     void displayDamageTaken(Entity);
     void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);
     void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity);
-
-    std::vector<std::vector<sf::Sprite*>> tiles;
 };

@@ -338,7 +338,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
     };
 
     Collision cc =
-        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
+        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id);
 
     float xPosCenter = transformComponent.position.x;
     float yPosCenter = transformComponent.position.y;

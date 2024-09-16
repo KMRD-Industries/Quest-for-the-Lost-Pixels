@@ -4,7 +4,6 @@
 #include <TextureSystem.h>
 #include <imgui-SFML.h>
 
-#include <imgui-SFML.h>
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"

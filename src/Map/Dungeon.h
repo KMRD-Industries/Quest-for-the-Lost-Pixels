@@ -25,7 +25,6 @@ private:
     void makeStartFloor();
     void moveDownDungeon();
 
-    std::unordered_map<long, long> m_mapDungeonLevelToFloorInfo = {{1, 1}, {2, 1}, {3, 1}, {4, 2}, {5, 2}};
     std::string m_asset_path;
     FloorGenerator m_floorGenerator;
     std::unordered_map<glm::ivec2, Room> m_roomMap;

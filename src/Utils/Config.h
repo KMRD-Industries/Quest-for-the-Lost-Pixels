@@ -6,6 +6,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <unordered_map>
+
 #include "Types.h"
 namespace config
 {
@@ -68,5 +70,41 @@ namespace config
     static constexpr glm::vec2 startingPosition{325.f, 325.f};
     static constexpr float spawnOffset{25};
 
+    static constexpr float ROTATION_90 = 90.0f;
+    static constexpr float ROTATION_180 = 180.0f;
+    static constexpr float ROTATION_270 = 270.0f;
+    static constexpr int MAX_LEFT_FACING_ANGLE = 420;
+
+    // Color balance structure
+    struct ColorBalance
+    {
+        int redBalance{0};
+        int greenBalance{0};
+        int blueBalance{0};
+    };
+
+    // Function to convert floor ID to color string
+    static std::string colorToString(int floorID)
+    {
+        switch (floorID)
+        {
+        case 0:
+            return "#331541";
+        case 1:
+            return "#18215d";
+        case 2:
+            return "#25392e";
+        default:
+            return backgroundColor;
+        }
+    }
+
+    // Maps
+    static const std::unordered_map<int, std::string> m_mapFloorToTextureFile{{1, "CosmicLilac"}, {2, "Jungle"}};
+
+    static const std::unordered_map<long, long> m_mapDungeonLevelToFloorInfo{{1, 1}, {2, 1}, {3, 1}, {4, 2}, {5, 2}};
+
+    static const std::unordered_map<long, ColorBalance> m_mapColorScheme{
+        {1, {25, 0, 0}}, {2, {0, 25, 0}}, {3, {0, 15, 15}}, {4, {45, 6, 35}}, {5, {15, 62, 35}}};
 
 } // namespace config

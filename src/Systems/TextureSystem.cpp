@@ -212,18 +212,18 @@ void TextureSystem::loadTextures()
             continue;
         }
 
-        if (std::ranges::find(m_vecTextureFiles, tile_component.tileset) == m_vecTextureFiles.end())
+        if (std::ranges::find(m_vecTextureFiles, tile_component.tileSet) == m_vecTextureFiles.end())
         {
             continue;
         }
 
         // Adjust tile index
-        long adjusted_id = tile_component.id + m_mapTextureIndexes.at(tile_component.tileset);
+        long adjusted_id = tile_component.id + m_mapTextureIndexes.at(tile_component.tileSet);
 
         // Load animations from a system if tile is animated
         if (m_mapAnimations.contains(adjusted_id))
         {
-            animation_component.frames = getAnimations(tile_component.tileset, tile_component.id);
+            animation_component.frames = getAnimations(tile_component.tileSet, tile_component.id);
             animation_component.it = {animation_component.frames.begin(), animation_component.frames.end()};
         }
 
@@ -247,7 +247,7 @@ void TextureSystem::loadTextures()
                 transformComponent.position.y += convertMetersToPixel(offset.y);
             }
 
-            collider_component.collision = getCollision(tile_component.tileset, tile_component.id);
+            collider_component.collision = getCollision(tile_component.tileSet, tile_component.id);
         }
 
         if (m_mapWeaponPlacements.contains(adjusted_id))
@@ -256,7 +256,7 @@ void TextureSystem::loadTextures()
         }
 
         // Load texture of tile with that id to render component
-        render_component.sprite = getTile(tile_component.tileset, tile_component.id);
+        render_component.sprite = getTile(tile_component.tileSet, tile_component.id);
         render_component.layer = tile_component.layer;
     }
 }
@@ -265,14 +265,14 @@ void TextureSystem::loadTextures()
 void TextureSystem::modifyColorScheme(const int playerFloor)
 {
     // One floor layout can be used for multiple levels
-    const auto floorId = m_mapDungeonLevelToFloorInfo.at(playerFloor);
-    const std::string& tileSet = m_mapFloorToTextureFile.at(floorId);
+    const auto floorId = config::m_mapDungeonLevelToFloorInfo.at(playerFloor);
+    const std::string& tileSet = config::m_mapFloorToTextureFile.at(floorId);
 
     // Copy image to apply color scheme
     sf::Image image = m_mapTextures.at(tileSet).copyToImage();
 
     const sf::Vector2u size = image.getSize();
-    const ColorBalance& balance = m_mapColorScheme.at(playerFloor);
+    const auto& [redBalance, greenBalance, blueBalance] = config::m_mapColorScheme.at(playerFloor);
 
     auto applySemitoneFilter = [](const int value, const int shift) -> int
     {
@@ -286,9 +286,9 @@ void TextureSystem::modifyColorScheme(const int playerFloor)
         {
             sf::Color pixel = image.getPixel(x, y);
 
-            const int r = applySemitoneFilter(pixel.r, balance.redBalance);
-            const int g = applySemitoneFilter(pixel.g, balance.greenBalance);
-            const int b = applySemitoneFilter(pixel.b, balance.blueBalance);
+            const int r = applySemitoneFilter(pixel.r, redBalance);
+            const int g = applySemitoneFilter(pixel.g, greenBalance);
+            const int b = applySemitoneFilter(pixel.b, blueBalance);
 
             pixel.r = static_cast<sf::Uint8>(r);
             pixel.g = static_cast<sf::Uint8>(g);
@@ -302,7 +302,7 @@ void TextureSystem::modifyColorScheme(const int playerFloor)
     m_mapTexturesWithColorSchemeApplied.at(tileSet).loadFromImage(image);
 
     // Change bg color
-    std::string hexColor = colorToString(floorId);
+    std::string hexColor = config::colorToString(floorId);
     hexColor = hexColor.substr(1);
 
     int hexValue;
@@ -315,9 +315,9 @@ void TextureSystem::modifyColorScheme(const int playerFloor)
     int green = hexValue >> 8 & 0xFF;
     int blue = hexValue & 0xFF;
 
-    red = applySemitoneFilter(red, balance.redBalance);
-    green = applySemitoneFilter(green, balance.greenBalance);
-    blue = applySemitoneFilter(blue, balance.blueBalance);
+    red = applySemitoneFilter(red, redBalance);
+    green = applySemitoneFilter(green, greenBalance);
+    blue = applySemitoneFilter(blue, blueBalance);
 
     std::stringstream stringHex;
     stringHex << "#" << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << red << std::setw(2)

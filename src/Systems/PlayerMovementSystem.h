@@ -12,6 +12,5 @@ public:
 private:
     void handleMovement();
     void handleAttack() const;
-    void handleMousePositionUpdate() const;
     bool flip = false;
 };

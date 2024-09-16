@@ -350,7 +350,7 @@ void Dungeon::makeStartFloor()
 void Dungeon::makeSimpleFloor()
 {
     const int playerFloor = gCoordinator.getComponent<FloorComponent>(config::playerEntity).currentPlayerFloor;
-    const int floorID = m_mapDungeonLevelToFloorInfo.at(playerFloor);
+    const int floorID = config::m_mapDungeonLevelToFloorInfo.at(playerFloor);
 
     m_floorGenerator.setFloorID(floorID);
 

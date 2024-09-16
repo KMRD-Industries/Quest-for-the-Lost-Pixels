@@ -43,6 +43,6 @@ void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& ani
 
     ++animation.it;
 
-    tileComponent.id = animation.it->tileid;
+    tileComponent.id = animation.it->tileID;
     transformComponent.rotation = animation.it->rotation;
 }

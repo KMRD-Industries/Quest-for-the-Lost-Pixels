@@ -2,7 +2,7 @@
 
 #include <deque>
 #include <functional>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 struct PassageComponent
 {

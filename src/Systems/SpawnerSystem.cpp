@@ -55,7 +55,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
 
     const TileComponent tileComponent{18, "AnimSlimes", 4};
     const ColliderComponent colliderComponent{
-        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id)};
+        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id)};
 
     gCoordinator.addComponent(newMonsterEntity, tileComponent);
     gCoordinator.addComponent(newMonsterEntity, spawnerTransformComponent);

@@ -15,6 +15,4 @@ private:
     void rotateForward(WeaponComponent&);
     void rotateBackward(WeaponComponent&, const RenderComponent&);
     void setAngle(WeaponComponent&, const RenderComponent&);
-
-    static constexpr int MAX_LEFT_FACING_ANGLE = 420;
 };

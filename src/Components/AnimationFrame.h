@@ -4,7 +4,7 @@
 
 struct AnimationFrame
 {
-    long tileid{};
+    long tileID{};
     long duration{};
     float rotation{};
 };

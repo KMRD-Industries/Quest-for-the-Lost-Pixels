@@ -14,7 +14,7 @@ public:
     void cleanUpUnnecessarySpawners();
 
 private:
-    int spawnTime;
+    int spawnTime{0};
     void incrementSpawnTimer();
     void processSpawner(SpawnerComponent &spawnerComponent, const TransformComponent &spawnerTransformComponent);
     bool isReadyToSpawn(int cooldown);

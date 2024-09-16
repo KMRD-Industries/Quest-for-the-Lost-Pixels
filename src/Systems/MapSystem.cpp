@@ -90,33 +90,33 @@ void MapSystem::doFlips(const std::uint8_t& flags, float& rotation, sf::Vector2f
 
     switch (flags)
     {
-    case VerticalFlip:
+    case GameType::VerticalFlip:
         scale.y *= -1;
         break;
 
-    case HorizontalFlip:
+    case GameType::HorizontalFlip:
         scale.x *= -1;
         break;
 
-    case HorizontalVerticalFlip:
+    case GameType::HorizontalVerticalFlip:
         scale = -scale;
         break;
 
-    case DiagonalFlip:
+    case GameType::DiagonalFlip:
         scale.x *= -1;
-        rotation += ROTATION_90;
+        rotation += config::ROTATION_90;
         break;
 
-    case DiagonalVerticalFlip:
-        rotation += ROTATION_270;
+    case GameType::DiagonalVerticalFlip:
+        rotation += config::ROTATION_270;
         break;
 
-    case DiagonalHorizontalFlip:
-        rotation += ROTATION_90;
+    case GameType::DiagonalHorizontalFlip:
+        rotation += config::ROTATION_90;
         break;
 
-    case AllFlips:
-        rotation += ROTATION_90;
+    case GameType::AllFlips:
+        rotation += config::ROTATION_90;
         scale.x *= -1;
         break;
     default:
@@ -149,8 +149,8 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     TransformComponent transform_component{};
 
     // Set up Tile Component
-    tile_component.tileset = findKeyLessThan(parsedMap.tilesets, tileID);
-    tile_component.id = tileID - parsedMap.tilesets.at(tile_component.tileset);
+    tile_component.tileSet = findKeyLessThan(parsedMap.tilesets, tileID);
+    tile_component.id = tileID - parsedMap.tilesets.at(tile_component.tileSet);
     tile_component.layer = layerID;
 
     // Set up correct position, rotation, scale of tile
@@ -163,7 +163,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     gCoordinator.addComponent(mapEntity, transform_component);
 
     // Handle special Tiles
-    if (tile_component.tileset == "SpecialBlocks")
+    if (tile_component.tileSet == "SpecialBlocks")
     {
         switch (tile_component.id)
         {

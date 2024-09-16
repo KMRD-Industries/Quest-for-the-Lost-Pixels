@@ -70,12 +70,12 @@ void CollisionSystem::createMapCollision()
     {
         const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
-        if (tileComponent.id < 0 || tileComponent.tileset.empty() || gCoordinator.hasComponent<PlayerComponent>(entity))
+        if (tileComponent.id < 0 || tileComponent.tileSet.empty() || gCoordinator.hasComponent<PlayerComponent>(entity))
         {
             continue;
         }
 
-        if (tileComponent.tileset == "SpecialBlocks")
+        if (tileComponent.tileSet == "SpecialBlocks")
         {
             if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER))
                 createCollisionBody(entity, "Wall", {config::tileHeight, config::tileHeight}, true, true);
@@ -95,7 +95,7 @@ void CollisionSystem::createMapCollision()
         else
         {
             const Collision& collision =
-                gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
+                gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id);
 
             if (collision.width > 0 && collision.height > 0)
                 createCollisionBody(entity, "Wall", {collision.width, collision.height}, true, false,
@@ -177,7 +177,7 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
 
     b2BodyDef bodyDef;
     const sf::Sprite sprite =
-        gCoordinator.getRegisterSystem<TextureSystem>()->getTile(tileComponent.tileset, tileComponent.id);
+        gCoordinator.getRegisterSystem<TextureSystem>()->getTile(tileComponent.tileSet, tileComponent.id);
     const auto spriteBounds = sprite.getGlobalBounds();
 
     float xPosition = {};

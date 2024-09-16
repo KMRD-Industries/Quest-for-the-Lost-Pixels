@@ -48,6 +48,18 @@ namespace GameType
         EAST = static_cast<int>('E')
     };
 
+    enum FlipFlags : std::uint8_t
+    {
+        NoFlip = 0x0,
+        VerticalFlip = 0x4, // 0100
+        HorizontalFlip = 0x8, // 1000
+        DiagonalFlip = 0x2, // 0010
+        HorizontalVerticalFlip = 0xC, // 1100
+        DiagonalVerticalFlip = 0x6, // 0110
+        DiagonalHorizontalFlip = 0xA, // 1010
+        AllFlips = 0xE // 1110
+    };
+
     const std::unordered_map<DoorEntraces, glm::ivec2> mapDoorsToGeo{{DoorEntraces::NORTH, {0, 1}},
                                                                      {DoorEntraces::SOUTH, {0, -1}},
                                                                      {DoorEntraces::EAST, {1, 0}},
