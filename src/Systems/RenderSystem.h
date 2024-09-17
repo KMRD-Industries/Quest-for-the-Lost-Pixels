@@ -20,11 +20,14 @@ public:
     sf::Vector2f m_mapOffset = {};
 
 private:
+    void displayEnemiesTable();
     void debugBoundingBoxes(sf::RenderWindow& window);
     void drawEquipment(Entity);
     void setOrigin(Entity);
     void setSpritePosition(Entity);
     void displayDamageTaken(Entity);
     void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);
-    void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity);
+    void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity) const;
+
+    std::vector<std::vector<sf::Sprite*>> tiles;
 };

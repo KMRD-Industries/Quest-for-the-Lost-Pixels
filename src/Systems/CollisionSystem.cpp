@@ -136,16 +136,6 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         if (body == nullptr || transformComponent.velocity == b2Vec2{}) continue;
         if (colliderComponent.tag != "Player 1" && colliderComponent.tag != "SecondPlayer") continue;
 
-        const auto spriteBounds = renderComponent.sprite.getGlobalBounds();
-
-        if (colliderComponent.collision.height == 0 || colliderComponent.collision.width == 0)
-        {
-            colliderComponent.collision.height = std::max(spriteBounds.height, config::tileHeight);
-            colliderComponent.collision.width = std::max(spriteBounds.width, config::tileHeight);
-            colliderComponent.collision.x = 0;
-            colliderComponent.collision.y = 0;
-        }
-
         const auto position = body->GetPosition();
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
 

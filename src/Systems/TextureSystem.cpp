@@ -156,43 +156,54 @@ void TextureSystem::loadTexturesFromFiles()
 
 sf::Sprite TextureSystem::getTile(const std::string& tileSetName, const long id) const
 {
-    try
+    const auto textureIter = m_mapTexturesWithColorSchemeApplied.find(tileSetName);
+    auto indexIter = m_mapTextureIndexes.find(tileSetName);
+
+    if (textureIter != m_mapTexturesWithColorSchemeApplied.end() && indexIter != m_mapTextureIndexes.end())
     {
-        sf::Sprite s(m_mapTexturesWithColorSchemeApplied.at(tileSetName),
-                     m_mapTextureRects.at(id + m_mapTextureIndexes.at(tileSetName)));
-        return s;
+        auto rectIter = m_mapTextureRects.find(id + indexIter->second);
+        if (rectIter != m_mapTextureRects.end())
+        {
+            return {textureIter->second, rectIter->second};
+        }
     }
-    catch (...)
-    {
-        std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET SPRITE\n";
-        return {};
-    }
+
+    std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET SPRITE\n";
+    return {};
 }
 
 Collision TextureSystem::getCollision(const std::string& tileSetName, const long id)
 {
-    try
+    auto indexIter = m_mapTextureIndexes.find(tileSetName);
+
+    if (indexIter != m_mapTextureIndexes.end())
     {
-        return m_mapCollisions.at(id + m_mapTextureIndexes.at(tileSetName));
+        auto collisionIter = m_mapCollisions.find(id + indexIter->second);
+        if (collisionIter != m_mapCollisions.end())
+        {
+            return collisionIter->second;
+        }
     }
-    catch (...)
-    {
-        // std::cout << "ERROR::TEXTURE_SYSTEM::GET_COLLISION::COULD NOT GET COLLISION\n";
-        return {};
-    }
+
+    // std::cout << "ERROR::TEXTURE_SYSTEM::GET_COLLISION::COULD NOT GET COLLISION\n";
+    return {};
 }
 
 std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileSetName, const long id)
 {
-    try
+    auto indexIter = m_mapTextureIndexes.find(tileSetName);
+
+    if (indexIter != m_mapTextureIndexes.end())
     {
-        return m_mapAnimations.at(id + m_mapTextureIndexes.at(tileSetName));
+        auto animIter = m_mapAnimations.find(id + indexIter->second);
+        if (animIter != m_mapAnimations.end())
+        {
+            return animIter->second;
+        }
     }
-    catch (...)
-    {
-        std::cout << "ERROR::TEXTURE_SYSTEM::GET_ANIMATIONS::COULD NOT GET ANIMATIONS\n";
-        return {};
-    }
+
+    std::cout << "ERROR::TEXTURE_SYSTEM::GET_ANIMATIONS::COULD NOT GET ANIMATIONS\n";
+    return {};
 }
 /**
  * Load textures into tiles.
@@ -202,9 +213,8 @@ void TextureSystem::loadTextures()
     for (const auto entity : m_entities)
     {
         auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
-        auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
         auto& render_component = gCoordinator.getComponent<RenderComponent>(entity);
-        auto& collider_component = gCoordinator.getComponent<ColliderComponent>(entity);
+        // auto& collider_component = gCoordinator.getComponent<ColliderComponent>(entity);
 
         // Ignore invalid values
         if (tile_component.id <= 0 || tile_component.id > m_lNoTextures)
@@ -223,36 +233,42 @@ void TextureSystem::loadTextures()
         // Load animations from a system if tile is animated
         if (m_mapAnimations.contains(adjusted_id))
         {
+            if (!gCoordinator.hasComponent<AnimationComponent>(entity))
+                gCoordinator.addComponent(entity, AnimationComponent{});
+
+            auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
             animation_component.frames = getAnimations(tile_component.tileSet, tile_component.id);
             animation_component.it = {animation_component.frames.begin(), animation_component.frames.end()};
         }
 
-        if (m_mapCollisions.contains(adjusted_id))
+        if (m_mapCollisions.contains(adjusted_id) && gCoordinator.hasComponent<ColliderComponent>(entity))
         {
             auto& cc = m_mapCollisions.at(adjusted_id);
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-            if (collider_component.body != nullptr && collider_component.collision != cc)
+            if (colliderComponent.body != nullptr && colliderComponent.collision != cc)
             {
-                b2Vec2 offset = {static_cast<float>(cc.x - collider_component.collision.x),
-                                 static_cast<float>(cc.y - collider_component.collision.y)};
+                b2Vec2 offset = {static_cast<float>(cc.x - colliderComponent.collision.x),
+                                 static_cast<float>(cc.y - colliderComponent.collision.y)};
 
                 offset.x = convertPixelsToMeters(offset.x * config::gameScale);
                 offset.y = convertPixelsToMeters(-offset.y * config::gameScale);
 
-                collider_component.body->SetTransform(collider_component.body->GetPosition() + offset,
-                                                      collider_component.body->GetAngle());
+                colliderComponent.body->SetTransform(colliderComponent.body->GetPosition() + offset,
+                                                     colliderComponent.body->GetAngle());
 
                 transformComponent.position.x += convertMetersToPixel(offset.x);
                 transformComponent.position.y += convertMetersToPixel(offset.y);
             }
 
-            collider_component.collision = getCollision(tile_component.tileSet, tile_component.id);
+            colliderComponent.collision = getCollision(tile_component.tileSet, tile_component.id);
         }
 
         if (m_mapWeaponPlacements.contains(adjusted_id))
         {
-            collider_component.specialCollision = m_mapWeaponPlacements.at(adjusted_id);
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            colliderComponent.specialCollision = m_mapWeaponPlacements.at(adjusted_id);
         }
 
         // Load texture of tile with that id to render component

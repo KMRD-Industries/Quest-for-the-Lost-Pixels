@@ -1,4 +1,8 @@
 #include "RenderSystem.h"
+
+#include <EnemySystem.h>
+
+#include <string>
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
@@ -17,38 +21,27 @@
 #include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
-
 #include "imgui.h"
 
 extern Coordinator gCoordinator;
 
 void RenderSystem::draw(sf::RenderWindow& window)
 {
-    std::vector<std::vector<sf::Sprite*>> tiles(config::maximumNumberOfLayers);
+    if (tiles.empty()) tiles.resize(config::maximumNumberOfLayers);
+    for (auto& layer : tiles) layer.clear();
+
     const sf::Vector2<unsigned int> windowSize = window.getSize();
     sf::Sprite portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0);
 
     for (const auto entity : m_entities)
     {
-        if (auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-            renderComponent.layer > 0 && renderComponent.layer < config::maximumNumberOfLayers)
-        {
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
-            sf::FloatRect spriteBounds = renderComponent.sprite.getGlobalBounds();
+        if (renderComponent.layer > 0 && renderComponent.layer < config::maximumNumberOfLayers)
+        {
             m_mapOffset.x = std::max(m_mapOffset.x, transformComponent.position.x);
             m_mapOffset.y = std::max(m_mapOffset.y, transformComponent.position.y);
-
-            // Ensure collision component have valid dimensions
-            if (collisionComponent.collision.height == 0 || collisionComponent.collision.width == 0)
-            {
-                collisionComponent.collision.height = std::max(spriteBounds.height, config::tileHeight);
-                collisionComponent.collision.width = std::max(spriteBounds.width, config::tileHeight);
-                collisionComponent.collision.x = {};
-                collisionComponent.collision.y = {};
-            }
-
             renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
 
             setOrigin(entity);
@@ -121,14 +114,23 @@ void RenderSystem::setOrigin(const Entity entity)
 
     // Get all necessary components
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-    const auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+    float centerX = {}, centerY = {};
 
-    // Calculate the center of the collision component from top left corner.
-    // X & Y are collision offset from top left corner of sprite tile.
-    const auto centerX = static_cast<float>(collisionComponent.collision.x + collisionComponent.collision.width / 2);
-    const auto centerY = static_cast<float>(collisionComponent.collision.y + collisionComponent.collision.height / 2);
+    if (gCoordinator.hasComponent<ColliderComponent>(entity))
+    {
+        const auto& collisionComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-    // Set the origin of the sprite to the center of the collision component
+        // Calculate the center of the collision component from top left corner.
+        // X & Y are collision offset from top left corner of sprite tile.
+        centerX = static_cast<float>(collisionComponent.collision.x + collisionComponent.collision.width / 2);
+        centerY = static_cast<float>(collisionComponent.collision.y + collisionComponent.collision.height / 2);
+    }
+    else
+    {
+        centerX = config::tileHeight / 2;
+        centerY = config::tileHeight / 2;
+    }
+
     renderComponent.sprite.setOrigin(centerX, centerY);
 
     // Handle player related utilities like Equipped Weapon
@@ -228,9 +230,9 @@ void RenderSystem::displayDamageTaken(const Entity entity)
     }
 }
 
-void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const Entity entity)
+void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const Entity entity) const
 {
-    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 250, 370), ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 370), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always); // Set the width to 250, height is auto
     ImGui::Begin("abc", nullptr,
                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
@@ -265,7 +267,7 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
     const auto& weapon = gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon);
 
     // Display the Weapon Stats table in the top-right corner
-    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 250, 10), ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 10), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always); // Set the width to 250, height is auto
     ImGui::Begin("Weapon Stats", nullptr,
                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
@@ -308,12 +310,64 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
     ImGui::End();
 }
 
+void RenderSystem::displayEnemiesTable()
+{
+    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(300, 0), ImGuiCond_Always);
+    ImGui::Begin("Enemy System");
+
+    if (ImGui::TreeNode("Enemy System"))
+    {
+        for (const auto entity : gCoordinator.getRegisterSystem<EnemySystem>()->m_entities)
+        {
+            std::string entityLabel = "Entity ID: " + std::to_string(entity);
+
+            if (ImGui::TreeNode(entityLabel.c_str()))
+            {
+                if (gCoordinator.hasComponent<TransformComponent>(entity))
+                {
+                    if (ImGui::TreeNode("Transform Component"))
+                    {
+                        const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+                        ImGui::Text("Position: (%f, %f)", transformComponent.position.x, transformComponent.position.y);
+                        ImGui::Text("Scale: (%f, %f)", transformComponent.scale.x, transformComponent.scale.y);
+                        ImGui::Text("Velocity: (%f, %f)", transformComponent.velocity.x, transformComponent.velocity.y);
+
+                        ImGui::TreePop(); // End of nested child node
+                    }
+                }
+
+                if (gCoordinator.hasComponent<TransformComponent>(entity))
+                {
+                    if (ImGui::TreeNode("Character Component"))
+                    {
+                        const auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
+
+                        ImGui::Text("HP: %f", characterComponent.hp);
+                        ImGui::Text("Time since attacked: %d", characterComponent.timeSinceAttacked);
+                        ImGui::Text("Attacked: %b", characterComponent.attacked);
+
+                        ImGui::TreePop(); // End of nested child node
+                    }
+                }
+
+                ImGui::TreePop(); // End of child node 1
+            }
+        }
+        ImGui::TreePop();
+    }
+    ImGui::End();
+}
+
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
 {
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
     auto transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
+
+    displayEnemiesTable();
 
     auto drawSprite = [&](const Entity entity)
     {

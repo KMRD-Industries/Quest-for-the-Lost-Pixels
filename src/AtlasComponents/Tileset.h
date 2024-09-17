@@ -1,9 +1,9 @@
 #pragma once
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include "AnimationFrame.h"
+#include "Config.h"
 
 struct ObjectProperty
 {
@@ -17,7 +17,7 @@ struct Collision
     int id{};
     double x{};
     double y{};
-    double width{};
+    double width{config::tileHeight};
     double height{};
     std::vector<ObjectProperty> properties;
 

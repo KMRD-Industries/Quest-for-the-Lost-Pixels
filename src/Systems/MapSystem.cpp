@@ -30,7 +30,7 @@ extern Coordinator gCoordinator;
  */
 void MapSystem::loadMap(const std::string& path)
 {
-    // Remove old room entites before creating new ones
+    // Remove old room entities before creating new ones
     resetMap();
 
     // Iterate over room layers
@@ -141,8 +141,6 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     const Entity mapEntity = gCoordinator.createEntity();
 
     gCoordinator.addComponent(mapEntity, RenderComponent{});
-    gCoordinator.addComponent(mapEntity, AnimationComponent{});
-    gCoordinator.addComponent(mapEntity, ColliderComponent{});
     gCoordinator.addComponent(mapEntity, MapComponent{});
 
     TileComponent tile_component{};
@@ -162,6 +160,19 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     gCoordinator.addComponent(mapEntity, tile_component);
     gCoordinator.addComponent(mapEntity, transform_component);
 
+    if (gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tile_component.tileSet, tile_component.id) !=
+        Collision{})
+    {
+        gCoordinator.addComponent(mapEntity, ColliderComponent{});
+    }
+
+    if (!gCoordinator.getRegisterSystem<TextureSystem>()
+             ->getAnimations(tile_component.tileSet, tile_component.id)
+             .empty())
+    {
+        gCoordinator.addComponent(mapEntity, AnimationComponent{});
+    }
+
     // Handle special Tiles
     if (tile_component.tileSet == "SpecialBlocks")
     {
@@ -170,6 +181,10 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
         case (static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER)):
             {
                 gCoordinator.addComponent(mapEntity, DoorComponent{});
+
+                if (!gCoordinator.hasComponent<ColliderComponent>(mapEntity))
+                    gCoordinator.addComponent(mapEntity, ColliderComponent{});
+
                 auto& doorComponent = gCoordinator.getComponent<DoorComponent>(mapEntity);
 
                 if (yPos == 0)
@@ -197,6 +212,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
                 if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
                 {
                     gCoordinator.addComponent(mapEntity, SpawnerComponent{});
+                    gCoordinator.addComponent(mapEntity, ColliderComponent{});
                 }
 
                 break;
@@ -211,6 +227,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
         case static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR):
             {
                 gCoordinator.addComponent(mapEntity, PassageComponent{});
+                gCoordinator.addComponent(mapEntity, ColliderComponent{});
                 break;
             }
         default:
@@ -238,8 +255,6 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
 
 void MapSystem::resetMap() const
 {
-    const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-
     std::deque<Entity> entityToRemove;
 
     for (const auto& entity : m_entities)

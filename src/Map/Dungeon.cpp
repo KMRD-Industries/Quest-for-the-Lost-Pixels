@@ -250,8 +250,6 @@ void Dungeon::setECS()
         Signature signature;
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         signature.set(gCoordinator.getComponentType<TileComponent>());
-        signature.set(gCoordinator.getComponentType<ColliderComponent>());
-        signature.set(gCoordinator.getComponentType<AnimationComponent>());
         signature.set(gCoordinator.getComponentType<MapComponent>());
         gCoordinator.setSystemSignature<MapSystem>(signature);
     }
@@ -281,9 +279,7 @@ void Dungeon::setECS()
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<RenderComponent>());
-        signature.set(gCoordinator.getComponentType<AnimationComponent>());
         signature.set(gCoordinator.getComponentType<TileComponent>());
-        signature.set(gCoordinator.getComponentType<ColliderComponent>());
         gCoordinator.setSystemSignature<TextureSystem>(signature);
     }
 

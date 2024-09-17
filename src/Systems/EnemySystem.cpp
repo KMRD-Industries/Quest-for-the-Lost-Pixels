@@ -13,7 +13,7 @@ void EnemySystem::update() const
 {
     static std::random_device rd;
     static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<int> dis(-1, 1); // Uniform distribution between -1 and 1
+    static std::uniform_int_distribution dis(-1, 1); // Uniform distribution between -1 and 1
 
     for (const auto entity : m_entities)
     {

@@ -9,40 +9,30 @@ void AnimationSystem::updateFrames()
 
     for (const auto entity : m_entities)
     {
-        updateEntityAnimation(entity);
+        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
+        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+
+        updateEntityAnimation(animationComponent, tileComponent);
     }
 }
 
-void AnimationSystem::updateEntityAnimation(const Entity entity)
+void AnimationSystem::updateEntityAnimation(AnimationComponent& animation_component,
+                                            TileComponent& tile_component) const
 {
-    if (auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
-        !animation.frames.empty() && isTimeForNextFrame(calculateFrameDuration(animation)))
+    if (!animation_component.frames.empty() && isTimeForNextFrame(calculateFrameDuration(animation_component)))
     {
-        loadNextFrame(entity, animation);
+        ++animation_component.it;
+        tile_component.id = animation_component.it->tileID;
     }
 }
 
-inline int AnimationSystem::calculateFrameDuration(AnimationComponent& animation)
+inline int AnimationSystem::calculateFrameDuration(AnimationComponent& animation) const
 {
-    // Ensure that the division and the addition are done in long, then cast to int
     const long duration = animation.it->duration;
-
-    // Explicitly cast to int after all calculations to avoid narrowing conversions
     return static_cast<int>(duration / static_cast<long>(config::oneFrameTime) + 1);
 }
 
-inline bool AnimationSystem::isTimeForNextFrame(const int frameDuration) const
+inline bool AnimationSystem::isTimeForNextFrame(const int& frameDuration) const
 {
     return m_frameTime % frameDuration == 0;
-}
-
-void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& animation)
-{
-    auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
-    ++animation.it;
-
-    tileComponent.id = animation.it->tileID;
-    transformComponent.rotation = animation.it->rotation;
 }
