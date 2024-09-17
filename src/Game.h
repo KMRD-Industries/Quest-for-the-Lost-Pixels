@@ -4,11 +4,11 @@
 class Game
 {
 public:
-    static void init();
-    static void draw();
-    static void update();
-    static void handleCollision();
+    void init();
+    void draw();
+    void update();
+    void handleCollision();
 
 private:
-    static Dungeon m_dungeon;
+    Dungeon m_dungeon;
 };

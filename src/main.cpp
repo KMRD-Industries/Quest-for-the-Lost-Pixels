@@ -1,5 +1,4 @@
 #include <imgui-SFML.h>
-#include <imgui.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
@@ -79,7 +78,8 @@ int main()
     window.setFramerateLimit(config::frameCycle);
 
     sf::Clock deltaClock;
-    Game::init();
+    Game game;
+    game.init();
 
     sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
 
@@ -89,9 +89,9 @@ int main()
         window.clear(customColor);
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        Game::handleCollision();
-        Game::update();
-        Game::draw();
+        game.handleCollision();
+        game.update();
+        game.draw();
 
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
