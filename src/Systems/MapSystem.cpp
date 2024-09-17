@@ -11,6 +11,7 @@
 #include "EnemySystem.h"
 #include "MapComponent.h"
 #include "MapParser.h"
+#include "MultiplayerComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
@@ -228,7 +229,9 @@ void MapSystem::resetMap() const
 
     for (const auto& entity : m_entities)
     {
-        if (!gCoordinator.hasComponent<PlayerComponent>(entity) && !gCoordinator.hasComponent<DoorComponent>(entity))
+        if (!gCoordinator.hasComponent<PlayerComponent>(entity) &&
+            !gCoordinator.hasComponent<MultiplayerComponent>(entity) &&
+            !gCoordinator.hasComponent<DoorComponent>(entity))
         {
             entityToRemove.push_back(entity);
         }

@@ -409,8 +409,6 @@ void Dungeon::changeRoom(const glm::ivec2& room)
     auto dir = room - m_currentPlayerPos;
     m_currentPlayerPos = room;
     std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
-    gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
-    gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
     gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
     gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 
