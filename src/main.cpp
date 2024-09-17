@@ -3,8 +3,6 @@
 #include <SFML/Window/Event.hpp>
 #include <TextureSystem.h>
 #include <imgui-SFML.h>
-
-#include "../cmake-build-debug/_deps/box2d-src/extern/imgui/imgui.h"
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
