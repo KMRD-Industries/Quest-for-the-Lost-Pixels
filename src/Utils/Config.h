@@ -4,9 +4,9 @@
 // https://www.youtube.com/watch?v=QVHwOOrSh3w
 // Remember that in the game we use units in pixels, and the collision and physics system takes meters
 
+#include <imgui.h>
 #include <regex>
 #include <string>
-#include <SFML/Graphics.hpp>
 #include "Types.h"
 
 namespace config
@@ -39,8 +39,10 @@ namespace config
     inline Entity playerEntity = {};
     static constexpr int playerAnimation{184};
 
+    static constexpr float maxCharacterHP{100};
     static constexpr float defaultCharacterHP{100};
-    static constexpr float defaultEnemyHP{89};
+    static constexpr float defaultEnemyHP{20};
+    static constexpr float defaultEnemyDMG{10};
 
     // Text tag defaults
     static constexpr int textTagDefaultSize{20};
@@ -72,4 +74,8 @@ namespace config
     static const std::regex playerRegexTag{"^Player \\d+$"};
     static constexpr float invulnerabilityTimeAfterDMG{30.f};
     static constexpr float knockbackForce{10.f};
+
+    // Healthbar config
+    static constexpr ImVec4 fullHPColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+    static constexpr ImVec4 lowHPColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 } // namespace config

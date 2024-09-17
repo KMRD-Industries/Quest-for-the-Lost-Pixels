@@ -87,23 +87,14 @@ int main()
     {
         // Clear the window before drawing
         window.clear(customColor);
+        ImGui::SFML::Update(window, deltaClock.restart());
 
         Game::handleCollision();
         Game::update();
         Game::draw();
 
-        ImGui::SFML::Update(window, deltaClock.restart());
-
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
-
-        ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always);
-        ImGui::Begin("Player HP", nullptr,
-                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
-                     ImGuiWindowFlags_NoTitleBar);
-        ImGui::ProgressBar(100, ImVec2(0.0f, 0.0f), "");
-        ImGui::End();
 
         ImGui::SFML::Render(window);
         window.display();

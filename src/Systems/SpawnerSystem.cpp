@@ -77,7 +77,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
     gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
-    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = config::defaultCharacterHP});
+    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = config::defaultEnemyHP});
 
     CollisionSystem::createBody(
         newMonsterEntity, "Enemy", {colliderComponent.collision.width, colliderComponent.collision.height},
@@ -88,7 +88,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
                 return;
             auto& playerCharacterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
             playerCharacterComponent.attacked = true;
-            playerCharacterComponent.hp -= 50;
+            playerCharacterComponent.hp -= config::defaultEnemyDMG;
         }, [&](const GameType::CollisionData&)
         {
         }, false, false,
