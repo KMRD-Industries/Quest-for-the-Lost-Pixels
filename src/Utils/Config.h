@@ -43,6 +43,8 @@ namespace config
     static constexpr float defaultCharacterHP{100};
     static constexpr float defaultEnemyHP{20};
     static constexpr float defaultEnemyDMG{10};
+    static constexpr float defaultEnemyKnockbackForce{300.f};
+    static constexpr bool applyKnockback{false};
 
     // Text tag defaults
     static constexpr int textTagDefaultSize{20};
@@ -73,7 +75,6 @@ namespace config
 
     static const std::regex playerRegexTag{"^Player \\d+$"};
     static constexpr float invulnerabilityTimeAfterDMG{30.f};
-    static constexpr float knockbackForce{10.f};
 
     // Healthbar config
     static constexpr ImVec4 fullHPColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);

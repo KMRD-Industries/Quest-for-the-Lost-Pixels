@@ -66,7 +66,6 @@ bool SpawnerSystem::isReadyToSpawn(const int cooldown) const { return spawnTime 
 void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent)
 {
     const Entity newMonsterEntity = gCoordinator.createEntity();
-
     const TileComponent tileComponent{18, "AnimSlimes", 4};
     const ColliderComponent colliderComponent{
         gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id)};
@@ -81,14 +80,29 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
 
     CollisionSystem::createBody(
         newMonsterEntity, "Enemy", {colliderComponent.collision.width, colliderComponent.collision.height},
-        [&](const GameType::CollisionData& collisionData)
+        [&, newMonsterEntity](const GameType::CollisionData& collisionData)
         {
             const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
             if (!isCollidingWithPlayer)
                 return;
-            auto& playerCharacterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
+
+            auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;
+
             playerCharacterComponent.hp -= config::defaultEnemyDMG;
+
+            if (!config::applyKnockback)
+                return;
+
+            auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
+            auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
+
+            b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() - myCollisionComponent.body->
+                GetPosition()};
+            knockbackDirection.Normalize();
+
+            const auto knockbackForce{config::defaultEnemyKnockbackForce * knockbackDirection};
+            playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
         }, [&](const GameType::CollisionData&)
         {
         }, false, false,
