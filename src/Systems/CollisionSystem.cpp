@@ -2,12 +2,13 @@
 
 #include "ColliderComponent.h"
 #include "DoorComponent.h"
-#include "PlayerComponent.h"
 #include "MultiplayerComponent.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
+#include "box2d/b2_body.h"
 
 extern Coordinator gCoordinator;
 
@@ -50,7 +51,8 @@ void CollisionSystem::createMapCollision() const
     for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TileComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity) &&
-            !gCoordinator.hasComponent<DoorComponent>(entity))
+            !gCoordinator.hasComponent<DoorComponent>(entity) &&
+            !gCoordinator.hasComponent<MultiplayerComponent>(entity))
         {
             deleteBody(entity);
         }
@@ -68,7 +70,9 @@ void CollisionSystem::createMapCollision() const
     {
         const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
-        if (tileComponent.id < 0 || tileComponent.tileset.empty() || gCoordinator.hasComponent<PlayerComponent>(entity))
+        if (tileComponent.id < 0 || tileComponent.tileset.empty() ||
+            gCoordinator.hasComponent<PlayerComponent>(entity) ||
+            gCoordinator.hasComponent<MultiplayerComponent>(entity))
         {
             continue;
         }
@@ -123,7 +127,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         const b2Body* body = colliderComponent.body;
         if (body == nullptr || transformComponent.velocity == b2Vec2{}) continue;
-        if (colliderComponent.tag.rfind("Player", 0) != 0) continue;
+        if (!colliderComponent.tag.starts_with("Player")) continue;
 
         const auto spriteBounds = renderComponent.sprite.getGlobalBounds();
 
@@ -221,6 +225,9 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
 
     body->CreateFixture(&fixtureDef);
     body->SetFixedRotation(true);
+
+    // set remote players' body to static so that players can't move each other
+    if (gCoordinator.hasComponent<MultiplayerComponent>(entity)) body->SetType(b2BodyType::b2_staticBody);
 
     colliderComponent.body = body;
     colliderComponent.onCollisionEnter = onCollisionEnter;
