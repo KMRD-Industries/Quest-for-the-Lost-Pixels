@@ -151,8 +151,8 @@ void MultiplayerSystem::update()
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
 
-            auto x = m_position.x();
-            auto y = m_position.y();
+            float x = m_position.x();
+            float y = m_position.y();
 
             transformComponent.position.x = x;
             transformComponent.position.y = y;
@@ -178,6 +178,7 @@ void MultiplayerSystem::disconnect()
 {
     if (!m_connected) return;
     delete m_state.release_room();
+    delete m_position.release_curr_room();
     m_tcp_socket.close();
     m_udp_socket.close();
 }

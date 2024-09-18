@@ -105,7 +105,7 @@ void PlayerMovementSystem::handleAttack() const
 
         const auto targetInBox = Physics::rayCast(center, point2, entity);
 
-        if (targetInBox.tag == "SecondPlayer")
+        if (targetInBox.tag.starts_with("Player"))
         {
             auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
             const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(targetInBox.entityID);

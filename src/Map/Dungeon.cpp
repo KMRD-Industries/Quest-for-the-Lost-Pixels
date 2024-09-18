@@ -386,10 +386,13 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         const auto doorType = GameType::geoToMapDoors.at(newDoor);
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
         const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
-        const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
 
         for (auto id : m_players)
         {
+            // make players spawn in different positions after room change
+            // there should be a better way to do this
+            const sf::Vector2f newPosition = {position.x + offset.x + id, position.y + offset.y + id};
+
             gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
             colliderComponent.body->SetTransform(
@@ -416,10 +419,10 @@ void Dungeon::changeRoom(const glm::ivec2& room)
     const auto doorType = GameType::geoToMapDoors.at(newDoor);
     const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
     const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
-    const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};
 
     for (auto id : m_players)
     {
+        const sf::Vector2f newPosition = {position.x + offset.x + id, position.y + offset.y + id};
         gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
         auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
 
