@@ -2,6 +2,7 @@
 
 #include <comm.pb.h>
 
+#include "Dungeon.h"
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
 #include "CharacterComponent.h"
@@ -10,7 +11,6 @@
 #include "CollisionSystem.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
-#include "Dungeon.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -315,6 +315,8 @@ void Dungeon::makeSimpleFloor()
         {.pathName{"FirstC"}, .startingPathName{"Main"}, .endPathName{"Main"}, .minPathLength{3}, .maxPathLength{5}});
     m_floorGenerator.generateSidePath(
         {.pathName{"SecondC"}, .startingPathName{"Main"}, .endPathName{""}, .minPathLength{3}, .maxPathLength{5}});
+    m_floorGenerator.generateSidePath(
+        {.pathName{"BossRoom"}, .startingPathName{}, .endPathName{""}, .minPathLength{0}, .maxPathLength{0}});
     m_floorGenerator.makeLockAndKey();
 
     m_roomMap = m_floorGenerator.getFloor(true);
@@ -358,6 +360,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 
 float Dungeon::getSpawnOffset(const float position, const int id)
 {
-    if (id % 2 == 0) return position + id * config::spawnOffset;
+    if (id % 2 == 0)
+        return position + id * config::spawnOffset;
     return position - id * config::spawnOffset;
 }
