@@ -8,6 +8,9 @@
 #include <regex>
 #include <string>
 #include <unordered_map>
+
+#include "GameTypes.h"
+#include "TileComponent.h"
 #include "Types.h"
 
 namespace config
@@ -42,8 +45,7 @@ namespace config
 
     static constexpr float maxCharacterHP{100};
     static constexpr float defaultCharacterHP{100};
-    static constexpr float defaultEnemyHP{20};
-    static constexpr float defaultEnemyDMG{10};
+
     static constexpr float defaultEnemyKnockbackForce{300.f};
     static constexpr bool applyKnockback{false};
 
@@ -88,9 +90,23 @@ namespace config
         BossRoom
     };
 
+    struct EnemyConfig
+    {
+        const std::string name{};
+        const float hp{};
+        const float damage{};
+        const TileComponent textureData{};
+    };
+
     const std::unordered_map<SpecialRoomTypes, char> prefixesForSpecialRooms
     {
         {SpecialRoomTypes::SpawnRoom, 's'},
         {SpecialRoomTypes::BossRoom, 'b'}
+    };
+
+    const std::unordered_multimap<Enemies::EnemyType, EnemyConfig> enemyData
+    {
+        {Enemies::EnemyType::MELEE, {.name = "Slime", .hp = 20.f, .damage = 5.f, .textureData{18, "AnimSlimes", 4}}},
+        {Enemies::EnemyType::BOSS, {.name = "Boss", .hp = 200.f, .damage = 30.f, .textureData{54, "AnimSlimes", 4}}},
     };
 } // namespace config

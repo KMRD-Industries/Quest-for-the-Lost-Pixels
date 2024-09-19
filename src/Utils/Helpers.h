@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <functional>
 #include <imgui.h>
+#include <iostream>
+#include <random>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -10,6 +12,27 @@
 #include <nlohmann/json.hpp>
 #include "Config.h"
 #include "glm/gtx/hash.hpp"
+
+static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& enemyType)
+{
+    std::mt19937 gen{};
+
+    auto enemyConfig = config::enemyData.equal_range(enemyType);
+    std::vector<config::EnemyConfig> enemiesConfig;
+    for (auto it = enemyConfig.first; it != enemyConfig.second; ++it)
+        enemiesConfig.push_back(it->second);
+
+    if (enemiesConfig.empty())
+    {
+        std::cerr << "[WARNING] There is not enemy for chosen type! \n";
+        return config::EnemyConfig{};
+    }
+
+    std::uniform_int_distribution<int> distrib(0, enemiesConfig.size() - 1);
+    const auto randomIndex{distrib(gen)};
+
+    return enemiesConfig[randomIndex];
+}
 
 static inline ImVec4 interpolateColor(const ImVec4& color1, const ImVec4& color2, const float t)
 {
