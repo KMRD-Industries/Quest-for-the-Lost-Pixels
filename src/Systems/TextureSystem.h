@@ -30,10 +30,13 @@ class TextureSystem : public System
     void loadAnimationsAndCollisionsIntoSystem(const Tileset &, const long &firstGid);
 
 public:
+    TextureSystem() { init(); }
     int loadFromFile(const std::string &);
     long initializeTileSet(const Tileset &);
     void loadTexturesFromFiles();
     void loadTextures();
+    void init();
+    void update();
 
     sf::Sprite getTile(const std::string &, long) const;
     std::vector<AnimationFrame> getAnimations(const std::string &, long);

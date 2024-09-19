@@ -6,7 +6,9 @@
 
 extern Coordinator gCoordinator;
 
-void CharacterSystem::update() const { cleanUpDeadEntities(); }
+void CharacterSystem::update() { cleanUpDeadEntities(); }
+
+void CharacterSystem::init() {}
 
 void CharacterSystem::cleanUpDeadEntities() const
 {

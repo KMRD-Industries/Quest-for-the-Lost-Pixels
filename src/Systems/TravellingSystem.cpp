@@ -7,6 +7,8 @@
 
 extern Coordinator gCoordinator;
 
+void TravellingSystem::init() {}
+
 void TravellingSystem::update()
 {
     for (const auto entity : m_entities)

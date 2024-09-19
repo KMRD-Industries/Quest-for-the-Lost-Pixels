@@ -3,6 +3,7 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "RenderComponent.h"
@@ -12,6 +13,16 @@
 #include "TransformComponent.h"
 
 constexpr int SPAWN_RATE = 3600;
+
+SpawnerSystem::SpawnerSystem()
+{
+     init();
+}
+
+void SpawnerSystem::init()
+{
+    enemiesDescription.push_back(std::make_pair<Collision, TileComponent>( gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("AnimSlimes", 18), {18, "AnimSlimes", 4}));
+}
 
 void SpawnerSystem::update()
 {
@@ -52,23 +63,30 @@ bool SpawnerSystem::isReadyToSpawn(const int cooldown) { return spawnTime % cool
 void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent)
 {
     const Entity newMonsterEntity = gCoordinator.createEntity();
-
-    const TileComponent tileComponent{18, "AnimSlimes", 4};
-    const ColliderComponent colliderComponent{
-        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id)};
+    auto [collision, tileComponent] = enemiesDescription.front();
 
     gCoordinator.addComponent(newMonsterEntity, tileComponent);
     gCoordinator.addComponent(newMonsterEntity, spawnerTransformComponent);
-    gCoordinator.addComponent(newMonsterEntity, colliderComponent);
     gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
     gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
+    gCoordinator.addComponent(newMonsterEntity, ColliderComponent(collision));
     gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = config::defaultCharacterHP});
 
-    gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        newMonsterEntity, "SecondPlayer", {colliderComponent.collision.width, colliderComponent.collision.height},
-        [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false, false,
-        {colliderComponent.collision.x, colliderComponent.collision.y});
+    const Entity newEventEntity = gCoordinator.createEntity();
+
+    const auto newEvent = CreateBodyWithCollisionEvent(
+        newMonsterEntity,
+        "SecondPlayer",
+       {collision.width, collision.height},
+       [&](const GameType::CollisionData&){},
+        [&](const GameType::CollisionData&){},
+        false,
+        false,
+        {collision.x, collision.y}
+    );
+
+    gCoordinator.addComponent(newEventEntity, newEvent);
 }
 
 void SpawnerSystem::clearSpawners()

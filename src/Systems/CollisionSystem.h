@@ -14,18 +14,19 @@ struct TransformComponent;
 class MyContactListener : public b2ContactListener
 {
     void BeginContact(b2Contact* contact) override;
-
     void EndContact(b2Contact* contact) override;
 };
 
 class CollisionSystem : public System
 {
 public:
-    explicit CollisionSystem() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
+    void init();
+    void update();
 
     void createMapCollision();
-    void updateCollision() const;
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations) const;
+
+    CollisionSystem();
 
     void createBody(
         Entity entity, const std::string& tag, const glm::vec2& colliderSize = {},

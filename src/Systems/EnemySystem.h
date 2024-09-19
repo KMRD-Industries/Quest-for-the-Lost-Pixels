@@ -6,6 +6,7 @@ extern Coordinator gCoordinator;
 class EnemySystem : public System
 {
 public:
-    void update() const;
+    void init();
+    void update();
     void deleteEnemies() const;
 };

@@ -13,7 +13,10 @@ class Dungeon
 public:
     Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
+    void setupWeaponEntity(Entity player);
     void init();
+    void addPlayerComponents(Entity player);
+    void setupPlayerCollision(Entity player);
     void draw();
     void update();
 

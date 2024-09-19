@@ -24,44 +24,41 @@
 
 extern Coordinator gCoordinator;
 
+void MapSystem::init() {}
+
+void MapSystem::update() {}
+
 /**
  * @brief Load room layout from given path of Tiled Json map format
  * @param path The path to JSON formatted Tiled map
  */
 void MapSystem::loadMap(const std::string& path)
 {
-    // Remove old room entities before creating new ones
-    resetMap();
+    resetMap(); // Remove old room entities before creating new ones
 
-    // Iterate over room layers
     for (const Map& parsedMap = parseMap(path); const Layer& layer : parsedMap.layers)
     {
         // Index to retrieve position of Tile. Layer contains all tiles in correct order,
         // and with number of tiles in rows and cols we can model room layout.
         int index{};
 
-        // Tiles info is stored in 32 bits format where first 4 bits describe flips of tile, and the rest stands for
-        // tile id
+        // Tiles info is stored in 32 bits format where first 4 bits describe flips of tile
         static constexpr std::uint32_t mask = 0xf0000000;
 
         // Process base64 layer data into vector of tiles
         for (const uint32_t tile : processDataString(layer.data, static_cast<size_t>(layer.width) * layer.height, 0))
         {
-            // Decode flip flags and tile ID
             const uint32_t flipFlags = (tile & mask) >> 28;
             const uint32_t tileID = tile & ~mask;
 
-            // Calculate Tile position
             const int x_position = index % layer.width;
             const int y_position = index / layer.width;
 
-            if (tileID < 1)
+            if (tileID > 0)
             {
-                index++;
-                continue;
+                processTile(tileID, flipFlags, layer.id, x_position, y_position, parsedMap);
             }
 
-            processTile(tileID, flipFlags, layer.id, x_position, y_position, parsedMap);
             index++;
         }
     }
@@ -137,54 +134,34 @@ void MapSystem::doFlips(const std::uint8_t& flags, float& rotation, sf::Vector2f
 void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, const int layerID, const int xPos,
                             const int yPos, const Map& parsedMap)
 {
-    // Create new Entity which will describe Tile of map
     const Entity mapEntity = gCoordinator.createEntity();
+
+    const auto tileComponent =
+        TileComponent{
+            static_cast<unsigned>(tileID - parsedMap.tilesets.at(findKeyLessThan(parsedMap.tilesets, tileID))),
+            findKeyLessThan(parsedMap.tilesets, static_cast<signed>(tileID)),
+            layerID
+        };
+
+    auto transformComponent =
+        TransformComponent(
+            getPosition(xPos + 1, yPos + 1, parsedMap.tileheight)
+        );
+
+    doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
     gCoordinator.addComponent(mapEntity, RenderComponent{});
     gCoordinator.addComponent(mapEntity, MapComponent{});
+    gCoordinator.addComponent(mapEntity, transformComponent);
+    gCoordinator.addComponent(mapEntity, tileComponent);
 
-    TileComponent tile_component{};
-    TransformComponent transform_component{};
-
-    // Set up Tile Component
-    tile_component.tileSet = findKeyLessThan(parsedMap.tilesets, tileID);
-    tile_component.id = tileID - parsedMap.tilesets.at(tile_component.tileSet);
-    tile_component.layer = layerID;
-
-    // Set up correct position, rotation, scale of tile
-    transform_component.position = getPosition(xPos, yPos, parsedMap.tileheight);
-    transform_component.scale = {1.f, 1.f};
-
-    doFlips(flipFlags, transform_component.rotation, transform_component.scale);
-
-    gCoordinator.addComponent(mapEntity, tile_component);
-    gCoordinator.addComponent(mapEntity, transform_component);
-
-    if (gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tile_component.tileSet, tile_component.id) !=
-        Collision{})
+    if (tileComponent.tileSet == "SpecialBlocks")     // Handle special Tiles
     {
-        gCoordinator.addComponent(mapEntity, ColliderComponent{});
-    }
-
-    if (!gCoordinator.getRegisterSystem<TextureSystem>()
-             ->getAnimations(tile_component.tileSet, tile_component.id)
-             .empty())
-    {
-        gCoordinator.addComponent(mapEntity, AnimationComponent{});
-    }
-
-    // Handle special Tiles
-    if (tile_component.tileSet == "SpecialBlocks")
-    {
-        switch (tile_component.id)
+        switch (tileComponent.id)
         {
-        case (static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER)):
+        case static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER):
             {
                 gCoordinator.addComponent(mapEntity, DoorComponent{});
-
-                if (!gCoordinator.hasComponent<ColliderComponent>(mapEntity))
-                    gCoordinator.addComponent(mapEntity, ColliderComponent{});
-
                 auto& doorComponent = gCoordinator.getComponent<DoorComponent>(mapEntity);
 
                 if (yPos == 0)
@@ -206,13 +183,11 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 
                 break;
             }
-
         case static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK):
             {
                 if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
                 {
                     gCoordinator.addComponent(mapEntity, SpawnerComponent{});
-                    gCoordinator.addComponent(mapEntity, ColliderComponent{});
                 }
 
                 break;
@@ -223,11 +198,9 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
                 startingPosition = pos;
                 break;
             }
-
         case static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR):
             {
                 gCoordinator.addComponent(mapEntity, PassageComponent{});
-                gCoordinator.addComponent(mapEntity, ColliderComponent{});
                 break;
             }
         default:

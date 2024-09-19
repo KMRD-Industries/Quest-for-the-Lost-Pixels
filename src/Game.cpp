@@ -5,6 +5,8 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
+#include "CreateBodyWithCollisionEvent.h"
+#include "ObjectCreatorSystem.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
 #include "TransformComponent.h"
@@ -18,6 +20,7 @@ void Game::init()
     gCoordinator.registerComponent<ColliderComponent>();
     gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TransformComponent>();
+    gCoordinator.registerComponent<CreateBodyWithCollisionEvent>();
 
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     {
@@ -36,6 +39,13 @@ void Game::init()
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 
+    auto objectCreatorSystem = gCoordinator.getRegisterSystem<ObjectCreatorSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<CreateBodyWithCollisionEvent>());
+        gCoordinator.setSystemSignature<ObjectCreatorSystem>(signature);
+    }
+
     m_dungeon.init();
 }
 
@@ -43,6 +53,7 @@ void Game::draw() { m_dungeon.draw(); }
 
 void Game::update()
 {
+    gCoordinator.getRegisterSystem<ObjectCreatorSystem>()->update();
     m_dungeon.update();
     gCoordinator.getRegisterSystem<CollisionSystem>()->deleteMarkedBodies();
 }
@@ -50,7 +61,7 @@ void Game::update()
 void Game::handleCollision()
 {
     const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-    collisionSystem->updateCollision();
+    collisionSystem->update();
     constexpr auto timeStep = 1.f / 60.f;
     collisionSystem->updateSimulation(timeStep, 8, 3);
 };

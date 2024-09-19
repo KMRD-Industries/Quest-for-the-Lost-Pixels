@@ -30,6 +30,7 @@ public:
     void setup(const std::string& ip, const std::string& port) noexcept;
     void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
     void entityDisconnected(const std::uint32_t id) noexcept;
+    void init();
     void update();
     void disconnect();
 

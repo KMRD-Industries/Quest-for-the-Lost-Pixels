@@ -50,10 +50,6 @@
         {
          "firstgid":105,
          "source":"..\/tileSets\/SpecialBlocks.json"
-        }, 
-        {
-         "firstgid":217,
-         "source":"..\/tileSets\/DungeonWalls.json"
         }],
  "tilewidth":16,
  "type":"map",

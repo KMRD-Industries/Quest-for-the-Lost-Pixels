@@ -7,6 +7,8 @@
 
 #define M_PI 3.14159265358979323846
 
+void WeaponSystem::init() {}
+
 void WeaponSystem::update()
 {
     for (const auto entity : m_entities)
@@ -27,11 +29,9 @@ void WeaponSystem::update()
  */
 void WeaponSystem::updateWeaponAngle(WeaponComponent& weaponComponent, const RenderComponent& renderComponent)
 {
-    if (!weaponComponent.isAttacking)
-        return;
-    weaponComponent.isSwingingForward
-        ? rotateForward(weaponComponent)
-        : rotateBackward(weaponComponent, renderComponent);
+    if (!weaponComponent.isAttacking) return;
+    weaponComponent.isSwingingForward ? rotateForward(weaponComponent)
+                                      : rotateBackward(weaponComponent, renderComponent);
 }
 
 /**
@@ -167,8 +167,7 @@ void WeaponSystem::updateStartingAngle(WeaponComponent& weaponComponent, const R
         return;
     }
 
-    if (weaponComponent.queuedAttack || weaponComponent.isAttacking)
-        return;
+    if (weaponComponent.queuedAttack || weaponComponent.isAttacking) return;
 
     setAngle(weaponComponent, renderComponent);
 }

@@ -7,23 +7,34 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
+#include "DoorComponent.h"
 #include "EnemyComponent.h"
 #include "EquippedWeaponComponent.h"
+#include "FloorComponent.h"
+#include "InventoryComponent.h"
+#include "MapComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
 #include "SFML/Graphics/ConvexShape.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
+#include "SpawnerComponent.h"
 #include "TextTagComponent.h"
-#include "TextTagSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
+#include "TravellingDungeonComponent.h"
 #include "WeaponComponent.h"
 #include "imgui.h"
 
 extern Coordinator gCoordinator;
+
+RenderSystem::RenderSystem() { init(); }
+
+void RenderSystem::init() {}
+
+void RenderSystem::update() {}
 
 void RenderSystem::draw(sf::RenderWindow& window)
 {
@@ -31,7 +42,9 @@ void RenderSystem::draw(sf::RenderWindow& window)
     for (auto& layer : tiles) layer.clear();
 
     const sf::Vector2<unsigned int> windowSize = window.getSize();
-    sf::Sprite portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0);
+
+    m_mapOffset.x = 0;
+    m_mapOffset.y = 0;
 
     for (const auto entity : m_entities)
     {
@@ -74,27 +87,11 @@ void RenderSystem::draw(sf::RenderWindow& window)
 
     for (auto& layer : tiles)
     {
-        for (const auto& sprite : layer)
+        for (auto& sprite : layer)
         {
-            sprite->setPosition(sprite->getPosition() + m_mapOffset);
+            sprite->setPosition({sprite->getPosition() + m_mapOffset});
             window.draw(*sprite);
         }
-    }
-
-    for (const auto& entity : gCoordinator.getRegisterSystem<TextTagSystem>()->m_entities)
-    {
-        auto& textTag = gCoordinator.getComponent<TextTagComponent>(entity);
-        const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
-        textTag.text.setPosition(transformComponent.position.x + m_mapOffset.x,
-                                 transformComponent.position.y + m_mapOffset.y);
-
-        textTag.text.setString(std::to_string(config::playerAttackDamage));
-        textTag.text.setFillColor(textTag.color);
-        textTag.text.setScale(config::gameScale, config::gameScale);
-        textTag.text.setCharacterSize(15);
-
-        window.draw(textTag.text);
     }
 
     if (config::debugMode)
@@ -233,10 +230,9 @@ void RenderSystem::displayDamageTaken(const Entity entity)
 void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const Entity entity) const
 {
     ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 370), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always); // Set the width to 250, height is auto
-    ImGui::Begin("abc", nullptr,
-                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
-                     ImGuiWindowFlags_NoTitleBar);
+    ImGui::SetNextWindowSize(ImVec2(270, 0), ImGuiCond_Always); // Set the width to 250, height is auto
+    ImGui::Begin("Player Stats", nullptr,
+                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysUseWindowPadding);
 
     const auto pos = gCoordinator.getComponent<TransformComponent>(entity);
     const auto& tile = gCoordinator.getComponent<TileComponent>(entity);
@@ -268,10 +264,9 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
 
     // Display the Weapon Stats table in the top-right corner
     ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 10), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always); // Set the width to 250, height is auto
+    ImGui::SetNextWindowSize(ImVec2(270, 0), ImGuiCond_Always);
     ImGui::Begin("Weapon Stats", nullptr,
-                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
-                     ImGuiWindowFlags_NoTitleBar);
+                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysUseWindowPadding);
 
     ImGui::Separator();
     ImGui::Text("Weapon Details");
@@ -310,64 +305,12 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
     ImGui::End();
 }
 
-void RenderSystem::displayEnemiesTable()
-{
-    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(300, 0), ImGuiCond_Always);
-    ImGui::Begin("Enemy System");
-
-    if (ImGui::TreeNode("Enemy System"))
-    {
-        for (const auto entity : gCoordinator.getRegisterSystem<EnemySystem>()->m_entities)
-        {
-            std::string entityLabel = "Entity ID: " + std::to_string(entity);
-
-            if (ImGui::TreeNode(entityLabel.c_str()))
-            {
-                if (gCoordinator.hasComponent<TransformComponent>(entity))
-                {
-                    if (ImGui::TreeNode("Transform Component"))
-                    {
-                        const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
-                        ImGui::Text("Position: (%f, %f)", transformComponent.position.x, transformComponent.position.y);
-                        ImGui::Text("Scale: (%f, %f)", transformComponent.scale.x, transformComponent.scale.y);
-                        ImGui::Text("Velocity: (%f, %f)", transformComponent.velocity.x, transformComponent.velocity.y);
-
-                        ImGui::TreePop(); // End of nested child node
-                    }
-                }
-
-                if (gCoordinator.hasComponent<TransformComponent>(entity))
-                {
-                    if (ImGui::TreeNode("Character Component"))
-                    {
-                        const auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
-
-                        ImGui::Text("HP: %f", characterComponent.hp);
-                        ImGui::Text("Time since attacked: %d", characterComponent.timeSinceAttacked);
-                        ImGui::Text("Attacked: %b", characterComponent.attacked);
-
-                        ImGui::TreePop(); // End of nested child node
-                    }
-                }
-
-                ImGui::TreePop(); // End of child node 1
-            }
-        }
-        ImGui::TreePop();
-    }
-    ImGui::End();
-}
-
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
 {
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
     auto transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
-
-    displayEnemiesTable();
 
     auto drawSprite = [&](const Entity entity)
     {

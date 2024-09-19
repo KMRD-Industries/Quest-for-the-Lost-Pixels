@@ -18,7 +18,7 @@ struct Collision
     double x{};
     double y{};
     double width{config::tileHeight};
-    double height{};
+    double height{config::tileHeight};
     std::vector<ObjectProperty> properties;
 
     // Equality operator

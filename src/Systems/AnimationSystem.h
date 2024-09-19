@@ -7,7 +7,9 @@ extern Coordinator gCoordinator;
 class AnimationSystem : public System
 {
 public:
-    void updateFrames();
+    void update();
+    void init();
+
     void updateEntityAnimation(AnimationComponent &, TileComponent &) const;
     int calculateFrameDuration(AnimationComponent &) const;
     bool isTimeForNextFrame(const int &) const;

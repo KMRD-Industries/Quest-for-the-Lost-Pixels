@@ -48,6 +48,7 @@ set(COMPONENTS
         Components/TextTagComponent.h
         Components/PassageComponent.h
         Components/FloorComponent.h
+        Components/CreateBodyWithCollisionEvent.h
 )
 
 set(MAP
@@ -93,6 +94,8 @@ set(SYSTEMS
         Systems/TextTagSystem.h
         Systems/PassageSystem.cpp
         Systems/PassageSystem.h
+        Systems/ObjectCreatorSystem.h
+        Systems/ObjectCreatorSystem.cpp
 )
 
 set(ATLAS_COMPONENTS

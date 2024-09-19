@@ -15,6 +15,11 @@
 
 extern Coordinator gCoordinator;
 
+
+void TextureSystem::init() { loadTexturesFromFiles(); }
+
+void TextureSystem::update() {}
+
 /**
  * Load JSON files to atlases.
 
@@ -157,11 +162,11 @@ void TextureSystem::loadTexturesFromFiles()
 sf::Sprite TextureSystem::getTile(const std::string& tileSetName, const long id) const
 {
     const auto textureIter = m_mapTexturesWithColorSchemeApplied.find(tileSetName);
-    auto indexIter = m_mapTextureIndexes.find(tileSetName);
+    const auto indexIter = m_mapTextureIndexes.find(tileSetName);
 
     if (textureIter != m_mapTexturesWithColorSchemeApplied.end() && indexIter != m_mapTextureIndexes.end())
     {
-        auto rectIter = m_mapTextureRects.find(id + indexIter->second);
+        const auto rectIter = m_mapTextureRects.find(id + indexIter->second);
         if (rectIter != m_mapTextureRects.end())
         {
             return {textureIter->second, rectIter->second};
@@ -205,6 +210,7 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
     std::cout << "ERROR::TEXTURE_SYSTEM::GET_ANIMATIONS::COULD NOT GET ANIMATIONS\n";
     return {};
 }
+
 /**
  * Load textures into tiles.
  */
@@ -212,23 +218,21 @@ void TextureSystem::loadTextures()
 {
     for (const auto entity : m_entities)
     {
-        auto& tile_component = gCoordinator.getComponent<TileComponent>(entity);
-        auto& render_component = gCoordinator.getComponent<RenderComponent>(entity);
-        // auto& collider_component = gCoordinator.getComponent<ColliderComponent>(entity);
+        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-        // Ignore invalid values
-        if (tile_component.id <= 0 || tile_component.id > m_lNoTextures)
+        if (tileComponent.id < 0 || tileComponent.id > m_lNoTextures)  // Ignore invalid values
         {
             continue;
         }
 
-        if (std::ranges::find(m_vecTextureFiles, tile_component.tileSet) == m_vecTextureFiles.end())
+        if (std::ranges::find(m_vecTextureFiles, tileComponent.tileSet) == m_vecTextureFiles.end())
         {
             continue;
         }
 
         // Adjust tile index
-        long adjusted_id = tile_component.id + m_mapTextureIndexes.at(tile_component.tileSet);
+        long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
 
         // Load animations from a system if tile is animated
         if (m_mapAnimations.contains(adjusted_id))
@@ -237,12 +241,15 @@ void TextureSystem::loadTextures()
                 gCoordinator.addComponent(entity, AnimationComponent{});
 
             auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
-            animation_component.frames = getAnimations(tile_component.tileSet, tile_component.id);
+            animation_component.frames = getAnimations(tileComponent.tileSet, tileComponent.id);
             animation_component.it = {animation_component.frames.begin(), animation_component.frames.end()};
         }
 
-        if (m_mapCollisions.contains(adjusted_id) && gCoordinator.hasComponent<ColliderComponent>(entity))
+        if (m_mapCollisions.contains(adjusted_id))
         {
+            if (!gCoordinator.hasComponent<ColliderComponent>(entity))
+                gCoordinator.addComponent(entity, ColliderComponent{});
+
             auto& cc = m_mapCollisions.at(adjusted_id);
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
@@ -255,14 +262,13 @@ void TextureSystem::loadTextures()
                 offset.x = convertPixelsToMeters(offset.x * config::gameScale);
                 offset.y = convertPixelsToMeters(-offset.y * config::gameScale);
 
-                colliderComponent.body->SetTransform(colliderComponent.body->GetPosition() + offset,
-                                                     colliderComponent.body->GetAngle());
+                colliderComponent.body->SetTransform(colliderComponent.body->GetPosition() + offset,0 );
 
                 transformComponent.position.x += convertMetersToPixel(offset.x);
                 transformComponent.position.y += convertMetersToPixel(offset.y);
             }
 
-            colliderComponent.collision = getCollision(tile_component.tileSet, tile_component.id);
+            colliderComponent.collision = cc;
         }
 
         if (m_mapWeaponPlacements.contains(adjusted_id))
@@ -272,8 +278,8 @@ void TextureSystem::loadTextures()
         }
 
         // Load texture of tile with that id to render component
-        render_component.sprite = getTile(tile_component.tileSet, tile_component.id);
-        render_component.layer = tile_component.layer;
+        renderComponent.sprite = getTile(tileComponent.tileSet, tileComponent.id);
+        renderComponent.layer = tileComponent.layer;
     }
 }
 

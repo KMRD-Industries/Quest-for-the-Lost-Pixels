@@ -75,7 +75,7 @@ int main()
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config::frameCycle);
+    // window.setFramerateLimit(config::frameCycle);
 
     sf::Clock deltaClock;
     Game game;
@@ -86,8 +86,8 @@ int main()
         // Clear the window before drawing
         window.clear(hexStringToSfmlColor(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor()));
 
-        game.handleCollision();
         game.update();
+        game.handleCollision();
         game.draw();
 
         ImGui::SFML::Update(window, deltaClock.restart());

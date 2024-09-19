@@ -7,7 +7,9 @@
 
 extern Coordinator gCoordinator;
 
-void PassageSystem::update() const
+void PassageSystem::init() {}
+
+void PassageSystem::update()
 {
     for (const auto entity : m_entities)
     {

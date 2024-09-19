@@ -19,6 +19,16 @@
 
 extern Coordinator gCoordinator;
 
+ PlayerMovementSystem::PlayerMovementSystem()
+ {
+     init();
+ }
+
+void PlayerMovementSystem::init()
+{
+    inputHandler = InputHandler::getInstance();
+}
+
 void PlayerMovementSystem::update()
 {
     handleMovement();
@@ -27,8 +37,6 @@ void PlayerMovementSystem::update()
 
 void PlayerMovementSystem::handleMovement()
 {
-    const auto inputHandler{InputHandler::getInstance()};
-
     glm::vec2 dir{};
 
     if (inputHandler->isHeld(InputType::MoveUp)) // Move Up
