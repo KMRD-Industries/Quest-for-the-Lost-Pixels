@@ -1,12 +1,10 @@
 #pragma once
-#include <functional>
-#include <iostream>
-
-#include "glm/vec2.hpp"
+#include "box2d/b2_math.h"
 
 struct CharacterComponent
 {
     float hp{};
     bool attacked{};
     int timeSinceAttacked{};
+    b2Vec2 knockbackForce{};
 };

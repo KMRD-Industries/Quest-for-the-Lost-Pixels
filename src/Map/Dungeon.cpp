@@ -15,6 +15,7 @@
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
 #include "EquippedWeaponComponent.h"
+#include "HealthBarSystem.h"
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
 #include "MapComponent.h"
@@ -65,10 +66,11 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], TileComponent{config::playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[m_id], RenderComponent{});
     gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = config::defaultEnemyHP});
+    gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = config::defaultCharacterHP});
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
+    //gCoordinator.addComponent(m_entities[m_id], TextTagComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
     gCoordinator.addComponent(
         m_entities[m_id],
@@ -128,6 +130,7 @@ void Dungeon::init()
 
 void Dungeon::draw()
 {
+    gCoordinator.getRegisterSystem<HealthBarSystem>()->drawHealthBar();
     gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
     m_roomMap.at(m_currentPlayerPos).draw();
 }
@@ -148,9 +151,9 @@ void Dungeon::update()
     if (multiplayerSystem->isConnected())
     {
         constexpr int playerAnimationTile = 243;
-        auto stateUpdate = multiplayerSystem->pollStateUpdates();
+        const auto stateUpdate = multiplayerSystem->pollStateUpdates();
         std::uint32_t id = stateUpdate.id();
-        auto tag = std::format("Player {}", id);
+        const auto tag = std::format("Player {}", id);
 
         switch (stateUpdate.variant())
         {
@@ -168,6 +171,7 @@ void Dungeon::update()
             gCoordinator.addComponent(m_entities[id], AnimationComponent{});
             gCoordinator.addComponent(m_entities[id], ColliderComponent{});
             gCoordinator.addComponent(m_entities[id], CharacterComponent{});
+        //gCoordinator.addComponent(m_entities[id], TextTagComponent{});
 
             CollisionSystem::createBody(m_entities[id], tag);
 
@@ -293,6 +297,14 @@ void Dungeon::setECS()
         signature.set(gCoordinator.getComponentType<TextTagComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         gCoordinator.setSystemSignature<TextTagSystem>(signature);
+    }
+
+    const auto healthBarSystem = gCoordinator.getRegisterSystem<HealthBarSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<CharacterComponent>());
+        signature.set(gCoordinator.getComponentType<PlayerComponent>());
+        gCoordinator.setSystemSignature<HealthBarSystem>(signature);
     }
 
     const auto equipWeaponSystem = gCoordinator.getRegisterSystem<EquipWeaponSystem>();
