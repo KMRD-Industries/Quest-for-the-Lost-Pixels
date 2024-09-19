@@ -48,6 +48,7 @@ public:
     [[nodiscard]] std::optional<char> getLock(const glm::ivec2& node) const;
     [[nodiscard]] std::optional<char> getKey(const glm::ivec2& node) const;
     [[nodiscard]] glm::ivec2 getStartingRoom() const;
+    [[nodiscard]] glm::ivec2 getBossRoom() const;
     [[nodiscard]] bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
 
 private:

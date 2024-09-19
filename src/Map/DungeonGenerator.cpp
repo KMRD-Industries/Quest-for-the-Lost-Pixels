@@ -39,6 +39,14 @@ std::optional<char> DungeonGenerator::getKey(const glm::ivec2& node) const
 
 glm::ivec2 DungeonGenerator::getStartingRoom() const { return m_startingRoom; }
 
+glm::ivec2 DungeonGenerator::getBossRoom() const
+{
+    if (m_pathNames.contains("BossRoom"))
+        return *m_paths.at("BossRoom").begin();
+    std::cerr << "[WARNING] Path need to have name \"BossRoom\"\n";
+    return m_startingRoom;
+}
+
 bool DungeonGenerator::isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const
 {
     if (m_uGraph.contains(firstNode))
@@ -335,8 +343,11 @@ DungeonGenerator::sidePathConfig DungeonGenerator::validateAndRepairSidePathConf
         auto it = m_pathNames.begin();
         std::advance(it, randomIndex);
 
-        std::cout << std::format("[INFO] Path \"{}\" doesn't exist, choosing random path to start: \"{}\"\n",
-                                 pathConfig.startingPathName, pathConfig.startingPathName);
+        if (pathConfig.pathName != "BossRoom")
+        {
+            std::cout << std::format("[INFO] Path \"{}\" doesn't exist, choosing random path to start: \"{}\"\n",
+                                     pathConfig.startingPathName, pathConfig.startingPathName);
+        }
 
         sidePathConfig correctConfig = pathConfig;
         correctConfig.startingPathName = *it;

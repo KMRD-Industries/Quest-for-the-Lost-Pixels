@@ -52,10 +52,10 @@ void Dungeon::init()
     if (multiplayerSystem->isConnected())
     {
         m_id = multiplayerSystem->registerPlayer(config::playerEntity);
-        std::cout << "Connected to server with id: {" << m_id << "}";
+        std::cout << "Connected to server with id: {" << m_id << "}\n";
     }
     else
-        std::cout << "Starting in single-player mode";
+        std::cout << "Starting in single-player mode\n";
 
     constexpr int playerAnimationTile = 185;
 

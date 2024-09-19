@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <regex>
 #include <string>
+#include <unordered_map>
 #include "Types.h"
 
 namespace config
@@ -79,4 +80,17 @@ namespace config
     // Healthbar config
     static constexpr ImVec4 fullHPColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
     static constexpr ImVec4 lowHPColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+    enum class SpecialRoomTypes
+    {
+        NormalRoom,
+        SpawnRoom,
+        BossRoom
+    };
+
+    const std::unordered_map<SpecialRoomTypes, char> prefixesForSpecialRooms
+    {
+        {SpecialRoomTypes::SpawnRoom, 's'},
+        {SpecialRoomTypes::BossRoom, 'b'}
+    };
 } // namespace config
