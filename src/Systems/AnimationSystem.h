@@ -8,7 +8,7 @@ class AnimationSystem : public System
 public:
     void updateFrames();
     void updateEntityAnimation(Entity) const;
-    static int calculateFrameDuration(AnimationComponent&);
+    static int calculateFrameDuration(const AnimationComponent&);
     inline bool isTimeForNextFrame(int frameDuration) const;
     static void loadNextFrame(Entity, AnimationComponent&);
 
