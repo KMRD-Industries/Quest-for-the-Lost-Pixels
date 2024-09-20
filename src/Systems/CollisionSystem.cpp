@@ -49,14 +49,10 @@ void MyContactListener::EndContact(b2Contact* contact)
 void CollisionSystem::createMapCollision() const
 {
     for (const auto entity : m_entities)
-    {
         if (gCoordinator.hasComponent<TileComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity) &&
             !gCoordinator.hasComponent<DoorComponent>(entity) &&
             !gCoordinator.hasComponent<MultiplayerComponent>(entity))
-        {
             deleteBody(entity);
-        }
-    }
 
     auto createCollisionBody = [](const Entity entity, const std::string type, const glm::vec2& size,
                                   const bool isStatic, const bool useTexture, const glm::vec2& offset = {0, 0})
@@ -73,9 +69,7 @@ void CollisionSystem::createMapCollision() const
         if (tileComponent.id < 0 || tileComponent.tileset.empty() ||
             gCoordinator.hasComponent<PlayerComponent>(entity) ||
             gCoordinator.hasComponent<MultiplayerComponent>(entity))
-        {
             continue;
-        }
 
         if (tileComponent.tileset == "SpecialBlocks")
         {
@@ -91,8 +85,10 @@ void CollisionSystem::createMapCollision() const
                 gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id);
 
             if (collision.width > 0 && collision.height > 0)
+            {
                 createCollisionBody(entity, "Wall", {collision.width, collision.height}, true, false,
                                     {collision.x, collision.y});
+            }
         }
     }
 }
@@ -127,7 +123,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         const b2Body* body = colliderComponent.body;
         if (body == nullptr || transformComponent.velocity == b2Vec2{}) continue;
-        if (!colliderComponent.tag.starts_with("Player")) continue;
+        if (!colliderComponent.tag.starts_with("Player") && colliderComponent.tag != "Enemy") continue;
 
         const auto spriteBounds = renderComponent.sprite.getGlobalBounds();
 

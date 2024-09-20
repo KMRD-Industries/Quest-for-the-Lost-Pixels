@@ -5,7 +5,6 @@
 #include "AnimationSystem.h"
 #include "Config.h"
 #include "Paths.h"
-#include "TextTag.h"
 #include "TextTagComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -35,9 +34,13 @@ void TextTagSystem::loadFont(const std::string& path)
         std::cout << "ERROR::TEXT_TAG_SYSTEM::CONSTRUCTOR::Failed to load font " << path << "\n";
 }
 
-void TextTagSystem::initPresets() {}
+void TextTagSystem::initPresets()
+{
+}
 
-void TextTagSystem::render(sf::RenderTarget& target) {}
+void TextTagSystem::render(sf::RenderTarget& target)
+{
+}
 
 void TextTagSystem::deleteTags()
 {
@@ -47,9 +50,7 @@ void TextTagSystem::deleteTags()
     {
         const auto& textTag = gCoordinator.getComponent<TextTagComponent>(entity);
         if (textTag.lifetime <= 0)
-        {
             entityToRemove.push_back(entity);
-        }
     }
 
     while (!entityToRemove.empty())

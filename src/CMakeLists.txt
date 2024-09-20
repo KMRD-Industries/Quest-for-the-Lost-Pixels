@@ -73,6 +73,8 @@ set(SYSTEMS
         Systems/CollisionSystem.h
         Systems/MapSystem.cpp
         Systems/MapSystem.h
+        Systems/HealthBarSystem.cpp
+        Systems/HealthBarSystem.h
         Systems/TextureSystem.cpp
         Systems/AnimationSystem.cpp
         Systems/DoorSystem.cpp
