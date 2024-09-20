@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 #include <SFML/System/Vector2.hpp>
+#include <SFML/System/Vector3.hpp>
 #include <boost/asio.hpp>
 #include <comm.pb.h>
 
@@ -21,7 +22,7 @@ private:
     tcp::socket m_tcp_socket;
     udp::socket m_udp_socket;
     std::array<char, 4096> m_buf{};
-    sf::Vector2<float> m_last_sent{};
+    sf::Vector3<float> m_last_sent{};
     glm::ivec2 m_current_room{};
     comm::PositionUpdate m_position{};
     comm::StateUpdate m_state{};

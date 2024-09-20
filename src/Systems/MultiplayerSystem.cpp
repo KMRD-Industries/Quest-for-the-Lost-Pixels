@@ -10,6 +10,7 @@
 #include "Coordinator.h"
 #include "Helpers.h"
 #include "MultiplayerSystem.h"
+#include "SFML/System/Vector3.hpp"
 #include "TransformComponent.h"
 #include "Types.h"
 
@@ -153,9 +154,12 @@ void MultiplayerSystem::update()
 
             float x = m_position.x();
             float y = m_position.y();
+            float r = m_position.rotation();
 
             transformComponent.position.x = x;
             transformComponent.position.y = y;
+            transformComponent.rotation = r;
+            std::cout << colliderComponent.body->GetAngle() << ' ' << transformComponent.scale.x << '\n';
             colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
                                                  colliderComponent.body->GetAngle());
         }
@@ -163,9 +167,12 @@ void MultiplayerSystem::update()
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
 
-    if (m_last_sent == transformComponent.position) return;
 
-    m_last_sent = transformComponent.position;
+    std::cout << transformComponent.rotation << '\n';
+    sf::Vector3<float> next = {transformComponent.position.x, transformComponent.position.y, transformComponent.rotation};
+    if (m_last_sent == next) return;
+
+    m_last_sent = next;
     m_position.set_entity_id(m_player_id);
     m_position.set_x(transformComponent.position.x);
     m_position.set_y(transformComponent.position.y);
