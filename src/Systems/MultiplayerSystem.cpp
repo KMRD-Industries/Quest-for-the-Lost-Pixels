@@ -101,18 +101,12 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
     comm::StateUpdate state;
     if (available > 0)
     {
-        // temporary solution - msg length should always be 4
-        // reading all available bytes will cause ignoring of all but 1 messages
+        // TODO: actual fix (works most of the time at the moment)
         // std::vector<char> buf(4);
         // std::size_t received = m_tcp_socket.read_some(boost::asio::buffer(buf));
 
         std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
 
-        // for (auto x: buf) {
-        //     std::cout << int(x) << ' ';
-        // }
-
-        // state.ParseFromArray(buf.data(), received);
         state.ParseFromArray(m_buf.data(), int(received));
         std::cout << state.ShortDebugString() << '\n';
 
