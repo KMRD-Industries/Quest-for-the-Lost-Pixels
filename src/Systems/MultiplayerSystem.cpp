@@ -154,12 +154,11 @@ void MultiplayerSystem::update()
 
             float x = m_position.x();
             float y = m_position.y();
-            float r = m_position.rotation();
+            float r = m_position.direction();
 
             transformComponent.position.x = x;
             transformComponent.position.y = y;
-            transformComponent.rotation = r;
-            std::cout << colliderComponent.body->GetAngle() << ' ' << transformComponent.scale.x << '\n';
+            transformComponent.scale.x = r;
             colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
                                                  colliderComponent.body->GetAngle());
         }
@@ -168,14 +167,14 @@ void MultiplayerSystem::update()
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
 
 
-    std::cout << transformComponent.rotation << '\n';
-    sf::Vector3<float> next = {transformComponent.position.x, transformComponent.position.y, transformComponent.rotation};
+    sf::Vector3<float> next = {transformComponent.position.x, transformComponent.position.y, transformComponent.scale.x};
     if (m_last_sent == next) return;
 
     m_last_sent = next;
     m_position.set_entity_id(m_player_id);
-    m_position.set_x(transformComponent.position.x);
-    m_position.set_y(transformComponent.position.y);
+    m_position.set_x(next.x);
+    m_position.set_y(next.y);
+    m_position.set_direction(next.z);
 
     auto serialized = m_position.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
