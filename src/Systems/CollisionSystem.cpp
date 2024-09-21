@@ -49,10 +49,7 @@ void MyContactListener::EndContact(b2Contact* contact)
     }
 }
 
-CollisionSystem::CollisionSystem()
-{
-    init();
-}
+CollisionSystem::CollisionSystem() { init(); }
 
 void CollisionSystem::init() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
 
@@ -71,25 +68,19 @@ void CollisionSystem::createMapCollision()
     {
         const Entity newEntity = gCoordinator.createEntity();
         const auto newEvent = CreateBodyWithCollisionEvent(
-            entity,
-            type,
-            size,
-            [](const GameType::CollisionData&) {},
-            [](const GameType::CollisionData&) {},
-            isStatic,
-            useTexture,
-            offset
-        );
+            entity, type, size, [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, isStatic,
+            useTexture, offset);
 
         gCoordinator.addComponent(newEntity, newEvent);
     };
 
     for (const auto entity : m_entities)
     {
-        const auto& tileComponent   = gCoordinator.getComponent<TileComponent>(entity);
-        auto& colliderComponent     = gCoordinator.getComponent<ColliderComponent>(entity);
+        const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-        if (tileComponent.id < 0 || tileComponent.tileSet.empty() || gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
+        if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
+            gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
         {
             continue;
         }
@@ -106,14 +97,13 @@ void CollisionSystem::createMapCollision()
                 if (gCoordinator.hasComponent<PassageComponent>(entity))
                     if (gCoordinator.getComponent<PassageComponent>(entity).activePassage)
                         createCollisionBody(entity, "Passage", {config::tileHeight, config::tileHeight}, true, true);
-
         }
         else
         {
             if (colliderComponent.collision.width > 0 && colliderComponent.collision.height > 0)
                 createCollisionBody(entity, "Wall",
                                     {colliderComponent.collision.width, colliderComponent.collision.height}, true,
-                                    false,  {colliderComponent.collision.x, colliderComponent.collision.y});
+                                    false, {colliderComponent.collision.x, colliderComponent.collision.y});
         }
     }
 }
@@ -148,7 +138,9 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         const b2Body* body = colliderComponent.body;
         if (body == nullptr || transformComponent.velocity == b2Vec2{}) continue;
-        if (colliderComponent.tag != "Player 1" && colliderComponent.tag != "SecondPlayer") continue;
+        if (colliderComponent.tag != "Player 1" && colliderComponent.tag != "SecondPlayer" &&
+            colliderComponent.tag != "Enemy")
+            continue;
 
         const auto position = body->GetPosition();
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};

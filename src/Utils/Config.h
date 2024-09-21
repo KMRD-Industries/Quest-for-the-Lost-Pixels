@@ -42,9 +42,6 @@ namespace config
 
     static const std::string backgroundColor{"#17205C"};
 
-    inline Entity playerEntity = {};
-    static constexpr int playerAnimation{184};
-
     static constexpr float maxCharacterHP{100};
     static constexpr float defaultCharacterHP{100};
     static constexpr float defaultEnemyHP{20};

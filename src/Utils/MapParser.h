@@ -1,6 +1,8 @@
 #pragma once
 
 #include <fstream>
+#include <iostream>
+
 #include "Map.h"
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;

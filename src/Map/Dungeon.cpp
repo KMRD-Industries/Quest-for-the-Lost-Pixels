@@ -195,28 +195,32 @@ void Dungeon::update()
         switch (stateUpdate.variant())
         {
         case comm::DISCONNECTED:
-            gCoordinator.destroyEntity(m_entities[id]);
-            multiplayerSystem->entityDisconnected(id);
-            break;
+            {
+                gCoordinator.destroyEntity(m_entities[id]);
+                multiplayerSystem->entityDisconnected(id);
+                break;
+            }
         case comm::CONNECTED:
-            m_entities[id] = gCoordinator.createEntity();
+            {
+                m_entities[id] = gCoordinator.createEntity();
 
-            gCoordinator.addComponent(m_entities[id], TileComponent{playerAnimationTile, "Characters", 6});
-            gCoordinator.addComponent(m_entities[id], RenderComponent{});
-            gCoordinator.addComponent(m_entities[id], TransformComponent{});
-            gCoordinator.addComponent(m_entities[id], AnimationComponent{});
-            gCoordinator.addComponent(m_entities[id], ColliderComponent{});
-            gCoordinator.addComponent(m_entities[id], CharacterComponent{});
-        //gCoordinator.addComponent(m_entities[id], TextTagComponent{});
+                gCoordinator.addComponent(m_entities[id], TileComponent{playerAnimationTile, "Characters", 6});
+                gCoordinator.addComponent(m_entities[id], RenderComponent{});
+                gCoordinator.addComponent(m_entities[id], TransformComponent{});
+                gCoordinator.addComponent(m_entities[id], AnimationComponent{});
+                gCoordinator.addComponent(m_entities[id], ColliderComponent{});
+                gCoordinator.addComponent(m_entities[id], CharacterComponent{});
+                gCoordinator.addComponent(m_entities[id], TextTagComponent{});
 
-            // gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[id], tag);
+                // gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[id], tag);
 
-            const Entity entity = gCoordinator.createEntity();
-            const auto newEvent = CreateBodyWithCollisionEvent(m_entities[id], tag, {}, {}, {}, false, false, {});
-            gCoordinator.addComponent(entity, newEvent);
+                const Entity entity = gCoordinator.createEntity();
+                const auto newEvent = CreateBodyWithCollisionEvent(m_entities[id], tag, {}, {}, {}, false, false, {});
+                gCoordinator.addComponent(entity, newEvent);
 
-            multiplayerSystem->entityConnected(id, m_entities[id]);
-            break;
+                multiplayerSystem->entityConnected(id, m_entities[id]);
+                break;
+            }
         default:
             break;
         }
