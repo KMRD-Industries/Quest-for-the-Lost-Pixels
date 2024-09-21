@@ -17,7 +17,7 @@ public:
 
     void init();
     void draw();
-    void update();
+    void update(float deltaTime);
 
 private:
     void setECS();

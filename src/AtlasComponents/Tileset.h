@@ -17,7 +17,7 @@ struct Collision
     int id{};
     double x{};
     double y{};
-    double width{};
+    float width{};
     double height{};
     std::vector<ObjectProperty> properties;
 

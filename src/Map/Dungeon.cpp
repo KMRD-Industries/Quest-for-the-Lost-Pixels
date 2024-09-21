@@ -138,7 +138,7 @@ void Dungeon::draw()
     m_roomMap.at(m_currentPlayerPos).draw();
 }
 
-void Dungeon::update()
+void Dungeon::update(const float deltaTime)
 {
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
     gCoordinator.getRegisterSystem<WeaponSystem>()->update();
@@ -149,6 +149,7 @@ void Dungeon::update()
     gCoordinator.getRegisterSystem<AnimationSystem>()->updateFrames();
     gCoordinator.getRegisterSystem<TextTagSystem>()->update();
     gCoordinator.getRegisterSystem<LootSystem>()->update();
+    gCoordinator.getRegisterSystem<LootSpawnerSystem>()->updateAnimation(deltaTime);
 
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
 

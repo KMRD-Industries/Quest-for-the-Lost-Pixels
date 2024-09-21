@@ -19,6 +19,15 @@ namespace SpecialBlocks
     };
 } // namespace SpecialBlocks
 
+namespace Items
+{
+    enum class Behaviours : int
+    {
+        HEAL = 0,
+        DMGUP = 1
+    };
+}
+
 namespace Enemies
 {
     enum class EnemyType : int

@@ -34,6 +34,16 @@ static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& e
     return enemiesConfig[randomIndex];
 }
 
+static inline config::ItemConfig getRandomItemData()
+{
+    std::mt19937 gen{};
+
+    std::uniform_int_distribution<int> distrib(0, config::itemsData.size() - 1);
+    const auto randomIndex{distrib(gen)};
+
+    return config::itemsData[randomIndex];
+}
+
 static inline ImVec4 interpolateColor(const ImVec4& color1, const ImVec4& color2, const float t)
 {
     return ImVec4(

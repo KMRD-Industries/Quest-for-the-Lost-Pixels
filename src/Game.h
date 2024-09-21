@@ -6,7 +6,7 @@ class Game
 public:
     void init();
     void draw();
-    void update();
+    void update(float deltaTime);
     void handleCollision();
 
 private:

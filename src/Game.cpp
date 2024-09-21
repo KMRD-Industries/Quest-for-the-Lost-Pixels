@@ -41,9 +41,9 @@ void Game::init()
 
 void Game::draw() { m_dungeon.draw(); }
 
-void Game::update()
+void Game::update(const float deltaTime)
 {
-    m_dungeon.update();
+    m_dungeon.update(deltaTime);
     gCoordinator.getRegisterSystem<CollisionSystem>()->deleteMarkedBodies();
 }
 
