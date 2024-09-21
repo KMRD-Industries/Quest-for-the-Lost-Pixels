@@ -14,7 +14,8 @@ namespace SpecialBlocks
         DOORSCOLLIDER = 0,
         STATICWALLCOLLIDER = 1,
         SPAWNERBLOCK = 2,
-        BOSSSPAWNERBLOCK = 3
+        BOSSSPAWNERBLOCK = 3,
+        CHESTSPAWNERBLOCK = 4
     };
 } // namespace SpecialBlocks
 

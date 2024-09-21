@@ -18,6 +18,8 @@
 #include "HealthBarSystem.h"
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
+#include "LootComponent.h"
+#include "LootSpawnerSystem.h"
 #include "LootSystem.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
@@ -204,6 +206,7 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<InventoryComponent>();
     gCoordinator.registerComponent<EquippedWeaponComponent>();
     gCoordinator.registerComponent<TextTagComponent>();
+    gCoordinator.registerComponent<LootComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -284,6 +287,15 @@ void Dungeon::setECS()
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         signature.set(gCoordinator.getComponentType<SpawnerComponent>());
         gCoordinator.setSystemSignature<SpawnerSystem>(signature);
+    }
+
+    const auto lootSpawnerSystem = gCoordinator.getRegisterSystem<LootSpawnerSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<TileComponent>());
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<LootComponent>());
+        gCoordinator.setSystemSignature<LootSpawnerSystem>(signature);
     }
 
     const auto weaponSystem = gCoordinator.getRegisterSystem<WeaponSystem>();

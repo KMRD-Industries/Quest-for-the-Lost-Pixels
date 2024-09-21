@@ -36,6 +36,7 @@ set(COMPONENTS
         Components/TransformComponent.h
         Components/TileComponent.h
         Components/MapComponent.h
+        Components/LootComponent.h
         Components/AnimationComponent.h
         Components/AnimationFrame.h
         Components/DoorComponent.h
@@ -80,6 +81,8 @@ set(SYSTEMS
         Systems/DoorSystem.h
         Systems/LootSystem.cpp
         Systems/LootSystem.h
+        Systems/LootSpawnerSystem.cpp
+        Systems/LootSpawnerSystem.h
         Systems/TravellingSystem.cpp
         Systems/TravellingSystem.h
         Systems/EnemySystem.cpp

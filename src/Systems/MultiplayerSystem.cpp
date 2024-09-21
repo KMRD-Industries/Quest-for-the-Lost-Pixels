@@ -1,12 +1,12 @@
 #include <cstdint>
 #include <iostream>
 
-#include <boost/asio.hpp>
 #include <comm.pb.h>
 #include <vector>
+#include <boost/asio.hpp>
 
-#include "Coordinator.h"
 #include "MultiplayerSystem.h"
+#include "Coordinator.h"
 #include "TransformComponent.h"
 #include "Types.h"
 #include "boost/system/system_error.hpp"
@@ -15,6 +15,7 @@ extern Coordinator gCoordinator;
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
+
 void MultiplayerSystem::setup(const std::string& ip, const std::string& port) noexcept
 {
     try
@@ -100,7 +101,8 @@ void MultiplayerSystem::update()
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
 
-    if (m_last_sent == transformComponent.position) return;
+    if (m_last_sent == transformComponent.position)
+        return;
 
     m_last_sent = transformComponent.position;
     m_position.set_entity_id(m_player_id);
@@ -113,7 +115,8 @@ void MultiplayerSystem::update()
 
 void MultiplayerSystem::disconnect()
 {
-    if (!m_connected) return;
+    if (!m_connected)
+        return;
     m_tcp_socket.close();
     m_udp_socket.close();
 }

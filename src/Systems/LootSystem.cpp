@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "LootSpawnerSystem.h"
+
 void LootSystem::update()
 {
     if (m_isCurrentRoomLooted)
@@ -27,7 +29,7 @@ void LootSystem::changeRoom(const glm::ivec2& newRoom)
 
 void LootSystem::spawnLoot()
 {
-    //Spawn logic
+    gCoordinator.getRegisterSystem<LootSpawnerSystem>()->spawnChest();
     std::cout << "[INFO] Spawning loot\n";
 
     m_lootedRooms[m_currentRoom] = true;

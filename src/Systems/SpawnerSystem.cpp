@@ -7,7 +7,6 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "EnemyComponent.h"
-#include "EnemySystem.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
 #include "TextureSystem.h"
