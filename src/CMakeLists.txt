@@ -49,6 +49,7 @@ set(COMPONENTS
         Components/PassageComponent.h
         Components/FloorComponent.h
         Components/CreateBodyWithCollisionEvent.h
+        Components/FightActionEvent.h
 )
 
 set(MAP
@@ -94,8 +95,13 @@ set(SYSTEMS
         Systems/TextTagSystem.h
         Systems/PassageSystem.cpp
         Systems/PassageSystem.h
-        Systems/ObjectCreatorSystem.h
-        Systems/ObjectCreatorSystem.cpp
+)
+
+set(EVENT_SYSTEMS
+        EventSystems/ObjectCreatorSystem.cpp
+        EventSystems/ObjectCreatorSystem.h
+        EventSystems/FightSystem.cpp
+        EventSystems/FightSystem.h
 )
 
 set(ATLAS_COMPONENTS
@@ -122,12 +128,13 @@ source_group("Systems" FILES ${SYSTEMS})
 source_group("AtlasComponents" FILES ${ATLAS_COMPONENTS})
 source_group("Utils" FILES ${UTILS})
 source_group("Map" FILES ${MAP})
+source_group("EventSystems" FILES ${EVENT_SYSTEMS})
 
 add_definitions(-D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./AtlasComponents ./Core ./Components ./Systems ./EventSystems ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(qlp ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
+add_executable(qlp ${SOURCES} ${CORE} ${EVENT_SYSTEMS} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
 
 target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
 

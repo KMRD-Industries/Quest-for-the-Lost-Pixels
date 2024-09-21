@@ -1,10 +1,8 @@
 #include "AnimationSystem.h"
 #include "Config.h"
 #include "TileComponent.h"
-#include "TransformComponent.h"
 
 void AnimationSystem::init() { m_frameTime = {}; }
-
 
 void AnimationSystem::update()
 {
@@ -12,8 +10,8 @@ void AnimationSystem::update()
 
     for (const auto entity : m_entities)
     {
-        auto& animationComponent        = gCoordinator.getComponent<AnimationComponent>(entity);
-        auto& animationTileComponent    = gCoordinator.getComponent<TileComponent>(entity);
+        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
+        auto& animationTileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
         if (!animationComponent.frames.empty())
         {
@@ -23,7 +21,8 @@ void AnimationSystem::update()
                 animationTileComponent.id = animationComponent.it->tileID;
 
                 const long duration = animationComponent.it->duration;
-                animationComponent.timeUntilNextFrame = static_cast<int>(duration / static_cast<long>(config::oneFrameTime) + 1);
+                animationComponent.timeUntilNextFrame =
+                    static_cast<int>(duration / static_cast<long>(config::oneFrameTime) + 1);
             }
         }
     }

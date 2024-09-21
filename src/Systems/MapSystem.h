@@ -19,4 +19,7 @@ private:
 
     sf::Vector2f getPosition(int, int, int);
     std::string findKeyLessThan(const std::unordered_map<std::string, long>&, long);
+    std::uint32_t mask = 0xf0000000;
+    uint32_t flipFlags{};
+    uint32_t tileID{};
 };

@@ -1,9 +1,6 @@
 #include "MapSystem.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
-
-#include <fstream>
-#include <nlohmann/json.hpp>
 #include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
@@ -24,7 +21,9 @@
 
 extern Coordinator gCoordinator;
 
-void MapSystem::init() {}
+void MapSystem::init()
+{
+}
 
 void MapSystem::update() {}
 
@@ -42,14 +41,11 @@ void MapSystem::loadMap(const std::string& path)
         // and with number of tiles in rows and cols we can model room layout.
         int index{};
 
-        // Tiles info is stored in 32 bits format where first 4 bits describe flips of tile
-        static constexpr std::uint32_t mask = 0xf0000000;
-
         // Process base64 layer data into vector of tiles
         for (const uint32_t tile : processDataString(layer.data, static_cast<size_t>(layer.width) * layer.height, 0))
         {
-            const uint32_t flipFlags = (tile & mask) >> 28;
-            const uint32_t tileID = tile & ~mask;
+            flipFlags = (tile & mask) >> 28;
+            tileID = tile & ~mask;
 
             const int x_position = index % layer.width;
             const int y_position = index / layer.width;
@@ -136,17 +132,11 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 {
     const Entity mapEntity = gCoordinator.createEntity();
 
-    const auto tileComponent =
-        TileComponent{
-            static_cast<unsigned>(tileID - parsedMap.tilesets.at(findKeyLessThan(parsedMap.tilesets, tileID))),
-            findKeyLessThan(parsedMap.tilesets, static_cast<signed>(tileID)),
-            layerID
-        };
+    const auto tileComponent = TileComponent{
+        static_cast<unsigned>(tileID - parsedMap.tilesets.at(findKeyLessThan(parsedMap.tilesets, tileID))),
+        findKeyLessThan(parsedMap.tilesets, static_cast<signed>(tileID)), layerID};
 
-    auto transformComponent =
-        TransformComponent(
-            getPosition(xPos + 1, yPos + 1, parsedMap.tileheight)
-        );
+    auto transformComponent = TransformComponent(getPosition(xPos + 1, yPos + 1, parsedMap.tileheight));
 
     doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
@@ -155,7 +145,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     gCoordinator.addComponent(mapEntity, transformComponent);
     gCoordinator.addComponent(mapEntity, tileComponent);
 
-    if (tileComponent.tileSet == "SpecialBlocks")     // Handle special Tiles
+    if (tileComponent.tileSet == "SpecialBlocks") // Handle special Tiles
     {
         switch (tileComponent.id)
         {
@@ -195,7 +185,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
         case static_cast<int>(SpecialBlocks::Blocks::STARTINGPOINT):
             {
                 const sf::Vector2f pos = getPosition(xPos, yPos, parsedMap.tileheight);
-                startingPosition = pos;
+                GameUtility::startingPosition = {pos.x, pos.y};
                 break;
             }
         case static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR):

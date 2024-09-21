@@ -6,6 +6,8 @@
 #include "CollisionSystem.h"
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
+#include "FightActionEvent.h"
+#include "FightSystem.h"
 #include "ObjectCreatorSystem.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
@@ -21,6 +23,7 @@ void Game::init()
     gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TransformComponent>();
     gCoordinator.registerComponent<CreateBodyWithCollisionEvent>();
+    gCoordinator.registerComponent<FightActionEvent>();
 
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     {
@@ -44,6 +47,13 @@ void Game::init()
         Signature signature;
         signature.set(gCoordinator.getComponentType<CreateBodyWithCollisionEvent>());
         gCoordinator.setSystemSignature<ObjectCreatorSystem>(signature);
+    }
+
+    auto fightSystem = gCoordinator.getRegisterSystem<FightSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<FightActionEvent>());
+        gCoordinator.setSystemSignature<FightSystem>(signature);
     }
 
     m_dungeon.init();

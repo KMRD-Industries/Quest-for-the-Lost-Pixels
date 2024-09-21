@@ -38,7 +38,35 @@ namespace GameType
         MyVec2(const b2Vec2& vec) : x(vec.x), y(vec.y) {}
 
         operator b2Vec2() const { return {x, y}; }
+
+        MyVec2 operator+(const sf::Vector2f& vec) const { return MyVec2{x + vec.x, y + vec.y}; }
+
+        MyVec2 operator+(const MyVec2& vec) const { return MyVec2{x + vec.x, y + vec.y}; }
+
+        MyVec2 operator*(const sf::Vector2f& vec) const { return MyVec2{x * vec.x, y * vec.y}; }
+
+        MyVec2 operator*(const MyVec2& vec) const { return MyVec2{x * vec.x, y * vec.y}; }
+
+        MyVec2 operator+(const b2Vec2& vec) const { return MyVec2{x + vec.x, y + vec.y}; }
+
+        MyVec2 operator*(float scalar) const { return MyVec2{x * scalar, y * scalar}; }
+
+        MyVec2 operator*(double scalar) const
+        {
+            return MyVec2{x * static_cast<float>(scalar), y * static_cast<float>(scalar)};
+        }
     };
+
+    inline sf::Vector2f operator+(const sf::Vector2f& sfVec, const MyVec2& myVec)
+    {
+        return sf::Vector2f{sfVec.x + myVec.x, sfVec.y + myVec.y};
+    }
+
+    inline sf::Vector2f operator*(const sf::Vector2f& sfVec, const MyVec2& myVec)
+    {
+        return sf::Vector2f{sfVec.x * myVec.x, sfVec.y * myVec.y};
+    }
+
 
     enum class DoorEntraces : int
     {

@@ -17,6 +17,7 @@
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
 #include "EquippedWeaponComponent.h"
+#include "FightSystem.h"
 #include "FloorComponent.h"
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
@@ -78,9 +79,9 @@ void Dungeon::init()
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponent(player, TileComponent{config::playerAnimation, "Characters", 3});
+    gCoordinator.addComponent(player, TileComponent{config::playerAnimation, "Characters", 6});
     gCoordinator.addComponent(player, RenderComponent{});
-    gCoordinator.addComponent(player, TransformComponent{startingPosition});
+    gCoordinator.addComponent(player, TransformComponent{GameUtility::startingPosition});
     gCoordinator.addComponent(player, AnimationComponent{});
     gCoordinator.addComponent(player, CharacterComponent{.hp = config::defaultEnemyHP});
     gCoordinator.addComponent(player, PlayerComponent{});
@@ -88,10 +89,9 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, InventoryComponent{});
     gCoordinator.addComponent(player, EquippedWeaponComponent{});
     gCoordinator.addComponent(player, FloorComponent{});
-    gCoordinator.addComponent(player, TravellingDungeonComponent{
-        .moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
-    gCoordinator.addComponent(player, PassageComponent{
-        .moveCallback = [this] { moveDownDungeon(); }});
+    gCoordinator.addComponent(
+        player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
+    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
 
 void Dungeon::setupPlayerCollision(const Entity player)
@@ -99,13 +99,12 @@ void Dungeon::setupPlayerCollision(const Entity player)
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(player).collision = cc;
 
-    auto onCollisionIn =  [&](const GameType::CollisionData& entityT)
+    auto onCollisionIn = [&](const GameType::CollisionData& entityT)
     {
         if (entityT.tag == "Door")
         {
             const auto& doorComponent = gCoordinator.getComponent<DoorComponent>(entityT.entityID);
-            auto& travellingDungeonComponent =
-                gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[m_id]);
+            auto& travellingDungeonComponent = gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[m_id]);
 
             if (travellingDungeonComponent.doorsPassed == 0)
             {
@@ -140,16 +139,8 @@ void Dungeon::setupPlayerCollision(const Entity player)
     };
 
     const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(
-        player,
-        "Player 1",
-       {cc.width, cc.height},
-        onCollisionIn,
-        onCollisionOut,
-        false,
-        false,
-        {cc.x, cc.y}
-    );
+    const auto newEvent = CreateBodyWithCollisionEvent(player, "Player 1", {cc.width, cc.height}, onCollisionIn,
+                                                       onCollisionOut, false, false, {cc.x, cc.y});
 
     gCoordinator.addComponent(entity, newEvent);
 }
@@ -159,7 +150,7 @@ void Dungeon::setupWeaponEntity(const Entity player)
     const Entity weaponEntity = gCoordinator.createEntity();
 
     gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19});
-    gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 5});
+    gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
     gCoordinator.addComponent(weaponEntity, TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
     gCoordinator.addComponent(weaponEntity, ColliderComponent{});
@@ -178,6 +169,7 @@ void Dungeon::draw()
 void Dungeon::update()
 {
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
+    gCoordinator.getRegisterSystem<FightSystem>()->update();
     gCoordinator.getRegisterSystem<WeaponSystem>()->update();
     gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
     gCoordinator.getRegisterSystem<EnemySystem>()->update();
@@ -207,7 +199,7 @@ void Dungeon::update()
         case comm::CONNECTED:
             m_entities[id] = gCoordinator.createEntity();
 
-            gCoordinator.addComponent(m_entities[id], TileComponent{playerAnimationTile, "Characters", 4});
+            gCoordinator.addComponent(m_entities[id], TileComponent{playerAnimationTile, "Characters", 6});
             gCoordinator.addComponent(m_entities[id], RenderComponent{});
             gCoordinator.addComponent(m_entities[id], TransformComponent{});
             gCoordinator.addComponent(m_entities[id], AnimationComponent{});
@@ -215,6 +207,10 @@ void Dungeon::update()
             gCoordinator.addComponent(m_entities[id], CharacterComponent{});
 
             // gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(m_entities[id], tag);
+
+            const Entity entity = gCoordinator.createEntity();
+            const auto newEvent = CreateBodyWithCollisionEvent(m_entities[id], tag, {}, {}, {}, false, false, {});
+            gCoordinator.addComponent(entity, newEvent);
 
             multiplayerSystem->entityConnected(id, m_entities[id]);
             break;
@@ -392,6 +388,7 @@ void Dungeon::moveDownDungeon()
 {
     makeSimpleFloor();
     const std::string& newMap = m_roomMap.at(m_currentPlayerPos).getMap();
+    const auto& pos = GameUtility::startingPosition;
 
     gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
     gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
@@ -402,13 +399,13 @@ void Dungeon::moveDownDungeon()
     gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
     gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 
-    gCoordinator.getComponent<TransformComponent>(m_entities[config::playerEntity]).position = startingPosition;
+    gCoordinator.getComponent<TransformComponent>(m_entities[config::playerEntity]).position = {pos.x, pos.y};
     gCoordinator.getComponent<TransformComponent>(m_entities[config::playerEntity]).velocity = {};
 
     b2Vec2 position =
         gCoordinator.getComponent<ColliderComponent>(m_entities[config::playerEntity]).body->GetPosition();
-    position.x = startingPosition.x * static_cast<float>(config::pixelToMeterRatio);
-    position.y = startingPosition.y * static_cast<float>(config::pixelToMeterRatio);
+    position.x = GameUtility::startingPosition.x * static_cast<float>(config::pixelToMeterRatio);
+    position.y = GameUtility::startingPosition.y * static_cast<float>(config::pixelToMeterRatio);
 
     gCoordinator.getComponent<ColliderComponent>(m_entities[config::playerEntity]).body->SetTransform(position, 0);
 }

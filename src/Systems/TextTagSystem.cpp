@@ -4,15 +4,14 @@
 
 #include "AnimationSystem.h"
 #include "Config.h"
+#include "GameUtility.h"
 #include "Paths.h"
 #include "TextTag.h"
 #include "TextTagComponent.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
-TextTagSystem::TextTagSystem() {
-     init();
-}
+TextTagSystem::TextTagSystem() { init(); }
 
 void TextTagSystem::init() { this->loadFont(std::string(ASSET_PATH) + "/fonts/PixellettersFull.ttf"); }
 
@@ -48,9 +47,7 @@ void TextTagSystem::render(sf::RenderTarget& window)
         auto& textTag = gCoordinator.getComponent<TextTagComponent>(entity);
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
-        textTag.text.setPosition(transformComponent.position.x,
-                                 transformComponent.position.y);
-
+        textTag.text.setPosition(transformComponent.position + GameUtility::mapOffset);
         textTag.text.setString(std::to_string(config::playerAttackDamage));
         textTag.text.setFillColor(textTag.color);
         textTag.text.setScale(config::gameScale, config::gameScale);

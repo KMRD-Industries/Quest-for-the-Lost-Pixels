@@ -1,14 +1,12 @@
-
 #include "ObjectCreatorSystem.h"
-
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 
-void ObjectCreatorSystem::update(){
-
+void ObjectCreatorSystem::update()
+{
     for (const auto& entity : m_entities)
     {
         const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
@@ -37,13 +35,13 @@ void ObjectCreatorSystem::update(){
         }
         else
         {
-            xPosition = convertPixelsToMeters(transformComponent.position.x -
-                                              (spriteBounds.width / 2 - (eventInfo.offset.x + eventInfo.colliderSize.x / 2)) *
-                                                  config::gameScale);
+            xPosition = convertPixelsToMeters(
+                transformComponent.position.x -
+                (spriteBounds.width / 2 - (eventInfo.offset.x + eventInfo.colliderSize.x / 2)) * config::gameScale);
 
-            yPosition = convertPixelsToMeters(transformComponent.position.y -
-                                              (spriteBounds.height / 2 - (eventInfo.offset.y + eventInfo.colliderSize.y / 2)) *
-                                                  config::gameScale);
+            yPosition = convertPixelsToMeters(
+                transformComponent.position.y -
+                (spriteBounds.height / 2 - (eventInfo.offset.y + eventInfo.colliderSize.y / 2)) * config::gameScale);
         }
 
         bodyDef.position.Set(xPosition, yPosition);
@@ -98,5 +96,4 @@ void ObjectCreatorSystem::update(){
         gCoordinator.destroyEntity(entityToRemove.front());
         entityToRemove.pop_front();
     }
-
 }

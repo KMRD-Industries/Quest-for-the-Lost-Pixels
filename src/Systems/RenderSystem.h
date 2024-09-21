@@ -21,7 +21,6 @@ public:
     void update();
     void displayPortal(Entity entity);
     void draw(sf::RenderWindow& window);
-    sf::Vector2f m_mapOffset = {};
 
 private:
     void displayEnemiesTable(const sf::RenderWindow& window);

@@ -1,6 +1,5 @@
-#include "AnimationComponent.h"
+#pragma once
 #include "Coordinator.h"
-#include "TileComponent.h"
 
 extern Coordinator gCoordinator;
 

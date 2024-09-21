@@ -67,7 +67,7 @@ namespace config
     static constexpr float weaponComponentDefaultRemainingDistance{0.0f};
     static constexpr float weaponComponentDefaultRecoilAmount{10.0f};
 
-    static constexpr glm::vec2 startingPosition{325.f, 325.f};
+    // static constexpr glm::vec2 startingPosition{325.f, 325.f};
     static constexpr float spawnOffset{25};
 
     static constexpr float ROTATION_90 = 90.0f;

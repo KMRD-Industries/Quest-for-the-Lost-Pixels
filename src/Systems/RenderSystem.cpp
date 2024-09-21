@@ -11,6 +11,7 @@
 #include "EnemyComponent.h"
 #include "EquippedWeaponComponent.h"
 #include "FloorComponent.h"
+#include "GameUtility.h"
 #include "InventoryComponent.h"
 #include "MapComponent.h"
 #include "PassageComponent.h"
@@ -32,9 +33,7 @@ extern Coordinator gCoordinator;
 
 RenderSystem::RenderSystem() { init(); }
 
-void RenderSystem::init() {}
-
-void RenderSystem::update() {}
+void RenderSystem::init() { portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0); }
 
 void RenderSystem::draw(sf::RenderWindow& window)
 {
@@ -43,53 +42,38 @@ void RenderSystem::draw(sf::RenderWindow& window)
 
     const sf::Vector2<unsigned int> windowSize = window.getSize();
 
-    m_mapOffset.x = 0;
-    m_mapOffset.y = 0;
-
     for (const auto entity : m_entities)
     {
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
         if (renderComponent.layer > 0 && renderComponent.layer < config::maximumNumberOfLayers)
         {
-            m_mapOffset.x = std::max(m_mapOffset.x, transformComponent.position.x);
-            m_mapOffset.y = std::max(m_mapOffset.y, transformComponent.position.y);
+            GameUtility::mapOffset.x = std::max(GameUtility::mapOffset.x, transformComponent.position.x);
+            GameUtility::mapOffset.y = std::max(GameUtility::mapOffset.y, transformComponent.position.y);
+
             renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
 
             setOrigin(entity);
             setSpritePosition(entity);
             displayDamageTaken(entity);
+            displayPortal(entity);
 
-            if (gCoordinator.hasComponent<PassageComponent>(entity))
-            {
-                if (gCoordinator.getComponent<PassageComponent>(entity).activePassage &&
-                    !gCoordinator.hasComponent<PlayerComponent>(entity))
-                {
-                    sf::Vector2f portalPosition = {};
-                    portalPosition.x = renderComponent.sprite.getPosition().x -
-                        renderComponent.sprite.getLocalBounds().width - 9 * config::gameScale;
-                    portalPosition.y = renderComponent.sprite.getPosition().y -
-                        renderComponent.sprite.getLocalBounds().height - 8 * config::gameScale;
-                    portalSprite.setPosition(portalPosition);
-                    portalSprite.setScale(renderComponent.sprite.getScale());
-
-                    tiles[2].push_back(&portalSprite);
-                }
-            }
-
-            tiles[renderComponent.layer].push_back(&renderComponent.sprite);
+            if (tileComponent.tileSet == "SpecialBlocks" && config::debugMode)
+                tiles[renderComponent.layer + 2].push_back(&renderComponent.sprite);
+            else
+                tiles[renderComponent.layer].push_back(&renderComponent.sprite);
         }
     }
 
-    m_mapOffset.x = (static_cast<float>(windowSize.x) - m_mapOffset.x) * 0.5f;
-    m_mapOffset.y = (static_cast<float>(windowSize.y) - m_mapOffset.y) * 0.5f;
+    GameUtility::mapOffset = (static_cast<sf::Vector2f>(windowSize) - GameUtility::mapOffset) * 0.5f;
 
     for (auto& layer : tiles)
     {
-        for (auto& sprite : layer)
+        for (const auto& sprite : layer)
         {
-            sprite->setPosition({sprite->getPosition() + m_mapOffset});
+            sprite->setPosition({sprite->getPosition() + GameUtility::mapOffset});
             window.draw(*sprite);
         }
     }
@@ -203,6 +187,32 @@ void RenderSystem::setSpritePosition(const Entity entity)
         weaponRenderComponent.sprite.setRotation(weaponTransformComponent.rotation);
     }
 }
+
+void RenderSystem::displayPortal(const Entity entity)
+{
+    const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+
+    if (gCoordinator.hasComponent<PassageComponent>(entity))
+    {
+        if (gCoordinator.getComponent<PassageComponent>(entity).activePassage &&
+            !gCoordinator.hasComponent<PlayerComponent>(entity))
+        {
+            sf::Vector2f portalPosition = {};
+            portalPosition.x = renderComponent.sprite.getPosition().x - renderComponent.sprite.getLocalBounds().width -
+                9 * config::gameScale;
+            portalPosition.y = renderComponent.sprite.getPosition().y - renderComponent.sprite.getLocalBounds().height -
+                8 * config::gameScale;
+
+            sf::Sprite portalSpriteCopy = portalSprite;
+
+            portalSpriteCopy.setPosition(portalPosition);
+            portalSpriteCopy.setScale(renderComponent.sprite.getScale());
+
+            tiles[3].push_back(new sf::Sprite(portalSpriteCopy));
+        }
+    }
+}
+
 
 void RenderSystem::displayDamageTaken(const Entity entity)
 {
@@ -337,18 +347,15 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
     Collision cc =
         gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id);
 
-    float xPosCenter = transformComponent.position.x;
-    float yPosCenter = transformComponent.position.y;
-
-    const auto center = GameType::MyVec2{xPosCenter + m_mapOffset.x, yPosCenter + m_mapOffset.y};
+    // const auto center = GameType::MyVec2{xPosCenter + m_mapOffset.x, yPosCenter + m_mapOffset.y};
+    const auto center = GameType::MyVec2{transformComponent.position + GameUtility::mapOffset};
 
     sf::CircleShape centerPoint(5);
     centerPoint.setFillColor(sf::Color::Red);
     centerPoint.setPosition(center.x, center.y);
     window.draw(centerPoint);
 
-    const b2Vec2 newCenter{convertPixelsToMeters(center.x) + m_mapOffset.x,
-                           convertPixelsToMeters(center.y) + m_mapOffset.y};
+    const b2Vec2 newCenter{convertPixelsToMeters(center) + GameUtility::mapOffset};
     const float newRadius = convertPixelsToMeters(config::playerAttackRange);
 
     b2CircleShape circle;
@@ -416,8 +423,11 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
                 convex.setFillColor(sf::Color::Transparent);
                 convex.setOutlineThickness(1.f);
                 convex.setOutlineColor(sf::Color::Green);
-                convex.setPosition(colliderComponent.body->GetPosition().x * config::meterToPixelRatio + m_mapOffset.x,
-                                   colliderComponent.body->GetPosition().y * config::meterToPixelRatio + m_mapOffset.y);
+                convex.setPosition(
+                    colliderComponent.body->GetPosition().x * static_cast<float>(config::meterToPixelRatio) +
+                        GameUtility::mapOffset.x,
+                    colliderComponent.body->GetPosition().y * static_cast<float>(config::meterToPixelRatio) +
+                        GameUtility::mapOffset.y);
 
                 convex.setRotation(colliderComponent.body->GetAngle() * 180 / b2_pi);
                 window.draw(convex);
