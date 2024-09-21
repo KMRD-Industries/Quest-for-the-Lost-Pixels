@@ -25,6 +25,7 @@ public:
 
     std::unordered_map<glm::ivec2, Room> getFloor(bool generate);
     glm::ivec2 getStartingRoom() const { return m_generator.getStartingRoom(); }
+    glm::ivec2 getBossRoom() const { return m_generator.getBossRoom(); }
 
 private:
     std::vector<GameType::MapInfo> getMapInfo();

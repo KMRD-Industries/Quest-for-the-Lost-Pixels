@@ -21,6 +21,13 @@ bool FloorGenerator::isConnected(const glm::ivec2& firstNode, const glm::ivec2& 
 std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generate)
 {
     const auto firstRoom = getStartingRoom();
+    const auto bossRoom = getBossRoom();
+
+    const std::unordered_map<glm::ivec2, config::SpecialRoomTypes> coordRoomToTypes
+    {
+        {firstRoom, config::SpecialRoomTypes::SpawnRoom},
+        {bossRoom, config::SpecialRoomTypes::BossRoom}
+    };
 
     if (!generate)
         return m_floorMap;
@@ -39,24 +46,33 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
         for (const auto& neighbor : nodeNeighbors)
             if (const auto dir = neighbor - nodePosition; m_mapDirOnGraphToEntrance.contains(dir))
                 doorsForRoom.insert(m_mapDirOnGraphToEntrance.at(dir));
-        std::vector<GameType::MapInfo> availableMapsForRoom;
-        const auto haveSameDoorsPlacement = [&doorsForRoom, &nodePosition, &firstRoom](const GameType::MapInfo& mapInfo)
+
+        const auto correctRoomType{[&nodePosition, &coordRoomToTypes](const GameType::MapInfo& mapInfo)
         {
-            bool isFirstRoomCorrect = true;
+            if (!coordRoomToTypes.contains(nodePosition))
+            {
+                for (const auto& specialRoomPrefix : config::prefixesForSpecialRooms | std::views::values)
+                    if (mapInfo.mapID[0] == specialRoomPrefix)
+                        return false;
+                return true;
+            }
+            const auto roomType{coordRoomToTypes.at(nodePosition)};
+            const auto roomPrefix{config::prefixesForSpecialRooms.at(roomType)};
+            return mapInfo.mapID[0] == roomPrefix;
+        }};
+
+        std::vector<GameType::MapInfo> availableMapsForRoomType;
+        std::ranges::copy_if(availableMaps, std::back_inserter(availableMapsForRoomType), correctRoomType);
+
+        const auto haveSameDoorsPlacement = [&doorsForRoom](const GameType::MapInfo& mapInfo)
+        {
             const std::unordered_set<GameType::DoorEntraces> mapDoors(mapInfo.doorsLoc.begin(), mapInfo.doorsLoc.end());
-            if (nodePosition == firstRoom)
-            {
-                if (mapInfo.mapID[0] != 's')
-                    isFirstRoomCorrect = false;
-            }
-            else
-            {
-                if (mapInfo.mapID[0] == 's')
-                    isFirstRoomCorrect = false;
-            }
-            return mapDoors == doorsForRoom && isFirstRoomCorrect;
+            return mapDoors == doorsForRoom;
         };
-        std::ranges::copy_if(availableMaps, std::back_inserter(availableMapsForRoom), haveSameDoorsPlacement);
+
+        std::vector<GameType::MapInfo> availableMapsForRoom;
+        std::ranges::copy_if(availableMapsForRoomType, std::back_inserter(availableMapsForRoom),
+                             haveSameDoorsPlacement);
 
         int minVal = std::numeric_limits<int>::max();
 

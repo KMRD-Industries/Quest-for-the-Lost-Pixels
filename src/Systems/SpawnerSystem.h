@@ -18,5 +18,5 @@ private:
     void incrementSpawnTimer();
     void processSpawner(SpawnerComponent &spawnerComponent, const TransformComponent &spawnerTransformComponent) const;
     bool isReadyToSpawn(int cooldown) const;
-    static void spawnEnemy(const TransformComponent &);
+    static void spawnEnemy(const TransformComponent &,const Enemies::EnemyType enemyType);
 };

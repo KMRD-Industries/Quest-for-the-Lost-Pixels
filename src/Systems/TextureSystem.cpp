@@ -6,11 +6,11 @@
 #include "Coordinator.h"
 #include "Paths.h"
 #include "RenderComponent.h"
-#include "SFML/Graphics/Image.hpp"
 #include "TextureParser.h"
 #include "TileComponent.h"
 #include "Tileset.h"
 #include "TransformComponent.h"
+#include "SFML/Graphics/Image.hpp"
 #include "Utils/Helpers.h"
 
 extern Coordinator gCoordinator;
@@ -65,9 +65,7 @@ long TextureSystem::initializeTileSet(const Tileset& parsedTileSet)
 
     // Load image from assets folder
     if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlas/" + parsedTileSet.image + ".png"))
-    {
         throw std::runtime_error("Cannot open image: " + parsedTileSet.image);
-    }
 
     // Store the starting ID (gid) of the loaded tile set.
     m_mapTextureIndexes.emplace(parsedTileSet.name, gid);
@@ -94,14 +92,10 @@ void TextureSystem::loadTilesIntoSystem(const Tileset& parsedTileSet, long& gid)
 
     // Load all tiles into the system
     for (int row = 0; row < numTilesVertically; ++row)
-    {
         for (int col = 0; col < numTilesHorizontally; ++col)
-        {
             m_mapTextureRects.emplace(gid++,
                                       sf::IntRect(col * parsedTileSet.tilewidth, row * parsedTileSet.tileheight,
                                                   parsedTileSet.tilewidth, parsedTileSet.tileheight));
-        }
-    }
 
     m_lNoTextures = static_cast<long>(m_mapTextureRects.size());
 }
@@ -120,24 +114,16 @@ void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedT
         const long adjusted_id = firstGid + id;
 
         if (!animation.empty())
-        {
             m_mapAnimations.emplace(adjusted_id, animation);
-        }
 
         if (!objects.empty())
         {
             for (const auto& object : objects)
-            {
                 // If an object contains more than one property, it's a weapon placement object.
                 if (object.properties.size() >= 2)
-                {
                     m_mapWeaponPlacements.emplace(adjusted_id, object);
-                }
                 else
-                {
                     m_mapCollisions.emplace(adjusted_id, object);
-                }
-            }
         }
     }
 }
@@ -148,9 +134,7 @@ void TextureSystem::loadTexturesFromFiles()
     const auto sufix = ".json";
 
     for (const auto& texture : m_vecTextureFiles)
-    {
         loadFromFile(prefix + texture + sufix);
-    }
 }
 
 sf::Sprite TextureSystem::getTile(const std::string& tileSetName, const long id) const
@@ -192,6 +176,7 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
         return {};
     }
 }
+
 /**
  * Load textures into tiles.
  */
@@ -203,14 +188,10 @@ void TextureSystem::loadTextures()
 
         // Ignore invalid values
         if (tile_component.id <= 0 || tile_component.id > m_lNoTextures)
-        {
             continue;
-        }
 
         if (std::ranges::find(m_vecTextureFiles, tile_component.tileset) == m_vecTextureFiles.end())
-        {
             continue;
-        }
 
         auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
         auto& render_component = gCoordinator.getComponent<RenderComponent>(entity);
@@ -221,10 +202,7 @@ void TextureSystem::loadTextures()
 
         // Load animations from a system if tile is animated
         if (m_mapAnimations.contains(adjusted_id))
-        {
             animation_component.frames = getAnimations(tile_component.tileset, tile_component.id);
-            animation_component.it = {animation_component.frames.begin(), animation_component.frames.end()};
-        }
 
         if (m_mapCollisions.contains(adjusted_id))
         {
@@ -250,9 +228,7 @@ void TextureSystem::loadTextures()
         }
 
         if (m_mapWeaponPlacements.contains(adjusted_id))
-        {
             collider_component.specialCollision = m_mapWeaponPlacements.at(adjusted_id);
-        }
 
         // Load texture of tile with that id to render component
         render_component.sprite = getTile(tile_component.tileset, tile_component.id);
