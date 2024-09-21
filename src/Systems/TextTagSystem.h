@@ -1,11 +1,11 @@
 #pragma once
 
-#include <unordered_map>
-#include "SFML/Graphics/Font.hpp"
 #include "System.h"
+#include "SFML/Graphics/Font.hpp"
 
 
 struct TextTag;
+
 class TextTagSystem : public System
 {
 public:

@@ -4,11 +4,13 @@
 // https://www.youtube.com/watch?v=QVHwOOrSh3w
 // Remember that in the game we use units in pixels, and the collision and physics system takes meters
 
-#include <SFML/Graphics.hpp>
+#include <imgui.h>
+#include <regex>
 #include <string>
 #include <unordered_map>
 
 #include "Types.h"
+
 namespace config
 {
     static constexpr bool debugMode{true};
@@ -40,8 +42,15 @@ namespace config
 
     static const std::string backgroundColor{"#17205C"};
 
+    inline Entity playerEntity = {};
+    static constexpr int playerAnimation{184};
+
+    static constexpr float maxCharacterHP{100};
     static constexpr float defaultCharacterHP{100};
-    static constexpr float defaultEnemyHP{89};
+    static constexpr float defaultEnemyHP{20};
+    static constexpr float defaultEnemyDMG{10};
+    static constexpr float defaultEnemyKnockbackForce{300.f};
+    static constexpr bool applyKnockback{false};
 
     // Text tag defaults
     static constexpr int textTagDefaultSize{20};
@@ -67,8 +76,17 @@ namespace config
     static constexpr float weaponComponentDefaultRemainingDistance{0.0f};
     static constexpr float weaponComponentDefaultRecoilAmount{10.0f};
 
+    static constexpr glm::vec2 startingPosition{325.f, 325.f};
+
     // static constexpr glm::vec2 startingPosition{325.f, 325.f};
     static constexpr float spawnOffset{25};
+
+    static const std::regex playerRegexTag{"^Player \\d+$"};
+    static constexpr float invulnerabilityTimeAfterDMG{30.f};
+
+    // Healthbar config
+    static constexpr ImVec4 fullHPColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+    static constexpr ImVec4 lowHPColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 
     static constexpr float ROTATION_90 = 90.0f;
     static constexpr float ROTATION_180 = 180.0f;
