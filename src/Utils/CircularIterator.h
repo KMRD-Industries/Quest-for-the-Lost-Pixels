@@ -1,5 +1,7 @@
 #pragma once
 
+//Deprecated makes random error on VS22 in windows 10
+
 #include <cassert>
 
 template <typename Iterator>
@@ -9,7 +11,7 @@ public:
     CircularIterator(Iterator begin, Iterator end)
         : begin_(begin), end_(end), current_(begin)
     {
-        //assert(begin_ != end_ && "CircularIterator cannot be initialized with an empty range");
+        assert(begin_ != end_ && "CircularIterator cannot be initialized with an empty range");
     }
 
     typename Iterator::value_type& operator*()

@@ -22,7 +22,7 @@ void AnimationSystem::updateEntityAnimation(const Entity entity) const
 inline int AnimationSystem::calculateFrameDuration(const AnimationComponent& animation)
 {
     // Ensure that the division and the addition are done in long, then cast to int
-    const long duration = animation.frames[animation.currentFrame].duration;
+    const long duration{animation.frames[animation.currentFrame].duration};
 
     // Explicitly cast to int after all calculations to avoid narrowing conversions
     return static_cast<int>(duration / static_cast<long>(config::oneFrameTime) + 1);
