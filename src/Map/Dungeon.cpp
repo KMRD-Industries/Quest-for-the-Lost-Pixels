@@ -2,6 +2,7 @@
 
 #include <comm.pb.h>
 
+#include "Dungeon.h"
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
 #include "CharacterComponent.h"
@@ -10,7 +11,6 @@
 #include "CollisionSystem.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
-#include "Dungeon.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -18,6 +18,7 @@
 #include "HealthBarSystem.h"
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
+#include "LootSystem.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
@@ -145,6 +146,7 @@ void Dungeon::update()
     gCoordinator.getRegisterSystem<CharacterSystem>()->update();
     gCoordinator.getRegisterSystem<AnimationSystem>()->updateFrames();
     gCoordinator.getRegisterSystem<TextTagSystem>()->update();
+    gCoordinator.getRegisterSystem<LootSystem>()->update();
 
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
 
@@ -181,7 +183,7 @@ void Dungeon::update()
             break;
         }
 
-        multiplayerSystem->update();
+        //multiplayerSystem->update();
     }
 
     m_roomMap.at(m_currentPlayerPos).update();
@@ -315,6 +317,13 @@ void Dungeon::setECS()
     {
     }
 
+    const auto lootSystem = gCoordinator.getRegisterSystem<LootSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<EnemyComponent>());
+        gCoordinator.setSystemSignature<LootSystem>(signature);
+    }
+
     textureSystem->loadTexturesFromFiles();
     textTagSystem->init();
 }
@@ -331,6 +340,7 @@ void Dungeon::makeSimpleFloor()
 
     m_roomMap = m_floorGenerator.getFloor(true);
     m_currentPlayerPos = m_floorGenerator.getStartingRoom();
+    gCoordinator.getRegisterSystem<LootSystem>()->changeRoom(m_currentPlayerPos);
 }
 
 void Dungeon::clearDungeon()
@@ -348,6 +358,9 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 
         const std::uint32_t id = gCoordinator.getRegisterSystem<MultiplayerSystem>()->playerID();
         m_currentPlayerPos += dir;
+        gCoordinator.getRegisterSystem<LootSystem>()->changeRoom(m_currentPlayerPos);
+
+
         const std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
 
         gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
@@ -370,6 +383,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 
 float Dungeon::getSpawnOffset(const float position, const int id)
 {
-    if (id % 2 == 0) return position + id * config::spawnOffset;
+    if (id % 2 == 0)
+        return position + id * config::spawnOffset;
     return position - id * config::spawnOffset;
 }

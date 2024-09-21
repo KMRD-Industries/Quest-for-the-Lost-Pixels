@@ -78,6 +78,8 @@ set(SYSTEMS
         Systems/AnimationSystem.cpp
         Systems/DoorSystem.cpp
         Systems/DoorSystem.h
+        Systems/LootSystem.cpp
+        Systems/LootSystem.h
         Systems/TravellingSystem.cpp
         Systems/TravellingSystem.h
         Systems/EnemySystem.cpp
