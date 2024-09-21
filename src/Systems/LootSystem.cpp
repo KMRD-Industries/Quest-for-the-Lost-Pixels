@@ -30,7 +30,7 @@ void LootSystem::changeRoom(const glm::ivec2& newRoom)
 void LootSystem::spawnLoot()
 {
     gCoordinator.getRegisterSystem<LootSpawnerSystem>()->spawnChest();
-    std::cout << "[INFO] Spawning loot\n";
+    std::cout << "[INFO] Spawning chest\n";
 
     m_lootedRooms[m_currentRoom] = true;
     m_isCurrentRoomLooted = true;

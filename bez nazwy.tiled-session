@@ -176,6 +176,14 @@
                 "y": 120.21778584392015
             }
         },
+        "assets/maps/map_s11.json": {
+            "scale": 3.4437499999999996,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 120.21778584392014,
+                "y": 120.21778584392015
+            }
+        },
         "assets/tileSets/CosmicLilac.json": {
             "scaleInDock": 1
         },

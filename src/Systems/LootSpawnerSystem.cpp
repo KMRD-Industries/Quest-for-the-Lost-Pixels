@@ -1,7 +1,6 @@
 #include "LootSpawnerSystem.h"
 
-#include <TextureSystem.h>
-
+#include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "LootComponent.h"
@@ -32,24 +31,24 @@ void LootSpawnerSystem::processSpawn(const TransformComponent& spawnerTransformC
     const ColliderComponent colliderComponent{
         gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id)};
 
-
     gCoordinator.addComponent(chest, tileComponent);
     gCoordinator.addComponent(chest, spawnerTransformComponent);
     gCoordinator.addComponent(chest, colliderComponent);
     gCoordinator.addComponent(chest, RenderComponent{});
+    gCoordinator.addComponent(chest, AnimationComponent{});
+    gCoordinator.addComponent(chest, CharacterComponent{.hp = 100});
 
-    /*
     CollisionSystem::createBody(
         chest, "Chest", {colliderComponent.collision.width, colliderComponent.collision.height},
-        [&](const GameType::CollisionData& collisionData)
+        [chest](const GameType::CollisionData& collisionData)
         {
             const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
             if (!isCollidingWithPlayer)
                 return;
 
-            std::cout << "collisionHappend\n";
+            gCoordinator.getComponent<CharacterComponent>(chest).hp = -1;
         }, [&](const GameType::CollisionData&)
         {
-        }, false, false,
-        {colliderComponent.collision.x, colliderComponent.collision.y});*/
+        }, true, true,
+        {colliderComponent.collision.x, colliderComponent.collision.y});
 }
