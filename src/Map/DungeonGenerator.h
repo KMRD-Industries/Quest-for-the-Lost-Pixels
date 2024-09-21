@@ -27,6 +27,7 @@ public:
         std::string pathName{};
         int pathLength{};
     };
+
     struct sidePathConfig
     {
         std::string pathName{};
@@ -35,6 +36,7 @@ public:
         int minPathLength{};
         int maxPathLength{};
     };
+
     DungeonGenerator() = default;
     DungeonGenerator(int height, int width);
     void generateMainPath(int pathLength);
@@ -46,6 +48,7 @@ public:
     [[nodiscard]] std::optional<char> getLock(const glm::ivec2& node) const;
     [[nodiscard]] std::optional<char> getKey(const glm::ivec2& node) const;
     [[nodiscard]] glm::ivec2 getStartingRoom() const;
+    [[nodiscard]] glm::ivec2 getBossRoom() const;
     [[nodiscard]] bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
 
 private:
@@ -55,7 +58,7 @@ private:
         const std::unordered_map<glm::ivec2, std::unordered_set<glm::ivec2>>& visitedNeighbors, int minL, int maxL,
         const std::string& endPath = "");
 
-    void validateSidePathConfig(const sidePathConfig& pathConfig) const;
+    sidePathConfig validateAndRepairSidePathConfig(const sidePathConfig& pathConfig);
     void validateMainPath(const PathConfig& pathConfig) const;
     void findPlaceForKey(const glm::ivec2& lock);
 

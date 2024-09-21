@@ -164,42 +164,39 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
         switch (tile_component.id)
         {
         case static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER):
-            {
-                gCoordinator.addComponent(mapEntity, DoorComponent{});
-                auto& doorComponent = gCoordinator.getComponent<DoorComponent>(mapEntity);
+        {
+            gCoordinator.addComponent(mapEntity, DoorComponent{});
+            auto& doorComponent = gCoordinator.getComponent<DoorComponent>(mapEntity);
 
-                if (yPos == 0)
-                {
-                    doorComponent.entrance = GameType::DoorEntraces::NORTH;
-                }
-                else if (yPos == parsedMap.height - 1)
-                {
-                    doorComponent.entrance = GameType::DoorEntraces::SOUTH;
-                }
-                else if (xPos == 0)
-                {
-                    doorComponent.entrance = GameType::DoorEntraces::WEST;
-                }
-                else if (xPos == parsedMap.width - 1)
-                {
-                    doorComponent.entrance = GameType::DoorEntraces::EAST;
-                }
+            if (yPos == 0)
+                doorComponent.entrance = GameType::DoorEntraces::NORTH;
+            else if (yPos == parsedMap.height - 1)
+                doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+            else if (xPos == 0)
+                doorComponent.entrance = GameType::DoorEntraces::WEST;
+            else if (xPos == parsedMap.width - 1)
+                doorComponent.entrance = GameType::DoorEntraces::EAST;
 
-                break;
-            }
+            break;
+        }
 
         case static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK):
-            {
-                if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
-                {
-                    gCoordinator.addComponent(mapEntity, SpawnerComponent{});
-                }
+        {
+            if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
+                gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::MELEE});
 
-                break;
-            }
+            break;
+        }
+        case static_cast<int>(SpecialBlocks::Blocks::BOSSSPAWNERBLOCK):
+        {
+            if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
+                gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::BOSS});
+
+            break;
+        }
         default:
-            {
-            }
+        {
+        }
         }
     }
 }
@@ -210,13 +207,11 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
     long act = 0;
 
     for (const auto& [first, second] : atlas_sets)
-    {
         if (second <= i && second >= act)
         {
             result = first;
             act = second;
         }
-    }
     return result;
 }
 
@@ -227,12 +222,8 @@ void MapSystem::resetMap() const
     std::deque<Entity> entityToRemove;
 
     for (const auto& entity : m_entities)
-    {
         if (!gCoordinator.hasComponent<PlayerComponent>(entity) && !gCoordinator.hasComponent<DoorComponent>(entity))
-        {
             entityToRemove.push_back(entity);
-        }
-    }
 
     while (!entityToRemove.empty())
     {

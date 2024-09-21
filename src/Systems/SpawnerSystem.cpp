@@ -45,7 +45,7 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
 
     // Spawn the enemy and increment the spawn count.
     spawnerComponent.noSpawns++;
-    spawnEnemy(spawnerTransformComponent);
+    spawnEnemy(spawnerTransformComponent, spawnerComponent.enemyType);
 }
 
 void SpawnerSystem::cleanUpUnnecessarySpawners() const
@@ -63,10 +63,13 @@ void SpawnerSystem::cleanUpUnnecessarySpawners() const
 
 bool SpawnerSystem::isReadyToSpawn(const int cooldown) const { return spawnTime % cooldown == 0; }
 
-void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent)
+void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent, const Enemies::EnemyType enemyType)
 {
+    const auto enemyConfig = getRandomEnemyData(enemyType);
+
+
     const Entity newMonsterEntity = gCoordinator.createEntity();
-    const TileComponent tileComponent{18, "AnimSlimes", 4};
+    const TileComponent tileComponent{enemyConfig.textureData};
     const ColliderComponent colliderComponent{
         gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id)};
 
@@ -76,7 +79,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
     gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
-    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = config::defaultEnemyHP});
+    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = enemyConfig.hp});
 
     CollisionSystem::createBody(
         newMonsterEntity, "Enemy", {colliderComponent.collision.width, colliderComponent.collision.height},
@@ -89,7 +92,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;
 
-            playerCharacterComponent.hp -= config::defaultEnemyDMG;
+            playerCharacterComponent.hp -= enemyConfig.damage;
 
             if (!config::applyKnockback)
                 return;
