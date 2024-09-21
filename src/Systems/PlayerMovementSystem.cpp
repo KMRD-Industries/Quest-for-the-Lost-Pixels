@@ -41,16 +41,10 @@ void PlayerMovementSystem::handleMovement()
         dir.y += 1;
 
     if (inputHandler->isHeld(InputType::MoveRight)) // Move Right
-    {
-        flip = false;
         dir.x += 1;
-    }
 
     if (inputHandler->isHeld(InputType::MoveLeft)) // Move Left
-    {
-        flip = true;
         dir.x -= 1;
-    }
 
     for (const auto entity : m_entities)
     {
@@ -60,8 +54,7 @@ void PlayerMovementSystem::handleMovement()
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
 
-        if (!gCoordinator.hasComponent<EquippedWeaponComponent>(entity))
-            continue;
+        if (!gCoordinator.hasComponent<EquippedWeaponComponent>(entity)) continue;
 
         const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
         auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
@@ -75,8 +68,7 @@ void PlayerMovementSystem::handleAttack() const
     const auto inputHandler{InputHandler::getInstance()};
     for (const auto& entity : m_entities)
     {
-        if (!inputHandler->isPressed(InputType::Attack))
-            continue;
+        if (!inputHandler->isPressed(InputType::Attack)) continue;
 
         const Entity fightAction = gCoordinator.createEntity();
         gCoordinator.addComponent(fightAction, FightActionEvent{.entity = entity});

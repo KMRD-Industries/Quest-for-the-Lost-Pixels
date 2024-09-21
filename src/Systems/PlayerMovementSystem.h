@@ -15,6 +15,5 @@ public:
 private:
     void handleMovement();
     void handleAttack() const;
-    bool flip = false;
     InputHandler* inputHandler = nullptr;
 };

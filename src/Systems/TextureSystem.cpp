@@ -153,7 +153,7 @@ void TextureSystem::loadTexturesFromFiles()
     const auto prefix = std::string(ASSET_PATH) + "/tileSets/";
     const auto sufix = ".json";
 
-    for (const auto& texture : m_vecTextureFiles)
+    for (const auto& texture : m_setTextureFiles)
     {
         loadFromFile(prefix + texture + sufix);
     }
@@ -221,31 +221,33 @@ void TextureSystem::loadTextures()
         auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-        if (tileComponent.id < 0 || tileComponent.id > m_lNoTextures)  // Ignore invalid values
+        if (tileComponent.id < 0 || tileComponent.id > m_lNoTextures) // Ignore invalid values
         {
             continue;
         }
 
-        if (std::ranges::find(m_vecTextureFiles, tileComponent.tileSet) == m_vecTextureFiles.end())
+        if (m_setTextureFiles.find(tileComponent.tileSet) == m_setTextureFiles.end())
         {
             continue;
         }
 
         // Adjust tile index
         long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
+        auto animationsIter = m_mapAnimations.find(adjusted_id);
+        auto collisionsIter = m_mapCollisions.find(adjusted_id);
+        auto weaponPlacementsIter = m_mapWeaponPlacements.find(adjusted_id);
 
         // Load animations from a system if tile is animated
-        if (m_mapAnimations.contains(adjusted_id))
+        if (animationsIter != m_mapAnimations.end())
         {
             if (!gCoordinator.hasComponent<AnimationComponent>(entity))
                 gCoordinator.addComponent(entity, AnimationComponent{});
 
             auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
             animation_component.frames = getAnimations(tileComponent.tileSet, tileComponent.id);
-            animation_component.it = {animation_component.frames.begin(), animation_component.frames.end()};
         }
 
-        if (m_mapCollisions.contains(adjusted_id))
+        if (collisionsIter != m_mapCollisions.end())
         {
             if (!gCoordinator.hasComponent<ColliderComponent>(entity))
                 gCoordinator.addComponent(entity, ColliderComponent{});
@@ -256,22 +258,25 @@ void TextureSystem::loadTextures()
 
             if (colliderComponent.body != nullptr && colliderComponent.collision != cc)
             {
-                b2Vec2 offset = {static_cast<float>(cc.x - colliderComponent.collision.x),
-                                 static_cast<float>(cc.y - colliderComponent.collision.y)};
+                if (cc.x != colliderComponent.collision.x || cc.y != colliderComponent.collision.y)
+                {
+                    b2Vec2 offset = {static_cast<float>(cc.x - colliderComponent.collision.x),
+                                     static_cast<float>(cc.y - colliderComponent.collision.y)};
 
-                offset.x = convertPixelsToMeters(offset.x * config::gameScale);
-                offset.y = convertPixelsToMeters(-offset.y * config::gameScale);
+                    offset.x = convertPixelsToMeters(offset.x * config::gameScale);
+                    offset.y = convertPixelsToMeters(-offset.y * config::gameScale);
 
-                colliderComponent.body->SetTransform(colliderComponent.body->GetPosition() + offset,0 );
+                    colliderComponent.body->SetTransform(colliderComponent.body->GetPosition() + offset, 0);
 
-                transformComponent.position.x += convertMetersToPixel(offset.x);
-                transformComponent.position.y += convertMetersToPixel(offset.y);
+                    transformComponent.position.x += convertMetersToPixel(offset.x);
+                    transformComponent.position.y += convertMetersToPixel(offset.y);
+                }
             }
 
             colliderComponent.collision = cc;
         }
 
-        if (m_mapWeaponPlacements.contains(adjusted_id))
+        if (weaponPlacementsIter != m_mapWeaponPlacements.end())
         {
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.specialCollision = m_mapWeaponPlacements.at(adjusted_id);

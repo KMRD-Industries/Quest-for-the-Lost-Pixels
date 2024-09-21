@@ -11,9 +11,8 @@ public:
     void update();
 
 private:
-    void updateWeaponAngle(WeaponComponent&, const RenderComponent&);
-    void updateStartingAngle(WeaponComponent&, const RenderComponent&);
-    void rotateForward(WeaponComponent&);
-    void rotateBackward(WeaponComponent&, const RenderComponent&);
-    void setAngle(WeaponComponent&, const RenderComponent&);
+    void updateWeaponAngle(Entity);
+    void updateStartingAngle(Entity);
+    void setAngle(Entity);
+    void rotateWeapon(Entity, bool);
 };

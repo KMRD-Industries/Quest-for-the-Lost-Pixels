@@ -1,20 +1,23 @@
 #include "EnemySystem.h"
 #include <random>
-
+#include <stdint.h>
 #include "ColliderComponent.h"
 #include "Config.h"
+#include "Coordinator.h"
 #include "EnemyComponent.h"
 #include "Physics.h"
-#include "RenderComponent.h"
-#include "TileComponent.h"
 #include "TransformComponent.h"
+
+EnemySystem::EnemySystem() { init(); }
+
+void EnemySystem::init()
+{
+    gen.seed(rd()); // Seed the generator
+    dis = std::uniform_int_distribution(-1, 1); // Range between -1 and 1
+}
 
 void EnemySystem::update()
 {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution dis(-1, 1); // Uniform distribution between -1 and 1
-
     for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TransformComponent>(entity))

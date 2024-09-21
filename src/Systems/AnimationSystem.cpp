@@ -15,14 +15,15 @@ void AnimationSystem::update()
 
         if (!animationComponent.frames.empty())
         {
-            if (animationComponent.timeUntilNextFrame--; animationComponent.timeUntilNextFrame <= 0)
+            if (--animationComponent.timeUntilNextFrame <= 0)
             {
-                ++animationComponent.it;
-                animationTileComponent.id = animationComponent.it->tileID;
+                ++animationComponent.currentFrame %= animationComponent.frames.size();
 
-                const long duration = animationComponent.it->duration;
+                animationTileComponent.id = animationComponent.frames[animationComponent.currentFrame].tileID;
                 animationComponent.timeUntilNextFrame =
-                    static_cast<int>(duration / static_cast<long>(config::oneFrameTime) + 1);
+                    static_cast<int>(animationComponent.frames[animationComponent.currentFrame].duration /
+                                         static_cast<long>(config::oneFrameTime) +
+                                     1);
             }
         }
     }
