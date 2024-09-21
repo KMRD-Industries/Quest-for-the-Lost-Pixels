@@ -86,7 +86,7 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
-    //gCoordinator.addComponent(m_entities[m_id], TextTagComponent{});
+    // gCoordinator.addComponent(m_entities[m_id], TextTagComponent{});
     gCoordinator.addComponent(m_entities[m_id], EquippedWeaponComponent{});
     gCoordinator.addComponent(
         m_entities[m_id],
@@ -213,9 +213,9 @@ void Dungeon::createRemotePlayer(uint32_t id)
     gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = config::defaultCharacterHP});
     gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
     gCoordinator.addComponent(m_entities[id], ColliderComponent{});
-    //gCoordinator.addComponent(m_entities[m_id], TextTagComponent{});
-    // gCoordinator.addComponent(m_entities[id], InventoryComponent{});
-    // gCoordinator.addComponent(m_entities[id], EquippedWeaponComponent{});
+    // gCoordinator.addComponent(m_entities[m_id], TextTagComponent{});
+    //  gCoordinator.addComponent(m_entities[id], InventoryComponent{});
+    //  gCoordinator.addComponent(m_entities[id], EquippedWeaponComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;

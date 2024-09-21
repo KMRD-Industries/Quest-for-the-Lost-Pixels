@@ -161,7 +161,8 @@ void MultiplayerSystem::update()
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
 
 
-    sf::Vector3<float> next = {transformComponent.position.x, transformComponent.position.y, transformComponent.scale.x};
+    sf::Vector3<float> next = {transformComponent.position.x, transformComponent.position.y,
+                               transformComponent.scale.x};
     if (m_last_sent == next) return;
 
     m_last_sent = next;
