@@ -25,6 +25,7 @@
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
 #include "ItemAnimationComponent.h"
+#include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "ItemSpawnerSystem.h"
 #include "LootComponent.h"
@@ -47,7 +48,6 @@
 #include "TravellingSystem.h"
 #include "WeaponComponent.h"
 #include "WeaponsSystem.h"
-#include "ItemAnimationComponent.h"
 
 extern Coordinator Coordinator;
 
@@ -149,7 +149,8 @@ void Dungeon::init()
     makeSimpleFloor();
 
     m_roomMap.at(m_currentPlayerPos).init();
-    if (multiplayerSystem->isConnected()) multiplayerSystem->setRoom(m_currentPlayerPos);
+    if (multiplayerSystem->isConnected())
+        multiplayerSystem->setRoom(m_currentPlayerPos);
 
     m_players.insert(m_id);
 
@@ -203,7 +204,7 @@ void Dungeon::update(const float deltaTime)
             break;
         }
 
-        //multiplayerSystem->update();
+        multiplayerSystem->update();
     }
 
     m_roomMap.at(m_currentPlayerPos).update();
@@ -234,8 +235,12 @@ void Dungeon::createRemotePlayer(uint32_t id)
     gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        m_entities[id], tag, {cc.width, cc.height}, [&](const GameType::CollisionData& entityT) {},
-        [&](const GameType::CollisionData& entityT) {}, false, false, {cc.x, cc.y});
+        m_entities[id], tag, {cc.width, cc.height}, [&](const GameType::CollisionData& entityT)
+        {
+        },
+        [&](const GameType::CollisionData& entityT)
+        {
+        }, false, false, {cc.x, cc.y});
 
     multiplayerSystem->entityConnected(id, m_entities[id]);
 }
@@ -472,7 +477,8 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 
 
         auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
-        if (multiplayerSystem->isConnected()) multiplayerSystem->roomChanged(m_currentPlayerPos);
+        if (multiplayerSystem->isConnected())
+            multiplayerSystem->roomChanged(m_currentPlayerPos);
     }
 }
 
