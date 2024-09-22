@@ -115,7 +115,7 @@ void PlayerMovementSystem::handleAttack() const
             gCoordinator.addComponent(tag, TransformComponent{secondPlayertransformComponent});
 
             characterComponent.attacked = true;
-            characterComponent.hp -= config::playerAttackDamage;
+            characterComponent.hp -= gCoordinator.getComponent<CharacterComponent>(entity).damage;
 
             const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(entity).body->GetPosition();
             const b2Vec2& targetPos = colliderComponent.body->GetPosition();

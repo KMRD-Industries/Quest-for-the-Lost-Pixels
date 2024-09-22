@@ -15,7 +15,7 @@
 
 static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& enemyType)
 {
-    std::mt19937 gen{};
+    static std::mt19937 gen{std::random_device{}()};
 
     auto enemyConfig = config::enemyData.equal_range(enemyType);
     std::vector<config::EnemyConfig> enemiesConfig;
@@ -36,7 +36,7 @@ static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& e
 
 static inline config::ItemConfig getRandomItemData()
 {
-    std::mt19937 gen{};
+    static std::mt19937 gen{std::random_device{}()};
 
     std::uniform_int_distribution<int> distrib(0, config::itemsData.size() - 1);
     const auto randomIndex{distrib(gen)};

@@ -10,7 +10,7 @@
 
 extern Coordinator gCoordinator;
 
-class LootSystem : public System
+class RoomListenerSystem : public System
 {
 public:
     void update();

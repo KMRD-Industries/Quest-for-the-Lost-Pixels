@@ -1,10 +1,10 @@
 {
-    "activeFile": "assets/tileSets/Items.json",
+    "activeFile": "assets/tileSets/AnimSlimes.json",
     "expandedProjectPaths": [
-        "build",
-        "assets",
         "assets/tileSets",
-        "."
+        "build",
+        ".",
+        "assets"
     ],
     "file.lastUsedOpenFilter": "Wszystkie pliki (*)",
     "fileStates": {
@@ -184,6 +184,10 @@
                 "y": 120.21778584392015
             }
         },
+        "assets/tileSets/AnimSlimes.json": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "assets/tileSets/CosmicLilac.json": {
             "scaleInDock": 1
         },
@@ -202,13 +206,15 @@
     },
     "openFiles": [
         "assets/tileSets/Weapons.json",
-        "assets/tileSets/Items.json"
+        "assets/tileSets/Items.json",
+        "assets/tileSets/AnimSlimes.json"
     ],
     "project": "bez nazwy.tiled-project",
     "recentFiles": [
-        "assets/maps/map_1.json",
         "assets/tileSets/Weapons.json",
         "assets/tileSets/Items.json",
+        "assets/tileSets/AnimSlimes.json",
+        "assets/maps/map_1.json",
         "assets/tileSets/SpecialBlocks.json"
     ]
 }

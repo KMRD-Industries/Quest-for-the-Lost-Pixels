@@ -1,10 +1,10 @@
-#include "LootSystem.h"
+#include "RoomListenerSystem.h"
 
 #include <iostream>
 
-#include "LootSpawnerSystem.h"
+#include "ChestSpawnerSystem.h"
 
-void LootSystem::update()
+void RoomListenerSystem::update()
 {
     if (m_isCurrentRoomLooted)
         return;
@@ -14,7 +14,7 @@ void LootSystem::update()
         spawnLoot();
 }
 
-void LootSystem::changeRoom(const glm::ivec2& newRoom)
+void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)
 {
     if (m_lootedRooms.contains(newRoom))
         m_isCurrentRoomLooted = m_lootedRooms.at(newRoom);
@@ -27,9 +27,9 @@ void LootSystem::changeRoom(const glm::ivec2& newRoom)
     m_toLoot = false;
 }
 
-void LootSystem::spawnLoot()
+void RoomListenerSystem::spawnLoot()
 {
-    gCoordinator.getRegisterSystem<LootSpawnerSystem>()->spawnChest();
+    gCoordinator.getRegisterSystem<ChestSpawnerSystem>()->spawnChest();
     std::cout << "[INFO] Spawning chest\n";
 
     m_lootedRooms[m_currentRoom] = true;

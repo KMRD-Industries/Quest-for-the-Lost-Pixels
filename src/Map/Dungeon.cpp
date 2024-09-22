@@ -7,6 +7,9 @@
 #include "AnimationSystem.h"
 #include "CharacterComponent.h"
 #include "CharacterSystem.h"
+#include "ChestComponent.h"
+#include "ChestSpawnerSystem.h"
+#include "ChestSystem.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "DoorComponent.h"
@@ -18,15 +21,17 @@
 #include "HealthBarSystem.h"
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
+#include "ItemAnimationComponent.h"
+#include "ItemComponent.h"
+#include "ItemSpawnerSystem.h"
 #include "LootComponent.h"
-#include "LootSpawnerSystem.h"
-#include "LootSystem.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
+#include "RoomListenerSystem.h"
 #include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
 #include "TextTagComponent.h"
@@ -38,6 +43,8 @@
 #include "TravellingSystem.h"
 #include "WeaponComponent.h"
 #include "WeaponsSystem.h"
+
+struct ItemAnimationComponent;
 
 void Dungeon::init()
 {
@@ -69,7 +76,9 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], TileComponent{config::playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[m_id], RenderComponent{});
     gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[m_id], CharacterComponent{.hp = config::defaultCharacterHP});
+    gCoordinator.addComponent(m_entities[m_id],
+                              CharacterComponent{.hp = config::defaultCharacterHP,
+                                                 .damage = config::playerAttackDamage});
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
@@ -148,8 +157,8 @@ void Dungeon::update(const float deltaTime)
     gCoordinator.getRegisterSystem<CharacterSystem>()->update();
     gCoordinator.getRegisterSystem<AnimationSystem>()->updateFrames();
     gCoordinator.getRegisterSystem<TextTagSystem>()->update();
-    gCoordinator.getRegisterSystem<LootSystem>()->update();
-    gCoordinator.getRegisterSystem<LootSpawnerSystem>()->updateAnimation(deltaTime);
+    gCoordinator.getRegisterSystem<RoomListenerSystem>()->update();
+    gCoordinator.getRegisterSystem<ItemSpawnerSystem>()->updateAnimation(deltaTime);
 
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
 
@@ -208,6 +217,9 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<EquippedWeaponComponent>();
     gCoordinator.registerComponent<TextTagComponent>();
     gCoordinator.registerComponent<LootComponent>();
+    gCoordinator.registerComponent<ItemComponent>();
+    gCoordinator.registerComponent<ItemAnimationComponent>();
+    gCoordinator.registerComponent<ChestComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -290,13 +302,22 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<SpawnerSystem>(signature);
     }
 
-    const auto lootSpawnerSystem = gCoordinator.getRegisterSystem<LootSpawnerSystem>();
+    const auto chestSpawnerSystem = gCoordinator.getRegisterSystem<ChestSpawnerSystem>();
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<TileComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         signature.set(gCoordinator.getComponentType<LootComponent>());
-        gCoordinator.setSystemSignature<LootSpawnerSystem>(signature);
+        gCoordinator.setSystemSignature<ChestSpawnerSystem>(signature);
+    }
+
+    const auto lootSpawnerSystem = gCoordinator.getRegisterSystem<ItemSpawnerSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<ItemAnimationComponent>());
+        signature.set(gCoordinator.getComponentType<ColliderComponent>());
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        gCoordinator.setSystemSignature<ItemSpawnerSystem>(signature);
     }
 
     const auto weaponSystem = gCoordinator.getRegisterSystem<WeaponSystem>();
@@ -330,11 +351,19 @@ void Dungeon::setECS()
     {
     }
 
-    const auto lootSystem = gCoordinator.getRegisterSystem<LootSystem>();
+    const auto roomListenerSystem = gCoordinator.getRegisterSystem<RoomListenerSystem>();
     {
         Signature signature;
         signature.set(gCoordinator.getComponentType<EnemyComponent>());
-        gCoordinator.setSystemSignature<LootSystem>(signature);
+        gCoordinator.setSystemSignature<RoomListenerSystem>(signature);
+    }
+
+    const auto chestSystem = gCoordinator.getRegisterSystem<ChestSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<CharacterComponent>());
+        signature.set(gCoordinator.getComponentType<ChestComponent>());
+        gCoordinator.setSystemSignature<ChestSystem>(signature);
     }
 
     textureSystem->loadTexturesFromFiles();
@@ -355,7 +384,7 @@ void Dungeon::makeSimpleFloor()
 
     m_roomMap = m_floorGenerator.getFloor(true);
     m_currentPlayerPos = m_floorGenerator.getStartingRoom();
-    gCoordinator.getRegisterSystem<LootSystem>()->changeRoom(m_currentPlayerPos);
+    gCoordinator.getRegisterSystem<RoomListenerSystem>()->changeRoom(m_currentPlayerPos);
 }
 
 void Dungeon::clearDungeon()
@@ -363,6 +392,8 @@ void Dungeon::clearDungeon()
     gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
     gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
     gCoordinator.getRegisterSystem<EnemySystem>()->deleteEnemies();
+    gCoordinator.getRegisterSystem<ItemSpawnerSystem>()->deleteItems();
+    gCoordinator.getRegisterSystem<ChestSystem>()->deleteItems();
 }
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)
@@ -373,7 +404,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 
         const std::uint32_t id = gCoordinator.getRegisterSystem<MultiplayerSystem>()->playerID();
         m_currentPlayerPos += dir;
-        gCoordinator.getRegisterSystem<LootSystem>()->changeRoom(m_currentPlayerPos);
+        gCoordinator.getRegisterSystem<RoomListenerSystem>()->changeRoom(m_currentPlayerPos);
 
 
         const std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
