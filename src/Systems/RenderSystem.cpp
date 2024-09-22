@@ -4,6 +4,7 @@
 #include "CollisionSystem.h"
 #include "EnemyComponent.h"
 #include "EquippedWeaponComponent.h"
+#include "MultiplayerComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
@@ -347,8 +348,9 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
             continue;
         };
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<EnemyComponent>(entity) ||
-            gCoordinator.hasComponent<WeaponComponent>(entity))
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
+            gCoordinator.hasComponent<MultiplayerComponent>(entity) ||
+            gCoordinator.hasComponent<EnemyComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
         {
             drawSprite(entity);
         }

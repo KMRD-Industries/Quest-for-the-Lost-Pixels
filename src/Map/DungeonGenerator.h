@@ -3,7 +3,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/hash.hpp"
 
-#include <chrono>
 #include <optional>
 #include <random>
 #include <unordered_map>
@@ -38,7 +37,7 @@ public:
     };
 
     DungeonGenerator() = default;
-    DungeonGenerator(int height, int width);
+    DungeonGenerator(const int height, const int width, const int64_t seed) : m_height(height), m_width(width), gen(seed) {};
     void generateMainPath(int pathLength);
     void generateSidePath(const sidePathConfig& pathConfig);
     void makeLockAndKey();
