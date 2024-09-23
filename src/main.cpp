@@ -1,4 +1,3 @@
-#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
@@ -49,8 +48,7 @@ void handleInput(sf::RenderWindow& window)
             const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
-        if (event.type == sf::Event::Closed)
-            window.close();
+        if (event.type == sf::Event::Closed) window.close();
     }
 }
 
@@ -83,18 +81,22 @@ int main()
     Game game;
     game.init();
 
+    RenderSystem* m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
+    TextTagSystem* m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
+    TextureSystem* m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
+
     while (window.isOpen())
     {
         // Clear the window before drawing
-        window.clear(hexStringToSfmlColor(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor()));
+        window.clear(hexStringToSfmlColor(m_textureSystem->getBackgroundColor()));
         ImGui::SFML::Update(window, deltaClock.restart());
 
         game.update();
         game.handleCollision();
         game.draw();
 
-        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
-        gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
+        m_renderSystem->draw(window);
+        m_textTagSystem->render(window);
 
         ImGui::SFML::Render(window);
         window.display();

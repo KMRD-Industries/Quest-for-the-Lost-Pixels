@@ -119,7 +119,6 @@ set(UTILS
         Utils/MapParser.h
         Utils/Config.h
         Utils/TextureParser.h
-        Utils/CircularIterator.h
         Utils/TextTag.h
         Utils/GameUtility.h
 )

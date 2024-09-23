@@ -3,10 +3,29 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Dungeon.h"
+#include "FightSystem.h"
 #include "FloorGenerator.h"
-#include "Paths.h"
+#include "PlayerMovementSystem.h"
 #include "Room.h"
 #include "Types.h"
+
+#include <TextureSystem.h>
+
+#include "AnimationSystem.h"
+#include "CharacterSystem.h"
+#include "DoorSystem.h"
+#include "EnemySystem.h"
+#include "EquipWeaponSystem.h"
+#include "HealthBarSystem.h"
+#include "InventorySystem.h"
+#include "MapSystem.h"
+#include "MultiplayerSystem.h"
+#include "PassageSystem.h"
+#include "SpawnerSystem.h"
+#include "TextTagSystem.h"
+#include "TravellingSystem.h"
+#include "WeaponsSystem.h"
 
 class Dungeon
 {
@@ -37,4 +56,21 @@ private:
     std::deque<glm::ivec2> m_moveInDungeon;
     float counter;
     bool m_passedBy;
+
+    PlayerMovementSystem* m_playerMovementSystem;
+    MultiplayerSystem* m_multiplayerSystem;
+    CharacterSystem* m_characterSystem;
+    MapSystem* m_mapSystem;
+    DoorSystem* m_doorSystem;
+    PassageSystem* m_passageSystem;
+    TravellingSystem* m_travellingSystem;
+    TextureSystem* m_textureSystem;
+    AnimationSystem* m_animationSystem;
+    EnemySystem* m_enemySystem;
+    SpawnerSystem* m_spawnerSystem;
+    WeaponSystem* m_weaponSystem;
+    TextTagSystem* m_textTagSystem;
+    HealthBarSystem* m_healthBarSystem;
+    EquipWeaponSystem* m_equipWeaponSystem;
+    InventorySystem* m_inventorySystem;
 };

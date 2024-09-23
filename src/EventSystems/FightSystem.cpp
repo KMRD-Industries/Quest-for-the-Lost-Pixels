@@ -46,7 +46,7 @@ void FightSystem::update()
 
         const auto targetInBox = Physics::rayCast(center, point2, eventEntity);
 
-        if (targetInBox.tag == "SecondPlayer")
+        if (targetInBox.tag == "Enemy")
         {
             auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
             const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(targetInBox.entityID);

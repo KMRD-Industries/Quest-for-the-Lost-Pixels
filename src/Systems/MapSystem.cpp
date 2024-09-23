@@ -21,9 +21,7 @@
 
 extern Coordinator gCoordinator;
 
-void MapSystem::init()
-{
-}
+void MapSystem::init() {}
 
 void MapSystem::update() {}
 
@@ -227,6 +225,8 @@ void MapSystem::resetMap() const
             entityToRemove.push_back(entity);
         }
     }
+
+    std::cout << entityToRemove.size() << "\n";
 
     while (!entityToRemove.empty())
     {

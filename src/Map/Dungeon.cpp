@@ -12,6 +12,8 @@
 #include "DoorSystem.h"
 #include "Dungeon.h"
 
+#include <RenderSystem.h>
+
 #include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
@@ -46,18 +48,35 @@ void Dungeon::init()
 {
     m_entities = std::vector<Entity>(MAX_ENTITIES - 1);
     setECS();
+
+    m_playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>().get();
+    m_multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>().get();
+    m_characterSystem = gCoordinator.getRegisterSystem<CharacterSystem>().get();
+    m_mapSystem = gCoordinator.getRegisterSystem<MapSystem>().get();
+    m_doorSystem = gCoordinator.getRegisterSystem<DoorSystem>().get();
+    m_passageSystem = gCoordinator.getRegisterSystem<PassageSystem>().get();
+    m_travellingSystem = gCoordinator.getRegisterSystem<TravellingSystem>().get();
+    m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
+    m_animationSystem = gCoordinator.getRegisterSystem<AnimationSystem>().get();
+    m_enemySystem = gCoordinator.getRegisterSystem<EnemySystem>().get();
+    m_spawnerSystem = gCoordinator.getRegisterSystem<SpawnerSystem>().get();
+    m_weaponSystem = gCoordinator.getRegisterSystem<WeaponSystem>().get();
+    m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
+    m_healthBarSystem = gCoordinator.getRegisterSystem<HealthBarSystem>().get();
+    m_equipWeaponSystem = gCoordinator.getRegisterSystem<EquipWeaponSystem>().get();
+    m_inventorySystem = gCoordinator.getRegisterSystem<InventorySystem>().get();
+
     auto _ = gCoordinator.createEntity(); // To evade Entity with ID == 0;
 
     const Entity player = gCoordinator.createEntity();
     config::playerEntity = player;
     m_id = config::playerEntity;
 
-    const auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
-    multiplayerSystem->setup("127.0.0.1", "9001");
+    m_multiplayerSystem->setup("127.0.0.1", "9001");
 
-    if (multiplayerSystem->isConnected())
+    if (m_multiplayerSystem->isConnected())
     {
-        m_id = multiplayerSystem->registerPlayer(player);
+        m_id = m_multiplayerSystem->registerPlayer(player);
         std::cout << "Connected to server with id: {}" << m_id;
     }
     else
@@ -67,8 +86,8 @@ void Dungeon::init()
     m_roomMap.at(m_currentPlayerPos).init();
 
     const auto mapPath = m_roomMap.at(m_currentPlayerPos).getMap();
-    gCoordinator.getRegisterSystem<MapSystem>()->loadMap(mapPath);
-    gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
+    m_mapSystem->loadMap(mapPath);
+    m_textureSystem->loadTextures();
     gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 
     m_entities[m_id] = config::playerEntity;
@@ -97,7 +116,7 @@ void Dungeon::addPlayerComponents(const Entity player)
 
 void Dungeon::setupPlayerCollision(const Entity player)
 {
-    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
+    Collision cc = m_textureSystem->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(player).collision = cc;
 
     auto onCollisionIn = [&](const GameType::CollisionData& entityT)
@@ -163,32 +182,27 @@ void Dungeon::setupWeaponEntity(const Entity player)
 
 void Dungeon::draw()
 {
-    gCoordinator.getRegisterSystem<HealthBarSystem>()->drawHealthBar();
-    gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
+    m_healthBarSystem->drawHealthBar();
+    m_textureSystem->loadTextures();
     m_roomMap.at(m_currentPlayerPos).draw();
 }
 
 void Dungeon::update()
 {
-    gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
-    gCoordinator.getRegisterSystem<FightSystem>()->update();
-    gCoordinator.getRegisterSystem<WeaponSystem>()->update();
-    gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
-    gCoordinator.getRegisterSystem<EnemySystem>()->update();
-    gCoordinator.getRegisterSystem<TravellingSystem>()->update();
-    gCoordinator.getRegisterSystem<PassageSystem>()->update();
-    gCoordinator.getRegisterSystem<CharacterSystem>()->update();
-    gCoordinator.getRegisterSystem<AnimationSystem>()->update();
-    gCoordinator.getRegisterSystem<TextTagSystem>()->update();
-    gCoordinator.getRegisterSystem<PassageSystem>()->setPassages(m_floorGenerator.getEndingRoom() ==
-                                                                 m_currentPlayerPos);
+    m_playerMovementSystem->update();
+    m_spawnerSystem->update();
+    m_enemySystem->update();
+    m_travellingSystem->update();
+    m_passageSystem->update();
+    m_characterSystem->update();
+    m_weaponSystem->update();
+    m_animationSystem->update();
+    m_textTagSystem->update();
 
-    auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
-
-    if (multiplayerSystem->isConnected())
+    if (m_multiplayerSystem->isConnected())
     {
         constexpr int playerAnimationTile = 243;
-        const auto stateUpdate = multiplayerSystem->pollStateUpdates();
+        const auto stateUpdate = m_multiplayerSystem->pollStateUpdates();
         std::uint32_t id = stateUpdate.id();
         const auto tag = std::format("Player {}", id);
 
@@ -197,7 +211,7 @@ void Dungeon::update()
         case comm::DISCONNECTED:
             {
                 gCoordinator.destroyEntity(m_entities[id]);
-                multiplayerSystem->entityDisconnected(id);
+                m_multiplayerSystem->entityDisconnected(id);
                 break;
             }
         case comm::CONNECTED:
@@ -218,14 +232,14 @@ void Dungeon::update()
                 const auto newEvent = CreateBodyWithCollisionEvent(m_entities[id], tag, {}, {}, {}, false, false, {});
                 gCoordinator.addComponent(entity, newEvent);
 
-                multiplayerSystem->entityConnected(id, m_entities[id]);
+                m_multiplayerSystem->entityConnected(id, m_entities[id]);
                 break;
             }
         default:
             break;
         }
 
-        multiplayerSystem->update();
+        m_multiplayerSystem->update();
     }
 
     m_roomMap.at(m_currentPlayerPos).update();
@@ -372,7 +386,7 @@ void Dungeon::makeStartFloor()
     m_roomMap.emplace(glm::ivec2{0, 0}, room);
     m_currentPlayerPos = {0.f, 0.f};
 
-    gCoordinator.getRegisterSystem<PassageSystem>()->setPassages(true);
+    m_passageSystem->setPassages(true);
 }
 
 void Dungeon::makeSimpleFloor()
@@ -381,8 +395,7 @@ void Dungeon::makeSimpleFloor()
     const int floorID = config::m_mapDungeonLevelToFloorInfo.at(playerFloor);
 
     m_floorGenerator.setFloorID(floorID);
-
-    gCoordinator.getRegisterSystem<TextureSystem>()->modifyColorScheme(playerFloor);
+    m_textureSystem->modifyColorScheme(playerFloor);
 
     m_floorGenerator.generateFloor(5, 6);
     m_floorGenerator.generateMainPath(11);
@@ -394,9 +407,7 @@ void Dungeon::makeSimpleFloor()
 
     m_roomMap = m_floorGenerator.getFloor(true);
     m_currentPlayerPos = m_floorGenerator.getStartingRoom();
-
-    gCoordinator.getRegisterSystem<PassageSystem>()->setPassages(m_floorGenerator.getEndingRoom() ==
-                                                                 m_currentPlayerPos);
+    m_passageSystem->setPassages(m_floorGenerator.getEndingRoom() == m_currentPlayerPos);
 }
 
 void Dungeon::moveDownDungeon()
@@ -405,13 +416,13 @@ void Dungeon::moveDownDungeon()
     const std::string& newMap = m_roomMap.at(m_currentPlayerPos).getMap();
     const auto& pos = GameUtility::startingPosition;
 
-    gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
-    gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
+    m_doorSystem->clearDoors();
+    m_spawnerSystem->clearSpawners();
     gCoordinator.getRegisterSystem<EnemySystem>()->deleteEnemies();
-    gCoordinator.getRegisterSystem<PassageSystem>()->setPassages(false);
+    m_passageSystem->setPassages(false);
 
-    gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
-    gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
+    m_mapSystem->loadMap(newMap);
+    m_textureSystem->loadTextures();
     gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 
     gCoordinator.getComponent<TransformComponent>(m_entities[config::playerEntity]).position = {pos.x, pos.y};
@@ -427,8 +438,8 @@ void Dungeon::moveDownDungeon()
 
 void Dungeon::clearDungeon()
 {
-    gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
-    gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
+    m_doorSystem->clearDoors();
+    m_spawnerSystem->clearSpawners();
     gCoordinator.getRegisterSystem<EnemySystem>()->deleteEnemies();
 }
 
@@ -438,22 +449,21 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
     {
         clearDungeon();
 
-        const std::uint32_t id = gCoordinator.getRegisterSystem<MultiplayerSystem>()->playerID();
+        const std::uint32_t id = m_multiplayerSystem->playerID();
         m_currentPlayerPos += dir;
         const std::string newMap = m_roomMap.at(m_currentPlayerPos).getMap();
 
-        gCoordinator.getRegisterSystem<DoorSystem>()->clearDoors();
-        gCoordinator.getRegisterSystem<SpawnerSystem>()->clearSpawners();
+        m_doorSystem->clearDoors();
+        m_spawnerSystem->clearSpawners();
         gCoordinator.getRegisterSystem<EnemySystem>()->deleteEnemies();
-        gCoordinator.getRegisterSystem<MapSystem>()->loadMap(newMap);
-        gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
-        gCoordinator.getRegisterSystem<PassageSystem>()->setPassages(m_currentPlayerPos ==
-                                                                     m_floorGenerator.getEndingRoom());
+        m_mapSystem->loadMap(newMap);
+        m_textureSystem->loadTextures();
+        m_passageSystem->setPassages(m_currentPlayerPos == m_floorGenerator.getEndingRoom());
         gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 
         const auto newDoor = dir * -1;
         const auto doorType = GameType::geoToMapDoors.at(newDoor);
-        const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
+        const auto position = m_doorSystem->getDoorPosition(doorType);
         const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
 
         const sf::Vector2f newPosition = {position.x + offset.x, position.y + offset.y};

@@ -2,7 +2,6 @@
 
 #include <vector>
 #include "AnimationFrame.h"
-#include "CircularIterator.h"
 #include "Helpers.h"
 
 struct AnimationComponent
