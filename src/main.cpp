@@ -85,12 +85,13 @@ int main()
 
     while (window.isOpen())
     {
+        sf::Time deltaTime = deltaClock.restart();
         // Clear the window before drawing
         window.clear(customColor);
-        ImGui::SFML::Update(window, deltaClock.restart());
+        ImGui::SFML::Update(window, deltaTime);
 
         game.handleCollision();
-        game.update();
+        game.update(deltaTime.asSeconds());
         game.draw();
 
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);

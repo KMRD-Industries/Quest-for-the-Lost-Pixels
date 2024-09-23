@@ -106,7 +106,23 @@ namespace config
 
     const std::unordered_multimap<Enemies::EnemyType, EnemyConfig> enemyData
     {
+        {Enemies::EnemyType::MELEE,
+         {.name = "GreenSlime", .hp = 30.f, .damage = 10.f, .textureData{36, "AnimSlimes", 4}}},
         {Enemies::EnemyType::MELEE, {.name = "Slime", .hp = 20.f, .damage = 5.f, .textureData{18, "AnimSlimes", 4}}},
         {Enemies::EnemyType::BOSS, {.name = "Boss", .hp = 200.f, .damage = 30.f, .textureData{54, "AnimSlimes", 4}}},
+    };
+
+    struct ItemConfig
+    {
+        const std::string name{};
+        const float value{};
+        const Items::Behaviours behaviour{};
+        const TileComponent textureData{};
+    };
+
+    const std::vector<ItemConfig> itemsData
+    {
+        {"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
+        {"DMGPotion", 2.f, Items::Behaviours::DMGUP, {693, "Items", 4}}
     };
 } // namespace config

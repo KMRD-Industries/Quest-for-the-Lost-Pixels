@@ -13,8 +13,8 @@
 
 class TextureSystem : public System
 {
-    std::vector<std::string> m_vecTextureFiles{"CosmicLilac",   "Decorative", "DungeonWalls", "Jungle", "Graveyard",
-                                               "SpecialBlocks", "AnimSlimes", "Characters",   "Weapons"};
+    const std::vector<std::string> m_vecTextureFiles{"Items","CosmicLilac",   "Decorative", "DungeonWalls", "Jungle", "Graveyard",
+                                               "SpecialBlocks", "AnimSlimes", "Characters","Weapons"};
     std::unordered_map<std::string, sf::Texture> m_mapTextures;
     std::unordered_map<long, sf::IntRect> m_mapTextureRects;
     std::unordered_map<std::string, long> m_mapTextureIndexes;

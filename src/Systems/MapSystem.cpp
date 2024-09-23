@@ -9,6 +9,7 @@
 #include "Coordinator.h"
 #include "DoorComponent.h"
 #include "EnemySystem.h"
+#include "LootComponent.h"
 #include "MapComponent.h"
 #include "MapParser.h"
 #include "MultiplayerComponent.h"
@@ -193,8 +194,15 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
                 if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
                     gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::BOSS});
 
-                break;
-            }
+            break;
+        }
+        case static_cast<int>(SpecialBlocks::Blocks::CHESTSPAWNERBLOCK):
+        {
+            if (!gCoordinator.hasComponent<LootComponent>(mapEntity))
+                gCoordinator.addComponent(mapEntity, LootComponent{});
+
+            break;
+        }
         default:
             {
             }

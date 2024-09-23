@@ -37,6 +37,10 @@ set(COMPONENTS
         Components/TransformComponent.h
         Components/TileComponent.h
         Components/MapComponent.h
+        Components/ItemComponent.h
+        Components/ItemAnimationComponent.h
+        Components/LootComponent.h
+        Components/ChestComponent.h
         Components/AnimationComponent.h
         Components/AnimationFrame.h
         Components/DoorComponent.h
@@ -73,12 +77,20 @@ set(SYSTEMS
         Systems/CollisionSystem.h
         Systems/MapSystem.cpp
         Systems/MapSystem.h
+        Systems/ItemSpawnerSystem.cpp
+        Systems/ItemSpawnerSystem.h
+        Systems/ChestSystem.cpp
+        Systems/ChestSystem.h
         Systems/HealthBarSystem.cpp
         Systems/HealthBarSystem.h
         Systems/TextureSystem.cpp
         Systems/AnimationSystem.cpp
         Systems/DoorSystem.cpp
         Systems/DoorSystem.h
+        Systems/ChestSpawnerSystem.cpp
+        Systems/ChestSpawnerSystem.h
+        Systems/RoomListenerSystem.cpp
+        Systems/RoomListenerSystem.h
         Systems/TravellingSystem.cpp
         Systems/TravellingSystem.h
         Systems/EnemySystem.cpp

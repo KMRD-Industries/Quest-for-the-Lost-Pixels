@@ -14,9 +14,19 @@ namespace SpecialBlocks
         DOORSCOLLIDER = 0,
         STATICWALLCOLLIDER = 1,
         SPAWNERBLOCK = 2,
-        BOSSSPAWNERBLOCK = 3
+        BOSSSPAWNERBLOCK = 3,
+        CHESTSPAWNERBLOCK = 4
     };
 } // namespace SpecialBlocks
+
+namespace Items
+{
+    enum class Behaviours : int
+    {
+        HEAL = 0,
+        DMGUP = 1
+    };
+}
 
 namespace Enemies
 {
