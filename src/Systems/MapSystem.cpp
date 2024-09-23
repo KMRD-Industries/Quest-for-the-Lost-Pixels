@@ -12,6 +12,7 @@
 #include "MapComponent.h"
 #include "MapParser.h"
 #include "PassageComponent.h"
+#include "MultiplayerComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
@@ -29,10 +30,12 @@ void MapSystem::update() {}
  * @brief Load room layout from given path of Tiled Json map format
  * @param path The path to JSON formatted Tiled map
  */
-void MapSystem::loadMap(const std::string& path)
+void MapSystem::loadMap(const std::string& path) const
 {
-    resetMap(); // Remove old room entities before creating new ones
+    // Remove old room entites before creating new ones
+    resetMap();
 
+    // Iterate over room layers
     for (const Map& parsedMap = parseMap(path); const Layer& layer : parsedMap.layers)
     {
         // Index to retrieve position of Tile. Layer contains all tiles in correct order,
@@ -62,7 +65,7 @@ void MapSystem::loadMap(const std::string& path)
  * @brief tile according to given flag
  * @param flags - First 4 bits of tile description from Tiled Map
  * @param rotation - Tile rotation parameter from TransformComponent
- * @param scale - Tile scale parameter from TransformComponent
+ * @param scale - Tile scale parameter from Transformcomponent
  */
 void MapSystem::doFlips(const std::uint8_t& flags, float& rotation, sf::Vector2f& scale)
 {
@@ -171,12 +174,18 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 
                 break;
             }
+
         case static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK):
             {
                 if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
-                {
-                    gCoordinator.addComponent(mapEntity, SpawnerComponent{});
-                }
+                    gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::MELEE});
+
+                break;
+            }
+        case static_cast<int>(SpecialBlocks::Blocks::BOSSSPAWNERBLOCK):
+            {
+                if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
+                    gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::BOSS});
 
                 break;
             }
@@ -219,14 +228,13 @@ void MapSystem::resetMap() const
     std::deque<Entity> entityToRemove;
 
     for (const auto& entity : m_entities)
-    {
-        if (!gCoordinator.hasComponent<PlayerComponent>(entity) && !gCoordinator.hasComponent<DoorComponent>(entity))
-        {
+        if (!gCoordinator.hasComponent<PlayerComponent>(entity) &&
+            !gCoordinator.hasComponent<MultiplayerComponent>(entity) &&
+            !gCoordinator.hasComponent<DoorComponent>(entity))
             entityToRemove.push_back(entity);
         }
     }
 
-    std::cout << entityToRemove.size() << "\n";
 
     while (!entityToRemove.empty())
     {

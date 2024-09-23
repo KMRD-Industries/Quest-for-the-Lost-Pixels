@@ -94,6 +94,39 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
 
+void Dungeon::createRemotePlayer(uint32_t id)
+{
+    auto tag = std::format("Player {}", id);
+
+    m_entities[id] = gCoordinator.createEntity();
+
+    gCoordinator.addComponent(m_entities[id],
+                              TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, id),
+                                                              getSpawnOffset(config::startingPosition.y, id)),
+                                                 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
+    gCoordinator.addComponent(m_entities[id], TileComponent{config::playerAnimation, "Characters", 3});
+    gCoordinator.addComponent(m_entities[id], RenderComponent{});
+    gCoordinator.addComponent(m_entities[id], AnimationComponent{});
+    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = config::defaultCharacterHP});
+    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
+    gCoordinator.addComponent(m_entities[id], ColliderComponent{});
+    // gCoordinator.addComponent(m_entities[m_id], TextTagComponent{});
+    //  gCoordinator.addComponent(m_entities[id], InventoryComponent{});
+    //  gCoordinator.addComponent(m_entities[id], EquippedWeaponComponent{});
+
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
+    gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
+
+    const Entity entity = gCoordinator.createEntity();
+    const auto newEvent = CreateBodyWithCollisionEvent(m_entities[id], tag,[&](const GameType::CollisionData& entityT) {},
+        [&](const GameType::CollisionData& entityT) {}, false, false, {cc.x, cc.y});
+
+    gCoordinator.addComponent(entity, newEvent);
+
+
+    multiplayerSystem->entityConnected(id, m_entities[id]);
+}
+
 void Dungeon::setupPlayerCollision(const Entity player)
 {
     Collision cc = m_textureSystem->getCollision("Characters", config::playerAnimation);

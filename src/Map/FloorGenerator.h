@@ -6,8 +6,6 @@
 #include "DungeonGenerator.h"
 #include "GameTypes.h"
 #include "Room.h"
-#include "SFML/Graphics/RectangleShape.hpp"
-#include "SFML/Graphics/Text.hpp"
 
 class FloorGenerator
 {
@@ -19,7 +17,7 @@ class FloorGenerator
 
 public:
     FloorGenerator() = default;
-    void generateFloor(int h, int w);
+    void generateFloor(const int height, const int width, const int64_t seed);
     void generateMainPath(const int mainPathLen) { m_generator.generateMainPath(mainPathLen); }
     void generateSidePath(const DungeonGenerator::sidePathConfig& path) { m_generator.generateSidePath(path); }
     void makeLockAndKey() { m_generator.makeLockAndKey(); }
@@ -31,6 +29,7 @@ public:
     glm::ivec2 getEndingRoom() const { return m_generator.getEndingRoom(); }
     static void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangles,
                                  std::vector<sf::Text>& texts);
+    glm::ivec2 getBossRoom() const { return m_generator.getBossRoom(); }
 
 private:
     std::vector<GameType::MapInfo> getMapInfo() const;

@@ -9,11 +9,15 @@
 #include <string>
 #include <unordered_map>
 
+#include <unordered_map>
+
+#include "GameTypes.h"
+#include "TileComponent.h"
 #include "Types.h"
 
 namespace config
 {
-    static constexpr bool debugMode{true};
+    static constexpr bool debugMode{false};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};
@@ -122,4 +126,31 @@ namespace config
     static const std::unordered_map<long, ColorBalance> m_mapColorScheme{
         {1, {25, 0, 0}}, {2, {0, 25, 0}}, {3, {0, 15, 15}}, {4, {45, 6, 35}}, {5, {15, 62, 35}}};
 
+
+    enum class SpecialRoomTypes
+    {
+        NormalRoom,
+        SpawnRoom,
+        BossRoom
+    };
+
+    struct EnemyConfig
+    {
+        const std::string name{};
+        const float hp{};
+        const float damage{};
+        const TileComponent textureData{};
+    };
+
+    const std::unordered_map<SpecialRoomTypes, char> prefixesForSpecialRooms
+    {
+        {SpecialRoomTypes::SpawnRoom, 's'},
+        {SpecialRoomTypes::BossRoom, 'b'}
+    };
+
+    const std::unordered_multimap<Enemies::EnemyType, EnemyConfig> enemyData
+    {
+        {Enemies::EnemyType::MELEE, {.name = "Slime", .hp = 20.f, .damage = 5.f, .textureData{18, "AnimSlimes", 4}}},
+        {Enemies::EnemyType::BOSS, {.name = "Boss", .hp = 200.f, .damage = 30.f, .textureData{54, "AnimSlimes", 4}}},
+    };
 } // namespace config

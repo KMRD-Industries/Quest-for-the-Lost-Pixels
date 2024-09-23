@@ -1,6 +1,7 @@
 #include "AnimationSystem.h"
 #include "Config.h"
 #include "TileComponent.h"
+#include "TransformComponent.h"
 
 void AnimationSystem::init() { m_frameTime = {}; }
 

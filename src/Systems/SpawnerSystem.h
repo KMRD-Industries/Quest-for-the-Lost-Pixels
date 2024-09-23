@@ -1,10 +1,7 @@
 #pragma once
-#include "ColliderComponent.h"
 #include "Coordinator.h"
-#include "SFML/Graphics/Sprite.hpp"
 #include "SpawnerComponent.h"
 #include "System.h"
-#include "TileComponent.h"
 #include "TransformComponent.h"
 
 extern Coordinator gCoordinator;

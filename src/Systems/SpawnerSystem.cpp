@@ -6,7 +6,6 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
-#include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "RenderComponent.h"
@@ -57,8 +56,14 @@ bool SpawnerSystem::isReadyToSpawn(const int cooldown) { return spawnTime % cool
 
 void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent)
 {
+    const auto enemyConfig = getRandomEnemyData(enemyType);
+
+
     const Entity newMonsterEntity = gCoordinator.createEntity();
     auto [collision, tileComponent] = enemiesDescription.front();
+    const TileComponent tileComponent{enemyConfig.textureData};
+    const ColliderComponent colliderComponent{
+        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id)};
 
     // const TileComponent tileComponent{18, "AnimSlimes", 4};
     // const ColliderComponent colliderComponent{
@@ -71,6 +76,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
     gCoordinator.addComponent(newMonsterEntity, ColliderComponent(collision));
     gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = config::defaultEnemyHP});
+    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = enemyConfig.hp});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
@@ -84,7 +90,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;
 
-            playerCharacterComponent.hp -= config::defaultEnemyDMG;
+            playerCharacterComponent.hp -= enemyConfig.damage;
 
             if (!config::applyKnockback) return;
 
