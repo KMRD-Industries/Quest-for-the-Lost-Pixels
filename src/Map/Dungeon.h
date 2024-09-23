@@ -14,6 +14,7 @@
 
 #include "AnimationSystem.h"
 #include "CharacterSystem.h"
+#include "CollisionSystem.h"
 #include "DoorSystem.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -32,7 +33,7 @@ class Dungeon
 public:
     Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
-    void setupWeaponEntity(Entity player);
+    void setupWeaponEntity(Entity player) const;
     void init();
     void addPlayerComponents(Entity player);
     void setupPlayerCollision(Entity player);
@@ -43,9 +44,10 @@ private:
     void setECS();
     void makeSimpleFloor();
     void moveInDungeon(const glm::ivec2& dir);
-    void clearDungeon();
+    void clearDungeon() const;
     void makeStartFloor();
     void moveDownDungeon();
+    void loadMap(const std::string& path) const;
 
     std::string m_asset_path;
     FloorGenerator m_floorGenerator;
@@ -73,4 +75,5 @@ private:
     HealthBarSystem* m_healthBarSystem;
     EquipWeaponSystem* m_equipWeaponSystem;
     InventorySystem* m_inventorySystem;
+    CollisionSystem* m_collisionSystem;
 };

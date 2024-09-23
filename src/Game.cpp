@@ -2,8 +2,6 @@
 
 #include <TextureSystem.h>
 
-#include <imgui.h>
-
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
@@ -57,7 +55,6 @@ void Game::init()
         signature.set(gCoordinator.getComponentType<FightActionEvent>());
         gCoordinator.setSystemSignature<FightSystem>(signature);
     }
-
 
     m_collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>().get();
     m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();

@@ -4,8 +4,11 @@
 #include <string>
 
 #include "AnimationSystem.h"
+#include "DoorComponent.h"
+#include "EnemyComponent.h"
 #include "FloorComponent.h"
 #include "GameUtility.h"
+#include "PassageComponent.h"
 #include "Paths.h"
 
 void Room::init() {}
