@@ -37,6 +37,8 @@ public:
     void init();
     void addPlayerComponents(Entity player);
     void setupPlayerCollision(Entity player);
+    void createRemotePlayer(uint32_t);
+
     void draw();
     void update();
 
@@ -48,13 +50,17 @@ private:
     void makeStartFloor();
     void moveDownDungeon();
     void loadMap(const std::string& path) const;
+    float getSpawnOffset(float, int);
+    void changeRoom(const glm::ivec2& dir);
 
     std::string m_asset_path;
     FloorGenerator m_floorGenerator;
     std::unordered_map<glm::ivec2, Room> m_roomMap;
     glm::ivec2 m_currentPlayerPos;
     std::vector<Entity> m_entities;
-    std::uint32_t m_id;
+    uint32_t m_id{};
+    int64_t m_seed{};
+    std::set<uint32_t> m_players{};
     std::deque<glm::ivec2> m_moveInDungeon;
     float counter;
     bool m_passedBy;

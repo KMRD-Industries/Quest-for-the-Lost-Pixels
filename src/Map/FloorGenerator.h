@@ -6,6 +6,8 @@
 #include "DungeonGenerator.h"
 #include "GameTypes.h"
 #include "Room.h"
+#include "SFML/Graphics/Font.hpp"
+#include "SFML/Graphics/RectangleShape.hpp"
 
 class FloorGenerator
 {

@@ -1,3 +1,4 @@
+#pragma once
 #include "AnimationComponent.h"
 #include "Coordinator.h"
 

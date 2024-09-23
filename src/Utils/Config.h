@@ -13,11 +13,12 @@
 
 #include "GameTypes.h"
 #include "TileComponent.h"
+#include "Tileset.h"
 #include "Types.h"
 
 namespace config
 {
-    static constexpr bool debugMode{false};
+    static constexpr bool debugMode{true};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};
@@ -140,17 +141,24 @@ namespace config
         const float hp{};
         const float damage{};
         const TileComponent textureData{};
+        const Collision collisionData{};
     };
 
-    const std::unordered_map<SpecialRoomTypes, char> prefixesForSpecialRooms
-    {
-        {SpecialRoomTypes::SpawnRoom, 's'},
-        {SpecialRoomTypes::BossRoom, 'b'}
-    };
+    const std::unordered_map<SpecialRoomTypes, char> prefixesForSpecialRooms{{SpecialRoomTypes::SpawnRoom, 's'},
+                                                                             {SpecialRoomTypes::BossRoom, 'b'}};
 
-    const std::unordered_multimap<Enemies::EnemyType, EnemyConfig> enemyData
-    {
-        {Enemies::EnemyType::MELEE, {.name = "Slime", .hp = 20.f, .damage = 5.f, .textureData{18, "AnimSlimes", 4}}},
-        {Enemies::EnemyType::BOSS, {.name = "Boss", .hp = 200.f, .damage = 30.f, .textureData{54, "AnimSlimes", 4}}},
+    const std::unordered_multimap<Enemies::EnemyType, EnemyConfig> enemyData{
+        {Enemies::EnemyType::MELEE,
+         {.name = "Slime",
+          .hp = 20.f,
+          .damage = 5.f,
+          .textureData{18, "AnimSlimes", 4},
+          .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
+        {Enemies::EnemyType::BOSS,
+         {.name = "Boss",
+          .hp = 200.f,
+          .damage = 30.f,
+          .textureData{54, "AnimSlimes", 4},
+          .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
     };
 } // namespace config

@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include "AnimationFrame.h"
-#include "Config.h"
 
 struct ObjectProperty
 {
@@ -17,8 +16,8 @@ struct Collision
     int id{};
     double x{};
     double y{};
-    double width{config::tileHeight};
-    double height{config::tileHeight};
+    double width{16};
+    double height{16};
     std::vector<ObjectProperty> properties;
 
     // Equality operator

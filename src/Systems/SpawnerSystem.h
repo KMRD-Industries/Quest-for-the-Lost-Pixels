@@ -18,9 +18,8 @@ public:
 
 private:
     int spawnTime{0};
-    std::vector<std::pair<Collision, TileComponent>> enemiesDescription;
     void incrementSpawnTimer();
     void processSpawner(SpawnerComponent &spawnerComponent, const TransformComponent &spawnerTransformComponent);
     bool isReadyToSpawn(int cooldown);
-    void spawnEnemy(const TransformComponent &);
+    void spawnEnemy(const TransformComponent &, Enemies::EnemyType);
 };

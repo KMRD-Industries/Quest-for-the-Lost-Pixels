@@ -11,8 +11,8 @@
 #include "GameUtility.h"
 #include "MapComponent.h"
 #include "MapParser.h"
-#include "PassageComponent.h"
 #include "MultiplayerComponent.h"
+#include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
@@ -30,7 +30,7 @@ void MapSystem::update() {}
  * @brief Load room layout from given path of Tiled Json map format
  * @param path The path to JSON formatted Tiled map
  */
-void MapSystem::loadMap(const std::string& path) const
+void MapSystem::loadMap(const std::string& path)
 {
     // Remove old room entites before creating new ones
     resetMap();
@@ -232,8 +232,6 @@ void MapSystem::resetMap() const
             !gCoordinator.hasComponent<MultiplayerComponent>(entity) &&
             !gCoordinator.hasComponent<DoorComponent>(entity))
             entityToRemove.push_back(entity);
-        }
-    }
 
 
     while (!entityToRemove.empty())

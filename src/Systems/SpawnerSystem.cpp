@@ -6,6 +6,7 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "RenderComponent.h"
@@ -18,11 +19,7 @@ constexpr int SPAWN_RATE = 3600;
 
 SpawnerSystem::SpawnerSystem() { init(); }
 
-void SpawnerSystem::init()
-{
-    enemiesDescription.push_back(std::make_pair<Collision, TileComponent>(
-        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("AnimSlimes", 18), {18, "AnimSlimes", 4}));
-}
+void SpawnerSystem::init() {}
 
 void SpawnerSystem::update()
 {
@@ -49,39 +46,31 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
 
     // Spawn the enemy and increment the spawn count.
     spawnerComponent.noSpawns++;
-    spawnEnemy(spawnerTransformComponent);
+    spawnEnemy(spawnerTransformComponent, spawnerComponent.enemyType);
 }
 
 bool SpawnerSystem::isReadyToSpawn(const int cooldown) { return spawnTime % cooldown == 0; }
 
-void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent)
+void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent, const Enemies::EnemyType enemyType)
 {
     const auto enemyConfig = getRandomEnemyData(enemyType);
-
-
     const Entity newMonsterEntity = gCoordinator.createEntity();
-    auto [collision, tileComponent] = enemiesDescription.front();
     const TileComponent tileComponent{enemyConfig.textureData};
     const ColliderComponent colliderComponent{
-        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id)};
+        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id)};
 
-    // const TileComponent tileComponent{18, "AnimSlimes", 4};
-    // const ColliderComponent colliderComponent{
-    //     gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileset, tileComponent.id)};
-    //
     gCoordinator.addComponent(newMonsterEntity, tileComponent);
     gCoordinator.addComponent(newMonsterEntity, spawnerTransformComponent);
     gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
     gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
-    gCoordinator.addComponent(newMonsterEntity, ColliderComponent(collision));
-    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = config::defaultEnemyHP});
+    gCoordinator.addComponent(newMonsterEntity, ColliderComponent(enemyConfig.collisionData));
     gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = enemyConfig.hp});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
     const auto newEvent = CreateBodyWithCollisionEvent(
-        newMonsterEntity, "Enemy", {collision.width, collision.height},
+        newMonsterEntity, "Enemy", {enemyConfig.collisionData.width, enemyConfig.collisionData.height},
         [&, newMonsterEntity](const GameType::CollisionData& collisionData)
         {
             const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
@@ -104,7 +93,8 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
             const auto knockbackForce{config::defaultEnemyKnockbackForce * knockbackDirection};
             playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
         },
-        [&](const GameType::CollisionData&) {}, false, false, {collision.x, collision.y});
+        [&](const GameType::CollisionData&) {}, false, false,
+        {enemyConfig.collisionData.x, enemyConfig.collisionData.y});
 
     gCoordinator.addComponent(newEventEntity, newEvent);
 }
