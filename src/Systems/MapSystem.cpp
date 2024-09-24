@@ -193,15 +193,13 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
                 gCoordinator.addComponent(mapEntity, PassageComponent{});
                 break;
             }
-            break;
-        }
         case static_cast<int>(SpecialBlocks::Blocks::CHESTSPAWNERBLOCK):
-        {
-            if (!gCoordinator.hasComponent<LootComponent>(mapEntity))
-                gCoordinator.addComponent(mapEntity, LootComponent{});
+            {
+                if (!gCoordinator.hasComponent<LootComponent>(mapEntity))
+                    gCoordinator.addComponent(mapEntity, LootComponent{});
 
-            break;
-        }
+                break;
+            }
         default:
             {
             }

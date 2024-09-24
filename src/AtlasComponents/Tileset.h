@@ -15,10 +15,10 @@ struct ObjectProperty
 struct Collision
 {
     int id{};
-    double x{};
-    double y{};
-    double width{16};
-    double height{16};
+    float x{};
+    float y{};
+    float width{16};
+    float height{16};
     std::vector<ObjectProperty> properties;
 
     // Equality operator

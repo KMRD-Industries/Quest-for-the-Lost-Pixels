@@ -68,8 +68,8 @@ void CollisionSystem::createMapCollision()
     {
         const Entity newEntity = gCoordinator.createEntity();
         const auto newEvent = CreateBodyWithCollisionEvent(
-            entity, type, size, [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, isStatic,
-            useTexture, offset);
+            entity, type, [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, isStatic,
+            useTexture);
 
         gCoordinator.addComponent(newEntity, newEvent);
     };

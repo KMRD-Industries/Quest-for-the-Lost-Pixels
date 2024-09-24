@@ -51,19 +51,19 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/tileSets\/CosmicLilac.json"
+         "source":"..\/..\/tileSets\/CosmicLilac.json"
         }, 
         {
          "firstgid":105,
-         "source":"..\/tileSets\/Decorative.json"
+         "source":"..\/..\/tileSets\/Decorative.json"
         }, 
         {
          "firstgid":361,
-         "source":"..\/tileSets\/SpecialBlocks.json"
+         "source":"..\/..\/tileSets\/SpecialBlocks.json"
         }, 
         {
          "firstgid":473,
-         "source":"..\/tileSets\/Jungle.json"
+         "source":"..\/..\/tileSets\/Jungle.json"
         }],
  "tilewidth":16,
  "type":"map",

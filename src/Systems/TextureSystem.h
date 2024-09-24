@@ -13,9 +13,9 @@
 
 class TextureSystem : public System
 {
-    std::unordered_set<std::string> m_setTextureFiles{"CosmicLilac", "Decorative",    "DungeonWalls", "Jungle",
-                                                      "Graveyard",   "SpecialBlocks", "AnimSlimes",   "Characters",
-                                                      "Weapons",     "CosmicLegacy",  "Portal"};
+    std::unordered_set<std::string> m_setTextureFiles{"Items",      "CosmicLilac", "Decorative",    "DungeonWalls",
+                                                      "Jungle",     "Graveyard",   "SpecialBlocks", "AnimSlimes",
+                                                      "Characters", "Weapons",     "CosmicLegacy",  "Portal"};
 
     //------------------------------------------
     std::unordered_map<std::string, sf::Texture> m_mapTextures;

@@ -37,11 +37,13 @@ void ObjectCreatorSystem::update()
         {
             xPosition = convertPixelsToMeters(
                 transformComponent.position.x -
-                (spriteBounds.width / 2 - (eventInfo.offset.x + eventInfo.colliderSize.x / 2)) * config::gameScale);
+                (spriteBounds.width / 2.f - (colliderComponent.collision.x + colliderComponent.collision.width / 2.f)) *
+                    config::gameScale);
 
             yPosition = convertPixelsToMeters(
                 transformComponent.position.y -
-                (spriteBounds.height / 2 - (eventInfo.offset.y + eventInfo.colliderSize.y / 2)) * config::gameScale);
+                (spriteBounds.height / 2 - (colliderComponent.collision.y + colliderComponent.collision.height / 2)) *
+                    config::gameScale);
         }
 
         bodyDef.position.Set(xPosition, yPosition);
@@ -59,8 +61,8 @@ void ObjectCreatorSystem::update()
         }
         else
         {
-            boxWidth = convertPixelsToMeters(eventInfo.colliderSize.x * config::gameScale) / 2;
-            boxHeight = convertPixelsToMeters(eventInfo.colliderSize.y * config::gameScale) / 2;
+            boxWidth = convertPixelsToMeters(colliderComponent.collision.width * config::gameScale) / 2;
+            boxHeight = convertPixelsToMeters(colliderComponent.collision.height * config::gameScale) / 2;
         }
 
         boxShape.SetAsBox(boxWidth, boxHeight);

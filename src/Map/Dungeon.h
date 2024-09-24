@@ -14,15 +14,18 @@
 
 #include "AnimationSystem.h"
 #include "CharacterSystem.h"
+#include "ChestSystem.h"
 #include "CollisionSystem.h"
 #include "DoorSystem.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
 #include "HealthBarSystem.h"
 #include "InventorySystem.h"
+#include "ItemSpawnerSystem.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
 #include "PassageSystem.h"
+#include "RoomListenerSystem.h"
 #include "SpawnerSystem.h"
 #include "TextTagSystem.h"
 #include "TravellingSystem.h"
@@ -40,7 +43,7 @@ public:
     void createRemotePlayer(uint32_t);
 
     void draw();
-    void update(float deltaTime);
+    void update(float);
 
 private:
     void setECS();
@@ -82,4 +85,7 @@ private:
     EquipWeaponSystem* m_equipWeaponSystem;
     InventorySystem* m_inventorySystem;
     CollisionSystem* m_collisionSystem;
+    ChestSystem* m_chestSystem;
+    RoomListenerSystem* m_roomListenerSystem;
+    ItemSpawnerSystem* m_itemSpawnerSystem;
 };

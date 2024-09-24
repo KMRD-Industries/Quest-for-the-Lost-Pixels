@@ -70,7 +70,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     const Entity newEventEntity = gCoordinator.createEntity();
 
     const auto newEvent = CreateBodyWithCollisionEvent(
-        newMonsterEntity, "Enemy", {enemyConfig.collisionData.width, enemyConfig.collisionData.height},
+        newMonsterEntity, "Enemy",
         [&, newMonsterEntity](const GameType::CollisionData& collisionData)
         {
             const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
@@ -93,8 +93,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
             const auto knockbackForce{config::defaultEnemyKnockbackForce * knockbackDirection};
             playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
         },
-        [&](const GameType::CollisionData&) {}, false, false,
-        {enemyConfig.collisionData.x, enemyConfig.collisionData.y});
+        [&](const GameType::CollisionData&) {}, false, false);
 
     gCoordinator.addComponent(newEventEntity, newEvent);
 }
@@ -111,7 +110,6 @@ void SpawnerSystem::clearSpawners()
         entityToRemove.pop_front();
     }
 }
-
 
 void SpawnerSystem::cleanUpUnnecessarySpawners()
 {

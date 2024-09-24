@@ -6,6 +6,7 @@
 #include "Coordinator.h"
 #include "EquipWeaponSystem.h"
 #include "EquippedWeaponComponent.h"
+#include "FightActionEvent.h"
 #include "InputHandler.h"
 #include "InventorySystem.h"
 #include "Physics.h"
@@ -43,13 +44,11 @@ void PlayerMovementSystem::handleMovement()
 
     if (inputHandler->isHeld(InputType::MoveRight)) // Move Right
     {
-        flip = false;
         dir.x += 1;
     }
 
     if (inputHandler->isHeld(InputType::MoveLeft)) // Move Left
     {
-        flip = true;
         dir.x -= 1;
     }
 

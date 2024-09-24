@@ -1,6 +1,7 @@
 #pragma once
 #include "Coordinator.h"
 #include "System.h"
+#include "Tileset.h"
 
 struct ColliderComponent;
 
@@ -26,13 +27,17 @@ class ChestSpawnerSystem : public System
 {
 public:
     void spawnChest();
+    ChestSpawnerSystem();
+    void init();
 
 private:
     void clearSpawners() const;
-    void processSpawn(const TransformComponent& spawnerTransformComponent);
-    void handleChestCollision(Entity chest, const TransformComponent& spawnerTransformComponent,
-                              const GameType::CollisionData& collisionData);
-    void spawnPotion(const TransformComponent& spawnerTransformComponent);
+    void processSpawn(const TransformComponent&);
+    void handleChestCollision(Entity chest, const TransformComponent&, const GameType::CollisionData&);
+    void spawnPotion(const TransformComponent&);
 
     std::vector<AnimationData> m_itemsToAnimate;
+
+    Collision m_chestCollision;
+    Collision m_potionCollision;
 };

@@ -45,11 +45,11 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/tileSets\/CosmicLilac.json"
+         "source":"..\/..\/tileSets\/CosmicLilac.json"
         }, 
         {
          "firstgid":105,
-         "source":"..\/tileSets\/SpecialBlocks.json"
+         "source":"..\/..\/tileSets\/SpecialBlocks.json"
         }],
  "tilewidth":16,
  "type":"map",

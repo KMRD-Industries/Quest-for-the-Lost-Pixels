@@ -87,6 +87,11 @@ namespace GameType
         return sf::Vector2f{sfVec.x * myVec.x, sfVec.y * myVec.y};
     }
 
+    inline sf::Vector2f operator+(const sf::Vector2f& sfVec, const glm::vec2& secondVec)
+    {
+        return sf::Vector2f{sfVec.x + secondVec.x, sfVec.y + secondVec.y};
+    }
+
 
     enum class DoorEntraces : int
     {
