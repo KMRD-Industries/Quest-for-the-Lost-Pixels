@@ -4,6 +4,7 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "DoorComponent.h"
+#include "ItemComponent.h"
 #include "MultiplayerSystem.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
@@ -122,6 +123,8 @@ void CollisionSystem::update()
 
         body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
                                  convertPixelsToMeters(transformComponent.velocity.y)});
+
+        transformComponent.velocity = {};
     }
 }
 
@@ -137,16 +140,15 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
         const b2Body* body = colliderComponent.body;
-        if (body == nullptr || transformComponent.velocity == b2Vec2{}) continue;
+        if (body == nullptr) continue;
         if (colliderComponent.tag != "Player 1" && colliderComponent.tag != "SecondPlayer" &&
-            colliderComponent.tag != "Enemy")
+            colliderComponent.tag != "Enemy" && colliderComponent.tag != "Item")
             continue;
 
         const auto position = body->GetPosition();
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
 
         renderComponent.sprite.setPosition(position.x, position.y);
-        transformComponent.velocity = {};
     }
 }
 

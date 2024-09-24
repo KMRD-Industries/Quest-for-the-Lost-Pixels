@@ -17,19 +17,23 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
     for (const auto entity : m_entities)
     {
         auto& animationComponent = gCoordinator.getComponent<ItemAnimationComponent>(entity);
+        const auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (animationComponent.destroy) continue;
-        if (!animationComponent.shouldAnimate)
+        if (animationComponent.shouldAnimate)
         {
             const auto& itemBehaviour = gCoordinator.getComponent<ItemComponent>(entity).behaviour;
-            const auto& itemValue = gCoordinator.getComponent<ItemComponent>(entity).value;
+
+            auto& item = gCoordinator.getComponent<ItemComponent>(entity);
+            auto& itemValue = gCoordinator.getComponent<ItemComponent>(entity).value;
+            item.timestamp = std::chrono::system_clock::now();
 
             const Entity newItemEntity = gCoordinator.createEntity();
 
             const auto newEvent = CreateBodyWithCollisionEvent(
                 entity, "Item", [this, entity, itemBehaviour, itemValue](const GameType::CollisionData& collisionData)
                 { handlePotionCollision(entity, collisionData, itemBehaviour, itemValue); },
-                [&](const GameType::CollisionData&) {}, false, true);
+                [&](const GameType::CollisionData&) {}, false, false);
 
             gCoordinator.addComponent(newItemEntity, newEvent);
 
@@ -60,6 +64,9 @@ void ItemSpawnerSystem::handlePotionCollision(const Entity potion, const GameTyp
 {
     const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
     if (!isCollidingWithPlayer) return;
+
+    const auto& itemComponent = gCoordinator.getComponent<ItemComponent>(potion);
+    if (itemComponent.timestamp + std::chrono::seconds(1) > std::chrono::system_clock::now()) return;
 
     gCoordinator.getComponent<CharacterComponent>(potion).hp = -1;
     switch (behaviour)

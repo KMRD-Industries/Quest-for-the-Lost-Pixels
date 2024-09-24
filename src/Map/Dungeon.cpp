@@ -55,7 +55,6 @@ void Dungeon::init()
 {
     setECS();
     auto _ = gCoordinator.createEntity(); // Ignore Entity with ID = 0
-
     config::playerEntity = gCoordinator.createEntity();
     m_id = 0;
     m_seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -67,12 +66,12 @@ void Dungeon::init()
         m_id = gameState.player_id();
         m_seed = gameState.seed();
 
-        std::println("Connected to server with id: {}", m_id);
+        std::cout << "Connected to server with id: " << m_id << "\n";
 
         for (uint32_t id : gameState.connected_players())
         {
             createRemotePlayer(id);
-            std::println("Connected remote player {}", id);
+            std::cout << "Connected remote player: " << m_id << "\n";
         }
     }
     else
@@ -110,10 +109,9 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
 
-void Dungeon::createRemotePlayer(uint32_t id)
+void Dungeon::createRemotePlayer(const uint32_t id)
 {
-    auto tag = std::format("Player {}", id);
-
+    const auto tag = std::format("Player {}", id);
     m_entities[id] = gCoordinator.createEntity();
 
     gCoordinator.addComponent(m_entities[id],
@@ -143,7 +141,7 @@ void Dungeon::createRemotePlayer(uint32_t id)
 
 void Dungeon::setupPlayerCollision(const Entity player)
 {
-    Collision cc = m_textureSystem->getCollision("Characters", config::playerAnimation);
+    const auto& cc = m_textureSystem->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(player).collision = cc;
 
     auto onCollisionIn = [&](const GameType::CollisionData& entityT)
@@ -194,7 +192,7 @@ void Dungeon::setupWeaponEntity(const Entity player) const
 
     gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19});
     gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
-    gCoordinator.addComponent(weaponEntity, TransformComponent(sf::Vector2f(0.f, 0.f), 0.f, sf::Vector2f(1.f, 1.f)));
+    gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
     gCoordinator.addComponent(weaponEntity, ColliderComponent{});
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
@@ -268,7 +266,7 @@ void Dungeon::changeRoom(const glm::ivec2& room)
 
     for (const auto id : m_players)
     {
-        const sf::Vector2f newPosition = {position.x + offset.x + id, position.y + offset.y + id};
+        const sf::Vector2f newPosition = position + offset + GameType::MyVec2(id, id);
         gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
 
@@ -322,7 +320,7 @@ void Dungeon::moveDownDungeon()
     gCoordinator.getComponent<TransformComponent>(config::playerEntity).position = {pos.x, pos.y};
     gCoordinator.getComponent<TransformComponent>(config::playerEntity).velocity = {};
 
-    b2Vec2 position = gCoordinator.getComponent<ColliderComponent>(config::playerEntity).body->GetPosition();
+    b2Vec2 position{};
     position.x = GameUtility::startingPosition.x * static_cast<float>(config::pixelToMeterRatio);
     position.y = GameUtility::startingPosition.y * static_cast<float>(config::pixelToMeterRatio);
 
@@ -356,6 +354,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         m_textureSystem->loadTextures();
         m_passageSystem->setPassages(m_currentPlayerPos == m_floorGenerator.getEndingRoom());
         m_collisionSystem->createMapCollision();
+        m_roomListenerSystem->changeRoom(m_currentPlayerPos);
 
         const auto newDoor = dir * -1;
         const auto doorType = GameType::geoToMapDoors.at(newDoor);
