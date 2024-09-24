@@ -69,9 +69,9 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
-    const auto newEvent = CreateBodyWithCollisionEvent(
+    auto newEvent = CreateBodyWithCollisionEvent(
         newMonsterEntity, "Enemy",
-        [&, newMonsterEntity](const GameType::CollisionData& collisionData)
+        [&, newMonsterEntity, enemyConfig](const GameType::CollisionData& collisionData)
         {
             const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
             if (!isCollidingWithPlayer) return;

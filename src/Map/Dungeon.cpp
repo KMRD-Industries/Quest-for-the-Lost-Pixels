@@ -143,6 +143,7 @@ void Dungeon::setupPlayerCollision(const Entity player)
 {
     const auto& cc = m_textureSystem->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(player).collision = cc;
+    const std::string tag = std::format("Player {}", m_id);
 
     auto onCollisionIn = [&](const GameType::CollisionData& entityT)
     {
@@ -181,7 +182,7 @@ void Dungeon::setupPlayerCollision(const Entity player)
     };
 
     const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(player, "Player 1", onCollisionIn, onCollisionOut, false, false);
+    const auto newEvent = CreateBodyWithCollisionEvent(player, tag, onCollisionIn, onCollisionOut, false, false);
 
     gCoordinator.addComponent(entity, newEvent);
 }

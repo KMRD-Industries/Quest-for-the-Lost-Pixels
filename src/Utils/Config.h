@@ -18,7 +18,7 @@
 
 namespace config
 {
-    static constexpr bool debugMode{true};
+    static constexpr bool debugMode{false};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};
@@ -167,9 +167,6 @@ namespace config
         const TileComponent textureData{};
     };
 
-    const std::vector<ItemConfig> itemsData
-    {
-        {"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
-        {"DMGPotion", 2.f, Items::Behaviours::DMGUP, {693, "Items", 4}}
-    };
+    const std::vector<ItemConfig> itemsData{{"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
+                                            {"DMGPotion", 2.f, Items::Behaviours::DMGUP, {693, "Items", 4}}};
 } // namespace config

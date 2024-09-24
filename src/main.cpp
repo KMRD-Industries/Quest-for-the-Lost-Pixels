@@ -75,7 +75,7 @@ int main()
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config::frameCycle * config::debugMode ? 100 : 1);
+    window.setFramerateLimit(config::frameCycle * (config::debugMode ? 100 : 1));
 
     sf::Clock deltaClock;
     Game game;
