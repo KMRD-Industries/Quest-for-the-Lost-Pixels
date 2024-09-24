@@ -48,14 +48,10 @@ void PlayerMovementSystem::handleMovement()
         dir.y += 1;
 
     if (inputHandler->isHeld(InputType::MoveRight)) // Move Right
-    {
         dir.x += 1;
-    }
 
     if (inputHandler->isHeld(InputType::MoveLeft)) // Move Left
-    {
         dir.x -= 1;
-    }
 
     for (const auto entity : m_entities)
     {
