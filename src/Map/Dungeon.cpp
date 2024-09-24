@@ -211,14 +211,14 @@ void Dungeon::draw()
 
 void Dungeon::update(const float deltaTime)
 {
-    m_playerMovementSystem->update();
+    m_playerMovementSystem->update(deltaTime);
     m_weaponSystem->update();
     m_spawnerSystem->update();
     m_enemySystem->update();
     m_travellingSystem->update();
     m_passageSystem->update();
     m_characterSystem->update();
-    m_animationSystem->update();
+    m_animationSystem->update(deltaTime);
     m_textTagSystem->update();
     m_roomListenerSystem->update();
     m_itemSpawnerSystem->updateAnimation(deltaTime);

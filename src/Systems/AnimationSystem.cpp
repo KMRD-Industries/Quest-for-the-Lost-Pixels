@@ -8,32 +8,24 @@ AnimationSystem::AnimationSystem() { init(); }
 
 void AnimationSystem::init() { m_frameTime = {}; }
 
-void AnimationSystem::update()
+void AnimationSystem::update(const float deltaTime)
 {
-    m_frameTime = (m_frameTime + 1) % config::frameCycle;
-
-    for (const auto entity : m_entities) updateEntityAnimation(entity);
+    for (const auto entity : m_entities) updateEntityAnimation(entity, deltaTime);
 }
 
-void AnimationSystem::updateEntityAnimation(const Entity entity)
+void AnimationSystem::updateEntityAnimation(const Entity entity, const float deltaTime)
 {
-    if (auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
-        !animation.frames.empty() && isTimeForNextFrame(calculateFrameDuration(animation)))
-        loadNextFrame(entity, animation);
-}
+    auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
+    animation.timeUntilNextFrame -= deltaTime * 1000;
 
-int AnimationSystem::calculateFrameDuration(const AnimationComponent& animation)
-{
-    // Ensure that the division and the addition are done in long, then cast to int
-    const long duration{animation.frames[animation.currentFrame].duration};
-    return static_cast<int>(duration / static_cast<long>(config::oneFrameTime) + 1);
+    if (!animation.frames.empty() && animation.timeUntilNextFrame <= 0) loadNextFrame(entity, animation);
 }
-
-bool AnimationSystem::isTimeForNextFrame(const int frameDuration) { return m_frameTime % frameDuration == 0; }
 
 void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& animation)
 {
     auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
     ++animation.currentFrame %= animation.frames.size();
+
+    animation.timeUntilNextFrame = animation.frames[animation.currentFrame].duration;
     tileComponent.id = animation.frames[animation.currentFrame].tileID;
 }

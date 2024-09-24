@@ -24,10 +24,15 @@ PlayerMovementSystem::PlayerMovementSystem() { init(); }
 
 void PlayerMovementSystem::init() { inputHandler = InputHandler::getInstance(); }
 
-void PlayerMovementSystem::update()
+void PlayerMovementSystem::update(const float deltaTime)
 {
-    handleMovement();
     handleAttack();
+
+    m_frameTime += deltaTime;
+    if (m_frameTime <= config::oneFrameTime) return;
+    m_frameTime = 0;
+
+    handleMovement();
 }
 
 void PlayerMovementSystem::handleMovement()

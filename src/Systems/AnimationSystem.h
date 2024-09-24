@@ -9,12 +9,12 @@ class AnimationSystem : public System
 public:
     AnimationSystem();
     void init();
-    void update();
-    void updateEntityAnimation(Entity);
+    void update(float deltaTime);
+    void updateEntityAnimation(Entity, float deltaTime);
     int calculateFrameDuration(const AnimationComponent&);
-    [[nodiscard]] bool isTimeForNextFrame(int);
+    [[nodiscard]] bool isTimeForNextFrame(Entity entity);
     void loadNextFrame(Entity, AnimationComponent&);
 
 private:
-    long m_frameTime{};
+    float m_frameTime{};
 };

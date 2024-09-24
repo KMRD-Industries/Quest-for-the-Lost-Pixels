@@ -18,7 +18,4 @@ public:
 private:
     void handlePotionCollision(Entity potion, const GameType::CollisionData& collisionData, Items::Behaviours behaviour,
                                float value);
-    std::random_device rd;
-    std::mt19937 gen;
-    std::uniform_int_distribution<> dis;
 };

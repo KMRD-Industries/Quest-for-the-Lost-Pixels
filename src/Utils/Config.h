@@ -23,7 +23,7 @@ namespace config
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};
     static constexpr float tileHeight{16.f};
-    static constexpr float oneFrameTime{16.67};
+    static constexpr float oneFrameTime{1 / 60.f};
     static constexpr int frameCycle{60};
     static constexpr int maximumNumberOfLayers{10};
     static constexpr float playerAttackRange{1000.f};
