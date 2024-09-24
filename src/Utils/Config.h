@@ -49,8 +49,7 @@ namespace config
 
     static constexpr float maxCharacterHP{100};
     static constexpr float defaultCharacterHP{100};
-    static constexpr float defaultEnemyHP{20};
-    static constexpr float defaultEnemyDMG{10};
+
     static constexpr float defaultEnemyKnockbackForce{300.f};
     static constexpr bool applyKnockback{false};
 
@@ -79,8 +78,6 @@ namespace config
     static constexpr float weaponComponentDefaultRecoilAmount{10.0f};
 
     static constexpr glm::vec2 startingPosition{325.f, 325.f};
-
-    // static constexpr glm::vec2 startingPosition{325.f, 325.f};
     static constexpr float spawnOffset{25};
 
     static const std::regex playerRegexTag{"^Player \\d+$"};
@@ -160,5 +157,19 @@ namespace config
           .damage = 30.f,
           .textureData{54, "AnimSlimes", 4},
           .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
+    };
+
+    struct ItemConfig
+    {
+        const std::string name{};
+        const float value{};
+        const Items::Behaviours behaviour{};
+        const TileComponent textureData{};
+    };
+
+    const std::vector<ItemConfig> itemsData
+    {
+        {"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
+        {"DMGPotion", 2.f, Items::Behaviours::DMGUP, {693, "Items", 4}}
     };
 } // namespace config

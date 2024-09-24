@@ -16,9 +16,19 @@ namespace SpecialBlocks
         SPAWNERBLOCK = 2,
         STARTINGPOINT = 3,
         DOWNDOOR = 4,
-        BOSSSPAWNERBLOCK = 5
+        BOSSSPAWNERBLOCK = 5,
+        CHESTSPAWNERBLOCK = 6
     };
 } // namespace SpecialBlocks
+
+namespace Items
+{
+    enum class Behaviours : int
+    {
+        HEAL = 0,
+        DMGUP = 1
+    };
+}
 
 namespace Enemies
 {
@@ -127,7 +137,6 @@ namespace GameType
         std::string tag;
         MyVec2 position;
     };
-
 } // namespace GameType
 
 namespace std

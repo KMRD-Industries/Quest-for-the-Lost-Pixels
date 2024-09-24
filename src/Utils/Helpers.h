@@ -16,7 +16,7 @@
 
 static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& enemyType)
 {
-    std::mt19937 gen{};
+    static std::mt19937 gen{std::random_device{}()};
 
     auto enemyConfig = config::enemyData.equal_range(enemyType);
     std::vector<config::EnemyConfig> enemiesConfig;
@@ -33,6 +33,16 @@ static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& e
     const auto randomIndex{distrib(gen)};
 
     return enemiesConfig[randomIndex];
+}
+
+static inline config::ItemConfig getRandomItemData()
+{
+    static std::mt19937 gen{std::random_device{}()};
+
+    std::uniform_int_distribution<int> distrib(0, config::itemsData.size() - 1);
+    const auto randomIndex{distrib(gen)};
+
+    return config::itemsData[randomIndex];
 }
 
 static inline ImVec4 interpolateColor(const ImVec4& color1, const ImVec4& color2, const float t)

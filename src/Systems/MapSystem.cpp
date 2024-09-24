@@ -9,6 +9,7 @@
 #include "DoorComponent.h"
 #include "EnemySystem.h"
 #include "GameUtility.h"
+#include "LootComponent.h"
 #include "MapComponent.h"
 #include "MapParser.h"
 #include "MultiplayerComponent.h"
@@ -156,21 +157,13 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
                 auto& doorComponent = gCoordinator.getComponent<DoorComponent>(mapEntity);
 
                 if (yPos == 0)
-                {
                     doorComponent.entrance = GameType::DoorEntraces::NORTH;
-                }
                 else if (yPos == parsedMap.height - 1)
-                {
                     doorComponent.entrance = GameType::DoorEntraces::SOUTH;
-                }
                 else if (xPos == 0)
-                {
                     doorComponent.entrance = GameType::DoorEntraces::WEST;
-                }
                 else if (xPos == parsedMap.width - 1)
-                {
                     doorComponent.entrance = GameType::DoorEntraces::EAST;
-                }
 
                 break;
             }
@@ -200,6 +193,15 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
                 gCoordinator.addComponent(mapEntity, PassageComponent{});
                 break;
             }
+            break;
+        }
+        case static_cast<int>(SpecialBlocks::Blocks::CHESTSPAWNERBLOCK):
+        {
+            if (!gCoordinator.hasComponent<LootComponent>(mapEntity))
+                gCoordinator.addComponent(mapEntity, LootComponent{});
+
+            break;
+        }
         default:
             {
             }
@@ -213,13 +215,11 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
     long act = 0;
 
     for (const auto& [first, second] : atlas_sets)
-    {
         if (second <= i && second >= act)
         {
             result = first;
             act = second;
         }
-    }
     return result;
 }
 

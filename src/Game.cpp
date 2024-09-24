@@ -66,11 +66,11 @@ void Game::init()
 
 void Game::draw() { m_dungeon.draw(); }
 
-void Game::update()
+void Game::update(const float deltaTime)
 {
     m_objectCreatorSystem->update();
     m_fightSystem->update();
-    m_dungeon.update();
+    m_dungeon.update(deltaTime);
     m_collisionSystem->deleteMarkedBodies();
 }
 

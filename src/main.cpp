@@ -1,3 +1,4 @@
+#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
@@ -75,7 +76,7 @@ int main()
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
-    // window.setFramerateLimit(config::frameCycle);
+    window.setFramerateLimit(config::frameCycle);
 
     sf::Clock deltaClock;
     Game game;
@@ -87,9 +88,10 @@ int main()
 
     while (window.isOpen())
     {
+        sf::Time deltaTime = deltaClock.restart();
         // Clear the window before drawing
         window.clear(hexStringToSfmlColor(m_textureSystem->getBackgroundColor()));
-        ImGui::SFML::Update(window, deltaClock.restart());
+        ImGui::SFML::Update(window, deltaTime);
 
         game.update();
         game.handleCollision();

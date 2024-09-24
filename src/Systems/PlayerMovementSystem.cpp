@@ -6,7 +6,6 @@
 #include "Coordinator.h"
 #include "EquipWeaponSystem.h"
 #include "EquippedWeaponComponent.h"
-#include "FightActionEvent.h"
 #include "InputHandler.h"
 #include "InventorySystem.h"
 #include "Physics.h"
@@ -32,6 +31,8 @@ void PlayerMovementSystem::update()
 
 void PlayerMovementSystem::handleMovement()
 {
+    const auto inputHandler{InputHandler::getInstance()};
+
     glm::vec2 dir{};
 
     if (inputHandler->isHeld(InputType::MoveUp)) // Move Up
@@ -41,10 +42,16 @@ void PlayerMovementSystem::handleMovement()
         dir.y += 1;
 
     if (inputHandler->isHeld(InputType::MoveRight)) // Move Right
+    {
+        flip = false;
         dir.x += 1;
+    }
 
     if (inputHandler->isHeld(InputType::MoveLeft)) // Move Left
+    {
+        flip = true;
         dir.x -= 1;
+    }
 
     for (const auto entity : m_entities)
     {

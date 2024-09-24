@@ -40,7 +40,7 @@ public:
     void createRemotePlayer(uint32_t);
 
     void draw();
-    void update();
+    void update(float deltaTime);
 
 private:
     void setECS();
