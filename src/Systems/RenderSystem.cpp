@@ -14,8 +14,8 @@
 #include "GameUtility.h"
 #include "InventoryComponent.h"
 #include "MapComponent.h"
-#include "PassageComponent.h"
 #include "MultiplayerComponent.h"
+#include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
@@ -319,6 +319,8 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
 {
+    if (!gCoordinator.hasComponent<RenderComponent>(config::playerEntity)) return;
+
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
     auto transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
