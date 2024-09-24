@@ -12,8 +12,8 @@ void ObjectCreatorSystem::update()
         const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(eventInfo.entity);
-        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
 
         auto* collisionData = new GameType::CollisionData{.entityID = eventInfo.entity, .tag = eventInfo.tag};
 
@@ -98,4 +98,6 @@ void ObjectCreatorSystem::update()
         gCoordinator.destroyEntity(entityToRemove.front());
         entityToRemove.pop_front();
     }
+    entityToRemove.clear();
+    m_entities.clear();
 }

@@ -56,7 +56,19 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
 
 void ItemSpawnerSystem::deleteItems()
 {
-    for (const auto entity : m_entities) gCoordinator.getComponent<CharacterComponent>(entity).hp = -1;
+    std::deque<Entity> entityToRemove;
+
+    for (const auto entity : m_entities)
+    {
+        entityToRemove.push_back(entity);
+    }
+
+    while (!entityToRemove.empty())
+    {
+        Physics::getWorld()->DestroyBody(gCoordinator.getComponent<ColliderComponent>(entityToRemove.front()).body);
+        gCoordinator.destroyEntity(entityToRemove.front());
+        entityToRemove.pop_front();
+    }
 }
 
 void ItemSpawnerSystem::handlePotionCollision(const Entity potion, const GameType::CollisionData& collisionData,

@@ -211,12 +211,12 @@ void Dungeon::draw()
 void Dungeon::update(const float deltaTime)
 {
     m_playerMovementSystem->update();
+    m_weaponSystem->update();
     m_spawnerSystem->update();
     m_enemySystem->update();
     m_travellingSystem->update();
     m_passageSystem->update();
     m_characterSystem->update();
-    m_weaponSystem->update();
     m_animationSystem->update();
     m_textTagSystem->update();
     m_roomListenerSystem->update();
@@ -339,22 +339,22 @@ inline void Dungeon::clearDungeon() const
     m_doorSystem->clearDoors();
     m_spawnerSystem->clearSpawners();
     m_enemySystem->deleteEnemies();
+    m_itemSpawnerSystem->deleteItems();
+    m_chestSystem->deleteItems();
 }
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)
 {
     if (m_roomMap.contains(m_currentPlayerPos + dir))
     {
+        clearDungeon();
         m_currentPlayerPos += dir;
+        m_roomListenerSystem->changeRoom(m_currentPlayerPos);
 
-        m_doorSystem->clearDoors();
-        m_spawnerSystem->clearSpawners();
-        m_enemySystem->deleteEnemies();
         m_mapSystem->loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
         m_textureSystem->loadTextures();
         m_passageSystem->setPassages(m_currentPlayerPos == m_floorGenerator.getEndingRoom());
         m_collisionSystem->createMapCollision();
-        m_roomListenerSystem->changeRoom(m_currentPlayerPos);
 
         const auto newDoor = dir * -1;
         const auto doorType = GameType::geoToMapDoors.at(newDoor);
@@ -373,7 +373,6 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
                 {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
                 colliderComponent.body->GetAngle());
         }
-
 
         if (m_multiplayerSystem->isConnected()) m_multiplayerSystem->roomChanged(m_currentPlayerPos);
     }

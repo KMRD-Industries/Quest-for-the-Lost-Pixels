@@ -16,9 +16,7 @@ void CharacterSystem::cleanUpDeadEntities() const
     std::unordered_set<Entity> entityToKill{};
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.getComponent<CharacterComponent>(entity).hp > 0 ||
-            gCoordinator.hasComponent<PlayerComponent>(entity))
-            continue;
+        if (gCoordinator.getComponent<CharacterComponent>(entity).hp > 0) continue;
         if (gCoordinator.hasComponent<ColliderComponent>(entity))
             gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
         else
