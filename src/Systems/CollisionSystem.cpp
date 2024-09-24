@@ -121,8 +121,15 @@ void CollisionSystem::update()
         b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
 
-        body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
-                                 convertPixelsToMeters(transformComponent.velocity.y)});
+        if (colliderComponent.tag == "Item")
+        {
+            body->ApplyForceToCenter({transformComponent.velocity.x, transformComponent.velocity.y}, true);
+        }
+        else
+        {
+            body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
+                                     convertPixelsToMeters(transformComponent.velocity.y)});
+        }
 
         transformComponent.velocity = {};
     }
@@ -141,10 +148,6 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         const b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
-        // if (colliderComponent.tag != "Player 1" && colliderComponent.tag != "SecondPlayer" &&
-        //     colliderComponent.tag != "Enemy" && colliderComponent.tag != "Item")
-        //     continue;
-
         const auto position = body->GetPosition();
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
 

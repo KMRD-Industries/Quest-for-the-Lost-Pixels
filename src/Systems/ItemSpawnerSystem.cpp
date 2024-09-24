@@ -12,6 +12,15 @@
 struct CharacterComponent;
 struct ColliderComponent;
 
+ItemSpawnerSystem::ItemSpawnerSystem() { init(); }
+
+void ItemSpawnerSystem::init()
+{
+    gen.seed(rd()); // Seed the generator
+    dis = std::uniform_int_distribution(-5, 5);
+}
+
+
 void ItemSpawnerSystem::updateAnimation(const float deltaTime)
 {
     for (const auto entity : m_entities)
@@ -23,12 +32,14 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
         if (animationComponent.shouldAnimate)
         {
             const auto& itemBehaviour = gCoordinator.getComponent<ItemComponent>(entity).behaviour;
-
             auto& item = gCoordinator.getComponent<ItemComponent>(entity);
+            TransformComponent& transform = gCoordinator.getComponent<TransformComponent>(entity);
             auto& itemValue = gCoordinator.getComponent<ItemComponent>(entity).value;
             item.timestamp = std::chrono::system_clock::now();
 
             const Entity newItemEntity = gCoordinator.createEntity();
+
+            transform.velocity = {static_cast<float>(dis(gen)), static_cast<float>(dis(gen))};
 
             const auto newEvent = CreateBodyWithCollisionEvent(
                 entity, "Item", [this, entity, itemBehaviour, itemValue](const GameType::CollisionData& collisionData)

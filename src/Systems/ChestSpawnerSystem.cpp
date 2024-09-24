@@ -72,11 +72,8 @@ void ChestSpawnerSystem::spawnPotion(const TransformComponent& spawnerTransformC
     const TileComponent tileComponent{itemConfig.textureData};
     const ColliderComponent colliderComponent{m_potionCollision};
 
-    TransformComponent potionTransformComponent{spawnerTransformComponent};
-    potionTransformComponent.velocity = {10000.0f, 10000.0f};
-
     gCoordinator.addComponent(potion, tileComponent);
-    gCoordinator.addComponent(potion, potionTransformComponent);
+    gCoordinator.addComponent(potion, spawnerTransformComponent);
     gCoordinator.addComponent(potion, colliderComponent);
     gCoordinator.addComponent(potion, RenderComponent{});
     gCoordinator.addComponent(potion, AnimationComponent{});

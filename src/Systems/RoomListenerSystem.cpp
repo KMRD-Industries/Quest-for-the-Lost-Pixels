@@ -6,12 +6,18 @@
 
 void RoomListenerSystem::update()
 {
-    if (m_isCurrentRoomLooted)
-        return;
+    if (m_isCurrentRoomLooted) return;
     if (!m_entities.empty())
         m_toLoot = true;
     else if (m_entities.empty() && m_toLoot)
         spawnLoot();
+}
+
+void RoomListenerSystem::reset()
+{
+    m_isCurrentRoomLooted = true;
+    m_lootedRooms.clear();
+    m_toLoot = false;
 }
 
 void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)

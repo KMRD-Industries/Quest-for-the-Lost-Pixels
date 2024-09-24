@@ -326,6 +326,7 @@ void Dungeon::moveDownDungeon()
     position.y = GameUtility::startingPosition.y * static_cast<float>(config::pixelToMeterRatio);
 
     gCoordinator.getComponent<ColliderComponent>(config::playerEntity).body->SetTransform(position, 0);
+    m_roomListenerSystem->reset();
 }
 
 inline void Dungeon::loadMap(const std::string& path) const

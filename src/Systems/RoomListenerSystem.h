@@ -14,6 +14,7 @@ class RoomListenerSystem : public System
 {
 public:
     void update();
+    void reset();
     void changeRoom(const glm::ivec2& newRoom);
     void spawnLoot();
 
