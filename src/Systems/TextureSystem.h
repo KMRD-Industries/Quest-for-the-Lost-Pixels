@@ -46,4 +46,5 @@ public:
     Collision getCollision(const std::string &, long);
     void modifyColorScheme(int);
     std::string getBackgroundColor();
+    std::vector<int> m_weaponsIDs;
 };

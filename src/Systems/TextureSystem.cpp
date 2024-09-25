@@ -138,6 +138,7 @@ void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedT
                 if (object.properties.size() >= 2)
                 {
                     m_mapWeaponPlacements.emplace(adjusted_id, object);
+                    if (id <= 180) m_weaponsIDs.push_back(id);
                 }
                 else
                 {

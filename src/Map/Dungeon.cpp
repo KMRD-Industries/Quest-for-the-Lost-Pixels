@@ -343,6 +343,7 @@ inline void Dungeon::clearDungeon() const
     m_enemySystem->deleteEnemies();
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
+    m_weaponSystem->deleteItems();
 }
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)

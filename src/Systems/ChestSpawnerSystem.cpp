@@ -12,6 +12,7 @@
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
+#include "WeaponComponent.h"
 
 ChestSpawnerSystem::ChestSpawnerSystem() { init(); }
 
@@ -19,6 +20,7 @@ void ChestSpawnerSystem::init()
 {
     m_chestCollision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Items", 819);
     m_potionCollision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Items", 693);
+    m_weaponsIDs = gCoordinator.getRegisterSystem<TextureSystem>()->m_weaponsIDs;
 }
 
 void ChestSpawnerSystem::spawnChest()
@@ -28,6 +30,24 @@ void ChestSpawnerSystem::spawnChest()
         const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         processSpawn(spawnerTransformComponent);
     }
+}
+
+void ChestSpawnerSystem::spawnWeapon(const TransformComponent& spawnerTransformComponent)
+{
+    const Entity weapon = gCoordinator.createEntity();
+    const auto& id = getRandomElement(m_weaponsIDs);
+
+    // Spawn Weapon on the right side of spawner
+    TransformComponent weaponSpawnPoint = spawnerTransformComponent;
+    gCoordinator.addComponent(weapon, WeaponComponent{.id = id});
+    gCoordinator.addComponent(weapon, TileComponent{static_cast<uint32_t>(id), "Weapons", 7});
+    gCoordinator.addComponent(weapon, weaponSpawnPoint);
+    gCoordinator.addComponent(weapon, RenderComponent{});
+    gCoordinator.addComponent(weapon, ColliderComponent{});
+    gCoordinator.addComponent(weapon, AnimationComponent{});
+    gCoordinator.addComponent(weapon, ItemComponent{});
+    gCoordinator.addComponent(
+        weapon, ItemAnimationComponent{.animationDuration = 1, .startingPositionY = weaponSpawnPoint.position.y});
 }
 
 void ChestSpawnerSystem::clearSpawners() const {}
@@ -47,11 +67,12 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent& spawnerTransform
 
     const Entity newItemEntity = gCoordinator.createEntity();
 
+    auto spawnFunction = [this, spawnerTransformComponent](const GameType::CollisionData& collisionData)
+    { std::time(nullptr) % 3 == 0 ? spawnPotion(spawnerTransformComponent) : spawnWeapon(spawnerTransformComponent); };
+
     const auto newEvent = CreateBodyWithCollisionEvent(
         chest, "Chest", [this, chest, spawnerTransformComponent](const GameType::CollisionData& collisionData)
-        { handleChestCollision(chest, spawnerTransformComponent, collisionData); },
-        [this, spawnerTransformComponent](const GameType::CollisionData&) { spawnPotion(spawnerTransformComponent); },
-        true, true);
+        { handleChestCollision(chest, spawnerTransformComponent, collisionData); }, spawnFunction, true, true);
 
     gCoordinator.addComponent(newItemEntity, newEvent);
 }

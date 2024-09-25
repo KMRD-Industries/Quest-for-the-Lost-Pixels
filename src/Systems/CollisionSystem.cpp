@@ -64,8 +64,8 @@ void CollisionSystem::createMapCollision()
         }
     }
 
-    auto createCollisionBody = [this](const Entity entity, const std::string& type, const glm::vec2& size,
-                                      const bool isStatic, const bool useTexture, const glm::vec2& offset = {0, 0})
+    auto createCollisionBody =
+        [this](const Entity entity, const std::string& type, const bool isStatic, const bool useTexture)
     {
         const Entity newEntity = gCoordinator.createEntity();
         const auto newEvent = CreateBodyWithCollisionEvent(
@@ -89,22 +89,20 @@ void CollisionSystem::createMapCollision()
         if (tileComponent.tileSet == "SpecialBlocks")
         {
             if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER))
-                createCollisionBody(entity, "Wall", {config::tileHeight, config::tileHeight}, true, true);
+                createCollisionBody(entity, "Wall", true, true);
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER))
-                createCollisionBody(entity, "Door", {config::tileHeight, config::tileHeight}, true, false);
+                createCollisionBody(entity, "Door", true, false);
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
                 if (gCoordinator.hasComponent<PassageComponent>(entity))
                     if (gCoordinator.getComponent<PassageComponent>(entity).activePassage)
-                        createCollisionBody(entity, "Passage", {config::tileHeight, config::tileHeight}, true, true);
+                        createCollisionBody(entity, "Passage", true, true);
         }
         else
         {
             if (colliderComponent.collision.width > 0 && colliderComponent.collision.height > 0)
-                createCollisionBody(entity, "Wall",
-                                    {colliderComponent.collision.width, colliderComponent.collision.height}, true,
-                                    false, {colliderComponent.collision.x, colliderComponent.collision.y});
+                createCollisionBody(entity, "Wall", true, false);
         }
     }
 }

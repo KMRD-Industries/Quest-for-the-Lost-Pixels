@@ -7,5 +7,5 @@ public:
     void init();
     void update();
     void pickUpWeapon(Entity, Entity);
-    void dropWeapon(Entity, Entity);
+    void dropWeapon(Entity);
 };

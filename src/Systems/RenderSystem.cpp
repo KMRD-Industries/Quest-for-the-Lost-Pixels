@@ -61,6 +61,9 @@ void RenderSystem::draw(sf::RenderWindow& window)
             displayDamageTaken(entity);
             displayPortal(entity);
 
+            if (renderComponent.color != sf::Color::White) renderComponent.sprite.setColor(renderComponent.color);
+            renderComponent.color = sf::Color::White;
+
             if (tileComponent.tileSet == "SpecialBlocks" && config::debugMode)
                 tiles[renderComponent.layer + 2].push_back(&renderComponent.sprite);
             else
@@ -92,7 +95,8 @@ void RenderSystem::draw(sf::RenderWindow& window)
  * */
 void RenderSystem::setOrigin(const Entity entity)
 {
-    if (gCoordinator.hasComponent<WeaponComponent>(entity)) return;
+    if (gCoordinator.hasComponent<WeaponComponent>(entity))
+        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) return;
 
     // Get all necessary components
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
@@ -104,8 +108,8 @@ void RenderSystem::setOrigin(const Entity entity)
 
         // Calculate the center of the collision component from top left corner.
         // X & Y are collision offset from top left corner of sprite tile.
-        centerX = static_cast<float>(collisionComponent.collision.x + collisionComponent.collision.width / 2);
-        centerY = static_cast<float>(collisionComponent.collision.y + collisionComponent.collision.height / 2);
+        centerX = collisionComponent.collision.x + collisionComponent.collision.width / 2;
+        centerY = collisionComponent.collision.y + collisionComponent.collision.height / 2;
     }
     else
     {
@@ -137,7 +141,10 @@ void RenderSystem::setOrigin(const Entity entity)
  * */
 void RenderSystem::setSpritePosition(const Entity entity)
 {
-    if (gCoordinator.hasComponent<WeaponComponent>(entity)) return;
+    if (gCoordinator.hasComponent<WeaponComponent>(entity))
+    {
+        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) return;
+    }
 
     // Get all necessary parts
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
@@ -164,21 +171,19 @@ void RenderSystem::setSpritePosition(const Entity entity)
         // Adjust the weapon's display position based on the relative positions of player and weapon colliders
         // The WeaponPlacement object (object from Tiled) helps in aligning the weapon correctly with the player's
         // sprite
-        weaponPlacement.x += static_cast<float>(
-            (weaponColliderComponent.specialCollision.x - playerColliderComponent.specialCollision.x) *
-            config::gameScale);
-        weaponPlacement.y += static_cast<float>(
-            (weaponColliderComponent.specialCollision.y - playerColliderComponent.specialCollision.y) *
-            config::gameScale);
+        weaponPlacement.x += (weaponColliderComponent.specialCollision.x - playerColliderComponent.specialCollision.x) *
+            config::gameScale;
+        weaponPlacement.y += (weaponColliderComponent.specialCollision.y - playerColliderComponent.specialCollision.y) *
+            config::gameScale;
 
         sf::Vector2f weaponPosition{};
 
         // Calculate the weapon's position relative to the player's sprite and game scale
         weaponPosition.x = renderComponent.sprite.getGlobalBounds().left +
-            static_cast<float>(weaponColliderComponent.specialCollision.x * config::gameScale);
+            weaponColliderComponent.specialCollision.x * config::gameScale;
 
         weaponPosition.y = renderComponent.sprite.getGlobalBounds().top +
-            static_cast<float>(weaponColliderComponent.specialCollision.y * config::gameScale);
+            weaponColliderComponent.specialCollision.y * config::gameScale;
 
         // Update the weapon sprite's position and scale according to the transform component and game scale
         weaponTransformComponent.position = weaponPosition - weaponPlacement;
@@ -224,7 +229,7 @@ void RenderSystem::displayDamageTaken(const Entity entity)
 
     if (!characterComponent.attacked)
     {
-        renderComponent.sprite.setColor(sf::Color::White);
+        if (!gCoordinator.hasComponent<WeaponComponent>(entity)) renderComponent.sprite.setColor(sf::Color::White);
     }
     else
     {
@@ -274,8 +279,8 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
     const auto& weapon = gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon);
 
     // Display the Weapon Stats table in the top-right corner
-    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 10), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(270, 0), ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 10));
+    ImGui::SetNextWindowSize(ImVec2(270, 0));
     ImGui::Begin("Weapon Stats", nullptr,
                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysUseWindowPadding);
 

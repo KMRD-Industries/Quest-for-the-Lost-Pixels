@@ -16,6 +16,7 @@
 #include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
+#include "WeaponsSystem.h"
 #include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;
@@ -27,12 +28,25 @@ void PlayerMovementSystem::init() { inputHandler = InputHandler::getInstance(); 
 void PlayerMovementSystem::update(const float deltaTime)
 {
     handleAttack();
+    handlePickUpAction();
 
     m_frameTime += deltaTime;
     if (m_frameTime <= config::oneFrameTime) return;
     m_frameTime = 0;
 
     handleMovement();
+}
+
+void PlayerMovementSystem::handlePickUpAction()
+{
+    const auto inputHandler{InputHandler::getInstance()};
+
+    if (!inputHandler->isPressed(InputType::PickUpItem)) return;
+
+    for (auto const entity : m_entities)
+    {
+        gCoordinator.getRegisterSystem<WeaponSystem>()->weaponInput(entity);
+    }
 }
 
 void PlayerMovementSystem::handleMovement()

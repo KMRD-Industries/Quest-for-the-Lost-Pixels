@@ -27,6 +27,7 @@ class ChestSpawnerSystem : public System
 {
 public:
     void spawnChest();
+    void spawnWeapon(const TransformComponent& spawnerTransformComponent);
     ChestSpawnerSystem();
     void init();
 
@@ -37,7 +38,7 @@ private:
     void spawnPotion(const TransformComponent&);
 
     std::vector<AnimationData> m_itemsToAnimate;
-
+    std::vector<int> m_weaponsIDs;
     Collision m_chestCollision;
     Collision m_potionCollision;
 };
