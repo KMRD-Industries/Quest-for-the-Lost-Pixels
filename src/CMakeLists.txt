@@ -123,18 +123,27 @@ set(UTILS
         Utils/TextTag.h
 )
 
+set(MENU_STATE_MACHINE
+        MenuStateMachine/MainMenuState.cpp
+        MenuStateMachine/MainMenuState.h
+        MenuStateMachine/State.h        
+        MenuStateMachine/StateMachine.cpp        
+        MenuStateMachine/StateMachine.h        
+)
+
 source_group("Core" FILES ${CORE})
 source_group("Components" FILES ${COMPONENTS})
 source_group("Systems" FILES ${SYSTEMS})
 source_group("AtlasComponents" FILES ${ATLAS_COMPONENTS})
 source_group("Utils" FILES ${UTILS})
 source_group("Map" FILES ${MAP})
+source_group("MenuStateMachine" FILES ${MENU_STATE_MACHINE})
 
 add_definitions(-D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(./AtlasComponents ./Core ./Components ./Systems ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./AtlasComponents ./Core ./Components ./Systems ./MenuStateMachine ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(qlp ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
+add_executable(qlp ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS} ${MENU_STATE_MACHINE})
 
 target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
 

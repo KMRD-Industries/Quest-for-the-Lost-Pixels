@@ -1,5 +1,6 @@
 #pragma once
 #include "Dungeon.h"
+#include "StateMachine.h"
 
 class Game
 {
@@ -11,4 +12,5 @@ public:
 
 private:
     Dungeon m_dungeon;
+    StateManager m_stateManager;
 };

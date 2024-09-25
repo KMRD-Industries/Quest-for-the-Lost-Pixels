@@ -5,6 +5,7 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
+#include "MainMenuState.h"
 #include "RenderComponent.h"
 #include "RenderSystem.h"
 #include "TransformComponent.h"
@@ -36,13 +37,21 @@ void Game::init()
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 
+    m_stateManager.pushState(std::make_unique<MainMenuState>());
+
     m_dungeon.init();
 }
 
-void Game::draw() { m_dungeon.draw(); }
+void Game::draw()
+{
+    m_stateManager.render();
+
+    m_dungeon.draw();
+}
 
 void Game::update(const float deltaTime)
 {
+    m_stateManager.update(deltaTime);
     m_dungeon.update(deltaTime);
     gCoordinator.getRegisterSystem<CollisionSystem>()->deleteMarkedBodies();
 }
