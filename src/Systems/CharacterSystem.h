@@ -6,8 +6,8 @@ class CharacterSystem : public System
 public:
     explicit CharacterSystem() = default;
 
-    void update();
-    void init();
+    void update() const;
+    void init() const;
 
 private:
     void cleanUpDeadEntities() const;

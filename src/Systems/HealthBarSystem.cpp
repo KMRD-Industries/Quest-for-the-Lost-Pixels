@@ -12,11 +12,8 @@ void HealthBarSystem::drawHealthBar()
     if (m_entities.empty()) return;
 
     const auto& entity = config::playerEntity;
-
     auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
-
     const auto progressValue{characterComponent.hp / config::maxCharacterHP};
-
     const auto interpolatedColor{interpolateColor(config::lowHPColor, config::fullHPColor, progressValue)};
 
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
@@ -30,8 +27,6 @@ void HealthBarSystem::drawHealthBar()
     const ImVec2 available_size = ImGui::GetContentRegionAvail();
 
     ImGui::ProgressBar(progressValue, ImVec2(available_size.x, 0.0f), "");
-
     ImGui::PopStyleColor();
-
     ImGui::End();
 }

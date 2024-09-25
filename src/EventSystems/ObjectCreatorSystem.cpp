@@ -11,6 +11,10 @@ void ObjectCreatorSystem::update()
     {
         const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
 
+        if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity)) continue;
+        if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity)) continue;
+        if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity)) continue;
+
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(eventInfo.entity);
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
         auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);

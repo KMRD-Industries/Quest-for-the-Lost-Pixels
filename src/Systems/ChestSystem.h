@@ -4,5 +4,5 @@
 class ChestSystem : public System
 {
 public:
-    void deleteItems();
+    void deleteItems() const;
 };

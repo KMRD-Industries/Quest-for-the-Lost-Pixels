@@ -56,16 +56,10 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     const auto enemyConfig = getRandomEnemyData(enemyType);
     const Entity newMonsterEntity = gCoordinator.createEntity();
     const TileComponent tileComponent{enemyConfig.textureData};
-    const ColliderComponent colliderComponent{
-        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id)};
 
-    gCoordinator.addComponent(newMonsterEntity, tileComponent);
-    gCoordinator.addComponent(newMonsterEntity, spawnerTransformComponent);
-    gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
-    gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
-    gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
-    gCoordinator.addComponent(newMonsterEntity, ColliderComponent(enemyConfig.collisionData));
-    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = enemyConfig.hp});
+    gCoordinator.addComponents(newMonsterEntity, enemyConfig.textureData, spawnerTransformComponent, RenderComponent{},
+                               AnimationComponent{}, EnemyComponent{}, ColliderComponent{enemyConfig.collisionData},
+                               CharacterComponent{.hp = enemyConfig.hp});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
@@ -73,8 +67,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
         newMonsterEntity, "Enemy",
         [&, newMonsterEntity, enemyConfig](const GameType::CollisionData& collisionData)
         {
-            const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
-            if (!isCollidingWithPlayer) return;
+            if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;

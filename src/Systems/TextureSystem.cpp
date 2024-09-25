@@ -261,8 +261,7 @@ void TextureSystem::loadTextures()
             {
                 if (cc.x != colliderComponent.collision.x || cc.y != colliderComponent.collision.y)
                 {
-                    b2Vec2 offset = {static_cast<float>(cc.x - colliderComponent.collision.x),
-                                     static_cast<float>(cc.y - colliderComponent.collision.y)};
+                    b2Vec2 offset = {(cc.x - colliderComponent.collision.x), (cc.y - colliderComponent.collision.y)};
 
                     offset.x = convertPixelsToMeters(offset.x * config::gameScale);
                     offset.y = convertPixelsToMeters(-offset.y * config::gameScale);

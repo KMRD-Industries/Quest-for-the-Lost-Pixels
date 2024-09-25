@@ -1,31 +1,33 @@
 #include "AnimationSystem.h"
 
 #include "Config.h"
+#include "RenderComponent.h"
 #include "TileComponent.h"
-#include "TransformComponent.h"
 
 AnimationSystem::AnimationSystem() { init(); }
 
 void AnimationSystem::init() { m_frameTime = {}; }
 
-void AnimationSystem::update(const float deltaTime)
+void AnimationSystem::update(const float deltaTime) const
 {
-    for (const auto entity : m_entities) updateEntityAnimation(entity, deltaTime);
+    for (const auto entity : m_entities)
+    {
+        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
+        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        updateEntityAnimationFrame(animationComponent, tileComponent, deltaTime);
+    }
 }
 
-void AnimationSystem::updateEntityAnimation(const Entity entity, const float deltaTime)
+void AnimationSystem::updateEntityAnimationFrame(AnimationComponent& animation, TileComponent& tile,
+                                                 const float deltaTime) const
 {
-    auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
     animation.timeUntilNextFrame -= deltaTime * 1000;
-
-    if (!animation.frames.empty() && animation.timeUntilNextFrame <= 0) loadNextFrame(entity, animation);
+    if (!animation.frames.empty() && animation.timeUntilNextFrame <= 0) loadNextFrame(animation, tile);
 }
 
-void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& animation)
+void AnimationSystem::loadNextFrame(AnimationComponent& animation, TileComponent& tile) const
 {
-    auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
     ++animation.currentFrame %= animation.frames.size();
-
     animation.timeUntilNextFrame = animation.frames[animation.currentFrame].duration;
-    tileComponent.id = animation.frames[animation.currentFrame].tileID;
+    tile.id = animation.frames[animation.currentFrame].tileID;
 }

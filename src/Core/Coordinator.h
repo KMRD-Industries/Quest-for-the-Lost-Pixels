@@ -33,6 +33,12 @@ public:
         m_systemManager->entitySignatureChanged(entity, signature);
     }
 
+    template <typename... Components>
+    void addComponents(const Entity entity, const Components&... components)
+    {
+        (addComponent(entity, components), ...);
+    }
+
     template <typename T>
     void removeComponent(const Entity entity)
     {

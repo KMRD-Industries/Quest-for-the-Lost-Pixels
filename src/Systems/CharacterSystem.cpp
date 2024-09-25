@@ -7,21 +7,29 @@
 
 extern Coordinator gCoordinator;
 
-void CharacterSystem::update() { cleanUpDeadEntities(); }
+void CharacterSystem::update() const { cleanUpDeadEntities(); }
 
-void CharacterSystem::init() {}
+void CharacterSystem::init() const {}
 
 void CharacterSystem::cleanUpDeadEntities() const
 {
-    std::unordered_set<Entity> entityToKill{};
+    std::vector<Entity> entitiesToKill;
+    entitiesToKill.reserve(m_entities.size());
+
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.getComponent<CharacterComponent>(entity).hp > 0) continue;
+        const auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
+        if (characterComponent.hp > 0) continue;
+
         if (gCoordinator.hasComponent<ColliderComponent>(entity))
+        {
             gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
+        }
         else
-            entityToKill.insert(entity);
+        {
+            entitiesToKill.push_back(entity);
+        }
     }
-    for (const auto entity : entityToKill) gCoordinator.destroyEntity(entity);
-    entityToKill.clear();
+
+    for (const auto entity : entitiesToKill) gCoordinator.destroyEntity(entity);
 }

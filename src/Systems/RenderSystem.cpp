@@ -62,6 +62,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
             displayPortal(entity);
 
             if (renderComponent.color != sf::Color::White) renderComponent.sprite.setColor(renderComponent.color);
+
             renderComponent.color = sf::Color::White;
 
             if (tileComponent.tileSet == "SpecialBlocks" && config::debugMode)

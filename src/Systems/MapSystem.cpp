@@ -142,10 +142,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 
     doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
-    gCoordinator.addComponent(mapEntity, RenderComponent{});
-    gCoordinator.addComponent(mapEntity, MapComponent{});
-    gCoordinator.addComponent(mapEntity, transformComponent);
-    gCoordinator.addComponent(mapEntity, tileComponent);
+    gCoordinator.addComponents(mapEntity, RenderComponent{}, MapComponent{}, transformComponent, tileComponent);
 
     if (tileComponent.tileSet == "SpecialBlocks") // Handle special Tiles
     {

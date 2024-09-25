@@ -36,7 +36,9 @@ void WeaponSystem::markClosest()
     {
         if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) continue;
 
+        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
         float distanceX = transformComponent.position.x - playerTransformComponent.position.x;
         float distanceY = transformComponent.position.y - playerTransformComponent.position.y;
 
@@ -49,7 +51,7 @@ void WeaponSystem::markClosest()
         }
         else
         {
-            gCoordinator.getComponent<RenderComponent>(entity).color = sf::Color::White;
+            renderComponent.color = sf::Color::White;
         }
     }
 
@@ -127,19 +129,16 @@ void WeaponSystem::deleteItems()
 
     for (const auto entity : m_entities)
     {
-        if (!gCoordinator.getComponent<WeaponComponent>(entity).equipped) entityToRemove.push_back(entity);
+        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == false)
+        {
+            if (gCoordinator.hasComponent<ColliderComponent>(entity))
+                gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
+            else
+                entityToRemove.push_back(entity);
+        }
     }
 
-    while (!entityToRemove.empty())
-    {
-        if (gCoordinator.hasComponent<ColliderComponent>(entityToRemove.front()))
-        {
-            auto& collider = gCoordinator.getComponent<ColliderComponent>(entityToRemove.front());
-            if (collider.body != nullptr) Physics::getWorld()->DestroyBody(collider.body);
-        }
-        gCoordinator.destroyEntity(entityToRemove.front());
-        entityToRemove.pop_front();
-    }
+    for (const auto entity : entityToRemove) gCoordinator.destroyEntity(entity);
 }
 
 
