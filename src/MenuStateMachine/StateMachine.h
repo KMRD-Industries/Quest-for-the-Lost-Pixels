@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include <optional>
 #include <stack>
 
 #include "State.h"
@@ -18,7 +17,8 @@ public:
     void popState();
     void update(float deltaTime);
     void render();
-    void handleStateChange(StateAction action, std::optional<std::unique_ptr<State>> newState);
+    void handleStateChange(StateAction action, std::unique_ptr<State> newState);
+    void handleStateChange(StateAction action);
 
 private:
     std::stack<std::unique_ptr<State>> m_states;

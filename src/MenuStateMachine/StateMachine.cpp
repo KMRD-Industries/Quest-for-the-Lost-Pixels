@@ -26,10 +26,15 @@ void StateManager::render()
         m_states.top()->render();
 }
 
-void StateManager::handleStateChange(const StateAction action, std::optional<std::unique_ptr<State>> newState)
+void StateManager::handleStateChange(const StateAction action, std::unique_ptr<State> newState)
 {
     if (action == StateAction::Pop)
         popState();
-    if (newState)
-        pushState(std::move(newState.value()));
+    pushState(std::move(newState));
+}
+
+void StateManager::handleStateChange(const StateAction action)
+{
+    if (action == StateAction::Pop)
+        popState();
 }
