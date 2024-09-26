@@ -9,6 +9,7 @@ struct TransformComponent
     sf::Vector2f position{0.f, 0.f};
     sf::Vector2f lastPosition{0.f, 0.f};
     sf::Vector2f scale{1.f, 1.f};
+    float angle {0};
 
     float rotation{0};
     b2Vec2 velocity{0.f, 0.f};

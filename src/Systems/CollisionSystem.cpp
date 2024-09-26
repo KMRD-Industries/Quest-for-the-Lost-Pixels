@@ -3,8 +3,6 @@
 #include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
-#include "DoorComponent.h"
-#include "ItemComponent.h"
 #include "MultiplayerSystem.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
@@ -150,6 +148,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         const auto position = body->GetPosition();
 
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
+        transformComponent.rotation = body->GetAngle() * 180.f / 3.131516;
         renderComponent.sprite.setPosition(position.x, position.y);
         renderComponent.dirty = true;
     }

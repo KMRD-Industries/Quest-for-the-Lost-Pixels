@@ -115,16 +115,35 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
 void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData& collisionData) const
 {
     if (std::regex_match(collisionData.tag, config::playerRegexTag)) return;
+    if (collisionData.tag == "Bullet") return;
+
+    if(collisionData.tag == "Enemy")
+    {
+        auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
+        auto& secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);
+
+        const Entity tag = gCoordinator.createEntity();
+        gCoordinator.addComponent(tag, TextTagComponent{});
+        gCoordinator.addComponent(tag, TransformComponent{secondPlayertransformComponent});
+
+        characterComponent.attacked = true;
+        characterComponent.hp -= config::playerAttackDamage;
+    }
+
     gCoordinator.getComponent<CharacterComponent>(bullet).hp = -1;
 }
 
 void FightSystem::handleWandAttack(Entity eventEntity)
 {
     const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);
+    const auto& weaponComponent {gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon)};
+
     const Entity newBulletEntity = gCoordinator.createEntity();
 
     TransformComponent transformComponent{gCoordinator.getComponent<TransformComponent>(equippedWeapon.currentWeapon)};
-    transformComponent.velocity = {1, 0};
+
+    float targetAngleRadians = (weaponComponent.currentAngle - 2 * weaponComponent.initialAngle) * (3.1415f / 180.0f);
+    transformComponent.velocity = {std::cos(targetAngleRadians) * 1, std::sin(targetAngleRadians) * 1};
 
     gCoordinator.addComponents(newBulletEntity,
         ColliderComponent{},

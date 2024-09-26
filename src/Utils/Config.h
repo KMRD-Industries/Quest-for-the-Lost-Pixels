@@ -161,6 +161,59 @@ namespace config
           .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
     };
 
+    enum _entityCategory
+    {
+        BOUNDARY =  0x0001,
+        PLAYER =    0x0002,
+        DOOR =      0x0003,
+        ENEMY =     0x0004,
+        PASSAGE =   0x0005,
+        BULLET =    0x0006,
+        ITEM =      0x0007,
+    };
+
+    constexpr uint32_t hashString(const char* str, uint32_t hash = 0) {
+        return *str ? hashString(str + 1, hash * 31 + *str) : hash;
+    }
+
+    inline uint16 stringToCategoryBits(const std::string& str) {
+        switch (hashString(str.c_str())) {
+            case hashString("Item"):
+                return ITEM;
+            case hashString("Bullet"):
+                return BULLET;
+            case hashString("Enemy"):
+                return ENEMY;
+            case hashString("Wall"):
+                return BOUNDARY;
+            case hashString("Door"):
+                return BOUNDARY;
+            case hashString("Passage"):
+                return BOUNDARY;
+            default:
+                return PLAYER;
+            }
+    }
+
+    inline uint16 stringToMaskBits(const std::string& str) {
+        switch (hashString(str.c_str())) {
+            case hashString("Item"):
+                return BOUNDARY | PLAYER;
+            case hashString("Door"):
+                return BOUNDARY | PLAYER;
+            case hashString("Passage"):
+                return BOUNDARY | PLAYER;
+            case hashString("Bullet"):
+                return BOUNDARY | ENEMY;
+            case hashString("Enemy"):
+                return BOUNDARY | PLAYER;
+            case hashString("Wall"):
+                return BOUNDARY | PLAYER | ENEMY | BULLET | ITEM;
+            default:
+                return BOUNDARY | ENEMY | ITEM;
+            }
+    }
+
     struct ItemConfig
     {
         const std::string name{};

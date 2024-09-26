@@ -62,6 +62,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
             if (renderComponent.dirty)
             {
                 renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
+                renderComponent.sprite.setRotation(transformComponent.rotation);
                 setOrigin(entity);
                 setSpritePosition(entity);
                 displayDamageTaken(entity);

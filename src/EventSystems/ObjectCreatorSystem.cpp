@@ -70,7 +70,7 @@ void ObjectCreatorSystem::createBaciscObject(CreateBodyWithCollisionEvent eventI
     }
 
     bodyDef.position.Set(xPosition, yPosition);
-    bodyDef.angle = transformComponent.rotation;
+    bodyDef.angle = transformComponent.rotation * (3.141516f / 180.f);
     bodyDef.type = eventInfo.isStatic ? b2_staticBody : b2_dynamicBody;
     bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(collisionData);
 
@@ -96,12 +96,14 @@ void ObjectCreatorSystem::createBaciscObject(CreateBodyWithCollisionEvent eventI
     constexpr auto defaultFriction{1.f};
     fixtureDef.density = defaultDensity;
     fixtureDef.friction = defaultFriction;
-    fixtureDef.filter.categoryBits = 0x0002;
-    fixtureDef.filter.maskBits = 0x0002;
+    fixtureDef.filter.categoryBits = config::stringToCategoryBits(eventInfo.tag);
+    fixtureDef.filter.maskBits =config::stringToMaskBits(eventInfo.tag);
     fixtureDef.restitution = {0.05f};
 
     colliderComponent.fixture = body->CreateFixture(&fixtureDef);
-    body->SetFixedRotation(true);
+    
+    if(collisionData->tag != "Item")
+        body->SetFixedRotation(true);
 
     colliderComponent.body = body;
     colliderComponent.onCollisionEnter = eventInfo.onCollisionEnter;
@@ -139,8 +141,9 @@ void ObjectCreatorSystem::createProjectile(CreateBodyWithCollisionEvent eventInf
             config::gameScale);
 
     bulletBodyDef.position.Set(xPosition, yPosition);
-    bulletBodyDef.angle = transformComponent.rotation;
+    bulletBodyDef.angle = transformComponent.rotation * (3.141516f / 180.f);
     bulletBodyDef.type = b2_dynamicBody;
+    bulletBodyDef.bullet = true;
     bulletBodyDef.userData.pointer = reinterpret_cast<uintptr_t>(collisionData);
 
     b2Body* body = Physics::getWorld()->CreateBody(&bulletBodyDef);
@@ -156,20 +159,18 @@ void ObjectCreatorSystem::createProjectile(CreateBodyWithCollisionEvent eventInf
     bulletFixtureDef.density = 1.0f;
     bulletFixtureDef.friction = 0.0f;
     bulletFixtureDef.restitution = 0.1f;
-    bulletFixtureDef.filter.categoryBits = 0x0002;
-    bulletFixtureDef.filter.maskBits = 0x0002;
+    bulletFixtureDef.filter.categoryBits = config::stringToCategoryBits(eventInfo.tag);
+    bulletFixtureDef.filter.maskBits = config::stringToMaskBits(eventInfo.tag);
 
     colliderComponent.fixture = body->CreateFixture(&bulletFixtureDef);
-    body->SetFixedRotation(true);
+
+    if(collisionData->tag != "Item")
+        body->SetFixedRotation(true);
 
     colliderComponent.body = body;
     colliderComponent.tag = eventInfo.tag;
     colliderComponent.onCollisionEnter = eventInfo.onCollisionEnter;
     colliderComponent.onCollisionOut = eventInfo.onCollisionOut;
-
-    b2Vec2 bulletVelocity(1.0f, 0.0f);
-    body->SetLinearVelocity(bulletVelocity);
-
 }
 
 

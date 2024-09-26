@@ -1,13 +1,13 @@
 {
-    "activeFile": "assets/tileSets/Weapons.json",
+    "activeFile": "assets/tileSets/CosmicLilac.json",
     "expandedProjectPaths": [
+        "assets",
+        "assets/maps/floor_01",
+        ".",
         "assets/maps",
         "build",
-        ".",
-        "assets/maps/floor_00",
-        "assets/maps/floor_01",
         "assets/tileSets",
-        "assets"
+        "assets/maps/floor_00"
     ],
     "file.lastUsedOpenFilter": "Wszystkie pliki (*)",
     "fileStates": {
@@ -16,223 +16,223 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 223.6013221459446,
-                "y": 119.73353674040172
+                "y": 119.94508009153319
             }
         },
         "assets/maps/floor_01/map_10.json": {
             "scale": 3.0726562499999996,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 147.26671751843378,
-                "y": 111.95525044495295
+                "x": 147.42944317315028,
+                "y": 112.11797609966948
             }
         },
         "assets/maps/floor_01/map_11.json": {
             "scale": 2.648125,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 159.92447486429077,
-                "y": 160.11328770356386
+                "x": 160.11328770356386,
+                "y": 159.9244748642908
             }
         },
         "assets/maps/floor_01/map_110.json": {
             "scale": 3.0726562499999996,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 159.95931858632088,
-                "y": 111.95525044495295
+                "x": 160.1220442410374,
+                "y": 112.11797609966948
             }
         },
         "assets/maps/floor_01/map_12.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 120.08496577767288
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_13.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_14.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_15.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_16.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_3.json": {
             "scale": 3.0726562499999996,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 159.95931858632088,
-                "y": 39.70505975082635
+                "x": 160.1220442410374,
+                "y": 39.86778540554285
             }
         },
         "assets/maps/floor_01/map_4.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_5.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 207.94711416221716,
-                "y": 119.73353674040172
+                "x": 208.1586575133486,
+                "y": 119.94508009153319
             }
         },
         "assets/maps/floor_01/map_6.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 207.94711416221716,
-                "y": 119.73353674040172
+                "x": 208.1586575133486,
+                "y": 119.94508009153319
             }
         },
         "assets/maps/floor_01/map_7.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 207.94711416221716,
-                "y": 119.73353674040172
+                "x": 208.1586575133486,
+                "y": 119.94508009153319
             }
         },
         "assets/maps/floor_01/map_8.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 207.94711416221716,
-                "y": 119.73353674040172
+                "x": 208.1586575133486,
+                "y": 119.94508009153319
             }
         },
         "assets/maps/floor_01/map_9.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 207.94711416221716,
-                "y": 119.73353674040172
+                "x": 208.1586575133486,
+                "y": 119.94508009153319
             }
         },
         "assets/maps/floor_01/map_b1.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_b2.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_b3.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_b4.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_s1.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_s10.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_s11.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_s14.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_s15.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_s2.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_s3.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/floor_01/map_s4.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 119.80174651876327
+                "x": 120.08496577767289,
+                "y": 119.94335614821807
             }
         },
         "assets/maps/map_1.json": {
@@ -419,32 +419,53 @@
             "scaleInDock": 1,
             "scaleInEditor": 2
         },
+        "assets/tileSets/Characters.json": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "assets/tileSets/CosmicLegacy.json": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "assets/tileSets/CosmicLilac.json": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "assets/tileSets/Decorative.json": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "assets/tileSets/DungeonWalls.json": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "assets/tileSets/Graveyard.json": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "assets/tileSets/Items.json": {
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "assets/tileSets/Jungle.json": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "assets/tileSets/Portal.json": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "assets/tileSets/SpecialBlocks.json": {
             "scaleInDock": 1,
             "scaleInEditor": 4
         },
+        "assets/tileSets/Swamp.json": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "assets/tileSets/Weapons.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 1.5
+            "scaleInEditor": 2
         }
     },
     "last.imagePath": "C:/Users/domin/CLionProjects/Quest-for-the-Lost-Pixels/assets/floorAtlas",
@@ -477,22 +498,35 @@
         "assets/maps/floor_01/map_s1.json",
         "assets/maps/floor_01/map_9.json",
         "assets/maps/floor_01/map_15.json",
-        "assets/maps/floor_01/map_12.json"
+        "assets/maps/floor_01/map_12.json",
+        "assets/tileSets/Swamp.json",
+        "assets/tileSets/SpecialBlocks.json",
+        "assets/tileSets/DungeonWalls.json",
+        "assets/tileSets/Graveyard.json",
+        "assets/tileSets/Items.json",
+        "assets/tileSets/Jungle.json",
+        "assets/tileSets/Portal.json",
+        "assets/tileSets/CosmicLegacy.json",
+        "assets/tileSets/Characters.json",
+        "assets/tileSets/AnimSlimes.json",
+        "assets/tileSets/Bullets.json",
+        "assets/tileSets/Decorative.json",
+        "assets/tileSets/CosmicLilac.json"
     ],
     "project": "bez nazwy.tiled-project",
     "recentFiles": [
-        "assets/tileSets/Bullets.json",
-        "assets/maps/floor_01/map_12.json",
-        "assets/maps/floor_01/map_15.json",
-        "assets/maps/floor_01/map_9.json",
-        "assets/maps/floor_01/map_s1.json",
-        "assets/maps/floor_01/map_s10.json",
-        "assets/maps/floor_01/map_s11.json",
-        "assets/maps/floor_01/map_s14.json",
-        "assets/maps/floor_01/map_s4.json",
-        "assets/maps/floor_01/map_s3.json",
-        "assets/maps/floor_01/map_s2.json",
-        "assets/maps/floor_01/map_s15.json"
+        "assets/tileSets/Weapons.json",
+        "assets/maps/floor_01/map_1.json",
+        "assets/maps/floor_01/map_10.json",
+        "assets/maps/floor_01/map_11.json",
+        "assets/maps/floor_01/map_110.json",
+        "assets/maps/floor_01/map_13.json",
+        "assets/maps/floor_01/map_16.json",
+        "assets/maps/floor_01/map_14.json",
+        "assets/maps/floor_01/map_3.json",
+        "assets/maps/floor_01/map_4.json",
+        "assets/maps/floor_01/map_5.json",
+        "assets/maps/floor_01/map_6.json"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {

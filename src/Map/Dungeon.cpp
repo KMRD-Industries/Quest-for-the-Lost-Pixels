@@ -191,7 +191,7 @@ void Dungeon::setupWeaponEntity(const Entity player) const
 {
     const Entity weaponEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19, .type = GameType::WeaponType::WAND});
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19, .type = GameType::WeaponType::MELE});
     gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
