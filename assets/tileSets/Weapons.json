@@ -63,9 +63,9 @@
             },
          "properties":[
                 {
-                 "name":"tileID",
+                 "name":"type",
                  "type":"string",
-                 "value":"19"
+                 "value":"mele"
                 }]
         }, 
         {
@@ -73,7 +73,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":3,
              "name":"",
              "objects":[
                     {
@@ -120,7 +119,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":21,
@@ -173,14 +178,19 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":51,
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -227,14 +237,19 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":52,
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -281,14 +296,19 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":53,
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -335,7 +355,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":82,
@@ -388,7 +414,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":83,
@@ -441,7 +473,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":84,
@@ -494,14 +532,19 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":85,
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -548,7 +591,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":114,
@@ -601,7 +650,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":115,
@@ -654,7 +709,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":116,
@@ -707,7 +768,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":117,
@@ -760,7 +827,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":146,
@@ -813,7 +886,13 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":147,
@@ -869,9 +948,129 @@
             },
          "properties":[
                 {
-                 "name":"tileID",
+                 "name":"type",
                  "type":"string",
-                 "value":"147"
+                 "value":"mele"
+                }]
+        }, 
+        {
+         "id":148,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":30,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"148"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":8,
+                     "x":4,
+                     "y":1
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"147"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":7.5,
+                     "y":26.4090909090909
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"wand"
+                }]
+        }, 
+        {
+         "id":149,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":30,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"149"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":8,
+                     "x":4,
+                     "y":1
+                    }, 
+                    {
+                     "height":1,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"149"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":7.5,
+                     "y":25
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"wand"
                 }]
         }, 
         {
@@ -879,7 +1078,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -926,14 +1124,28 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
+        }, 
+        {
+         "id":179,
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
         }, 
         {
          "id":180,
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -974,7 +1186,73 @@
              "visible":true,
              "x":0,
              "y":0
-            }
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"mele"
+                }]
+        }, 
+        {
+         "id":210,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":26,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"210"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":7,
+                     "x":8,
+                     "y":3
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"210"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":13,
+                     "y":15
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"bow"
+                }]
         }],
  "tilewidth":16,
  "type":"tileset",

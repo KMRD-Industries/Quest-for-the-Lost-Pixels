@@ -120,7 +120,7 @@ void TextureSystem::loadTilesIntoSystem(const Tileset& parsedTileSet, long& gid)
  */
 void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedTileSet, const long& firstGid)
 {
-    for (const auto& [id, animation, objects] : parsedTileSet.tiles)
+    for (const auto& [id,properties, animation, objects] : parsedTileSet.tiles)
     {
         // Adjust tile with a tile set id.
         const long adjusted_id = firstGid + id;
@@ -138,7 +138,7 @@ void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedT
                 if (object.properties.size() >= 2)
                 {
                     m_mapWeaponPlacements.emplace(adjusted_id, object);
-                    if (id <= 180) m_weaponsIDs.push_back(id);
+                    if (id <= 180) m_weaponsIDs.emplace_back(id, GameType::stringToWeaponType(properties[0].value));
                 }
                 else
                 {

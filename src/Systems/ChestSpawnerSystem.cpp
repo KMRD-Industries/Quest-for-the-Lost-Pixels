@@ -34,11 +34,11 @@ void ChestSpawnerSystem::spawnChest() const
 void ChestSpawnerSystem::spawnWeapon(const TransformComponent& spawnerTransformComponent) const
 {
     const Entity newWeaponEntity = gCoordinator.createEntity();
-    const auto& id = getRandomElement(m_weaponsIDs);
+    const auto& weaponDesc = getRandomElement(m_weaponsIDs);
 
     gCoordinator.addComponents(newWeaponEntity,
-        WeaponComponent{.id = id},
-        TileComponent{static_cast<uint32_t>(id), "Weapons", 7},
+        WeaponComponent{.id = weaponDesc.first, .type =  weaponDesc.second},
+        TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", 7},
         spawnerTransformComponent,
         RenderComponent{},
         ColliderComponent{},
@@ -69,6 +69,9 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent& spawnerTransform
     {
         // TODO: Spawning Logic
         std::time(nullptr) % 3 == 0 ? spawnPotion(spawnerTransformComponent) : spawnWeapon(spawnerTransformComponent);
+        spawnWeapon(spawnerTransformComponent);
+        spawnWeapon(spawnerTransformComponent);
+        spawnWeapon(spawnerTransformComponent);
     };
 
     // Create new object with special eventComponent

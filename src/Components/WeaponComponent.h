@@ -24,4 +24,6 @@ struct WeaponComponent
     sf::Vector2f targetPoint{};
     float targetAngleDegrees{};
     bool equipped{false};
+    GameType::WeaponType type{GameType::WeaponType::UNKNOWN};
+
 };

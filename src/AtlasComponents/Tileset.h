@@ -30,6 +30,7 @@ struct Collision
 struct Tile
 {
     int id;
+    std::vector<ObjectProperty> properties;
     std::vector<AnimationFrame> animation;
     std::vector<Collision> objects;
 };
