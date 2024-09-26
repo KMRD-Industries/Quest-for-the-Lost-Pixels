@@ -213,7 +213,6 @@ void Dungeon::update(const float deltaTime)
 {
     m_playerMovementSystem->update(deltaTime);
     m_weaponSystem->update();
-    m_spawnerSystem->update();
     m_enemySystem->update();
     m_travellingSystem->update();
     m_passageSystem->update();
