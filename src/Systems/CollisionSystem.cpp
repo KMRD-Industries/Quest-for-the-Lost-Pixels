@@ -149,9 +149,13 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         if (body == nullptr) continue;
         const auto position = body->GetPosition();
 
-        transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
-        renderComponent.sprite.setPosition(position.x, position.y);
-        renderComponent.dirty = true;
+        if(sf::Vector2f{convertMetersToPixel(position.x), convertMetersToPixel(position.y)} != transformComponent.position)
+        {
+            transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
+            renderComponent.sprite.setPosition(position.x, position.y);
+            renderComponent.dirty = true;
+        }
+
     }
 }
 
