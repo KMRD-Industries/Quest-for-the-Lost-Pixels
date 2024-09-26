@@ -56,15 +56,18 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     const auto enemyConfig = getRandomEnemyData(enemyType);
     const Entity newMonsterEntity = gCoordinator.createEntity();
     const TileComponent tileComponent{enemyConfig.textureData};
-    const ColliderComponent colliderComponent{
-        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id)};
+    const ColliderComponent colliderComponent{enemyConfig.collisionData};
+    TransformComponent transformComponent{spawnerTransformComponent};
+
+    transformComponent.position.x -= colliderComponent.collision.x * config::gameScale;
+    transformComponent.position.y -= colliderComponent.collision.y * config::gameScale;
 
     gCoordinator.addComponent(newMonsterEntity, tileComponent);
-    gCoordinator.addComponent(newMonsterEntity, spawnerTransformComponent);
+    gCoordinator.addComponent(newMonsterEntity, transformComponent);
     gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
     gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
-    gCoordinator.addComponent(newMonsterEntity, ColliderComponent(enemyConfig.collisionData));
+    gCoordinator.addComponent(newMonsterEntity, colliderComponent);
     gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = enemyConfig.hp});
 
     const Entity newEventEntity = gCoordinator.createEntity();
