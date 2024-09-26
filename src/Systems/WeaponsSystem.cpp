@@ -17,49 +17,37 @@ void WeaponSystem::init() {}
 
 void WeaponSystem::update()
 {
-    for (const auto entity : m_entities)
-    {
-        updateStartingAngle(entity);
-        updateWeaponAngle(entity);
-    }
-
-    markClosest();
-}
-
-void WeaponSystem::markClosest()
-{
     const auto& playerTransformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
     double minDistance = std::numeric_limits<float>::max();
     Entity closestWeaponEntity{};
 
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) continue;
+        updateStartingAngle(entity);
+        updateWeaponAngle(entity);
 
-        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        if(gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) continue;
+
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
-        float distanceX = transformComponent.position.x - playerTransformComponent.position.x;
-        float distanceY = transformComponent.position.y - playerTransformComponent.position.y;
+        const float distanceX = transformComponent.position.x - playerTransformComponent.position.x;
+        const float distanceY = transformComponent.position.y - playerTransformComponent.position.y;
+        const double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2) <= minDistance);
 
-        double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2));
-
-        if (distance <= minDistance)
+        if(distance <= minDistance)
         {
             minDistance = distance;
             closestWeaponEntity = entity;
         }
-        else
-        {
-            renderComponent.color = sf::Color::White;
-        }
     }
 
-    if (minDistance < config::weaponInteractionDistance)
+    if(minDistance <= config::weaponInteractionDistance)
     {
         gCoordinator.getComponent<RenderComponent>(closestWeaponEntity).color = sf::Color(255, 102, 102);
         displayStats(closestWeaponEntity);
     }
+
+    // markClosest();
 }
 
 void WeaponSystem::displayStats(const Entity entity)

@@ -50,29 +50,28 @@ void MyContactListener::EndContact(b2Contact* contact)
     }
 }
 
-CollisionSystem::CollisionSystem() { init(); }
+CollisionSystem::CollisionSystem()
+{
+    init();
+}
 
-void CollisionSystem::init() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
+void CollisionSystem::init()
+{
+    Physics::getWorld()->SetContactListener(&m_myContactListenerInstance);
+}
 
 void CollisionSystem::createMapCollision()
 {
-    for (const auto entity : m_entities)
-    {
-        if (!gCoordinator.hasComponent<PlayerComponent>(entity))
-        {
-            deleteBody(entity);
-        }
-    }
-
     auto createCollisionBody =
         [this](const Entity entity, const std::string& type, const bool isStatic, const bool useTexture)
     {
-        const Entity newEntity = gCoordinator.createEntity();
+        const Entity newMapCollisionEntity = gCoordinator.createEntity();
+
         const auto newEvent = CreateBodyWithCollisionEvent(
             entity, type, [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, isStatic,
             useTexture);
 
-        gCoordinator.addComponent(newEntity, newEvent);
+        gCoordinator.addComponent(newMapCollisionEntity, newEvent);
     };
 
     for (const auto entity : m_entities)
@@ -95,8 +94,8 @@ void CollisionSystem::createMapCollision()
                 createCollisionBody(entity, "Door", true, false);
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
-                if (gCoordinator.hasComponent<PassageComponent>(entity))
-                    if (gCoordinator.getComponent<PassageComponent>(entity).activePassage)
+                if (const auto* passageComponent = gCoordinator.tryGetComponent<PassageComponent>(entity))
+                    if (passageComponent->activePassage)
                         createCollisionBody(entity, "Passage", true, true);
         }
         else
@@ -107,12 +106,13 @@ void CollisionSystem::createMapCollision()
     }
 }
 
-void CollisionSystem::update()
+void CollisionSystem::update() const
 {
     for (const auto entity : m_entities)
     {
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        auto& transformComponent    = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& colliderComponent     = gCoordinator.getComponent<ColliderComponent>(entity);
+        auto& renderComponent       = gCoordinator.getComponent<RenderComponent>(entity);
 
         if (!transformComponent.velocity.IsValid()) continue;
 
@@ -129,6 +129,7 @@ void CollisionSystem::update()
                                      convertPixelsToMeters(transformComponent.velocity.y)});
         }
 
+        renderComponent.dirty = true;
         transformComponent.velocity = {};
     }
 }
@@ -140,9 +141,9 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
     for (const auto entity : m_entities)
     {
-        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        auto& colliderComponent     = gCoordinator.getComponent<ColliderComponent>(entity);
+        auto& transformComponent    = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& renderComponent       = gCoordinator.getComponent<RenderComponent>(entity);
 
         const b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
@@ -150,19 +151,21 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
         renderComponent.sprite.setPosition(position.x, position.y);
+        renderComponent.dirty = true;
     }
 }
 
-void CollisionSystem::deleteBody(const Entity entity)
+void CollisionSystem::deleteBody(const Entity entity) const
 {
-    if (!gCoordinator.hasComponent<ColliderComponent>(entity)) return;
-    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-    if (colliderComponent.body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent.body);
-    colliderComponent.body = nullptr;
-    colliderComponent.collision = {};
+    if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+    {
+        if (colliderComponent->body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent->body);
+        colliderComponent->body = nullptr;
+        colliderComponent->collision = {};
+    }
 }
 
-void CollisionSystem::deleteMarkedBodies()
+void CollisionSystem::deleteMarkedBodies() const
 {
     std::unordered_set<Entity> entityToKill{};
 

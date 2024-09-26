@@ -7,4 +7,5 @@ struct RenderComponent
     sf::Sprite sprite{};
     int layer{};
     sf::Color color{sf::Color::White};
+    bool dirty{true};
 };

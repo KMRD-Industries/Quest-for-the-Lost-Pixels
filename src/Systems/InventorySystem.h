@@ -4,8 +4,6 @@
 class InventorySystem : public System
 {
 public:
-    void init();
-    void update();
-    void pickUpWeapon(Entity, Entity);
+    void pickUpWeapon(Entity, Entity) const;
     void dropWeapon(Entity);
 };

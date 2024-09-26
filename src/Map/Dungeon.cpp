@@ -213,7 +213,7 @@ void Dungeon::update(const float deltaTime)
 {
     m_playerMovementSystem->update(deltaTime);
     m_weaponSystem->update();
-    m_spawnerSystem->update();
+    m_spawnerSystem->update(deltaTime);
     m_enemySystem->update();
     m_travellingSystem->update();
     m_passageSystem->update();
@@ -246,7 +246,7 @@ void Dungeon::update(const float deltaTime)
             break;
         }
 
-        m_multiplayerSystem->update();
+        // m_multiplayerSystem->update();
     }
 
     m_roomMap.at(m_currentPlayerPos).update();

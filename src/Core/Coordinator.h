@@ -58,6 +58,12 @@ public:
     }
 
     template <typename T>
+    T* tryGetComponent(const Entity entity) const
+    {
+        return m_componentManager->tryGetComponent<T>(entity);
+    }
+
+    template <typename T>
     bool hasComponent(const Entity entity) const
     {
         return m_componentManager->hasComponent<T>(entity);

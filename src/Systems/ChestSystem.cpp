@@ -2,24 +2,6 @@
 
 #include "AnimationSystem.h"
 #include "ColliderComponent.h"
-#include "Physics.h"
-//
-// void ChestSystem::deleteItems()
-// {
-//     std::deque<Entity> entityToRemove;
-//
-//     for (const auto entity : m_entities)
-//     {
-//         entityToRemove.push_back(entity);
-//     }
-//
-//     while (!entityToRemove.empty())
-//     {
-//         Physics::getWorld()->DestroyBody(gCoordinator.getComponent<ColliderComponent>(entityToRemove.front()).body);
-//         gCoordinator.destroyEntity(entityToRemove.front());
-//         entityToRemove.pop_front();
-//     }
-// }
 
 void ChestSystem::deleteItems() const
 {
@@ -28,9 +10,10 @@ void ChestSystem::deleteItems() const
 
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.hasComponent<ColliderComponent>(entity))
+
+        if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
         {
-            gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
+            colliderComponent->toDestroy = true;
         }
         else
         {

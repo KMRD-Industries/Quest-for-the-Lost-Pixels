@@ -36,25 +36,29 @@ void MapSystem::loadMap(const std::string& path)
     // Remove old room entites before creating new ones
     resetMap();
 
+    int index{};
+    int x_position = {};
+    int y_position = {};
+
     // Iterate over room layers
     for (const Map& parsedMap = parseMap(path); const Layer& layer : parsedMap.layers)
     {
         // Index to retrieve position of Tile. Layer contains all tiles in correct order,
         // and with number of tiles in rows and cols we can model room layout.
-        int index{};
+        index = {};
 
         // Process base64 layer data into vector of tiles
         for (const uint32_t tile : processDataString(layer.data, static_cast<size_t>(layer.width) * layer.height, 0))
         {
-            flipFlags = (tile & mask) >> 28;
-            tileID = tile & ~mask;
+            m_flipFlags = (tile & m_mask) >> 28;
+            m_tileID = tile & ~m_mask;
 
-            const int x_position = index % layer.width;
-            const int y_position = index / layer.width;
+            x_position = index % layer.width;
+            y_position = index / layer.width;
 
-            if (tileID > 0)
+            if (m_tileID > 0)
             {
-                processTile(tileID, flipFlags, layer.id, x_position, y_position, parsedMap);
+                processTile(m_tileID, m_flipFlags, layer.id, x_position, y_position, parsedMap);
             }
 
             index++;
@@ -137,12 +141,15 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     const auto tileComponent = TileComponent{
         static_cast<unsigned>(tileID - parsedMap.tilesets.at(findKeyLessThan(parsedMap.tilesets, tileID))),
         findKeyLessThan(parsedMap.tilesets, static_cast<signed>(tileID)), layerID};
-
     auto transformComponent = TransformComponent(getPosition(xPos + 1, yPos + 1, parsedMap.tileheight));
 
     doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
-    gCoordinator.addComponents(mapEntity, RenderComponent{}, MapComponent{}, transformComponent, tileComponent);
+    gCoordinator.addComponents(mapEntity,
+        RenderComponent{},
+        MapComponent{},
+        transformComponent,
+        tileComponent);
 
     if (tileComponent.tileSet == "SpecialBlocks") // Handle special Tiles
     {
@@ -224,8 +231,7 @@ void MapSystem::resetMap() const
 
     for (const auto& entity : m_entities)
         if (!gCoordinator.hasComponent<PlayerComponent>(entity) &&
-            !gCoordinator.hasComponent<MultiplayerComponent>(entity) &&
-            !gCoordinator.hasComponent<DoorComponent>(entity))
+            !gCoordinator.hasComponent<MultiplayerComponent>(entity))
             entityToRemove.push_back(entity);
 
 
@@ -239,7 +245,7 @@ void MapSystem::resetMap() const
     entityToRemove.clear();
 }
 
-sf::Vector2f MapSystem::getPosition(const int x_axis, const int y_axis, const int map_tile_width)
+sf::Vector2f MapSystem::getPosition(const int x_axis, const int y_axis, const int map_tile_width) const
 {
     return sf::Vector2f(static_cast<float>(x_axis), static_cast<float>(y_axis)) * static_cast<float>(map_tile_width) *
         config::gameScale;

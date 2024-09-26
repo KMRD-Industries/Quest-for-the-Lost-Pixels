@@ -7,8 +7,6 @@
 class DoorSystem : public System
 {
 public:
-    void init();
-    void update();
     void clearDoors() const;
-    sf::Vector2f getDoorPosition(GameType::DoorEntraces entrance) const;
+    [[nodiscard]] sf::Vector2f getDoorPosition(GameType::DoorEntraces entrance) const;
 };

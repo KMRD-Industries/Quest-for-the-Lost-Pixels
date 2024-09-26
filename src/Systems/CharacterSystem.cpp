@@ -3,13 +3,13 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
-#include "PlayerComponent.h"
 
 extern Coordinator gCoordinator;
 
-void CharacterSystem::update() const { cleanUpDeadEntities(); }
-
-void CharacterSystem::init() const {}
+void CharacterSystem::update() const
+{
+    cleanUpDeadEntities();
+}
 
 void CharacterSystem::cleanUpDeadEntities() const
 {
@@ -21,9 +21,9 @@ void CharacterSystem::cleanUpDeadEntities() const
         const auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
         if (characterComponent.hp > 0) continue;
 
-        if (gCoordinator.hasComponent<ColliderComponent>(entity))
+        if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
         {
-            gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
+           colliderComponent->toDestroy = true;
         }
         else
         {

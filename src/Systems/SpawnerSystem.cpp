@@ -15,23 +15,29 @@
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
-constexpr int SPAWN_RATE = 3600;
+constexpr float SPAWN_RATE = 3600.f;
 
 SpawnerSystem::SpawnerSystem() { init(); }
 
-void SpawnerSystem::init() {}
-
-void SpawnerSystem::update()
+void SpawnerSystem::init()
 {
-    spawnTime = (spawnTime + 1) % SPAWN_RATE;
+    m_spawnTime = {};
+}
+
+void SpawnerSystem::update(const float timeStamp)
+{
+    m_spawnTime += timeStamp * 1000.f;
 
     for (const auto entity : m_entities)
     {
-        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& spawnerComponent                  = gCoordinator.getComponent<SpawnerComponent>(entity);
+        const auto& spawnerTransformComponent   = gCoordinator.getComponent<TransformComponent>(entity);
 
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
+
+    if(m_spawnTime >= SPAWN_RATE)
+        m_spawnTime -= SPAWN_RATE;
 
     cleanUpUnnecessarySpawners();
 }
@@ -39,27 +45,27 @@ void SpawnerSystem::update()
 void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
                                    const TransformComponent& spawnerTransformComponent)
 {
-    if (!spawnerComponent.loopSpawn && spawnerComponent.noSpawns >= 1) return;
-
     // Check if the spawner is ready to spawn the enemy.
-    if (!isReadyToSpawn(static_cast<int>(spawnerComponent.spawnCooldown))) return;
+    if (m_spawnTime < SPAWN_RATE) return;
 
     // Spawn the enemy and increment the spawn count.
     spawnerComponent.noSpawns++;
     spawnEnemy(spawnerTransformComponent, spawnerComponent.enemyType);
 }
 
-bool SpawnerSystem::isReadyToSpawn(const int cooldown) { return spawnTime % cooldown == 0; }
-
-void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent, const Enemies::EnemyType enemyType)
+void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent, const Enemies::EnemyType enemyType) const
 {
     const auto enemyConfig = getRandomEnemyData(enemyType);
     const Entity newMonsterEntity = gCoordinator.createEntity();
-    const TileComponent tileComponent{enemyConfig.textureData};
 
-    gCoordinator.addComponents(newMonsterEntity, enemyConfig.textureData, spawnerTransformComponent, RenderComponent{},
-                               AnimationComponent{}, EnemyComponent{}, ColliderComponent{enemyConfig.collisionData},
-                               CharacterComponent{.hp = enemyConfig.hp});
+    gCoordinator.addComponents(newMonsterEntity,
+        enemyConfig.textureData,
+        spawnerTransformComponent,
+        RenderComponent{},
+        AnimationComponent{},
+        EnemyComponent{},
+        ColliderComponent{enemyConfig.collisionData},
+        CharacterComponent{.hp = enemyConfig.hp});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
@@ -70,8 +76,8 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
             if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
-            playerCharacterComponent.attacked = true;
 
+            playerCharacterComponent.attacked = true;
             playerCharacterComponent.hp -= enemyConfig.damage;
 
             if (!config::applyKnockback) return;

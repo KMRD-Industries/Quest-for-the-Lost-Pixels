@@ -232,6 +232,8 @@ void TextureSystem::loadTextures()
             continue;
         }
 
+        if (renderComponent.dirty == false) continue;
+
         // Adjust tile index
         long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
         auto animationsIter = m_mapAnimations.find(adjusted_id);
@@ -285,6 +287,7 @@ void TextureSystem::loadTextures()
         // Load texture of tile with that id to render component
         renderComponent.sprite = getTile(tileComponent.tileSet, tileComponent.id);
         renderComponent.layer = tileComponent.layer;
+        renderComponent.dirty = true;
     }
 }
 

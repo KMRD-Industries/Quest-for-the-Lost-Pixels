@@ -10,10 +10,6 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-void InventorySystem::init(){};
-
-void InventorySystem::update() {}
-
 void InventorySystem::dropWeapon(const Entity player)
 {
     auto& inventory = gCoordinator.getComponent<InventoryComponent>(player);
@@ -34,16 +30,15 @@ void InventorySystem::dropWeapon(const Entity player)
     inventory.weapons.clear();
 }
 
-void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon)
+void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon) const
 {
-    if (gCoordinator.hasComponent<ColliderComponent>(weapon))
+    if(auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(weapon))
     {
-        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(weapon);
-        if (colliderComponent.body != nullptr)
+        if (colliderComponent->body != nullptr)
         {
-            Physics::getWorld()->DestroyBody(colliderComponent.body);
-            colliderComponent.body = nullptr;
-            colliderComponent.collision = {};
+            Physics::getWorld()->DestroyBody(colliderComponent->body);
+            colliderComponent->body = nullptr;
+            colliderComponent->collision = {};
         }
     }
 
@@ -51,7 +46,8 @@ void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon)
     inventory.weapons.push_back(weapon);
     gCoordinator.getComponent<WeaponComponent>(weapon).equipped = true;
 
-    if (gCoordinator.hasComponent<ItemComponent>(weapon)) gCoordinator.removeComponent<ItemComponent>(weapon);
+    if (gCoordinator.hasComponent<ItemComponent>(weapon))
+        gCoordinator.removeComponent<ItemComponent>(weapon);
 
     if (gCoordinator.hasComponent<ItemAnimationComponent>(weapon))
         gCoordinator.removeComponent<ItemAnimationComponent>(weapon);

@@ -20,7 +20,7 @@ void FightSystem::update()
 
         // Start attack animation
         const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);
-        const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventEntity);
+        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventEntity);
         auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
 
         if (weaponComponent.isAttacking) continue;

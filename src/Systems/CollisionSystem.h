@@ -21,7 +21,7 @@ class CollisionSystem : public System
 {
 public:
     void init();
-    void update();
+    void update() const;
 
     void createMapCollision();
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations) const;
@@ -34,8 +34,8 @@ public:
         const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&) {},
         bool isStatic = true, bool useTextureSize = true, const glm::vec2& offset = {0., 0.});
 
-    void deleteBody(Entity entity);
-    void deleteMarkedBodies();
+    void deleteBody(Entity entity) const;
+    void deleteMarkedBodies() const;
 
 private:
     MyContactListener m_myContactListenerInstance;
