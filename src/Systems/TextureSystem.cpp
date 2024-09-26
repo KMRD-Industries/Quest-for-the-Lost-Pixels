@@ -1,6 +1,7 @@
 #include "TextureSystem.h"
 #include <iostream>
 
+#include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
@@ -13,12 +14,10 @@
 #include "TransformComponent.h"
 #include "Utils/Helpers.h"
 
+
 extern Coordinator gCoordinator;
 
-
 void TextureSystem::init() { loadTexturesFromFiles(); }
-
-void TextureSystem::update() {}
 
 /**
  * Load JSON files to atlases.
@@ -247,7 +246,7 @@ void TextureSystem::loadTextures()
                 gCoordinator.addComponent(entity, AnimationComponent{});
 
             auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
-            animation_component.frames = getAnimations(tileComponent.tileSet, tileComponent.id);
+            animation_component.animationFrames = getAnimations(tileComponent.tileSet, tileComponent.id);
         }
 
         if (collisionsIter != m_mapCollisions.end())

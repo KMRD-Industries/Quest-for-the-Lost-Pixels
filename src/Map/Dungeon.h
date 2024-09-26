@@ -13,6 +13,7 @@
 #include <TextureSystem.h>
 
 #include "AnimationSystem.h"
+#include "BulletSystem.h"
 #include "CharacterSystem.h"
 #include "ChestSystem.h"
 #include "CollisionSystem.h"
@@ -49,7 +50,7 @@ private:
     void setECS();
     void makeSimpleFloor();
     void moveInDungeon(const glm::ivec2& dir);
-    void clearDungeon() const;
+    void clearDungeon();
     void makeStartFloor();
     void moveDownDungeon();
     void loadMap(const std::string& path) const;
@@ -88,4 +89,6 @@ private:
     ChestSystem* m_chestSystem;
     RoomListenerSystem* m_roomListenerSystem;
     ItemSpawnerSystem* m_itemSpawnerSystem;
+    BulletSystem* m_bulletSystem;
+
 };

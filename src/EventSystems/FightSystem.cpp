@@ -6,6 +6,8 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "EquippedWeaponComponent.h"
 #include "FightActionEvent.h"
+#include "ItemAnimationComponent.h"
+#include "ItemComponent.h"
 #include "ObjectCreatorSystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"
@@ -133,17 +135,28 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
     gCoordinator.getComponent<CharacterComponent>(bullet).hp = -1;
 }
 
-void FightSystem::handleWandAttack(Entity eventEntity)
+float FightSystem::calculateAngle(const sf::Vector2f& pivotPoint, const sf::Vector2f& targetPoint) {
+    const sf::Vector2f direction = targetPoint - pivotPoint;
+    return std::atan2(direction.y, direction.x);
+}
+
+void FightSystem::handleWandAttack(const Entity eventEntity)
 {
     const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);
     const auto& weaponComponent {gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon)};
+    const auto& colliderComponent {gCoordinator.getComponent<ColliderComponent>(equippedWeapon.currentWeapon)};
 
     const Entity newBulletEntity = gCoordinator.createEntity();
 
-    TransformComponent transformComponent{gCoordinator.getComponent<TransformComponent>(equippedWeapon.currentWeapon)};
+    auto transformComponent{gCoordinator.getComponent<TransformComponent>(equippedWeapon.currentWeapon)};
 
-    float targetAngleRadians = (weaponComponent.currentAngle - 2 * weaponComponent.initialAngle) * (3.1415f / 180.0f);
-    transformComponent.velocity = {std::cos(targetAngleRadians) * 1, std::sin(targetAngleRadians) * 1};
+    const float targetAngleDegrees = weaponComponent.currentAngle - 90.f;
+    const float targetAngleRadians = targetAngleDegrees * (M_PI / 180.f);
+
+    transformComponent.velocity = {std::cos(targetAngleRadians) * 1.f, std::sin(targetAngleRadians) * 1.f};
+    transformComponent.rotation = weaponComponent.currentAngle - 90.f;
+    transformComponent.position.x += std::cos(targetAngleRadians) * colliderComponent.collision.width * config::gameScale;
+    transformComponent.position.y += std::sin(targetAngleRadians) * colliderComponent.collision.height * config::gameScale + 20;
 
     gCoordinator.addComponents(newBulletEntity,
         ColliderComponent{},
@@ -169,22 +182,18 @@ void FightSystem::handleWandAttack(Entity eventEntity)
     gCoordinator.addComponent(newBulletEvent, newEvent);
 }
 
-
 void FightSystem::clear()
 {
+    std::deque<Entity> entityToRemove;
 
+    for (const auto entity : m_entities)
     {
-        std::deque<Entity> entityToRemove;
+        entityToRemove.push_back(entity);
+    }
 
-        for (const auto entity : m_entities)
-        {
-            entityToRemove.push_back(entity);
-        }
-
-        while (!entityToRemove.empty())
-        {
-            gCoordinator.destroyEntity(entityToRemove.front());
-            entityToRemove.pop_front();
-        }
+    while (!entityToRemove.empty())
+    {
+        gCoordinator.destroyEntity(entityToRemove.front());
+        entityToRemove.pop_front();
     }
 }

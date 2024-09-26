@@ -55,6 +55,7 @@ set(COMPONENTS
         Components/FloorComponent.h
         Components/CreateBodyWithCollisionEvent.h
         Components/FightActionEvent.h
+        Components/BulletComponent.h
 )
 
 set(MAP
@@ -110,6 +111,8 @@ set(SYSTEMS
         Systems/TextTagSystem.h
         Systems/PassageSystem.cpp
         Systems/PassageSystem.h
+        Systems/BulletSystem.h
+        Systems/BulletSystem.cpp
 )
 
 set(EVENT_SYSTEMS

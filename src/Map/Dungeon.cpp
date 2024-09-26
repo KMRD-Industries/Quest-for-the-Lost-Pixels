@@ -14,6 +14,9 @@
 #include "DoorComponent.h"
 #include "DoorSystem.h"
 #include "Dungeon.h"
+
+#include "BulletComponent.h"
+#include "BulletSystem.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -30,6 +33,7 @@
 #include "MapSystem.h"
 #include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
+#include "ObjectCreatorSystem.h"
 #include "PassageComponent.h"
 #include "PassageSystem.h"
 #include "PlayerComponent.h"
@@ -191,7 +195,7 @@ void Dungeon::setupWeaponEntity(const Entity player) const
 {
     const Entity weaponEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19, .type = GameType::WeaponType::MELE});
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19, .type = GameType::WeaponType::WAND});
     gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
@@ -217,11 +221,11 @@ void Dungeon::update(const float deltaTime)
     m_enemySystem->update();
     m_travellingSystem->update();
     m_passageSystem->update();
-    m_characterSystem->update();
     m_animationSystem->update(deltaTime);
     m_textTagSystem->update();
     m_roomListenerSystem->update();
     m_itemSpawnerSystem->updateAnimation(deltaTime);
+    m_characterSystem->update();
 
     if (m_multiplayerSystem->isConnected())
     {
@@ -246,7 +250,7 @@ void Dungeon::update(const float deltaTime)
             break;
         }
 
-        // m_multiplayerSystem->update();
+        m_multiplayerSystem->update();
     }
 
     m_roomMap.at(m_currentPlayerPos).update();
@@ -283,7 +287,6 @@ void Dungeon::makeStartFloor()
     m_roomMap.clear();
     m_roomMap.emplace(glm::ivec2{0, 0}, room);
     m_currentPlayerPos = {0.f, 0.f};
-
     m_passageSystem->setPassages(true);
 }
 
@@ -336,7 +339,7 @@ inline void Dungeon::loadMap(const std::string& path) const
     m_collisionSystem->createMapCollision();
 }
 
-inline void Dungeon::clearDungeon() const
+inline void Dungeon::clearDungeon()
 {
     m_doorSystem->clearDoors();
     m_spawnerSystem->clearSpawners();
@@ -344,6 +347,9 @@ inline void Dungeon::clearDungeon() const
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
     m_weaponSystem->deleteItems();
+    m_bulletSystem->deleteBullets();
+    gCoordinator.getRegisterSystem<ObjectCreatorSystem>()->clear();
+    gCoordinator.getRegisterSystem<FightSystem>()->clear();
 }
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)
@@ -409,6 +415,7 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<ItemComponent>();
     gCoordinator.registerComponent<ItemAnimationComponent>();
     gCoordinator.registerComponent<ChestComponent>();
+    gCoordinator.registerComponent<BulletComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -560,24 +567,33 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<ChestSystem>(signature);
     }
 
-    m_playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>().get();
-    m_multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>().get();
-    m_characterSystem = gCoordinator.getRegisterSystem<CharacterSystem>().get();
-    m_mapSystem = gCoordinator.getRegisterSystem<MapSystem>().get();
-    m_doorSystem = gCoordinator.getRegisterSystem<DoorSystem>().get();
-    m_passageSystem = gCoordinator.getRegisterSystem<PassageSystem>().get();
-    m_travellingSystem = gCoordinator.getRegisterSystem<TravellingSystem>().get();
-    m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
-    m_animationSystem = gCoordinator.getRegisterSystem<AnimationSystem>().get();
-    m_enemySystem = gCoordinator.getRegisterSystem<EnemySystem>().get();
-    m_spawnerSystem = gCoordinator.getRegisterSystem<SpawnerSystem>().get();
-    m_weaponSystem = gCoordinator.getRegisterSystem<WeaponSystem>().get();
-    m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
-    m_healthBarSystem = gCoordinator.getRegisterSystem<HealthBarSystem>().get();
-    m_equipWeaponSystem = gCoordinator.getRegisterSystem<EquipWeaponSystem>().get();
-    m_inventorySystem = gCoordinator.getRegisterSystem<InventorySystem>().get();
-    m_collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>().get();
-    m_chestSystem = gCoordinator.getRegisterSystem<ChestSystem>().get();
-    m_roomListenerSystem = gCoordinator.getRegisterSystem<RoomListenerSystem>().get();
-    m_itemSpawnerSystem = gCoordinator.getRegisterSystem<ItemSpawnerSystem>().get();
+    const auto bulletSystem = gCoordinator.getRegisterSystem<BulletSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<BulletComponent>());
+        gCoordinator.setSystemSignature<BulletSystem>(signature);
+    }
+
+    m_playerMovementSystem =gCoordinator.getRegisterSystem<PlayerMovementSystem>().get();
+    m_multiplayerSystem =   gCoordinator.getRegisterSystem<MultiplayerSystem>().get();
+    m_characterSystem =     gCoordinator.getRegisterSystem<CharacterSystem>().get();
+    m_mapSystem =           gCoordinator.getRegisterSystem<MapSystem>().get();
+    m_doorSystem =          gCoordinator.getRegisterSystem<DoorSystem>().get();
+    m_passageSystem =       gCoordinator.getRegisterSystem<PassageSystem>().get();
+    m_travellingSystem =    gCoordinator.getRegisterSystem<TravellingSystem>().get();
+    m_textureSystem =       gCoordinator.getRegisterSystem<TextureSystem>().get();
+    m_animationSystem =     gCoordinator.getRegisterSystem<AnimationSystem>().get();
+    m_enemySystem =         gCoordinator.getRegisterSystem<EnemySystem>().get();
+    m_spawnerSystem =       gCoordinator.getRegisterSystem<SpawnerSystem>().get();
+    m_weaponSystem =        gCoordinator.getRegisterSystem<WeaponSystem>().get();
+    m_textTagSystem =       gCoordinator.getRegisterSystem<TextTagSystem>().get();
+    m_healthBarSystem =     gCoordinator.getRegisterSystem<HealthBarSystem>().get();
+    m_equipWeaponSystem =   gCoordinator.getRegisterSystem<EquipWeaponSystem>().get();
+    m_inventorySystem =     gCoordinator.getRegisterSystem<InventorySystem>().get();
+    m_collisionSystem =     gCoordinator.getRegisterSystem<CollisionSystem>().get();
+    m_chestSystem =         gCoordinator.getRegisterSystem<ChestSystem>().get();
+    m_roomListenerSystem =  gCoordinator.getRegisterSystem<RoomListenerSystem>().get();
+    m_itemSpawnerSystem =   gCoordinator.getRegisterSystem<ItemSpawnerSystem>().get();
+    m_bulletSystem =        gCoordinator.getRegisterSystem<BulletSystem>().get();
+
 }

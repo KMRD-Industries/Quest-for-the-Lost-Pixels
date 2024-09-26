@@ -5,7 +5,6 @@
 
 #include <unordered_map>
 #include <vector>
-#include "AnimationComponent.h"
 #include "AnimationFrame.h"
 #include "AtlasComponents/Texture.h"
 #include "GameTypes.h"
@@ -42,7 +41,7 @@ public:
     void init();
     void update();
 
-    sf::Sprite getTile(const std::string &, long) const;
+    [[nodiscard]] sf::Sprite getTile(const std::string &, long) const;
     std::vector<AnimationFrame> getAnimations(const std::string &, long);
     Collision getCollision(const std::string &, long);
     void modifyColorScheme(int);

@@ -7,6 +7,8 @@
 #include "box2d/b2_math.h"
 #include "glm/gtx/hash.hpp"
 
+#define M_PI 3.1415927f
+
 namespace SpecialBlocks
 {
     enum class Blocks : int

@@ -21,7 +21,7 @@ void AnimationSystem::update(const float timeStep) const
         auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
         auto& tileComponent      = gCoordinator.getComponent<TileComponent>(entity);
 
-        if(animationComponent.frames.empty()) continue;
+        if(animationComponent.animationFrames.empty()) continue;
         updateEntityAnimationFrame(animationComponent, tileComponent, timeStep);
     }
 }
@@ -36,8 +36,8 @@ void AnimationSystem::updateEntityAnimationFrame(AnimationComponent& tileAnimati
 
 void AnimationSystem::loadNextFrame(AnimationComponent& animation, TileComponent& tile) const
 {
-    ++animation.currentFrame %= animation.frames.size();
-    animation.timeUntilNextFrame = animation.frames[animation.currentFrame].duration;
+    ++animation.currentFrame %= animation.animationFrames.size();
+    animation.timeUntilNextFrame = animation.animationFrames[animation.currentFrame].duration;
 
-    tile.id = animation.frames[animation.currentFrame].tileID;
+    tile.id = animation.animationFrames[animation.currentFrame].tileID;
 }

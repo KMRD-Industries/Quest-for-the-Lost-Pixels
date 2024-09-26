@@ -82,7 +82,6 @@ void RenderSystem::draw(sf::RenderWindow& window)
     setWeapon();
 
     GameUtility::mapOffset = (static_cast<sf::Vector2f>(windowSize) - GameUtility::mapOffset) * 0.5f;
-    const bool offsetChanged = oldMapOffset != GameUtility::mapOffset;
 
     for (auto& layer : tiles)
     {
@@ -90,7 +89,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
         {
             if(*isDirty == true) sprite->setPosition({sprite->getPosition() + GameUtility::mapOffset});
             window.draw(*sprite);
-            *isDirty = true;
+            *isDirty = oldMapOffset != GameUtility::mapOffset;
         }
     }
 
@@ -100,7 +99,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
     }
 }
 
-void RenderSystem::setWeapon()
+void RenderSystem::setWeapon() const
 {
     if (const auto equippedWeaponComponent = gCoordinator.tryGetComponent<EquippedWeaponComponent>(config::playerEntity))
     {
@@ -147,7 +146,7 @@ void RenderSystem::setWeapon()
  * If the entity has an equipped weapon, it also sets the origin for the weapon's sprite.
  * \param entity The entity to process.
  * */
-void RenderSystem::setOrigin(const Entity entity)
+void RenderSystem::setOrigin(const Entity entity) const
 {
     if (gCoordinator.hasComponent<WeaponComponent>(entity))
         if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) return;

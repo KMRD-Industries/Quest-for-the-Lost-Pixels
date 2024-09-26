@@ -5,8 +5,8 @@
 
 struct AnimationComponent
 {
-    std::vector<AnimationFrame> frames{};
-    size_t currentFrame{};
+    std::vector<AnimationFrame> animationFrames {};
+    size_t currentFrame {};
     float timeUntilNextFrame = 0;
-    [[maybe_unused]] bool loop_animation = true;
+    bool loopAnimation {true};
 };

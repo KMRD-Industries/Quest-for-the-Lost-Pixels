@@ -168,13 +168,9 @@ inline void WeaponSystem::setAngle(const Entity entity)
     auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-    // Reset the remaining distance when not in animating state.
     weaponComponent.remainingDistance = weaponComponent.swingDistance;
 
-    // Get the position of player.
     const auto& origin = renderComponent.sprite.getPosition();
-
-    // Calculate the vector from the player position to the mouse position.
     const sf::Vector2f mouseOffset = weaponComponent.pivotPoint - origin;
 
     // Update the target point and determine the facing direction.
@@ -182,10 +178,7 @@ inline void WeaponSystem::setAngle(const Entity entity)
     weaponComponent.isFacingRight = mouseOffset.x >= 0;
     const double angleRad = std::atan2(mouseOffset.y, mouseOffset.x);
 
-    constexpr float radToDeg = -180.0f / M_PI;
-
-    // Convert radians into an angle.
-    const auto angleInDegrees = static_cast<float>(angleRad * radToDeg);
+    const auto angleInDegrees = -static_cast<float>(angleRad * 180.0f / M_PI);
     weaponComponent.targetAngleDegrees = angleInDegrees;
 
     // Adjust the current angle based on the facing direction.
@@ -199,6 +192,9 @@ inline void WeaponSystem::setAngle(const Entity entity)
 inline void WeaponSystem::updateStartingAngle(const Entity entity)
 {
     auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
+
+    if(weaponComponent.type == GameType::WeaponType::WAND)
+        weaponComponent.initialAngle = 0;
 
     if (weaponComponent.queuedAttack && !weaponComponent.isAttacking)
     {

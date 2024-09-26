@@ -21,14 +21,14 @@ public:
     void update();
     void displayPortal(Entity entity);
     void draw(sf::RenderWindow& window);
-    void setWeapon();
+    void setWeapon() const;
     void setWeaponOrigin();
 
 private:
     void displayEnemiesTable(const sf::RenderWindow& window);
     void debugBoundingBoxes(sf::RenderWindow& window);
     void drawEquipment(Entity);
-    void setOrigin(Entity);
+    void setOrigin(Entity) const;
     void setSpritePosition(Entity);
     void displayDamageTaken(Entity);
     void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);

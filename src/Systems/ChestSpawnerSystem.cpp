@@ -1,5 +1,6 @@
 #include "ChestSpawnerSystem.h"
 
+#include "AnimationComponent.h"
 #include "CharacterComponent.h"
 #include "ChestComponent.h"
 #include "ColliderComponent.h"
