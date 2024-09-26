@@ -119,7 +119,7 @@ void CollisionSystem::update() const
         b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
 
-        if (colliderComponent.tag == "Item")
+        if (colliderComponent.tag == "Item" ||  colliderComponent.tag == "Bullet")
         {
             body->ApplyForceToCenter({transformComponent.velocity.x, transformComponent.velocity.y}, true);
         }
@@ -130,7 +130,7 @@ void CollisionSystem::update() const
         }
 
         renderComponent.dirty = true;
-        transformComponent.velocity = {};
+        if(colliderComponent.tag != "Bullet") transformComponent.velocity = {};
     }
 }
 
@@ -149,23 +149,21 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         if (body == nullptr) continue;
         const auto position = body->GetPosition();
 
-        if(sf::Vector2f{convertMetersToPixel(position.x), convertMetersToPixel(position.y)} != transformComponent.position)
-        {
-            transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
-            renderComponent.sprite.setPosition(position.x, position.y);
-            renderComponent.dirty = true;
-        }
-
+        transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
+        renderComponent.sprite.setPosition(position.x, position.y);
+        renderComponent.dirty = true;
     }
 }
 
 void CollisionSystem::deleteBody(const Entity entity) const
 {
-    if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+    if(gCoordinator.hasComponent<ColliderComponent>(entity))
     {
-        if (colliderComponent->body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent->body);
-        colliderComponent->body = nullptr;
-        colliderComponent->collision = {};
+        auto& cc = gCoordinator.getComponent<ColliderComponent>(entity);
+        if (cc.body != nullptr)
+            Physics::getWorld()->DestroyBody(cc.body);
+        cc.body = nullptr;
+        cc.body = {};
     }
 }
 

@@ -19,7 +19,7 @@ void InventorySystem::dropWeapon(const Entity player)
         gCoordinator.addComponent(inventory.weapons[0], ItemComponent{});
 
     const Entity newItemEntity = gCoordinator.createEntity();
-    gCoordinator.getComponent<TransformComponent>(inventory.weapons[0]).rotation = 0;
+    // gCoordinator.getComponent<TransformComponent>(inventory.weapons[0]).rotation = 0;
 
     const auto newEvent = CreateBodyWithCollisionEvent(
         inventory.weapons[0], "Item", [this](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {},

@@ -1253,6 +1253,38 @@
                  "type":"string",
                  "value":"bow"
                 }]
+        }, 
+        {
+         "id":212,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":21,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"212"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":7,
+                     "x":4,
+                     "y":10
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
         }],
  "tilewidth":16,
  "type":"tileset",

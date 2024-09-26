@@ -15,6 +15,7 @@ struct CreateBodyWithCollisionEvent
     bool isStatic{};
     bool useTextureSize{};
     glm::vec2 offset{};
+    GameType::ObjectType type {GameType::ObjectType::NORMAL};
 
     CreateBodyWithCollisionEvent() :
         entity(0),
@@ -30,13 +31,14 @@ struct CreateBodyWithCollisionEvent
         const Entity entity, std::string tag,
         const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&) {},
         const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&) {},
-        const bool isStatic = true, const bool useTextureSize = true) :
+        const bool isStatic = true, const bool useTextureSize = true, GameType::ObjectType type = GameType::ObjectType::NORMAL) :
         entity{entity},
         tag{std::move(tag)},
         onCollisionEnter{onCollisionEnter},
         onCollisionOut{onCollisionOut},
         isStatic{isStatic},
-        useTextureSize{useTextureSize}
+        useTextureSize{useTextureSize},
+        type{type}
     {
     }
 };

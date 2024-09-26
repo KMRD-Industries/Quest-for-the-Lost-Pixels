@@ -89,7 +89,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
         {
             if(*isDirty == true) sprite->setPosition({sprite->getPosition() + GameUtility::mapOffset});
             window.draw(*sprite);
-            *isDirty = offsetChanged;
+            *isDirty = true;
         }
     }
 

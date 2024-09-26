@@ -169,6 +169,12 @@ namespace GameType
         UNKNOWN = 0
     };
 
+    enum class ObjectType: int
+    {
+        NORMAL = 1,
+        BULLET = 2
+    };
+
     inline WeaponType stringToWeaponType(const std::string& type) {
         if (type == "mele") return WeaponType::MELE;
         if (type == "wand") return WeaponType::WAND;
