@@ -1,6 +1,7 @@
 #include "FightSystem.h"
 
 #include "AnimationComponent.h"
+#include "BulletComponent.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
@@ -122,11 +123,11 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
     if(collisionData.tag == "Enemy")
     {
         auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
-        auto& secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);
+        auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);
 
         const Entity tag = gCoordinator.createEntity();
         gCoordinator.addComponent(tag, TextTagComponent{});
-        gCoordinator.addComponent(tag, TransformComponent{secondPlayertransformComponent});
+        gCoordinator.addComponent(tag, TransformComponent{enemyTransformComponent});
 
         characterComponent.attacked = true;
         characterComponent.hp -= config::playerAttackDamage;
@@ -135,12 +136,13 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
     gCoordinator.getComponent<CharacterComponent>(bullet).hp = -1;
 }
 
-float FightSystem::calculateAngle(const sf::Vector2f& pivotPoint, const sf::Vector2f& targetPoint) {
+float FightSystem::calculateAngle(const sf::Vector2f& pivotPoint, const sf::Vector2f& targetPoint) const
+{
     const sf::Vector2f direction = targetPoint - pivotPoint;
     return std::atan2(direction.y, direction.x);
 }
 
-void FightSystem::handleWandAttack(const Entity eventEntity)
+void FightSystem::handleWandAttack(const Entity eventEntity) const
 {
     const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);
     const auto& weaponComponent {gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon)};
@@ -164,7 +166,8 @@ void FightSystem::handleWandAttack(const Entity eventEntity)
         RenderComponent{},
         TileComponent{336, "Bullets", 7},
         AnimationComponent{},
-        CharacterComponent{}
+        CharacterComponent{},
+        BulletComponent{}
         );
 
     const Entity newBulletEvent = gCoordinator.createEntity();

@@ -11,6 +11,7 @@
 #include "EnemySystem.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
+#include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -76,9 +77,14 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
             if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
+            auto& playerTransformComponent{gCoordinator.getComponent<TransformComponent>(collisionData.entityID)};
 
             playerCharacterComponent.attacked = true;
             playerCharacterComponent.hp -= enemyConfig.damage;
+
+            const Entity tag = gCoordinator.createEntity();
+            gCoordinator.addComponent(tag, TextTagComponent{});
+            gCoordinator.addComponent(tag, TransformComponent{playerTransformComponent});
 
             if (!config::applyKnockback) return;
 

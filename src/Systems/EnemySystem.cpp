@@ -3,6 +3,7 @@
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
+#include "EnemyComponent.h"
 #include "Physics.h"
 #include "TransformComponent.h"
 
@@ -44,5 +45,8 @@ void EnemySystem::deleteEnemies() const
             entitiesToKill.push_back(entity);
     }
 
-    for (const auto entity : entitiesToKill) gCoordinator.destroyEntity(entity);
+    for (const auto entity : entitiesToKill)
+    {
+        gCoordinator.removeComponent<EnemyComponent>(entity);
+    }
 }

@@ -2,6 +2,7 @@
 
 #include "AnimationSystem.h"
 #include "ColliderComponent.h"
+#include "ItemComponent.h"
 
 void ChestSystem::deleteItems() const
 {
@@ -21,5 +22,8 @@ void ChestSystem::deleteItems() const
         }
     }
 
-    for (const auto entity : entitiesToKill) gCoordinator.destroyEntity(entity);
+    for (const auto entity : entitiesToKill)
+    {
+        gCoordinator.removeComponent<ItemComponent>(entity);
+    }
 }

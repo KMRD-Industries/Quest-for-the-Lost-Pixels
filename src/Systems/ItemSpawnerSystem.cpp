@@ -72,7 +72,10 @@ void ItemSpawnerSystem::deleteItems()
         }
     }
 
-    for (const auto entity : entityToRemove) gCoordinator.destroyEntity(entity);
+    for (const auto entity : entityToRemove)
+    {
+        gCoordinator.removeComponent<ItemComponent>(entity);
+    }
 }
 
 void ItemSpawnerSystem::handlePotionCollision(const Entity potion, const GameType::CollisionData& collisionData,

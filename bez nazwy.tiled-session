@@ -1,13 +1,13 @@
 {
-    "activeFile": "assets/tileSets/CosmicLilac.json",
+    "activeFile": "assets/tileSets/Bullets.json",
     "expandedProjectPaths": [
+        "assets/tileSets",
+        "build",
+        "assets/maps",
+        "assets/maps/floor_00",
         "assets",
         "assets/maps/floor_01",
-        ".",
-        "assets/maps",
-        "build",
-        "assets/tileSets",
-        "assets/maps/floor_00"
+        "."
     ],
     "file.lastUsedOpenFilter": "Wszystkie pliki (*)",
     "fileStates": {

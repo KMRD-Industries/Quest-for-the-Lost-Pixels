@@ -111,7 +111,7 @@ inline void WeaponSystem::updateWeaponAngle(const Entity entity)
     rotateWeapon(entity, weaponComponent.isSwingingForward);
 }
 
-void WeaponSystem::deleteItems()
+void WeaponSystem::deleteItems() const
 {
     std::deque<Entity> entityToRemove;
 
@@ -126,7 +126,10 @@ void WeaponSystem::deleteItems()
         }
     }
 
-    for (const auto entity : entityToRemove) gCoordinator.destroyEntity(entity);
+    for (const auto entity : entityToRemove)
+    {
+        gCoordinator.removeComponent<WeaponComponent>(entity);
+    }
 }
 
 

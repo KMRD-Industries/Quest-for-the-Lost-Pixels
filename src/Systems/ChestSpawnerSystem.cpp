@@ -40,7 +40,7 @@ void ChestSpawnerSystem::spawnWeapon(const TransformComponent& spawnerTransformC
     gCoordinator.addComponents(newWeaponEntity,
         WeaponComponent{.id = weaponDesc.first, .type =  weaponDesc.second},
         TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", 7},
-        spawnerTransformComponent,
+        TransformComponent{spawnerTransformComponent},
         RenderComponent{},
         ColliderComponent{},
         AnimationComponent{},

@@ -12,7 +12,7 @@ public:
     void markClosest();
     void displayStats(Entity);
     void weaponInput(Entity);
-    void deleteItems();
+    void deleteItems() const;
 
 private:
     void updateWeaponAngle(Entity);

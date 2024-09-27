@@ -958,7 +958,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -1018,7 +1017,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -1199,7 +1197,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -1255,11 +1252,70 @@
                 }]
         }, 
         {
-         "id":212,
+         "id":211,
          "objectgroup":
             {
              "draworder":"index",
              "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":1,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"211"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":13.0454545454545,
+                     "y":15.3181818181818
+                    }, 
+                    {
+                     "height":26,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"211"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":14,
+                     "x":1,
+                     "y":3
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"bow"
+                }]
+        }, 
+        {
+         "id":212,
+         "objectgroup":
+            {
+             "draworder":"index",
              "name":"",
              "objects":[
                     {

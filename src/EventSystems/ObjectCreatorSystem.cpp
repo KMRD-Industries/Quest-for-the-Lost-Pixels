@@ -67,7 +67,7 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
     bodyDef.position.Set(objectPosition.x, objectPosition.y);
     bodyDef.angle = transformComponent.rotation * (M_PI / 180.f);
     bodyDef.type = eventInfo.isStatic ? b2_staticBody : b2_dynamicBody;
-    bodyDef.bullet = (eventInfo.type == GameType::ObjectType::BULLET);
+    bodyDef.bullet = eventInfo.type == GameType::ObjectType::BULLET;
 
     return bodyDef;
 }

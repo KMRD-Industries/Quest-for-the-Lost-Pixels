@@ -15,7 +15,7 @@ public:
 private:
     void handleMeleAttack(Entity);
     void handleCollision(Entity bullet, const GameType::CollisionData& collisionData) const;
-    float calculateAngle(const sf::Vector2f& pivotPoint, const sf::Vector2f& targetPoint);
-    void handleWandAttack(Entity);
+    float calculateAngle(const sf::Vector2f& pivotPoint, const sf::Vector2f& targetPoint) const;
+    void handleWandAttack(Entity) const;
     void handleBowAttack(Entity);
 };

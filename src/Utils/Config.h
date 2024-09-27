@@ -163,55 +163,59 @@ namespace config
 
     enum _entityCategory
     {
-        BOUNDARY =  0x0001,
-        PLAYER =    0x0002,
-        DOOR =      0x0003,
-        ENEMY =     0x0004,
-        PASSAGE =   0x0005,
-        BULLET =    0x0006,
-        ITEM =      0x0007,
+        BOUNDARY = 0x0001,
+        PLAYER = 0x0002,
+        DOOR = 0x0003,
+        ENEMY = 0x0004,
+        PASSAGE = 0x0005,
+        BULLET = 0x0006,
+        ITEM = 0x0007,
     };
 
-    constexpr uint32_t hashString(const char* str, uint32_t hash = 0) {
-        return *str ? hashString(str + 1, hash * 31 + *str) : hash;
-    }
+    inline std::unordered_map<std::string, _entityCategory> categoriesLookup{
+        {"Wall", BOUNDARY},
+        {"Bullet", BULLET},
+        {"Enemy", ENEMY},
+        {"Passage", PASSAGE},
+        {"Item", ITEM},
+        {"Player", PLAYER},
+        {"Door", DOOR}
+    };
+
+    inline std::unordered_map<std::string, uint16> bitMaskLookup{
+        {"Wall", BOUNDARY | PLAYER | ENEMY | BULLET | ITEM},  // Wall collides with everything
+        {"Bullet", BOUNDARY | ENEMY},                         // Bullet only collides with walls and enemies
+        {"Enemy", BOUNDARY | PLAYER},                         // Enemy collides with walls and players
+        {"Passage", BOUNDARY | PLAYER},                       // Passage collides with walls and players
+        {"Item", BOUNDARY | PLAYER},                          // Item only collides with walls and players
+        {"Player", BOUNDARY | ENEMY | ITEM},                  // Player collides with walls, enemies, and items
+        {"Door", BOUNDARY | PLAYER}                           // Door collides with walls and players
+    };
 
     inline uint16 stringToCategoryBits(const std::string& str) {
-        switch (hashString(str.c_str())) {
-            case hashString("Item"):
-                return ITEM;
-            case hashString("Bullet"):
-                return BULLET;
-            case hashString("Enemy"):
-                return ENEMY;
-            case hashString("Wall"):
-                return BOUNDARY;
-            case hashString("Door"):
-                return BOUNDARY;
-            case hashString("Passage"):
-                return BOUNDARY;
-            default:
-                return PLAYER;
-            }
+        if(categoriesLookup.contains(str))
+            return categoriesLookup[str];
+
+        if(std::regex_match(str, playerRegexTag))
+                return categoriesLookup["Player"];
+
+        if(str ==  "Chest")
+            return categoriesLookup["Item"];
+
+        return 0x0000;
     }
 
     inline uint16 stringToMaskBits(const std::string& str) {
-        switch (hashString(str.c_str())) {
-            case hashString("Item"):
-                return BOUNDARY | PLAYER;
-            case hashString("Door"):
-                return BOUNDARY | PLAYER;
-            case hashString("Passage"):
-                return BOUNDARY | PLAYER;
-            case hashString("Bullet"):
-                return BOUNDARY | ENEMY;
-            case hashString("Enemy"):
-                return BOUNDARY | PLAYER;
-            case hashString("Wall"):
-                return BOUNDARY | PLAYER | ENEMY | BULLET | ITEM;
-            default:
-                return BOUNDARY | ENEMY | ITEM;
-            }
+        if(bitMaskLookup.contains(str))
+            return bitMaskLookup[str];
+
+        if(std::regex_match(str, playerRegexTag))
+            return bitMaskLookup["Player"];
+
+        if(str ==  "Chest")
+            return bitMaskLookup["Item"];
+
+        return 0x0000;
     }
 
     struct ItemConfig

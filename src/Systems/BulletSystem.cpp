@@ -4,15 +4,12 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "ObjectCreatorSystem.h"
-#include "Physics.h"
 #include "RenderComponent.h"
 
 extern Coordinator gCoordinator;
 
 void BulletSystem::deleteBullets()
 {
-    std::deque<Entity> entityToRemove;
-
     for (const auto entity : m_entities)
     {
         gCoordinator.getComponent<CharacterComponent>(entity).hp = -1;
