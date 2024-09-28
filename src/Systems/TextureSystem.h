@@ -14,9 +14,9 @@
 
 class TextureSystem : public System
 {
-    std::unordered_set<std::string> m_setTextureFiles{"Items",      "CosmicLilac", "Decorative",    "DungeonWalls",
-                                                      "Jungle",     "Graveyard",   "SpecialBlocks", "AnimSlimes",
-                                                      "Characters", "Weapons",     "CosmicLegacy",  "Portal"};
+    std::unordered_set<std::string> m_setTextureFiles{
+        "Items",      "CosmicLilac", "Decorative", "DungeonWalls", "Jungle", "Graveyard", "SpecialBlocks",
+        "AnimSlimes", "Characters",  "Weapons",    "CosmicLegacy", "Portal", "Armour"};
 
     //------------------------------------------
     std::unordered_map<std::string, sf::Texture> m_mapTextures;
@@ -28,6 +28,8 @@ class TextureSystem : public System
     std::unordered_map<long, Collision> m_mapCollisions;
     std::string m_currentBackgroundColor = "#331541";
     std::unordered_map<long, Collision> m_mapWeaponPlacements;
+    std::unordered_map<long, Collision> m_mapHelmetPlacements;
+
     long m_lNoTextures = 0;
 
     void loadTilesIntoSystem(const Tileset &, long &);
@@ -48,4 +50,5 @@ public:
     void modifyColorScheme(int);
     std::string getBackgroundColor();
     std::vector<std::pair<int, GameType::WeaponType>> m_weaponsIDs;
+    std::vector<int> m_helmets;
 };

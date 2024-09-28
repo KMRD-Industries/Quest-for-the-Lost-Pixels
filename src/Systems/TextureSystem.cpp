@@ -5,6 +5,7 @@
 #include "CollisionSystem.h"
 #include "Coordinator.h"
 #include "Paths.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/Image.hpp"
 #include "TextureParser.h"
@@ -120,7 +121,7 @@ void TextureSystem::loadTilesIntoSystem(const Tileset& parsedTileSet, long& gid)
  */
 void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedTileSet, const long& firstGid)
 {
-    for (const auto& [id,properties, animation, objects] : parsedTileSet.tiles)
+    for (const auto& [id, properties, animation, objects] : parsedTileSet.tiles)
     {
         // Adjust tile with a tile set id.
         const long adjusted_id = firstGid + id;
@@ -137,8 +138,21 @@ void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedT
                 // If an object contains more than one property, it's a weapon placement object.
                 if (object.properties.size() >= 2)
                 {
-                    m_mapWeaponPlacements.emplace(adjusted_id, object);
-                    if (id <= 180) m_weaponsIDs.emplace_back(id, GameType::stringToWeaponType(properties[0].value));
+                    for (auto& property : object.properties)
+                    {
+                        if (property.name == "helmetPlacement")
+                        {
+                            m_mapHelmetPlacements.emplace(adjusted_id, object);
+                            if (id <= 180) m_helmets.push_back(id);
+                        }
+
+                        if (property.name == "weaponPlacement")
+                        {
+                            m_mapWeaponPlacements.emplace(adjusted_id, object);
+                            if (id <= 180)
+                                m_weaponsIDs.emplace_back(id, GameType::stringToWeaponType(properties[0].value));
+                        }
+                    }
                 }
                 else
                 {
@@ -232,13 +246,14 @@ void TextureSystem::loadTextures()
             continue;
         }
 
-        if (renderComponent.dirty == false) continue;
+        if (renderComponent.dirty == false && !gCoordinator.hasComponent<PlayerComponent>(entity)) continue;
 
         // Adjust tile index
         long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
         auto animationsIter = m_mapAnimations.find(adjusted_id);
         auto collisionsIter = m_mapCollisions.find(adjusted_id);
         auto weaponPlacementsIter = m_mapWeaponPlacements.find(adjusted_id);
+        auto helmetPlacementsIter = m_mapHelmetPlacements.find(adjusted_id);
 
         // Load animations from a system if tile is animated
         if (animationsIter != m_mapAnimations.end())
@@ -281,7 +296,13 @@ void TextureSystem::loadTextures()
         if (weaponPlacementsIter != m_mapWeaponPlacements.end())
         {
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-            colliderComponent.specialCollision = m_mapWeaponPlacements.at(adjusted_id);
+            colliderComponent.weaponPlacement = m_mapWeaponPlacements.at(adjusted_id);
+        }
+
+        if (helmetPlacementsIter != m_mapHelmetPlacements.end())
+        {
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            colliderComponent.helmetPlacement = m_mapHelmetPlacements.at(adjusted_id);
         }
 
         // Load texture of tile with that id to render component

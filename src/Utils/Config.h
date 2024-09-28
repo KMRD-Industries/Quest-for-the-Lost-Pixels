@@ -29,6 +29,9 @@ namespace config
     static constexpr float playerAttackRange{1000.f};
     static constexpr float playerAttackDamage{10.f};
     static constexpr float playerAttackAngle{0.785f};
+    constexpr auto defaultDensity{1.f};
+    constexpr auto defaultFriction{1.f};
+    constexpr auto defaultRestitution{0.05f};
 
     static constexpr int mapFirstEntity{1000};
     static constexpr int numberOfMapEntities{500};
@@ -219,7 +222,7 @@ namespace config
         return 0x0000;
     }
 
-    inline uint16 stringToIndexGroup(const std::string& str)
+    inline int16 stringToIndexGroup(const std::string& str)
     {
         if (str == "Bullet") return -8;
         return 0;

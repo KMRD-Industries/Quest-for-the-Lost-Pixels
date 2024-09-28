@@ -145,11 +145,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 
     doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
-    gCoordinator.addComponents(mapEntity,
-        RenderComponent{},
-        MapComponent{},
-        transformComponent,
-        tileComponent);
+    gCoordinator.addComponents(mapEntity, RenderComponent{}, MapComponent{}, transformComponent, tileComponent);
 
     if (tileComponent.tileSet == "SpecialBlocks") // Handle special Tiles
     {
@@ -227,22 +223,28 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
 
 void MapSystem::resetMap() const
 {
-    std::deque<Entity> entityToRemove;
+    std::unordered_set<Entity> entityToKill{};
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
+    {
         if (!gCoordinator.hasComponent<PlayerComponent>(entity) &&
             !gCoordinator.hasComponent<MultiplayerComponent>(entity))
-            entityToRemove.push_back(entity);
-
-
-    while (!entityToRemove.empty())
-    {
-        gCoordinator.getRegisterSystem<CollisionSystem>()->deleteBody(entityToRemove.front());
-        gCoordinator.destroyEntity(entityToRemove.front());
-        entityToRemove.pop_front();
+        {
+            if (auto* collisionComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+            {
+                collisionComponent->toDestroy = true;
+            }
+            else
+            {
+                entityToKill.insert(entity);
+            }
+        }
     }
 
-    entityToRemove.clear();
+    gCoordinator.getRegisterSystem<CollisionSystem>()->deleteMarkedBodies();
+
+    for (auto& entity : entityToKill) gCoordinator.destroyEntity(entity);
+    entityToKill.clear();
 }
 
 sf::Vector2f MapSystem::getPosition(const int x_axis, const int y_axis, const int map_tile_width) const

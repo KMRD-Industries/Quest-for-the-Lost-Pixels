@@ -22,6 +22,7 @@
 #include "HealthBarSystem.h"
 #include "InventorySystem.h"
 #include "ItemSpawnerSystem.h"
+#include "ItemSystem.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
 #include "PassageSystem.h"
@@ -37,6 +38,8 @@ public:
     Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
     void setupWeaponEntity(Entity player) const;
+    void setupHelmetEntity(Entity player) const;
+
     void init();
     void addPlayerComponents(Entity player);
     void setupPlayerCollision(Entity player);
@@ -88,4 +91,5 @@ private:
     ChestSystem* m_chestSystem;
     RoomListenerSystem* m_roomListenerSystem;
     ItemSpawnerSystem* m_itemSpawnerSystem;
+    ItemSystem* m_itemSystem;
 };

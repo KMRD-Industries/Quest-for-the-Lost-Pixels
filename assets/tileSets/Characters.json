@@ -6,7 +6,7 @@
  "name":"Characters",
  "spacing":0,
  "tilecount":290,
- "tiledversion":"1.8.2",
+ "tiledversion":"1.11.0",
  "tileheight":32,
  "tiles":[
         {
@@ -67,431 +67,28 @@
                      "width":1,
                      "x":8,
                      "y":26
-                    }],
-             "opacity":1,
-             "type":"objectgroup",
-             "visible":true,
-             "x":0,
-             "y":0
-            }
-        }, 
-        {
-         "id":185,
-         "objectgroup":
-            {
-             "draworder":"index",
-             "name":"",
-             "objects":[
-                    {
-                     "height":7,
-                     "id":1,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"36",
-                             "type":"string",
-                             "value":"185"
-                            }],
-                     "rotation":0,
-                     "type":"Collision",
-                     "visible":true,
-                     "width":13,
-                     "x":3,
-                     "y":23
                     }, 
                     {
                      "height":1,
-                     "id":2,
+                     "id":14,
                      "name":"",
                      "properties":[
+                            {
+                             "name":"helmetPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
                             {
                              "name":"tileID",
                              "type":"string",
-                             "value":"185"
-                            }, 
-                            {
-                             "name":"weaponPlacement",
-                             "type":"string",
-                             "value":"true"
+                             "value":"184"
                             }],
                      "rotation":0,
-                     "type":"WeaponPlacement",
+                     "type":"HelmetPlacement",
                      "visible":true,
                      "width":1,
-                     "x":8,
-                     "y":26
-                    }],
-             "opacity":1,
-             "type":"objectgroup",
-             "visible":true,
-             "x":0,
-             "y":0
-            }
-        }, 
-        {
-         "id":186,
-         "objectgroup":
-            {
-             "draworder":"index",
-             "name":"",
-             "objects":[
-                    {
-                     "height":7,
-                     "id":2,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"36",
-                             "type":"string",
-                             "value":"186"
-                            }],
-                     "rotation":0,
-                     "type":"Collision",
-                     "visible":true,
-                     "width":13,
-                     "x":3,
-                     "y":23
-                    }, 
-                    {
-                     "height":1,
-                     "id":4,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"tileID",
-                             "type":"string",
-                             "value":"186"
-                            }, 
-                            {
-                             "name":"weaponPlacement",
-                             "type":"string",
-                             "value":"true"
-                            }],
-                     "rotation":0,
-                     "type":"WeaponPlacement",
-                     "visible":true,
-                     "width":1,
-                     "x":8,
-                     "y":27.5
-                    }],
-             "opacity":1,
-             "type":"objectgroup",
-             "visible":true,
-             "x":0,
-             "y":0
-            }
-        }, 
-        {
-         "id":187,
-         "objectgroup":
-            {
-             "draworder":"index",
-             "name":"",
-             "objects":[
-                    {
-                     "height":7,
-                     "id":2,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"36",
-                             "type":"string",
-                             "value":"187"
-                            }],
-                     "rotation":0,
-                     "type":"Collision",
-                     "visible":true,
-                     "width":13,
-                     "x":3,
-                     "y":23
-                    }, 
-                    {
-                     "height":1,
-                     "id":4,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"tileID",
-                             "type":"string",
-                             "value":"187"
-                            }, 
-                            {
-                             "name":"weaponPlacement",
-                             "type":"string",
-                             "value":"true"
-                            }],
-                     "rotation":0,
-                     "type":"WeaponPlacement",
-                     "visible":true,
-                     "width":1,
-                     "x":8,
-                     "y":26.5
-                    }],
-             "opacity":1,
-             "type":"objectgroup",
-             "visible":true,
-             "x":0,
-             "y":0
-            }
-        }, 
-        {
-         "id":188,
-         "objectgroup":
-            {
-             "draworder":"index",
-             "name":"",
-             "objects":[
-                    {
-                     "height":7,
-                     "id":1,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"36",
-                             "type":"string",
-                             "value":"188"
-                            }],
-                     "rotation":0,
-                     "type":"Collision",
-                     "visible":true,
-                     "width":13,
-                     "x":3,
-                     "y":23
-                    }, 
-                    {
-                     "height":1,
-                     "id":3,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"tileID",
-                             "type":"string",
-                             "value":"188"
-                            }, 
-                            {
-                             "name":"weaponPlacement",
-                             "type":"string",
-                             "value":"true"
-                            }],
-                     "rotation":0,
-                     "type":"WeaponPlacement",
-                     "visible":true,
-                     "width":1,
-                     "x":8,
-                     "y":24.5
-                    }],
-             "opacity":1,
-             "type":"objectgroup",
-             "visible":true,
-             "x":0,
-             "y":0
-            }
-        }, 
-        {
-         "id":189,
-         "objectgroup":
-            {
-             "draworder":"index",
-             "name":"",
-             "objects":[
-                    {
-                     "height":7,
-                     "id":1,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"36",
-                             "type":"string",
-                             "value":"189"
-                            }],
-                     "rotation":0,
-                     "type":"Collision",
-                     "visible":true,
-                     "width":13,
-                     "x":3,
-                     "y":23
-                    }, 
-                    {
-                     "height":1,
-                     "id":3,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"tileID",
-                             "type":"string",
-                             "value":"189"
-                            }, 
-                            {
-                             "name":"weaponPlacement",
-                             "type":"string",
-                             "value":"true"
-                            }],
-                     "rotation":0,
-                     "type":"WeaponPlacement",
-                     "visible":true,
-                     "width":1,
-                     "x":8,
-                     "y":23.5
-                    }],
-             "opacity":1,
-             "type":"objectgroup",
-             "visible":true,
-             "x":0,
-             "y":0
-            }
-        }, 
-        {
-         "id":190,
-         "objectgroup":
-            {
-             "draworder":"index",
-             "name":"",
-             "objects":[
-                    {
-                     "height":7,
-                     "id":1,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"36",
-                             "type":"string",
-                             "value":"190"
-                            }],
-                     "rotation":0,
-                     "type":"Collision",
-                     "visible":true,
-                     "width":13,
-                     "x":3,
-                     "y":23
-                    }, 
-                    {
-                     "height":1,
-                     "id":3,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"tileID",
-                             "type":"string",
-                             "value":"190"
-                            }, 
-                            {
-                             "name":"weaponPlacement",
-                             "type":"string",
-                             "value":"true"
-                            }],
-                     "rotation":0,
-                     "type":"WeaponPlacement",
-                     "visible":true,
-                     "width":1,
-                     "x":8,
-                     "y":26
-                    }],
-             "opacity":1,
-             "type":"objectgroup",
-             "visible":true,
-             "x":0,
-             "y":0
-            }
-        }, 
-        {
-         "id":191,
-         "objectgroup":
-            {
-             "draworder":"index",
-             "id":3,
-             "name":"",
-             "objects":[
-                    {
-                     "height":7,
-                     "id":1,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"36",
-                             "type":"string",
-                             "value":"191"
-                            }],
-                     "rotation":0,
-                     "type":"Collision",
-                     "visible":true,
-                     "width":13,
-                     "x":3,
-                     "y":23
-                    }, 
-                    {
-                     "height":1,
-                     "id":3,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"tileID",
-                             "type":"string",
-                             "value":"190"
-                            }, 
-                            {
-                             "name":"weaponPlacement",
-                             "type":"string",
-                             "value":"true"
-                            }],
-                     "rotation":0,
-                     "type":"WeaponPlacement",
-                     "visible":true,
-                     "width":1,
-                     "x":8,
-                     "y":27
-                    }],
-             "opacity":1,
-             "type":"objectgroup",
-             "visible":true,
-             "x":0,
-             "y":0
-            }
-        }, 
-        {
-         "id":192,
-         "objectgroup":
-            {
-             "draworder":"index",
-             "name":"",
-             "objects":[
-                    {
-                     "height":7,
-                     "id":1,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"36",
-                             "type":"string",
-                             "value":"192"
-                            }],
-                     "rotation":0,
-                     "type":"Collision",
-                     "visible":true,
-                     "width":13,
-                     "x":3,
-                     "y":23
-                    }, 
-                    {
-                     "height":1,
-                     "id":3,
-                     "name":"",
-                     "properties":[
-                            {
-                             "name":"tileID",
-                             "type":"string",
-                             "value":"191"
-                            }, 
-                            {
-                             "name":"weaponPlacement",
-                             "type":"string",
-                             "value":"true"
-                            }],
-                     "rotation":0,
-                     "type":"WeaponPlacement",
-                     "visible":true,
-                     "width":1,
-                     "x":8,
-                     "y":23.5
+                     "x":9,
+                     "y":15
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -524,6 +121,50 @@
                      "width":12.5,
                      "x":3.47727272727273,
                      "y":24.8636377272727
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"helmetPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"185"
+                            }],
+                     "rotation":0,
+                     "type":"HelmetPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":9,
+                     "y":17
+                    }, 
+                    {
+                     "height":1,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"185"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":26.5
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -554,8 +195,52 @@
                      "type":"",
                      "visible":true,
                      "width":12.5,
-                     "x":3.47727272727273,
+                     "x":1,
                      "y":26.3181831818182
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"helmetPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"186"
+                            }],
+                     "rotation":0,
+                     "type":"HelmetPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":9,
+                     "y":19
+                    }, 
+                    {
+                     "height":1,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"185"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":27.5
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -588,6 +273,50 @@
                      "width":12.5,
                      "x":3.47727272727273,
                      "y":24.3181831818182
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"helmetPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"187"
+                            }],
+                     "rotation":0,
+                     "type":"HelmetPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":9,
+                     "y":17
+                    }, 
+                    {
+                     "height":1,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"186"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":7,
+                     "y":26.5
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -620,6 +349,50 @@
                      "width":12.5,
                      "x":3.20454545454545,
                      "y":22.2272740909091
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"helmetPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"188"
+                            }],
+                     "rotation":0,
+                     "type":"HelmetPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":9,
+                     "y":15
+                    }, 
+                    {
+                     "height":1,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"187"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":25
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -652,6 +425,50 @@
                      "width":12.5,
                      "x":3.20454545454545,
                      "y":21.4090922727273
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"helmetPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"189"
+                            }],
+                     "rotation":0,
+                     "type":"HelmetPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":9,
+                     "y":14
+                    }, 
+                    {
+                     "height":1,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"189"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":23.5
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -684,6 +501,50 @@
                      "width":12.5,
                      "x":3.20454545454546,
                      "y":22.8636377272727
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"helmetPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"189"
+                            }],
+                     "rotation":0,
+                     "type":"HelmetPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":9,
+                     "y":16
+                    }, 
+                    {
+                     "height":1,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"190"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":25.5
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -697,7 +558,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -729,7 +589,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -774,5 +633,5 @@
         }],
  "tilewidth":16,
  "type":"tileset",
- "version":"1.8"
+ "version":"1.10"
 }

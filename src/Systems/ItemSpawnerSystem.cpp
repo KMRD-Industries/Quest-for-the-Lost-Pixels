@@ -5,6 +5,7 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "CreateBodyWithCollisionEvent.h"
+#include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "TransformComponent.h"
@@ -58,27 +59,16 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
 
 void ItemSpawnerSystem::deleteItems()
 {
-    std::deque<Entity> entityToRemove;
-
     for (const auto entity : m_entities)
-    {
         if (gCoordinator.hasComponent<ColliderComponent>(entity))
-        {
             gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
-        }
-        else
-        {
-            entityToRemove.push_back(entity);
-        }
-    }
-
-    for (const auto entity : entityToRemove) gCoordinator.destroyEntity(entity);
 }
 
 void ItemSpawnerSystem::handlePotionCollision(const Entity potion, const GameType::CollisionData& collisionData,
                                               const Items::Behaviours behaviour, const float value)
 {
     if (gCoordinator.hasComponent<WeaponComponent>(potion)) return;
+    if (gCoordinator.hasComponent<HelmetComponent>(potion)) return;
 
     const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
     if (!isCollidingWithPlayer) return;

@@ -17,14 +17,17 @@
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
+#include "EquippedHelmetComponent.h"
 #include "EquippedWeaponComponent.h"
 #include "FloorComponent.h"
 #include "HealthBarSystem.h"
+#include "HelmetComponent.h"
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "ItemSpawnerSystem.h"
+#include "ItemSystem.h"
 #include "LootComponent.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
@@ -90,8 +93,8 @@ void Dungeon::init()
     addPlayerComponents(m_entities[m_id]);
     setupPlayerCollision(m_entities[m_id]);
     setupWeaponEntity(m_entities[m_id]);
+    setupHelmetEntity(m_entities[m_id]);
 }
-
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
@@ -104,6 +107,7 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, ColliderComponent{});
     gCoordinator.addComponent(player, InventoryComponent{});
     gCoordinator.addComponent(player, EquippedWeaponComponent{});
+    gCoordinator.addComponent(player, EquippedHelmetComponent{});
     gCoordinator.addComponent(player, FloorComponent{});
     gCoordinator.addComponent(
         player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
@@ -198,9 +202,28 @@ void Dungeon::setupWeaponEntity(const Entity player) const
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
     gCoordinator.addComponent(weaponEntity, ColliderComponent{});
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
+    gCoordinator.addComponent(weaponEntity, ItemAnimationComponent{});
+    gCoordinator.addComponent(weaponEntity, CharacterComponent{});
 
     m_inventorySystem->pickUpWeapon(player, weaponEntity);
     m_equipWeaponSystem->equipWeapon(player, weaponEntity);
+}
+
+void Dungeon::setupHelmetEntity(const Entity player) const
+{
+    const Entity helmetEntity = gCoordinator.createEntity();
+
+    gCoordinator.addComponent(helmetEntity, HelmetComponent{.id = 0});
+    gCoordinator.addComponent(helmetEntity, TileComponent{0, "Armour", 6});
+    gCoordinator.addComponent(helmetEntity, TransformComponent{});
+    gCoordinator.addComponent(helmetEntity, RenderComponent{});
+    gCoordinator.addComponent(helmetEntity, ColliderComponent{});
+    gCoordinator.addComponent(helmetEntity, AnimationComponent{});
+    gCoordinator.addComponent(helmetEntity, ItemAnimationComponent{});
+    gCoordinator.addComponent(helmetEntity, ItemComponent{});
+
+    m_inventorySystem->pickUpItem(player, helmetEntity);
+    m_equipWeaponSystem->equipHelmet(player, helmetEntity);
 }
 
 void Dungeon::draw()
@@ -213,6 +236,7 @@ void Dungeon::draw()
 void Dungeon::update(const float deltaTime)
 {
     m_playerMovementSystem->update(deltaTime);
+    m_itemSystem->update();
     m_weaponSystem->update();
     m_enemySystem->update();
     m_travellingSystem->update();
@@ -343,8 +367,10 @@ inline void Dungeon::clearDungeon() const
     m_enemySystem->deleteEnemies();
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
-    m_weaponSystem->deleteItems();
+    m_itemSystem->deleteItems();
     m_collisionSystem->deleteMarkedBodies();
+    gCoordinator.getRegisterSystem<ObjectCreatorSystem>()->clear();
+    gCoordinator.getRegisterSystem<FightSystem>()->clear();
 }
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)
@@ -410,6 +436,8 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<ItemComponent>();
     gCoordinator.registerComponent<ItemAnimationComponent>();
     gCoordinator.registerComponent<ChestComponent>();
+    gCoordinator.registerComponent<HelmetComponent>();
+    gCoordinator.registerComponent<EquippedHelmetComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -561,6 +589,13 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<ChestSystem>(signature);
     }
 
+    const auto itemSystem = gCoordinator.getRegisterSystem<ItemSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<ItemComponent>());
+        gCoordinator.setSystemSignature<ItemSystem>(signature);
+    }
+
     m_playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>().get();
     m_multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>().get();
     m_characterSystem = gCoordinator.getRegisterSystem<CharacterSystem>().get();
@@ -581,4 +616,5 @@ void Dungeon::setECS()
     m_chestSystem = gCoordinator.getRegisterSystem<ChestSystem>().get();
     m_roomListenerSystem = gCoordinator.getRegisterSystem<RoomListenerSystem>().get();
     m_itemSpawnerSystem = gCoordinator.getRegisterSystem<ItemSpawnerSystem>().get();
+    m_itemSystem = gCoordinator.getRegisterSystem<ItemSystem>().get();
 }
