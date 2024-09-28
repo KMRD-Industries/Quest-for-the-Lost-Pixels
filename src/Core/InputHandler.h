@@ -13,7 +13,8 @@ enum class InputType
     MoveRight,
     MoveUp,
     MoveDown,
-    Attack
+    Attack,
+    PickUpItem
 };
 
 class InputHandler
@@ -38,11 +39,9 @@ class InputHandler
     std::unordered_set<InputType> m_keysPressed{};
 
     std::unordered_map<InputKey, InputType, InputKeyHash> m_keyToMapInput{
-        {sf::Keyboard::Key::W, InputType::MoveUp},
-        {sf::Keyboard::Key::A, InputType::MoveLeft},
-        {sf::Keyboard::Key::S, InputType::MoveDown},
-        {sf::Keyboard::Key::D, InputType::MoveRight},
-        {sf::Keyboard::Key::Space, InputType::Attack},
+        {sf::Keyboard::Key::W, InputType::MoveUp},     {sf::Keyboard::Key::A, InputType::MoveLeft},
+        {sf::Keyboard::Key::S, InputType::MoveDown},   {sf::Keyboard::Key::D, InputType::MoveRight},
+        {sf::Keyboard::Key::Space, InputType::Attack}, {sf::Keyboard::Key::E, InputType::PickUpItem},
         {sf::Mouse::Left, InputType::Attack} // Handling for the right mouse button
     };
 

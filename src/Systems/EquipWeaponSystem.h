@@ -4,7 +4,7 @@
 class EquipWeaponSystem : public System
 {
 public:
-    void init();
-    void update();
-    void equipWeapon(Entity, Entity);
+    void init() const;
+    void update() const;
+    void equipWeapon(Entity, Entity) const;
 };

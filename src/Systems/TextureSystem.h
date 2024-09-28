@@ -8,6 +8,7 @@
 #include "AnimationComponent.h"
 #include "AnimationFrame.h"
 #include "AtlasComponents/Texture.h"
+#include "GameTypes.h"
 #include "System.h"
 #include "Tileset.h"
 
@@ -46,4 +47,5 @@ public:
     Collision getCollision(const std::string &, long);
     void modifyColorScheme(int);
     std::string getBackgroundColor();
+    std::vector<std::pair<int, GameType::WeaponType>> m_weaponsIDs;
 };

@@ -41,7 +41,12 @@ inline void from_json(const json& json, Tile& tile)
     if (json.find("animation") != json.end())
     {
         json.at("animation").get_to(tile.animation);
-    };
+    }
+
+    if (json.find("properties") != json.end())
+    {
+        json.at("properties").get_to(tile.properties);
+    }
 
     if (json.find("objectgroup") != json.end())
     {
@@ -56,7 +61,9 @@ inline void from_json(const json& json, Tile& tile)
         {
             objectgroup.at("objects").get_to(tile.objects);
         }
-    };
+    }
+
+
 }
 
 inline void from_json(const json& json, Tileset& tileSet)

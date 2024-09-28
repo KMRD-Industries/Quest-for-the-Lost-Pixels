@@ -7,6 +7,8 @@
 #include "box2d/b2_math.h"
 #include "glm/gtx/hash.hpp"
 
+#define M_PI 3.1415927f
+
 namespace SpecialBlocks
 {
     enum class Blocks : int
@@ -160,6 +162,28 @@ namespace GameType
         WEST = static_cast<int>('W'),
         EAST = static_cast<int>('E')
     };
+
+    enum class WeaponType : int
+    {
+        MELE = 1,
+        WAND = 2,
+        BOW = 3,
+        UNKNOWN = 0
+    };
+
+    enum class ObjectType : int
+    {
+        NORMAL = 1,
+        BULLET = 2
+    };
+
+    inline WeaponType stringToWeaponType(const std::string& type)
+    {
+        if (type == "mele") return WeaponType::MELE;
+        if (type == "wand") return WeaponType::WAND;
+        if (type == "bow") return WeaponType::BOW;
+        return WeaponType::MELE; // Return unknown if no match found
+    }
 
     enum FlipFlags : std::uint8_t
     {

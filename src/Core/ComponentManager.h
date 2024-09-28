@@ -55,6 +55,12 @@ public:
     }
 
     template <typename T>
+    T* tryGetComponent(const Entity entity) const
+    {
+        return getComponentArray<T>()->tryGetData(entity);
+    }
+
+    template <typename T>
     [[nodiscard]] bool hasComponent(const Entity entity) const
     {
         return getComponentArray<T>()->hasComponent(entity);

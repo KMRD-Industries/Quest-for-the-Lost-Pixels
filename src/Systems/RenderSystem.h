@@ -21,6 +21,8 @@ public:
     void update();
     void displayPortal(Entity entity);
     void draw(sf::RenderWindow& window);
+    void setWeapon();
+    void setWeaponOrigin();
 
 private:
     void displayEnemiesTable(const sf::RenderWindow& window);
@@ -32,7 +34,7 @@ private:
     void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);
     void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity) const;
 
-    std::vector<std::vector<sf::Sprite*>> tiles;
+    std::vector<std::vector<std::pair<sf::Sprite*, bool*>>> tiles;
     sf::Sprite portalSprite;
     std::vector<std::function<void(Entity)>> actions;
 };

@@ -5,7 +5,7 @@
 
 #include "ChestSpawnerSystem.h"
 
-void RoomListenerSystem::update()
+void RoomListenerSystem::update(const float deltaTime)
 {
     if (m_isCurrentRoomLooted) return;
     if (!m_entities.empty())
@@ -13,7 +13,7 @@ void RoomListenerSystem::update()
     else if (m_entities.empty() && m_toLoot)
         spawnLoot();
     else
-        gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
+        gCoordinator.getRegisterSystem<SpawnerSystem>()->update(deltaTime);
 }
 
 void RoomListenerSystem::reset()

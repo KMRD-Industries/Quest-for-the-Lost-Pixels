@@ -8,6 +8,7 @@
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "TransformComponent.h"
+#include "WeaponComponent.h"
 
 struct CharacterComponent;
 struct ColliderComponent;
@@ -42,7 +43,7 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
         }
         else
         {
-            animationComponent.currentAnimationTime += deltaTime;
+            animationComponent.currentAnimationTime += deltaTime * 4;
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
             const float newPositionY =
@@ -61,18 +62,24 @@ void ItemSpawnerSystem::deleteItems()
 
     for (const auto entity : m_entities)
     {
-        if(gCoordinator.hasComponent<ColliderComponent>(entity))
+        if (gCoordinator.hasComponent<ColliderComponent>(entity))
+        {
             gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
-
-        if(gCoordinator.hasComponent<CharacterComponent>(entity))
-            gCoordinator.getComponent<CharacterComponent>(entity).hp = -1;
+        }
+        else
+        {
+            entityToRemove.push_back(entity);
+        }
     }
 
+    for (const auto entity : entityToRemove) gCoordinator.destroyEntity(entity);
 }
 
 void ItemSpawnerSystem::handlePotionCollision(const Entity potion, const GameType::CollisionData& collisionData,
                                               const Items::Behaviours behaviour, const float value)
 {
+    if (gCoordinator.hasComponent<WeaponComponent>(potion)) return;
+
     const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
     if (!isCollidingWithPlayer) return;
 
@@ -84,6 +91,8 @@ void ItemSpawnerSystem::handlePotionCollision(const Entity potion, const GameTyp
         break;
     case Items::Behaviours::DMGUP:
         gCoordinator.getComponent<CharacterComponent>(collisionData.entityID).damage += value;
+        break;
+    default:
         break;
     }
 }

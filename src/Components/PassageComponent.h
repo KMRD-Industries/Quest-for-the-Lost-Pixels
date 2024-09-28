@@ -8,5 +8,5 @@ struct PassageComponent
 {
     std::deque<glm::ivec2> moveInDungeon{};
     std::function<void()> moveCallback;
-    bool activePassage{true};
+    bool activePassage = true;
 };

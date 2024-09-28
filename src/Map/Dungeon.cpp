@@ -220,7 +220,7 @@ void Dungeon::update(const float deltaTime)
     m_characterSystem->update();
     m_animationSystem->update(deltaTime);
     m_textTagSystem->update();
-    m_roomListenerSystem->update();
+    m_roomListenerSystem->update(deltaTime);
     m_itemSpawnerSystem->updateAnimation(deltaTime);
 
     if (m_multiplayerSystem->isConnected())
@@ -343,6 +343,7 @@ inline void Dungeon::clearDungeon() const
     m_enemySystem->deleteEnemies();
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
+    m_weaponSystem->deleteItems();
     m_collisionSystem->deleteMarkedBodies();
 }
 

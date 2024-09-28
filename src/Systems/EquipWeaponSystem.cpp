@@ -2,13 +2,12 @@
 #include "AnimationSystem.h"
 #include "EquippedWeaponComponent.h"
 
-void EquipWeaponSystem::init() {}
+void EquipWeaponSystem::init() const {}
 
-void EquipWeaponSystem::update() {}
+void EquipWeaponSystem::update() const {}
 
-void EquipWeaponSystem::equipWeapon(const Entity player, const Entity weapon)
+void EquipWeaponSystem::equipWeapon(const Entity player, const Entity weapon) const
 {
     auto& equipped = gCoordinator.getComponent<EquippedWeaponComponent>(player);
-    gCoordinator.destroyEntity(equipped.currentWeapon);
     equipped.currentWeapon = weapon;
 }

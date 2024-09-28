@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "Coordinator.h"
 #include "GameTypes.h"
 #include "System.h"

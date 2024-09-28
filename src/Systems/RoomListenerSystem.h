@@ -13,7 +13,7 @@ extern Coordinator gCoordinator;
 class RoomListenerSystem : public System
 {
 public:
-    void update();
+    void update(float);
     void reset();
     void changeRoom(const glm::ivec2& newRoom);
     void spawnLoot();

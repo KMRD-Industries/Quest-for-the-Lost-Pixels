@@ -120,7 +120,7 @@ void TextureSystem::loadTilesIntoSystem(const Tileset& parsedTileSet, long& gid)
  */
 void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedTileSet, const long& firstGid)
 {
-    for (const auto& [id, animation, objects] : parsedTileSet.tiles)
+    for (const auto& [id,properties, animation, objects] : parsedTileSet.tiles)
     {
         // Adjust tile with a tile set id.
         const long adjusted_id = firstGid + id;
@@ -138,6 +138,7 @@ void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedT
                 if (object.properties.size() >= 2)
                 {
                     m_mapWeaponPlacements.emplace(adjusted_id, object);
+                    if (id <= 180) m_weaponsIDs.emplace_back(id, GameType::stringToWeaponType(properties[0].value));
                 }
                 else
                 {
@@ -231,6 +232,8 @@ void TextureSystem::loadTextures()
             continue;
         }
 
+        if (renderComponent.dirty == false) continue;
+
         // Adjust tile index
         long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
         auto animationsIter = m_mapAnimations.find(adjusted_id);
@@ -260,8 +263,7 @@ void TextureSystem::loadTextures()
             {
                 if (cc.x != colliderComponent.collision.x || cc.y != colliderComponent.collision.y)
                 {
-                    b2Vec2 offset = {static_cast<float>(cc.x - colliderComponent.collision.x),
-                                     static_cast<float>(cc.y - colliderComponent.collision.y)};
+                    b2Vec2 offset = {(cc.x - colliderComponent.collision.x), (cc.y - colliderComponent.collision.y)};
 
                     offset.x = convertPixelsToMeters(offset.x * config::gameScale);
                     offset.y = convertPixelsToMeters(-offset.y * config::gameScale);
@@ -285,6 +287,7 @@ void TextureSystem::loadTextures()
         // Load texture of tile with that id to render component
         renderComponent.sprite = getTile(tileComponent.tileSet, tileComponent.id);
         renderComponent.layer = tileComponent.layer;
+        renderComponent.dirty = true;
     }
 }
 

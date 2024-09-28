@@ -77,6 +77,8 @@ namespace config
     static constexpr float weaponComponentDefaultRemainingDistance{0.0f};
     static constexpr float weaponComponentDefaultRecoilAmount{10.0f};
 
+    static constexpr int weaponInteractionDistance{200};
+
     static constexpr glm::vec2 startingPosition{325.f, 325.f};
     static constexpr float spawnOffset{25};
 
@@ -169,4 +171,59 @@ namespace config
 
     const std::vector<ItemConfig> itemsData{{"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
                                             {"DMGPotion", 2.f, Items::Behaviours::DMGUP, {693, "Items", 4}}};
+
+    enum _entityCategory
+    {
+        BOUNDARY = 0x0001,
+        PLAYER = 0x0002,
+        DOOR = 0x0003,
+        ENEMY = 0x0004,
+        PASSAGE = 0x0005,
+        BULLET = 0x0006,
+        ITEM = 0x0007,
+    };
+
+    inline std::unordered_map<std::string, _entityCategory> categoriesLookup{
+        {"Wall", BOUNDARY}, {"Bullet", BULLET}, {"Enemy", ENEMY}, {"Passage", PASSAGE},
+        {"Item", ITEM},     {"Player", PLAYER}, {"Door", DOOR}};
+
+    inline std::unordered_map<std::string, uint16> bitMaskLookup{
+        {"Wall", BOUNDARY | PLAYER | ENEMY | BULLET | ITEM}, // Wall collides with everything
+        {"Bullet", BOUNDARY | ENEMY}, // Bullet only collides with walls and enemies
+        {"Enemy", BOUNDARY | PLAYER}, // Enemy collides with walls and players
+        {"Passage", BOUNDARY | PLAYER}, // Passage collides with walls and players
+        {"Item", BOUNDARY | PLAYER}, // Item only collides with walls and players
+        {"Player", BOUNDARY | ENEMY | ITEM}, // Player collides with walls, enemies, and items
+        {"Door", BOUNDARY | PLAYER} // Door collides with walls and players
+    };
+
+    inline uint16 stringToCategoryBits(const std::string& str)
+    {
+        if (categoriesLookup.contains(str)) return categoriesLookup[str];
+
+        if (std::regex_match(str, playerRegexTag)) return categoriesLookup["Player"];
+
+        if (str == "Chest") return categoriesLookup["Item"];
+
+        return 0x0000;
+    }
+
+    inline uint16 stringToMaskBits(const std::string& str)
+    {
+        if (bitMaskLookup.contains(str)) return bitMaskLookup[str];
+
+        if (std::regex_match(str, playerRegexTag)) return bitMaskLookup["Player"];
+
+        if (str == "Chest") return bitMaskLookup["Item"];
+
+        return 0x0000;
+    }
+
+    inline uint16 stringToIndexGroup(const std::string& str)
+    {
+        if (str == "Bullet") return -8;
+        return 0;
+    }
+
+
 } // namespace config
