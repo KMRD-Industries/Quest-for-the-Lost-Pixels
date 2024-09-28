@@ -17,7 +17,7 @@ inline void from_json(const json& json, ObjectProperty& objectProperty)
 inline void from_json(const json& json, AnimationFrame& frame)
 {
     json.at("duration").get_to(frame.duration);
-    json.at("tileid").get_to(frame.tileid);
+    json.at("tileid").get_to(frame.tileID);
 }
 
 inline void from_json(const json& json, Collision& obj)

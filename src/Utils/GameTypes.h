@@ -14,8 +14,10 @@ namespace SpecialBlocks
         DOORSCOLLIDER = 0,
         STATICWALLCOLLIDER = 1,
         SPAWNERBLOCK = 2,
-        BOSSSPAWNERBLOCK = 3,
-        CHESTSPAWNERBLOCK = 4
+        STARTINGPOINT = 3,
+        DOWNDOOR = 4,
+        BOSSSPAWNERBLOCK = 5,
+        CHESTSPAWNERBLOCK = 6
     };
 } // namespace SpecialBlocks
 
@@ -37,34 +39,119 @@ namespace Enemies
     };
 } // namespace Enemies
 
+inline sf::Vector2f operator+(const sf::Vector2f& sfVec, const glm::vec2& glmVec)
+{
+    return sf::Vector2f{sfVec.x + glmVec.x, sfVec.y + glmVec.y};
+}
+
+inline sf::Vector2f operator+(const sf::Vector2f& sfVec, const int x) { return sf::Vector2f{sfVec.x + x, sfVec.y + x}; }
+
 namespace GameType
 {
     struct MyVec2
     {
         float x, y;
 
-        MyVec2(const float x, const float y) : x{x}, y{y}
-        {
-        }
+        // Constructors
+        MyVec2(const float x, const float y) : x{x}, y{y} {}
 
-        MyVec2(const glm::vec2& vec) : x(vec.x), y(vec.y)
-        {
-        }
+        MyVec2(const glm::vec2& vec) : x(vec.x), y(vec.y) {}
 
         operator glm::vec2() const { return {x, y}; }
 
-        MyVec2(const sf::Vector2f& vec) : x(vec.x), y(vec.y)
-        {
-        }
+        MyVec2(const sf::Vector2f& vec) : x(vec.x), y(vec.y) {}
 
         operator sf::Vector2f() const { return {x, y}; }
 
-        MyVec2(const b2Vec2& vec) : x(vec.x), y(vec.y)
-        {
-        }
+        MyVec2(const b2Vec2& vec) : x(vec.x), y(vec.y) {}
 
         operator b2Vec2() const { return {x, y}; }
+
+        // Overloaded operators for vector addition
+        MyVec2 operator+(const sf::Vector2f& vec) const { return MyVec2{x + vec.x, y + vec.y}; }
+
+        MyVec2 operator+(const glm::vec2& vec) const { return MyVec2{x + vec.x, y + vec.y}; }
+
+        MyVec2 operator+(const b2Vec2& vec) const { return MyVec2{x + vec.x, y + vec.y}; }
+
+        MyVec2 operator+(const MyVec2& vec) const { return MyVec2{x + vec.x, y + vec.y}; }
+
+        // Overloaded operators for vector multiplication
+        MyVec2 operator*(const sf::Vector2f& vec) const { return MyVec2{x * vec.x, y * vec.y}; }
+
+        MyVec2 operator*(const glm::vec2& vec) const { return MyVec2{x * vec.x, y * vec.y}; }
+
+        MyVec2 operator*(const MyVec2& vec) const { return MyVec2{x * vec.x, y * vec.y}; }
+
+        // Scalar multiplication
+        MyVec2 operator*(const float scalar) const { return MyVec2{x * scalar, y * scalar}; }
+
+        MyVec2 operator*(const double scalar) const
+        {
+            return MyVec2{x * static_cast<float>(scalar), y * static_cast<float>(scalar)};
+        }
+
+        // Compound assignment operators
+        MyVec2& operator+=(const MyVec2& vec)
+        {
+            x += vec.x;
+            y += vec.y;
+            return *this;
+        }
+
+        MyVec2& operator*=(const MyVec2& vec)
+        {
+            x *= vec.x;
+            y *= vec.y;
+            return *this;
+        }
+
+        MyVec2& operator+=(const sf::Vector2f& vec)
+        {
+            x += vec.x;
+            y += vec.y;
+            return *this;
+        }
+
+        MyVec2& operator*=(const float scalar)
+        {
+            x *= scalar;
+            y *= scalar;
+            return *this;
+        }
+
+        // Subtraction operator (handling negative direction)
+        MyVec2 operator-() const { return MyVec2{-x, -y}; }
     };
+
+    // Additional operators for sf::Vector2f and MyVec2
+    inline sf::Vector2f operator+(const sf::Vector2f& sfVec, const MyVec2& myVec)
+    {
+        return sf::Vector2f{sfVec.x + myVec.x, sfVec.y + myVec.y};
+    }
+
+    inline sf::Vector2f operator*(const sf::Vector2f& sfVec, const MyVec2& myVec)
+    {
+        return sf::Vector2f{sfVec.x * myVec.x, sfVec.y * myVec.y};
+    }
+
+    // Add handling for glm::vec2 operations with MyVec2
+    inline glm::vec2 operator+(const glm::vec2& glmVec, const MyVec2& myVec)
+    {
+        return glm::vec2{glmVec.x + myVec.x, glmVec.y + myVec.y};
+    }
+
+    inline glm::vec2 operator*(const glm::vec2& glmVec, const MyVec2& myVec)
+    {
+        return glm::vec2{glmVec.x * myVec.x, glmVec.y * myVec.y};
+    }
+
+    // Handle MyVec2 * int directly for cases like dir * -1
+    inline MyVec2 operator*(const MyVec2& vec, const int scalar) { return MyVec2{vec.x * scalar, vec.y * scalar}; }
+
+    inline MyVec2 operator*(const int scalar, const MyVec2& vec) { return MyVec2{scalar * vec.x, scalar * vec.y}; }
+
+    inline MyVec2 operator+(const MyVec2& vec, const int scalar) { return MyVec2{vec.x + scalar, vec.y + scalar}; }
 
     enum class DoorEntraces : int
     {
@@ -72,6 +159,18 @@ namespace GameType
         SOUTH = static_cast<int>('S'),
         WEST = static_cast<int>('W'),
         EAST = static_cast<int>('E')
+    };
+
+    enum FlipFlags : std::uint8_t
+    {
+        NoFlip = 0x0,
+        VerticalFlip = 0x4, // 0100
+        HorizontalFlip = 0x8, // 1000
+        DiagonalFlip = 0x2, // 0010
+        HorizontalVerticalFlip = 0xC, // 1100
+        DiagonalVerticalFlip = 0x6, // 0110
+        DiagonalHorizontalFlip = 0xA, // 1010
+        AllFlips = 0xE // 1110
     };
 
     const std::unordered_map<DoorEntraces, glm::ivec2> mapDoorsToGeo{{DoorEntraces::NORTH, {0, 1}},

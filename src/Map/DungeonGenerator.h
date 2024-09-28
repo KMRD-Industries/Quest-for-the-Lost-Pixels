@@ -48,7 +48,20 @@ public:
     [[nodiscard]] std::optional<char> getKey(const glm::ivec2& node) const;
     [[nodiscard]] glm::ivec2 getStartingRoom() const;
     [[nodiscard]] glm::ivec2 getBossRoom() const;
+    [[nodiscard]] glm::ivec2 getEndingRoom() const;
     [[nodiscard]] bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
+
+    int getOutEdgesCount(int i, int j) const
+    {
+        try
+        {
+            return m_nodeOutEdgesCount.at({i, j});
+        }
+        catch (const std::out_of_range& e)
+        {
+            return {};
+        }
+    };
 
 private:
     void generateMainPath(const PathConfig& pathConfig);
@@ -70,6 +83,8 @@ private:
     RoomCount m_roomCount{};
     int m_freeKey{};
     glm::ivec2 m_startingRoom{};
+    glm::ivec2 m_endingRoom{};
+
     std::unordered_map<glm::ivec2, int> m_locks{};
     std::unordered_map<glm::ivec2, int> m_keys{};
     NodeOutEdgesCount m_nodeOutEdgesCount;

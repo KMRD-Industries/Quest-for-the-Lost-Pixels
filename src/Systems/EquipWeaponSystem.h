@@ -4,5 +4,7 @@
 class EquipWeaponSystem : public System
 {
 public:
-    static void equipWeapon(Entity, Entity);
+    void init();
+    void update();
+    void equipWeapon(Entity, Entity);
 };

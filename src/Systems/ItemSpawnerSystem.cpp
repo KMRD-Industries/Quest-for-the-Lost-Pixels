@@ -4,6 +4,7 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "CreateBodyWithCollisionEvent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "TransformComponent.h"
@@ -11,43 +12,44 @@
 struct CharacterComponent;
 struct ColliderComponent;
 
+ItemSpawnerSystem::ItemSpawnerSystem() { init(); }
+
+void ItemSpawnerSystem::init() {}
+
 void ItemSpawnerSystem::updateAnimation(const float deltaTime)
 {
     for (const auto entity : m_entities)
     {
-        ItemAnimationComponent& animationComponent = gCoordinator.getComponent<ItemAnimationComponent>(entity);
-        if (animationComponent.destroy)
-            continue;
+        auto& animationComponent = gCoordinator.getComponent<ItemAnimationComponent>(entity);
+        const auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+
+        if (animationComponent.destroy) continue;
         if (!animationComponent.shouldAnimate)
         {
-            const auto itemBehaviour = gCoordinator.getComponent<ItemComponent>(entity).behaviour;
-            const auto itemValue = gCoordinator.getComponent<ItemComponent>(entity).value;
-            ColliderComponent& colliderComponent = gCoordinator.getComponent<ColliderComponent>(
-                entity);
-            CollisionSystem::createBody(
-                entity, "Item", {colliderComponent.collision.width,
-                                 colliderComponent.collision.height},
-                [this, entity,itemBehaviour,itemValue](const GameType::CollisionData& collisionData)
-                {
-                    handlePotionCollision(entity, collisionData, itemBehaviour, itemValue);
-                }, [&](const GameType::CollisionData&)
-                {
-                }, false, true,
-                {colliderComponent.collision.x, colliderComponent.collision.y});
+            const auto& itemBehaviour = gCoordinator.getComponent<ItemComponent>(entity).behaviour;
+            auto& itemValue = gCoordinator.getComponent<ItemComponent>(entity).value;
+
+            const Entity newItemEntity = gCoordinator.createEntity();
+
+            const auto newEvent = CreateBodyWithCollisionEvent(
+                entity, "Item", [this, entity, itemBehaviour, itemValue](const GameType::CollisionData& collisionData)
+                { handlePotionCollision(entity, collisionData, itemBehaviour, itemValue); },
+                [&](const GameType::CollisionData&) {}, false, false);
+
+            gCoordinator.addComponent(newItemEntity, newEvent);
+
             animationComponent.destroy = true;
         }
         else
         {
             animationComponent.currentAnimationTime += deltaTime;
-            TransformComponent& transformComponent = gCoordinator.getComponent<TransformComponent>(
-                entity);
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
-            const float newPositionY = animationComponent.currentAnimationTime * (
-                animationComponent.currentAnimationTime - 2.f) * 100;
-            if (newPositionY >= 0)
-                animationComponent.shouldAnimate = false;
+            const float newPositionY =
+                animationComponent.currentAnimationTime * (animationComponent.currentAnimationTime - 2.f) * 100;
+            if (newPositionY >= 0) animationComponent.shouldAnimate = false;
+
             transformComponent.position.y = animationComponent.startingPositionY + newPositionY;
-
             transformComponent.position.x += 1.f;
         }
     }
@@ -55,24 +57,32 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
 
 void ItemSpawnerSystem::deleteItems()
 {
+    std::deque<Entity> entityToRemove;
+
     for (const auto entity : m_entities)
-        gCoordinator.getComponent<CharacterComponent>(entity).hp = -1;
+    {
+        if(gCoordinator.hasComponent<ColliderComponent>(entity))
+            gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
+
+        if(gCoordinator.hasComponent<CharacterComponent>(entity))
+            gCoordinator.getComponent<CharacterComponent>(entity).hp = -1;
+    }
+
 }
 
 void ItemSpawnerSystem::handlePotionCollision(const Entity potion, const GameType::CollisionData& collisionData,
                                               const Items::Behaviours behaviour, const float value)
 {
     const bool isCollidingWithPlayer = std::regex_match(collisionData.tag, config::playerRegexTag);
-    if (!isCollidingWithPlayer)
-        return;
+    if (!isCollidingWithPlayer) return;
 
     gCoordinator.getComponent<CharacterComponent>(potion).hp = -1;
     switch (behaviour)
     {
-    case (Items::Behaviours::HEAL):
+    case Items::Behaviours::HEAL:
         gCoordinator.getComponent<CharacterComponent>(collisionData.entityID).hp += value;
         break;
-    case (Items::Behaviours::DMGUP):
+    case Items::Behaviours::DMGUP:
         gCoordinator.getComponent<CharacterComponent>(collisionData.entityID).damage += value;
         break;
     }

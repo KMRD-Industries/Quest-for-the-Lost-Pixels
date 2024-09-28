@@ -1,16 +1,23 @@
 #include "EnemySystem.h"
 #include <random>
+#include <stdint.h>
+#include "ColliderComponent.h"
 #include "Config.h"
-#include "RenderComponent.h"
-#include "TileComponent.h"
+#include "Coordinator.h"
+#include "EnemyComponent.h"
+#include "Physics.h"
 #include "TransformComponent.h"
 
-void EnemySystem::update() const
-{
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<int> dis(-1, 1); // Uniform distribution between -1 and 1
+EnemySystem::EnemySystem() { init(); }
 
+void EnemySystem::init()
+{
+    gen.seed(rd()); // Seed the generator
+    dis = std::uniform_int_distribution(-1, 1); // Range between -1 and 1
+}
+
+void EnemySystem::update()
+{
     for (const auto entity : m_entities)
     {
         if (gCoordinator.hasComponent<TransformComponent>(entity))
@@ -28,17 +35,17 @@ void EnemySystem::update() const
 
 void EnemySystem::deleteEnemies() const
 {
+    std::deque<Entity> entityToRemove;
+
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.hasComponent<TileComponent>(entity))
-        {
-            auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        if (gCoordinator.hasComponent<EnemyComponent>(entity)) entityToRemove.push_back(entity);
+    }
 
-            tileComponent = {};
-            transformComponent = {};
-            renderComponent = {};
-        }
+    while (!entityToRemove.empty())
+    {
+        Physics::getWorld()->DestroyBody(gCoordinator.getComponent<ColliderComponent>(entityToRemove.front()).body);
+        gCoordinator.destroyEntity(entityToRemove.front());
+        entityToRemove.pop_front();
     }
 }

@@ -6,7 +6,7 @@
  "name":"SpecialBlocks",
  "spacing":0,
  "tilecount":112,
- "tiledversion":"1.10.2",
+ "tiledversion":"1.11.0",
  "tileheight":16,
  "tiles":[
         {
@@ -21,6 +21,23 @@
                      "height":16,
                      "id":1,
                      "name":"",
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":16,
+                     "x":0,
+                     "y":0
+                    }, 
+                    {
+                     "height":16,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"id",
+                             "type":"string",
+                             "value":"0"
+                            }],
                      "rotation":0,
                      "type":"",
                      "visible":true,
@@ -51,6 +68,102 @@
                              "name":"tile_id",
                              "type":"string",
                              "value":"1"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":16,
+                     "x":0,
+                     "y":0
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "id":2,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":16,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"id",
+                             "type":"string",
+                             "value":"2"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":16,
+                     "x":0,
+                     "y":0
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "id":3,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":16,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"id",
+                             "type":"string",
+                             "value":"3"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":16,
+                     "x":0,
+                     "y":0
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "id":4,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":16,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"id",
+                             "type":"string",
+                             "value":"4"
                             }],
                      "rotation":0,
                      "type":"",

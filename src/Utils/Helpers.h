@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 #include "Config.h"
+#include "GameTypes.h"
 #include "glm/gtx/hash.hpp"
 
 static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& enemyType)
@@ -232,6 +233,13 @@ static T roundTo(T value, int places)
     return std::round(value * factor) / factor;
 }
 
+static GameType::MyVec2 roundTo(const GameType::MyVec2& vec, int places)
+{
+    auto factor = static_cast<float>(std::pow(10.0f, places));
+    return GameType::MyVec2{std::round(vec.x * factor) / factor, std::round(vec.y * factor) / factor};
+}
+
+
 template <typename T>
 static T convertMetersToPixel(const T meterValue)
 {
@@ -244,4 +252,16 @@ static T convertPixelsToMeters(const T pixelValue)
 {
     T result = pixelValue * config::pixelToMeterRatio;
     return roundTo(result, 10);
+}
+
+static sf::Vector2f convertPixelsToMeters(const sf::Vector2f& pixelValue)
+{
+    sf::Vector2f result = {};
+    result.x = static_cast<float>(pixelValue.x * config::pixelToMeterRatio);
+    result.y = static_cast<float>(pixelValue.y * config::pixelToMeterRatio);
+
+    result.x = roundTo(result.x, 10);
+    result.y = roundTo(result.y, 10);
+
+    return result;
 }

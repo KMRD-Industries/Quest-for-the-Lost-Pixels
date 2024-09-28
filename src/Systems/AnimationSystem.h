@@ -1,3 +1,4 @@
+#pragma once
 #include "AnimationComponent.h"
 #include "Coordinator.h"
 
@@ -6,12 +7,14 @@ extern Coordinator gCoordinator;
 class AnimationSystem : public System
 {
 public:
-    void updateFrames();
-    void updateEntityAnimation(Entity) const;
-    static int calculateFrameDuration(const AnimationComponent&);
-    inline bool isTimeForNextFrame(int frameDuration) const;
-    static void loadNextFrame(Entity, AnimationComponent&);
+    AnimationSystem();
+    void init();
+    void update(float deltaTime);
+    void updateEntityAnimation(Entity, float deltaTime);
+    int calculateFrameDuration(const AnimationComponent&);
+    [[nodiscard]] bool isTimeForNextFrame(Entity entity);
+    void loadNextFrame(Entity, AnimationComponent&);
 
 private:
-    long m_frameTime{};
+    float m_frameTime{};
 };

@@ -4,42 +4,28 @@
 #include "TileComponent.h"
 #include "TransformComponent.h"
 
-void AnimationSystem::updateFrames()
-{
-    m_frameTime = (m_frameTime + 1) % config::frameCycle;
+AnimationSystem::AnimationSystem() { init(); }
 
-    for (const auto entity : m_entities)
-        updateEntityAnimation(entity);
+void AnimationSystem::init() { m_frameTime = {}; }
+
+void AnimationSystem::update(const float deltaTime)
+{
+    for (const auto entity : m_entities) updateEntityAnimation(entity, deltaTime);
 }
 
-void AnimationSystem::updateEntityAnimation(const Entity entity) const
+void AnimationSystem::updateEntityAnimation(const Entity entity, const float deltaTime)
 {
-    if (auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
-        !animation.frames.empty() && isTimeForNextFrame(calculateFrameDuration(animation)))
-        loadNextFrame(entity, animation);
-}
+    auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
+    animation.timeUntilNextFrame -= deltaTime * 1000;
 
-inline int AnimationSystem::calculateFrameDuration(const AnimationComponent& animation)
-{
-    // Ensure that the division and the addition are done in long, then cast to int
-    const long duration{animation.frames[animation.currentFrame].duration};
-
-    // Explicitly cast to int after all calculations to avoid narrowing conversions
-    return static_cast<int>(duration / static_cast<long>(config::oneFrameTime) + 1);
-}
-
-inline bool AnimationSystem::isTimeForNextFrame(const int frameDuration) const
-{
-    return m_frameTime % frameDuration == 0;
+    if (!animation.frames.empty() && animation.timeUntilNextFrame <= 0) loadNextFrame(entity, animation);
 }
 
 void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& animation)
 {
     auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
     ++animation.currentFrame %= animation.frames.size();
 
-    tileComponent.id = animation.frames[animation.currentFrame].tileid;
-    transformComponent.rotation = animation.frames[animation.currentFrame].rotation;
+    animation.timeUntilNextFrame = animation.frames[animation.currentFrame].duration;
+    tileComponent.id = animation.frames[animation.currentFrame].tileID;
 }

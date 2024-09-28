@@ -1,11 +1,10 @@
-//
-// Created by dominik-szot on 28.07.24.
-//
-
 #include "EquipWeaponSystem.h"
-
 #include "AnimationSystem.h"
 #include "EquippedWeaponComponent.h"
+
+void EquipWeaponSystem::init() {}
+
+void EquipWeaponSystem::update() {}
 
 void EquipWeaponSystem::equipWeapon(const Entity player, const Entity weapon)
 {
