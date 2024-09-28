@@ -2,5 +2,5 @@
 
 struct FloorComponent
 {
-    long currentPlayerFloor {0};
+    long currentPlayerFloor{};
 };

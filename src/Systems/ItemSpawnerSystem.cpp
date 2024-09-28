@@ -61,15 +61,13 @@ void ItemSpawnerSystem::deleteItems()
 
     for (const auto entity : m_entities)
     {
-        entityToRemove.push_back(entity);
+        if(gCoordinator.hasComponent<ColliderComponent>(entity))
+            gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
+
+        if(gCoordinator.hasComponent<CharacterComponent>(entity))
+            gCoordinator.getComponent<CharacterComponent>(entity).hp = -1;
     }
 
-    while (!entityToRemove.empty())
-    {
-        Physics::getWorld()->DestroyBody(gCoordinator.getComponent<ColliderComponent>(entityToRemove.front()).body);
-        gCoordinator.destroyEntity(entityToRemove.front());
-        entityToRemove.pop_front();
-    }
 }
 
 void ItemSpawnerSystem::handlePotionCollision(const Entity potion, const GameType::CollisionData& collisionData,

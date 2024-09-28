@@ -30,6 +30,7 @@
 #include "MapSystem.h"
 #include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
+#include "ObjectCreatorSystem.h"
 #include "PassageComponent.h"
 #include "PassageSystem.h"
 #include "PlayerComponent.h"
@@ -343,6 +344,7 @@ inline void Dungeon::clearDungeon() const
     m_enemySystem->deleteEnemies();
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
+    m_collisionSystem->deleteMarkedBodies();
 }
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)

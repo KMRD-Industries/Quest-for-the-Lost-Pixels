@@ -7,7 +7,7 @@
 
 void ObjectCreatorSystem::update()
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
 
@@ -86,6 +86,11 @@ void ObjectCreatorSystem::update()
         colliderComponent.tag = eventInfo.tag;
     }
 
+    clear();
+}
+
+void ObjectCreatorSystem::clear()
+{
     std::deque<Entity> entityToRemove;
 
     for (const auto entity : m_entities)

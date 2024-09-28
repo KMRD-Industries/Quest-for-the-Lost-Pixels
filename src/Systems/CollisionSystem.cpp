@@ -155,7 +155,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
     }
 }
 
-void CollisionSystem::deleteBody(const Entity entity)
+void CollisionSystem::deleteBody(const Entity entity) const
 {
     if (!gCoordinator.hasComponent<ColliderComponent>(entity)) return;
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);

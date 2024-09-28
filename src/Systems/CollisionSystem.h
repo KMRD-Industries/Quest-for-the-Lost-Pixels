@@ -34,7 +34,7 @@ public:
         const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&) {},
         bool isStatic = true, bool useTextureSize = true, const glm::vec2& offset = {0., 0.});
 
-    void deleteBody(Entity entity);
+    void deleteBody(const Entity entity) const;
     void deleteMarkedBodies();
 
 private:

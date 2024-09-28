@@ -14,7 +14,7 @@
 
 void FightSystem::update()
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         const auto& [eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
 
