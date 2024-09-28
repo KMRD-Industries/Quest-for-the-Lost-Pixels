@@ -22,6 +22,20 @@ SpawnerSystem::SpawnerSystem() { init(); }
 void SpawnerSystem::init() { m_spawnTime = {}; }
 
 void SpawnerSystem::update(const float timeStamp)
+void SpawnerSystem::spawnEnemies()
+{
+    for (const auto entity : m_entities)
+    {
+        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
+        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+        processSpawner(spawnerComponent, spawnerTransformComponent);
+    }
+
+    cleanUpUnnecessarySpawners();
+}
+
+void SpawnerSystem::update()
 {
     m_spawnTime += timeStamp * 1000.f;
 
@@ -41,6 +55,8 @@ void SpawnerSystem::update(const float timeStamp)
 void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
                                    const TransformComponent& spawnerTransformComponent)
 {
+    if (!spawnerComponent.loopSpawn && spawnerComponent.noSpawns >= 1) return;
+
     // Check if the spawner is ready to spawn the enemy.
     if (m_spawnTime < SPAWN_RATE) return;
 
@@ -74,8 +90,8 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
             if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
-
             playerCharacterComponent.attacked = true;
+
             playerCharacterComponent.hp -= enemyConfig.damage;
 
             if (!config::applyKnockback) return;

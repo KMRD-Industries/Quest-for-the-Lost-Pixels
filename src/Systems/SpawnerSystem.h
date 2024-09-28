@@ -13,6 +13,7 @@ public:
     void update(const float timeStamp);
     void clearSpawners();
     void cleanUpUnnecessarySpawners();
+    void spawnEnemies();
 
     SpawnerSystem();
 

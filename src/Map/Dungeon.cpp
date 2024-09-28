@@ -30,6 +30,7 @@
 #include "MapSystem.h"
 #include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
+#include "ObjectCreatorSystem.h"
 #include "PassageComponent.h"
 #include "PassageSystem.h"
 #include "PlayerComponent.h"
@@ -246,7 +247,7 @@ void Dungeon::update(const float deltaTime)
             break;
         }
 
-        // m_multiplayerSystem->update();
+        m_multiplayerSystem->update();
     }
 
     m_roomMap.at(m_currentPlayerPos).update();
@@ -344,6 +345,7 @@ inline void Dungeon::clearDungeon() const
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
     m_weaponSystem->deleteItems();
+    m_collisionSystem->deleteMarkedBodies();
 }
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)
