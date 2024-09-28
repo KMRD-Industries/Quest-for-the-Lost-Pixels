@@ -4,6 +4,7 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "DoorComponent.h"
+#include "HelmetComponent.h"
 #include "ItemComponent.h"
 #include "MultiplayerSystem.h"
 #include "PassageComponent.h"
@@ -74,7 +75,8 @@ void CollisionSystem::createMapCollision()
         auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
-            gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
+            gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
+            gCoordinator.hasComponent<HelmetComponent>(entity))
         {
             continue;
         }
@@ -144,8 +146,18 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
         transformComponent.rotation = body->GetAngle() * 180.f / 3.131516;
-        renderComponent.sprite.setPosition(position.x, position.y);
         renderComponent.dirty = true;
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity))
+        {
+            renderComponent.sprite.setPosition(
+                position.x + config::gameScale * (colliderComponent.collision.width + colliderComponent.collision.x),
+                position.y + config::gameScale * (colliderComponent.collision.height + colliderComponent.collision.y));
+        }
+        else
+        {
+            renderComponent.sprite.setPosition(position.x, position.y);
+        }
     }
 }
 

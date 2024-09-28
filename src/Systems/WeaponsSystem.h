@@ -11,7 +11,7 @@ public:
     void update();
     void markClosest();
     void displayStats(Entity);
-    void weaponInput(Entity);
+    void input(Entity);
     void deleteItems();
 
 private:

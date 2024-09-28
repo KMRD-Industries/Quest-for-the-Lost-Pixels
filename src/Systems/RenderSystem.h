@@ -22,6 +22,7 @@ public:
     void displayPortal(Entity entity);
     void draw(sf::RenderWindow& window);
     void setWeapon();
+    void setHelmet() const;
     void setWeaponOrigin();
 
 private:

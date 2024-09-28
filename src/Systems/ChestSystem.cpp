@@ -2,6 +2,8 @@
 
 #include "AnimationSystem.h"
 #include "ColliderComponent.h"
+#include "HelmetComponent.h"
+#include "WeaponComponent.h"
 
 void ChestSystem::deleteItems() const
 {
@@ -10,16 +12,13 @@ void ChestSystem::deleteItems() const
 
     for (const auto entity : m_entities)
     {
+        if (const auto* weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(entity))
+            if (weaponComponent->equipped == true) continue;
 
-        if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
-        {
-            colliderComponent->toDestroy = true;
-        }
-        else
-        {
-            entitiesToKill.push_back(entity);
-        }
+        if (const auto* itemComponent = gCoordinator.tryGetComponent<HelmetComponent>(entity))
+            if (itemComponent->equipped == true) continue;
+
+        if (auto* collisionComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+            collisionComponent->toDestroy = true;
     }
-
-    for (const auto entity : entitiesToKill) gCoordinator.destroyEntity(entity);
 }

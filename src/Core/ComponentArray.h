@@ -39,19 +39,21 @@ public:
         --m_size;
     }
 
-    bool hasComponent(const Entity entity) const
-    {
-        return m_entityToIndex.contains(entity);
-    }
+    bool hasComponent(const Entity entity) const { return m_entityToIndex.contains(entity); }
 
     T* tryGetData(const Entity entity)
     {
-        if(!m_entityToIndex.contains(entity)) return nullptr;
+        if (!m_entityToIndex.contains(entity)) return nullptr;
         return &m_componentArray[m_entityToIndex[entity]];
     }
 
     T& getData(const Entity entity)
     {
+        if (!m_entityToIndex.contains(entity))
+        {
+            throw std::runtime_error("Retrieving non-existent component.");
+        }
+
         assert(m_entityToIndex.contains(entity) && "Retrieving non-existent component.");
         return m_componentArray[m_entityToIndex[entity]];
     }

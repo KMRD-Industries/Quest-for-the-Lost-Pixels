@@ -6,6 +6,7 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "CreateBodyWithCollisionEvent.h"
+#include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "RenderComponent.h"
@@ -21,6 +22,7 @@ void ChestSpawnerSystem::init()
     m_chestCollision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Items", 819);
     m_potionCollision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Items", 693);
     m_weaponsIDs = gCoordinator.getRegisterSystem<TextureSystem>()->m_weaponsIDs;
+    m_helmetsIDs = gCoordinator.getRegisterSystem<TextureSystem>()->m_helmets;
     m_chestTile = TileComponent{819, "Items", 5};
 }
 
@@ -45,6 +47,18 @@ void ChestSpawnerSystem::spawnWeapon(const TransformComponent& spawnerTransformC
         ItemAnimationComponent{.animationDuration = 1, .startingPositionY = spawnerTransformComponent.position.y - 75});
 }
 
+void ChestSpawnerSystem::spawnHelmet(const TransformComponent& spawnerTransformComponent) const
+{
+    const Entity newHelmetEntity = gCoordinator.createEntity();
+    const auto& helmetDesc = getRandomElement(m_helmetsIDs);
+
+    gCoordinator.addComponents(
+        newHelmetEntity, HelmetComponent{.id = helmetDesc},
+        TileComponent{static_cast<uint32_t>(helmetDesc), "Armour", 7}, TransformComponent{spawnerTransformComponent},
+        RenderComponent{}, ColliderComponent{}, AnimationComponent{}, ItemComponent{},
+        ItemAnimationComponent{.animationDuration = 1, .startingPositionY = spawnerTransformComponent.position.y - 75});
+}
+
 void ChestSpawnerSystem::clearSpawners() const {}
 
 void ChestSpawnerSystem::processSpawn(const TransformComponent& spawnerTransformComponent) const
@@ -61,7 +75,9 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent& spawnerTransform
     auto spawnFunction = [this, spawnerTransformComponent](const GameType::CollisionData&)
     {
         // TODO: Spawning Logic
-        std::time(nullptr) % 3 == 0 ? spawnPotion(spawnerTransformComponent) : spawnWeapon(spawnerTransformComponent);
+        spawnPotion(spawnerTransformComponent);
+        spawnWeapon(spawnerTransformComponent);
+        spawnHelmet(spawnerTransformComponent);
     };
 
     // Create new object with special eventComponent
