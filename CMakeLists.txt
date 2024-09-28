@@ -54,7 +54,7 @@ FetchContent_MakeAvailable(Boost)
 
 FetchContent_Declare(qlp-proto
     GIT_REPOSITORY https://github.com/kmrd-industries/qlp-proto-bindings
-    GIT_TAG 48-zmiana-pokoji)
+    GIT_TAG 80-multiplayer-system-broni)
 FetchContent_MakeAvailable(qlp-proto)
 
 add_subdirectory(src)

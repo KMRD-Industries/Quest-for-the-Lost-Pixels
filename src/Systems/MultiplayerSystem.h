@@ -17,13 +17,16 @@ class MultiplayerSystem : public System
 private:
     bool m_connected = false;
     Entity m_player_entity = 0;
-    std::uint32_t m_player_id = 0;
+    uint32_t m_player_id = 0;
     boost::asio::io_context m_io_context;
     tcp::socket m_tcp_socket;
     udp::socket m_udp_socket;
     std::array<char, 4096> m_buf{};
     sf::Vector3<float> m_last_sent{};
     glm::ivec2 m_current_room{};
+    int m_prefix_size{};
+    std::vector<char> m_prefix_buf{};
+    comm::BytePrefix m_prefix{};
     comm::PositionUpdate m_position{};
     comm::StateUpdate m_state{};
     std::unordered_map<std::uint32_t, Entity> m_entity_map{};

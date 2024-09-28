@@ -1,9 +1,9 @@
 #include <cstdint>
 #include <iostream>
 
+#include <boost/asio.hpp>
 #include <comm.pb.h>
 #include <vector>
-#include <boost/asio.hpp>
 
 #include "ColliderComponent.h"
 #include "Config.h"
@@ -38,17 +38,24 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port) no
 
         m_udp_socket.wait(udp::socket::wait_write);
         m_tcp_socket.wait(tcp::socket::wait_write);
-        m_connected = true;
-
-        auto r1 = new comm::Room();
-        m_state.set_allocated_room(r1);
-
-        auto r2 = new comm::Room();
-        m_position.set_allocated_curr_room(r2);
     }
     catch (boost::system::system_error)
     {
+        return;
     }
+
+    m_connected = true;
+
+    auto r1 = new comm::Room();
+    m_state.set_allocated_room(r1);
+
+    auto r2 = new comm::Room();
+    m_position.set_allocated_curr_room(r2);
+
+    comm::BytePrefix prefixDummy;
+    prefixDummy.set_bytes(1);
+    m_prefix_size = static_cast<int>(prefixDummy.ByteSizeLong());
+    m_prefix_buf.resize(m_prefix_size);
 }
 
 void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
@@ -86,9 +93,9 @@ comm::GameState MultiplayerSystem::registerPlayer(const Entity player)
     std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
 
     comm::GameState gameState;
-    gameState.ParseFromArray(&m_buf, int(received));
+    gameState.ParseFromArray(&m_buf, static_cast<int>(received));
 
-    std::uint32_t id = gameState.player_id();
+    uint32_t id = gameState.player_id();
     m_entity_map[id] = player;
     m_player_entity = player;
     m_player_id = id;
@@ -98,32 +105,37 @@ comm::GameState MultiplayerSystem::registerPlayer(const Entity player)
 
 comm::StateUpdate MultiplayerSystem::pollStateUpdates()
 {
-    const std::size_t available = m_tcp_socket.available();
-    comm::StateUpdate state;
-    if (available > 0)
+    size_t available = m_tcp_socket.available();
+    if (available >= m_prefix_size)
     {
-        // TODO: actual fix (works most of the time at the moment)
-        // std::vector<char> buf(4);
-        // std::size_t received = m_tcp_socket.read_some(boost::asio::buffer(buf));
+        // read message byte size
+        size_t received = m_tcp_socket.read_some(boost::asio::buffer(m_prefix_buf, m_prefix_size));
+        m_prefix.ParseFromArray(m_prefix_buf.data(), m_prefix_size);
 
-        std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
+        uint32_t msg_size = m_prefix.bytes();
 
-        state.ParseFromArray(m_buf.data(), int(received));
-        std::cout << state.ShortDebugString() << '\n';
+        available = m_tcp_socket.available();
+        while (available < msg_size) available = m_tcp_socket.available();
 
-        if (state.variant() == comm::ROOM_CHANGED)
+        // read exactly msg_size bytes
+        received = m_tcp_socket.read_some(boost::asio::buffer(m_buf, msg_size));
+
+        m_state.ParseFromArray(m_buf.data(), static_cast<int>(received));
+        std::cout << m_state.ShortDebugString() << '\n';
+
+        if (m_state.variant() == comm::ROOM_CHANGED)
         {
-            auto r = state.room();
+            auto r = m_state.room();
             m_current_room.x = r.x();
             m_current_room.y = r.y();
         }
     }
     else
     {
-        state.set_id(0);
-        state.set_variant(comm::NONE);
+        m_state.set_id(0);
+        m_state.set_variant(comm::NONE);
     }
-    return state;
+    return m_state;
 }
 
 void MultiplayerSystem::entityConnected(const uint32_t id, const Entity entity) noexcept { m_entity_map[id] = entity; }
