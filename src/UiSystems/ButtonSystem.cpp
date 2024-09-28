@@ -1,5 +1,7 @@
 #include "ButtonSystem.h"
 
+#include <imgui-SFML.h>
+
 #include "ButtonComponent.h"
 #include "Coordinator.h"
 #include "SFML/Graphics/Texture.hpp"
@@ -10,6 +12,8 @@ void ButtonSystem::render()
 {
     for (const auto entity : m_entities)
     {
+        if (m_entities.empty())
+            return;
         auto& buttonComponent = gCoordinator.getComponent<ButtonComponent>(entity);
 
         ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -30,7 +34,7 @@ void ButtonSystem::render()
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
         if (ImGui::ImageButton(
-            atlasID, ImVec2(static_cast<float>(buttonTexture.width), static_cast<float>(buttonTexture.height)),
+            atlasID, ImVec2(buttonTexture.width * buttonComponent.scale, buttonTexture.height * buttonComponent.scale),
             buttonComponent.m_uv0, buttonComponent.m_uv1))
         {
             if (buttonComponent.m_onClickedFunction)
@@ -85,5 +89,18 @@ void ButtonSystem::render()
         ImGui::PopFont();
 
         ImGui::End();
+    }
+}
+
+void ButtonSystem::loadData(const std::string& atlasPath, const std::string& fontPath, const float fontSize)
+{
+    if (!m_loadedTextures.contains(atlasPath))
+        m_loadedTextures[atlasPath].loadFromFile(atlasPath);
+    if (!m_loadedFonts.contains(fontPath + std::to_string(fontSize)))
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        ImFont* loadedFont = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);
+        m_loadedFonts[fontPath + std::to_string(fontSize)] = loadedFont;
+        ImGui::SFML::UpdateFontTexture();
     }
 }

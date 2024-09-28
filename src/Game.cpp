@@ -2,6 +2,9 @@
 
 #include <imgui.h>
 
+#include "ButtonComponent.h"
+#include "ButtonSystem.h"
+#include  "ButtonSystem.h";
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
@@ -16,6 +19,7 @@ void Game::init()
 {
     gCoordinator.init();
 
+    gCoordinator.registerComponent<ButtonComponent>();
     gCoordinator.registerComponent<ColliderComponent>();
     gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TransformComponent>();
@@ -37,11 +41,19 @@ void Game::init()
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 
+    auto buttonSystem = gCoordinator.getRegisterSystem<ButtonSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<ButtonComponent>());
+        gCoordinator.setSystemSignature<ButtonSystem>(signature);
+    }
+
     m_stateManager.handleStateChange(MenuStateMachine::StateAction::Push, std::make_unique<MainMenuState>());
 }
 
 void Game::draw()
 {
+    gCoordinator.getRegisterSystem<ButtonSystem>()->render();
     m_stateManager.render();
 }
 

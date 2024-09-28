@@ -1,14 +1,18 @@
 #pragma once
 
-#include <imgui.h>
 #include "State.h"
 
 class MainMenuState : public State
 {
 public:
+    MainMenuState() : m_entities(MAX_ENTITIES - 1)
+    {
+    };
+
     void update(float deltaTime) override;
     void render() override;
     void init() override;
-    ImVec2 m_uv0;
-    ImVec2 m_uv1;
+
+private:
+    std::vector<Entity> m_entities{};
 };

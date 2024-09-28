@@ -1,20 +1,15 @@
 #pragma once
+#include <imgui.h>
 #include <unordered_map>
 
 #include "System.h"
-
-struct ImFont;
-
-namespace sf
-{
-    class Texture;
-}
+#include "SFML/Graphics/Texture.hpp"
 
 class ButtonSystem : public System
 {
 public:
     void render();
-    void loadData();
+    void loadData(const std::string& atlasPath, const std::string& fontPath, float fontSize);
 
 private:
     std::unordered_map<std::string, sf::Texture> m_loadedTextures;

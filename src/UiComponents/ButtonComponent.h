@@ -12,6 +12,7 @@ struct ButtonComponent
 
     std::string text{};
     float textSize{};
+    float scale{};
 
     ImVec2 position{};
 
