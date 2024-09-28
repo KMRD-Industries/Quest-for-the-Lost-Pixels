@@ -1,5 +1,6 @@
 #include "RoomListenerSystem.h"
 
+#include <SpawnerSystem.h>
 #include <iostream>
 
 #include "ChestSpawnerSystem.h"
@@ -11,11 +12,14 @@ void RoomListenerSystem::update()
         m_toLoot = true;
     else if (m_entities.empty() && m_toLoot)
         spawnLoot();
+    else
+        gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
 }
 
 void RoomListenerSystem::reset()
 {
     m_isCurrentRoomLooted = true;
+    m_isCurrentRoomClear = false;
     m_lootedRooms.clear();
     m_toLoot = false;
 }
@@ -23,11 +27,15 @@ void RoomListenerSystem::reset()
 void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)
 {
     if (m_lootedRooms.contains(newRoom))
+    {
         m_isCurrentRoomLooted = m_lootedRooms.at(newRoom);
+        m_isCurrentRoomClear = !m_isCurrentRoomLooted;
+    }
     else
     {
         m_lootedRooms.insert({newRoom, false});
         m_isCurrentRoomLooted = false;
+        gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnEnemies();
     }
     m_currentRoom = newRoom;
     m_toLoot = false;

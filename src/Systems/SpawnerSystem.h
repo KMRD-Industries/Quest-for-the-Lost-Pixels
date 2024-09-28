@@ -13,6 +13,7 @@ public:
     void update();
     void clearSpawners();
     void cleanUpUnnecessarySpawners();
+    void spawnEnemies();
 
     SpawnerSystem();
 
