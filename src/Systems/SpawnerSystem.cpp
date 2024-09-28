@@ -19,23 +19,9 @@ constexpr float SPAWN_RATE = 3600.f;
 
 SpawnerSystem::SpawnerSystem() { init(); }
 
-void SpawnerSystem::init() { m_spawnTime = {}; }
+void SpawnerSystem::init() {}
 
 void SpawnerSystem::update(const float timeStamp)
-void SpawnerSystem::spawnEnemies()
-{
-    for (const auto entity : m_entities)
-    {
-        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
-        processSpawner(spawnerComponent, spawnerTransformComponent);
-    }
-
-    cleanUpUnnecessarySpawners();
-}
-
-void SpawnerSystem::update()
 {
     m_spawnTime += timeStamp * 1000.f;
 
@@ -53,10 +39,8 @@ void SpawnerSystem::update()
 }
 
 void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
-                                   const TransformComponent& spawnerTransformComponent)
+                                   const TransformComponent& spawnerTransformComponent) const
 {
-    if (!spawnerComponent.loopSpawn && spawnerComponent.noSpawns >= 1) return;
-
     // Check if the spawner is ready to spawn the enemy.
     if (m_spawnTime < SPAWN_RATE) return;
 
@@ -123,6 +107,18 @@ void SpawnerSystem::clearSpawners()
         entityToRemove.pop_front();
     }
 }
+
+void SpawnerSystem::spawnEnemies()
+{
+    for (const auto entity : m_entities)
+    {
+        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
+        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        processSpawner(spawnerComponent, spawnerTransformComponent);
+    }
+    cleanUpUnnecessarySpawners();
+}
+
 
 void SpawnerSystem::cleanUpUnnecessarySpawners()
 {
