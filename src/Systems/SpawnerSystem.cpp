@@ -21,19 +21,6 @@ SpawnerSystem::SpawnerSystem() { init(); }
 
 void SpawnerSystem::init() {}
 
-void SpawnerSystem::spawnEnemies()
-{
-    for (const auto entity : m_entities)
-    {
-        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
-        processSpawner(spawnerComponent, spawnerTransformComponent);
-    }
-
-    cleanUpUnnecessarySpawners();
-}
-
 void SpawnerSystem::update()
 {
     spawnTime = (spawnTime + 1) % SPAWN_RATE;

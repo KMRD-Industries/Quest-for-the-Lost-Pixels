@@ -5,7 +5,7 @@
 struct TileComponent
 {
     long id{};
-    std::string tileSet;
+    std::string tileSet{};
     int layer{};
 
     explicit TileComponent(const uint32_t tile_id) : id{static_cast<long>(tile_id)} {};

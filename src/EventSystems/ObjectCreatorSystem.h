@@ -7,4 +7,5 @@ class ObjectCreatorSystem : public System
 {
 public:
     void update();
+    void clear();
 };

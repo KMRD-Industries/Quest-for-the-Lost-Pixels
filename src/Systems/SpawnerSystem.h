@@ -12,7 +12,6 @@ public:
     void init();
     void update();
     void clearSpawners();
-    void spawnEnemies();
     void cleanUpUnnecessarySpawners();
 
     SpawnerSystem();
