@@ -7,6 +7,15 @@
 #include "box2d/b2_math.h"
 #include "glm/gtx/hash.hpp"
 
+namespace MenuStateMachine
+{
+    enum class StateAction
+    {
+        Push,
+        Pop
+    };
+}
+
 namespace SpecialBlocks
 {
     enum class Blocks : int

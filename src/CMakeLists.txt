@@ -53,6 +53,16 @@ set(COMPONENTS
         Components/TextTagComponent.h
 )
 
+set(UI_COMPONENTS
+		UiComponents/ButtonComponent.h
+)
+
+set(ATLAS_COMPONENTS
+        AtlasComponents/Texture.h
+        AtlasComponents/Map.h
+        AtlasComponents/Tileset.h
+)
+
 set(MAP
         Map/DungeonGenerator.cpp
         Map/DungeonGenerator.h
@@ -81,8 +91,6 @@ set(SYSTEMS
         Systems/ItemSpawnerSystem.h
         Systems/ChestSystem.cpp
         Systems/ChestSystem.h
-        Systems/HealthBarSystem.cpp
-        Systems/HealthBarSystem.h
         Systems/TextureSystem.cpp
         Systems/AnimationSystem.cpp
         Systems/DoorSystem.cpp
@@ -106,10 +114,11 @@ set(SYSTEMS
         Systems/TextTagSystem.h
 )
 
-set(ATLAS_COMPONENTS
-        AtlasComponents/Texture.h
-        AtlasComponents/Map.h
-        AtlasComponents/Tileset.h
+set(UI_SYSTEMS
+        UiSystems/HealthBarSystem.cpp
+        UiSystems/HealthBarSystem.h        
+		UiSystems/ButtonSystem.cpp
+        UiSystems/ButtonSystem.h
 )
 
 set(UTILS
@@ -138,12 +147,15 @@ source_group("AtlasComponents" FILES ${ATLAS_COMPONENTS})
 source_group("Utils" FILES ${UTILS})
 source_group("Map" FILES ${MAP})
 source_group("MenuStateMachine" FILES ${MENU_STATE_MACHINE})
+source_group("UiComponents" FILES ${UI_COMPONENTS})
+source_group("UiSystems" FILES ${UI_SYSTEMS})
 
 add_definitions(-D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(./AtlasComponents ./Core ./Components ./Systems ./MenuStateMachine ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./UiComponents ./UiSystems ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(qlp ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS} ${MENU_STATE_MACHINE})
+add_executable(qlp ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS} ${MENU_STATE_MACHINE} ${UI_COMPONENTS} ${UI_SYSTEMS})
 
 target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
 

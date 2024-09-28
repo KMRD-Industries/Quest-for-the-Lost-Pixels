@@ -11,6 +11,5 @@ public:
     void handleCollision();
 
 private:
-    Dungeon m_dungeon;
     StateManager m_stateManager;
 };

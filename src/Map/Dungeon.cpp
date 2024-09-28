@@ -159,7 +159,7 @@ void Dungeon::init()
     gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 }
 
-void Dungeon::draw()
+void Dungeon::render()
 {
     gCoordinator.getRegisterSystem<HealthBarSystem>()->drawHealthBar();
     gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();

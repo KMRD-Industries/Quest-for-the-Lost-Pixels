@@ -37,29 +37,24 @@ void Game::init()
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 
-    m_stateManager.pushState(std::make_unique<MainMenuState>());
-
-    //m_dungeon.init();
+    m_stateManager.handleStateChange(MenuStateMachine::StateAction::Push, std::make_unique<MainMenuState>());
 }
 
 void Game::draw()
 {
     m_stateManager.render();
-
-    //m_dungeon.draw();
 }
 
 void Game::update(const float deltaTime)
 {
     m_stateManager.update(deltaTime);
-    //m_dungeon.update(deltaTime);
     gCoordinator.getRegisterSystem<CollisionSystem>()->deleteMarkedBodies();
 }
 
 void Game::handleCollision()
 {
-    //const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-    //collisionSystem->updateCollision();
-    //constexpr auto timeStep = 1.f / 60.f;
-    //collisionSystem->updateSimulation(timeStep, 8, 3);
+    const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+    collisionSystem->updateCollision();
+    constexpr auto timeStep = 1.f / 60.f;
+    collisionSystem->updateSimulation(timeStep, 8, 3);
 };

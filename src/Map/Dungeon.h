@@ -7,16 +7,19 @@
 #include "FloorGenerator.h"
 #include "Paths.h"
 #include "Room.h"
+#include "State.h"
 #include "Types.h"
 
-class Dungeon
+class Dungeon : public State
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1) {};
+    Dungeon() : m_entities(MAX_ENTITIES - 1)
+    {
+    };
 
-    void init();
-    void draw();
-    void update(float deltaTime);
+    void init() override;
+    void render() override;
+    void update(float deltaTime) override;
 
 private:
     void setECS();

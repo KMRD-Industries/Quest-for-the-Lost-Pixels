@@ -26,10 +26,20 @@ void StateManager::render()
         m_states.top()->render();
 }
 
-void StateManager::handleStateChange(const StateAction action, std::optional<std::unique_ptr<State>> newState)
+void StateManager::handleStateChange(const MenuStateMachine::StateAction action,
+                                     std::optional<std::unique_ptr<State>> newState)
 {
-    if (action == StateAction::Pop)
+    if (action == MenuStateMachine::StateAction::Pop)
         popState();
     if (newState)
+    {
+        auto callback = [this](const MenuStateMachine::StateAction action,
+                               std::optional<std::unique_ptr<State>> newState)
+        {
+            this->handleStateChange(action, std::move(newState));
+        };
+
+        newState.value()->m_stateChangeCallback = callback;
         pushState(std::move(newState.value()));
+    }
 }

@@ -5,21 +5,15 @@
 
 #include "State.h"
 
-enum class StateAction
-{
-    Push,
-    Pop
-};
-
 class StateManager
 {
 public:
-    void pushState(std::unique_ptr<State> newState);
-    void popState();
+    void handleStateChange(MenuStateMachine::StateAction action, std::optional<std::unique_ptr<State>> newState);
     void update(float deltaTime);
     void render();
-    void handleStateChange(StateAction action, std::optional<std::unique_ptr<State>> newState);
 
 private:
+    void pushState(std::unique_ptr<State> newState);
+    void popState();
     std::stack<std::unique_ptr<State>> m_states;
 };
