@@ -11,8 +11,6 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-#define M_PI 3.14159265358979323846
-
 void WeaponSystem::init() {}
 
 void WeaponSystem::update()
@@ -26,7 +24,7 @@ void WeaponSystem::update()
         updateStartingAngle(entity);
         updateWeaponAngle(entity);
 
-        if(gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) continue;
+        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) continue;
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
@@ -34,14 +32,14 @@ void WeaponSystem::update()
         const float distanceY = transformComponent.position.y - playerTransformComponent.position.y;
         const double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2));
 
-        if(distance <= minDistance)
+        if (distance <= minDistance)
         {
             minDistance = distance;
             closestWeaponEntity = entity;
         }
     }
 
-    if(minDistance <= config::weaponInteractionDistance)
+    if (minDistance <= config::weaponInteractionDistance)
     {
         gCoordinator.getComponent<RenderComponent>(closestWeaponEntity).color = sf::Color(255, 102, 102);
         displayStats(closestWeaponEntity);

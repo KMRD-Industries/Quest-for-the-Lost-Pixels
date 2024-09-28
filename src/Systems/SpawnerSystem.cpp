@@ -19,10 +19,7 @@ constexpr float SPAWN_RATE = 3600.f;
 
 SpawnerSystem::SpawnerSystem() { init(); }
 
-void SpawnerSystem::init()
-{
-    m_spawnTime = {};
-}
+void SpawnerSystem::init() { m_spawnTime = {}; }
 
 void SpawnerSystem::update(const float timeStamp)
 {
@@ -30,14 +27,13 @@ void SpawnerSystem::update(const float timeStamp)
 
     for (const auto entity : m_entities)
     {
-        auto& spawnerComponent                  = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto& spawnerTransformComponent   = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
+        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
 
-    if(m_spawnTime >= SPAWN_RATE)
-        m_spawnTime -= SPAWN_RATE;
+    if (m_spawnTime >= SPAWN_RATE) m_spawnTime -= SPAWN_RATE;
 
     cleanUpUnnecessarySpawners();
 }
@@ -53,19 +49,21 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
     spawnEnemy(spawnerTransformComponent, spawnerComponent.enemyType);
 }
 
-void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent, const Enemies::EnemyType enemyType) const
+void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent,
+                               const Enemies::EnemyType enemyType) const
 {
     const auto enemyConfig = getRandomEnemyData(enemyType);
     const Entity newMonsterEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(newMonsterEntity,
-        enemyConfig.textureData,
-        spawnerTransformComponent,
-        RenderComponent{},
-        AnimationComponent{},
-        EnemyComponent{},
-        ColliderComponent{enemyConfig.collisionData},
-        CharacterComponent{.hp = enemyConfig.hp});
+    const ColliderComponent colliderComponent{enemyConfig.collisionData};
+    TransformComponent transformComponent{spawnerTransformComponent};
+
+    transformComponent.position.x -= colliderComponent.collision.x * config::gameScale;
+    transformComponent.position.y -= colliderComponent.collision.y * config::gameScale;
+
+    gCoordinator.addComponents(newMonsterEntity, enemyConfig.textureData, transformComponent, RenderComponent{},
+                               AnimationComponent{}, EnemyComponent{}, ColliderComponent{enemyConfig.collisionData},
+                               CharacterComponent{.hp = enemyConfig.hp});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 

@@ -10,5 +10,4 @@ struct ItemComponent
     float value{};
     Items::Behaviours behaviour{};
     TileComponent textureData{};
-    std::chrono::system_clock::time_point timestamp{};
 };

@@ -50,15 +50,9 @@ void MyContactListener::EndContact(b2Contact* contact)
     }
 }
 
-CollisionSystem::CollisionSystem()
-{
-    init();
-}
+CollisionSystem::CollisionSystem() { init(); }
 
-void CollisionSystem::init()
-{
-    Physics::getWorld()->SetContactListener(&m_myContactListenerInstance);
-}
+void CollisionSystem::init() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
 
 void CollisionSystem::createMapCollision()
 {
@@ -95,8 +89,7 @@ void CollisionSystem::createMapCollision()
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
                 if (const auto* passageComponent = gCoordinator.tryGetComponent<PassageComponent>(entity))
-                    if (passageComponent->activePassage)
-                        createCollisionBody(entity, "Passage", true, true);
+                    if (passageComponent->activePassage) createCollisionBody(entity, "Passage", true, true);
         }
         else
         {
@@ -110,9 +103,9 @@ void CollisionSystem::update() const
 {
     for (const auto entity : m_entities)
     {
-        auto& transformComponent    = gCoordinator.getComponent<TransformComponent>(entity);
-        auto& colliderComponent     = gCoordinator.getComponent<ColliderComponent>(entity);
-        auto& renderComponent       = gCoordinator.getComponent<RenderComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
         if (!transformComponent.velocity.IsValid()) continue;
 
@@ -141,9 +134,9 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
     for (const auto entity : m_entities)
     {
-        auto& colliderComponent     = gCoordinator.getComponent<ColliderComponent>(entity);
-        auto& transformComponent    = gCoordinator.getComponent<TransformComponent>(entity);
-        auto& renderComponent       = gCoordinator.getComponent<RenderComponent>(entity);
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
         const b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;

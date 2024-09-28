@@ -12,19 +12,13 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-FightSystem::FightSystem()
-{
-    init();
-}
+FightSystem::FightSystem() { init(); }
 
-void FightSystem::init()
-{
-
-}
+void FightSystem::init() {}
 
 void FightSystem::update()
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         const auto& [eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
 
@@ -32,17 +26,17 @@ void FightSystem::update()
         const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);
         auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
 
-        switch(weaponComponent.type)
+        switch (weaponComponent.type)
         {
         case GameType::WeaponType::MELE:
             handleMeleAttack(eventEntity);
             break;
         case GameType::WeaponType::WAND:
-            //TODO: Wand attack support
+            // TODO: Wand attack support
             handleMeleAttack(eventEntity);
             break;
         case GameType::WeaponType::BOW:
-            //TODO: Bow attack support
+            // TODO: Bow attack support
             handleMeleAttack(eventEntity);
             break;
         default:
@@ -53,10 +47,7 @@ void FightSystem::update()
     clear();
 }
 
-void FightSystem::handleBowAttack(Entity)
-{
-
-}
+void FightSystem::handleBowAttack(Entity) {}
 
 void FightSystem::handleMeleAttack(Entity eventEntity)
 {
@@ -103,10 +94,8 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
         const float& recoilMagnitude = 20.0f;
         const b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
 
-        secondPlayertransformComponent.velocity.x +=
-            static_cast<float>(recoilVelocity.x * config::meterToPixelRatio);
-        secondPlayertransformComponent.velocity.y +=
-            static_cast<float>(recoilVelocity.y * config::meterToPixelRatio);
+        secondPlayertransformComponent.velocity.x += static_cast<float>(recoilVelocity.x * config::meterToPixelRatio);
+        secondPlayertransformComponent.velocity.y += static_cast<float>(recoilVelocity.y * config::meterToPixelRatio);
 
         b2Vec2 newPosition = colliderComponent.body->GetPosition() + 0.25 * recoilDirection;
         colliderComponent.body->SetTransform(newPosition, colliderComponent.body->GetAngle());
@@ -118,7 +107,7 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
     if (std::regex_match(collisionData.tag, config::playerRegexTag)) return;
     if (collisionData.tag == "Bullet") return;
 
-    if(collisionData.tag == "Enemy")
+    if (collisionData.tag == "Enemy")
     {
         auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
         auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);

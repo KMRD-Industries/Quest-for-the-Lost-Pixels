@@ -7,7 +7,7 @@
 
 void ObjectCreatorSystem::update()
 {
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
 
