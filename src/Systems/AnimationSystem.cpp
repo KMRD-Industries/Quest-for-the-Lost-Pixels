@@ -1,13 +1,8 @@
 #include "AnimationSystem.h"
 
 #include "Config.h"
-#include "RenderComponent.h"
 #include "TileComponent.h"
-
-AnimationSystem::AnimationSystem()
-{
-    init();
-}
+#include "TransformComponent.h"
 
 void AnimationSystem::init()
 {

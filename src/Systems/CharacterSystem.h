@@ -1,5 +1,6 @@
 #pragma once
 #include "System.h"
+#include "box2d/b2_math.h"
 
 class CharacterSystem : public System
 {

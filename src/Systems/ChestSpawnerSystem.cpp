@@ -8,6 +8,7 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
+#include "LootComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"

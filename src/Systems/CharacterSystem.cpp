@@ -3,6 +3,7 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
+#include "PlayerComponent.h"
 
 extern Coordinator gCoordinator;
 
