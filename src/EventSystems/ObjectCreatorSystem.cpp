@@ -68,7 +68,6 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
     bodyDef.angle = transformComponent.rotation * (M_PI / 180.f);
     bodyDef.type = eventInfo.isStatic ? b2_staticBody : b2_dynamicBody;
     bodyDef.bullet = eventInfo.type == GameType::ObjectType::BULLET;
-
     return bodyDef;
 }
 
@@ -81,6 +80,7 @@ b2FixtureDef ObjectCreatorSystem::defineFixture(const CreateBodyWithCollisionEve
     fixtureDef.friction = defaultFriction;
     fixtureDef.filter.categoryBits = config::stringToCategoryBits(eventInfo.tag);
     fixtureDef.filter.maskBits = config::stringToMaskBits(eventInfo.tag);
+    fixtureDef.filter.groupIndex = config::stringToIndexGroup(eventInfo.tag);
     fixtureDef.restitution = {0.05f};
 
     return fixtureDef;

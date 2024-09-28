@@ -6,5 +6,5 @@ class BulletSystem : public System
 {
 public:
     void init();
-    void deleteBullets();
+    void deleteBullets() const;
 };

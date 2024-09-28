@@ -1,13 +1,13 @@
 {
-    "activeFile": "assets/tileSets/Bullets.json",
+    "activeFile": "assets/tileSets/AnimSlimes.json",
     "expandedProjectPaths": [
-        "assets/tileSets",
         "build",
         "assets/maps",
-        "assets/maps/floor_00",
         "assets",
+        ".",
+        "assets/maps/floor_00",
         "assets/maps/floor_01",
-        "."
+        "assets/tileSets"
     ],
     "file.lastUsedOpenFilter": "Wszystkie pliki (*)",
     "fileStates": {
@@ -425,11 +425,11 @@
         },
         "assets/tileSets/CosmicLegacy.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 2
         },
         "assets/tileSets/CosmicLilac.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 3
         },
         "assets/tileSets/Decorative.json": {
             "scaleInDock": 1,
@@ -437,11 +437,11 @@
         },
         "assets/tileSets/DungeonWalls.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 1.5
         },
         "assets/tileSets/Graveyard.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 2
         },
         "assets/tileSets/Items.json": {
             "scaleInDock": 1,
@@ -449,7 +449,7 @@
         },
         "assets/tileSets/Jungle.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 3
         },
         "assets/tileSets/Portal.json": {
             "scaleInDock": 1,
@@ -465,7 +465,7 @@
         },
         "assets/tileSets/Weapons.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 2
+            "scaleInEditor": 1.5
         }
     },
     "last.imagePath": "C:/Users/domin/CLionProjects/Quest-for-the-Lost-Pixels/assets/floorAtlas",

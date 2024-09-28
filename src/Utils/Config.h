@@ -124,7 +124,7 @@ namespace config
     static const std::unordered_map<long, long> m_mapDungeonLevelToFloorInfo{{1, 1}, {2, 1}, {3, 1}, {4, 2}, {5, 2}};
 
     static const std::unordered_map<long, ColorBalance> m_mapColorScheme{
-        {1, {25, 0, 0}}, {2, {0, 25, 0}}, {3, {0, 15, 15}}, {4, {45, 6, 35}}, {5, {15, 62, 35}}};
+            {1, {25, 0, 0}}, {2, {0, 25, 0}}, {3, {0, 15, 15}}, {4, {45, 6, 35}}, {5, {15, 62, 35}}};
 
 
     enum class SpecialRoomTypes
@@ -147,19 +147,19 @@ namespace config
                                                                              {SpecialRoomTypes::BossRoom, 'b'}};
 
     const std::unordered_multimap<Enemies::EnemyType, EnemyConfig> enemyData{
-        {Enemies::EnemyType::MELEE,
-         {.name = "Slime",
-          .hp = 20.f,
-          .damage = 5.f,
-          .textureData{18, "AnimSlimes", 4},
-          .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
-        {Enemies::EnemyType::BOSS,
-         {.name = "Boss",
-          .hp = 200.f,
-          .damage = 30.f,
-          .textureData{54, "AnimSlimes", 4},
-          .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
-    };
+            {Enemies::EnemyType::MELEE,
+             {.name = "Slime",
+              .hp = 20.f,
+              .damage = 5.f,
+              .textureData{18, "AnimSlimes", 4},
+              .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
+            {Enemies::EnemyType::BOSS,
+             {.name = "Boss",
+              .hp = 200.f,
+              .damage = 30.f,
+              .textureData{54, "AnimSlimes", 4},
+              .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
+        };
 
     enum _entityCategory
     {
@@ -173,23 +173,23 @@ namespace config
     };
 
     inline std::unordered_map<std::string, _entityCategory> categoriesLookup{
-        {"Wall", BOUNDARY},
-        {"Bullet", BULLET},
-        {"Enemy", ENEMY},
-        {"Passage", PASSAGE},
-        {"Item", ITEM},
-        {"Player", PLAYER},
-        {"Door", DOOR}
+            {"Wall", BOUNDARY},
+            {"Bullet", BULLET},
+            {"Enemy", ENEMY},
+            {"Passage", PASSAGE},
+            {"Item", ITEM},
+            {"Player", PLAYER},
+            {"Door", DOOR}
     };
 
     inline std::unordered_map<std::string, uint16> bitMaskLookup{
-        {"Wall", BOUNDARY | PLAYER | ENEMY | BULLET | ITEM},  // Wall collides with everything
-        {"Bullet", BOUNDARY | ENEMY},                         // Bullet only collides with walls and enemies
-        {"Enemy", BOUNDARY | PLAYER},                         // Enemy collides with walls and players
-        {"Passage", BOUNDARY | PLAYER},                       // Passage collides with walls and players
-        {"Item", BOUNDARY | PLAYER},                          // Item only collides with walls and players
-        {"Player", BOUNDARY | ENEMY | ITEM},                  // Player collides with walls, enemies, and items
-        {"Door", BOUNDARY | PLAYER}                           // Door collides with walls and players
+            {"Wall", BOUNDARY | PLAYER | ENEMY | BULLET | ITEM},  // Wall collides with everything
+            {"Bullet", BOUNDARY | ENEMY},                         // Bullet only collides with walls and enemies
+            {"Enemy", BOUNDARY | PLAYER},                         // Enemy collides with walls and players
+            {"Passage", BOUNDARY | PLAYER},                       // Passage collides with walls and players
+            {"Item", BOUNDARY | PLAYER},                          // Item only collides with walls and players
+            {"Player", BOUNDARY | ENEMY | ITEM},                  // Player collides with walls, enemies, and items
+            {"Door", BOUNDARY | PLAYER}                           // Door collides with walls and players
     };
 
     inline uint16 stringToCategoryBits(const std::string& str) {
@@ -197,7 +197,7 @@ namespace config
             return categoriesLookup[str];
 
         if(std::regex_match(str, playerRegexTag))
-                return categoriesLookup["Player"];
+            return categoriesLookup["Player"];
 
         if(str ==  "Chest")
             return categoriesLookup["Item"];
@@ -216,6 +216,12 @@ namespace config
             return bitMaskLookup["Item"];
 
         return 0x0000;
+    }
+
+    inline uint16 stringToIndexGroup(const std::string& str)
+    {
+        if(str == "Item" || str == "Bullet") return -8;
+        return 0;
     }
 
     struct ItemConfig

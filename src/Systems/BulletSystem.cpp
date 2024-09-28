@@ -8,7 +8,7 @@
 
 extern Coordinator gCoordinator;
 
-void BulletSystem::deleteBullets()
+void BulletSystem::deleteBullets() const
 {
     for (const auto entity : m_entities)
     {
