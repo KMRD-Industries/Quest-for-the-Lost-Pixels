@@ -72,10 +72,13 @@ int main()
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!");
 
+    // W³aœciwa inicjalizacja okna
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
+    // Inicjalizacja ImGui
     int _ = ImGui::SFML::Init(window);
     window.setFramerateLimit(config::frameCycle);
+    ImGui::CreateContext();
 
     sf::Clock deltaClock;
     Game game;
@@ -86,22 +89,35 @@ int main()
     while (window.isOpen())
     {
         sf::Time deltaTime = deltaClock.restart();
+
         // Clear the window before drawing
         window.clear(customColor);
-        ImGui::SFML::Update(window, deltaTime);
 
+        // Upewnij siê, ¿e ImGui wchodzi w now¹ ramkê
+        ImGui::SFML::Update(window, deltaTime);
+        //ImGui::NewFrame(); // Nowa ramka dla ImGui
+
+        // Logika gry
         game.handleCollision();
         game.update(deltaTime.asSeconds());
         game.draw();
 
+        // Rysowanie systemów
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
 
-        ImGui::SFML::Render(window);
+        // Renderowanie ImGui
+        //ImGui::Render(); // Wywo³anie Render
+        ImGui::SFML::Render(window); // Renderowanie UI SFML
+
+        // Wyœwietlenie okna
         window.display();
+
+        // Obs³uga wejœcia
         handleInput(window);
     }
 
+    // Zakoñczenie po³¹czenia i zamkniêcie ImGui
     gCoordinator.getRegisterSystem<MultiplayerSystem>()->disconnect();
     ImGui::SFML::Shutdown();
     return 0;
