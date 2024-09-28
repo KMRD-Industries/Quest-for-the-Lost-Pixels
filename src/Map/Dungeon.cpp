@@ -4,7 +4,6 @@
 
 #include <comm.pb.h>
 
-#include "Dungeon.h"
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
 #include "CharacterComponent.h"
@@ -17,6 +16,7 @@
 #include "Config.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
+#include "Dungeon.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -24,7 +24,6 @@
 #include "HealthBarSystem.h"
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
-#include "ItemAnimationComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "ItemSpawnerSystem.h"
@@ -91,9 +90,8 @@ void Dungeon::init()
     gCoordinator.addComponent(m_entities[m_id], TileComponent{config::playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[m_id], RenderComponent{});
     gCoordinator.addComponent(m_entities[m_id], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[m_id],
-                              CharacterComponent{.hp = config::defaultCharacterHP,
-                                                 .damage = config::playerAttackDamage});
+    gCoordinator.addComponent(
+        m_entities[m_id], CharacterComponent{.hp = config::defaultCharacterHP, .damage = config::playerAttackDamage});
     gCoordinator.addComponent(m_entities[m_id], PlayerComponent{});
     gCoordinator.addComponent(m_entities[m_id], ColliderComponent{});
     gCoordinator.addComponent(m_entities[m_id], InventoryComponent{});
@@ -149,8 +147,7 @@ void Dungeon::init()
     makeSimpleFloor();
 
     m_roomMap.at(m_currentPlayerPos).init();
-    if (multiplayerSystem->isConnected())
-        multiplayerSystem->setRoom(m_currentPlayerPos);
+    if (multiplayerSystem->isConnected()) multiplayerSystem->setRoom(m_currentPlayerPos);
 
     m_players.insert(m_id);
 
@@ -189,9 +186,9 @@ void Dungeon::update(const float deltaTime)
         switch (stateUpdate.variant())
         {
         case comm::DISCONNECTED:
-            gCoordinator.destroyEntity(m_entities[id]);
             multiplayerSystem->entityDisconnected(id);
             m_players.erase(id);
+            gCoordinator.getComponent<ColliderComponent>(m_entities[id]).toDestroy = true;
             break;
         case comm::CONNECTED:
             createRemotePlayer(id);
@@ -235,12 +232,8 @@ void Dungeon::createRemotePlayer(uint32_t id)
     gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
 
     gCoordinator.getRegisterSystem<CollisionSystem>()->createBody(
-        m_entities[id], tag, {cc.width, cc.height}, [&](const GameType::CollisionData& entityT)
-        {
-        },
-        [&](const GameType::CollisionData& entityT)
-        {
-        }, false, false, {cc.x, cc.y});
+        m_entities[id], tag, {cc.width, cc.height}, [&](const GameType::CollisionData& entityT) {},
+        [&](const GameType::CollisionData& entityT) {}, false, false, {cc.x, cc.y});
 
     multiplayerSystem->entityConnected(id, m_entities[id]);
 }
@@ -477,8 +470,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 
 
         auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
-        if (multiplayerSystem->isConnected())
-            multiplayerSystem->roomChanged(m_currentPlayerPos);
+        if (multiplayerSystem->isConnected()) multiplayerSystem->roomChanged(m_currentPlayerPos);
     }
 }
 
@@ -510,7 +502,6 @@ void Dungeon::changeRoom(const glm::ivec2& room)
 
 float Dungeon::getSpawnOffset(const float position, const int id)
 {
-    if (id % 2 == 0)
-        return position + id * config::spawnOffset;
+    if (id % 2 == 0) return position + id * config::spawnOffset;
     return position - id * config::spawnOffset;
 }
