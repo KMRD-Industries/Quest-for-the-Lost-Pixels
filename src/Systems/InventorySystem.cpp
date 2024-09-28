@@ -58,7 +58,7 @@ void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon)
 
             equippedTransformComponent.position.y +=
                 (newWeaponCollisionComponent.collision.height - equippedWeaponCollisionComponent.collision.height) *
-                config::gameScale / 2;
+                config::gameScale;
 
             dropWeapon(player);
         }
