@@ -163,7 +163,7 @@ namespace GameType
         EAST = static_cast<int>('E')
     };
 
-    enum class WeaponType: int
+    enum class WeaponType : int
     {
         MELE = 1,
         WAND = 2,
@@ -171,17 +171,18 @@ namespace GameType
         UNKNOWN = 0
     };
 
-    enum class ObjectType: int
+    enum class ObjectType : int
     {
         NORMAL = 1,
         BULLET = 2
     };
 
-    inline WeaponType stringToWeaponType(const std::string& type) {
+    inline WeaponType stringToWeaponType(const std::string& type)
+    {
         if (type == "mele") return WeaponType::MELE;
         if (type == "wand") return WeaponType::WAND;
         if (type == "bow") return WeaponType::BOW;
-        return WeaponType::UNKNOWN;  // Return unknown if no match found
+        return WeaponType::MELE; // Return unknown if no match found
     }
 
     enum FlipFlags : std::uint8_t
