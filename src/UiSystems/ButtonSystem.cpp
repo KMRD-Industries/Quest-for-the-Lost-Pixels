@@ -76,17 +76,21 @@ void ButtonSystem::render()
 
         auto buttonFont = m_loadedFonts[buttonComponent.fontPath + std::to_string(buttonComponent.textSize)];
         ImGui::PushFont(buttonFont);
-        ImVec2 posOfButton = ImGui::GetItemRectMin();
+
+        ImVec2 buttonSize = ImVec2(buttonTexture.width * buttonComponent.scale,
+                                   buttonTexture.height * buttonComponent.scale);
         ImVec2 textSize = ImGui::CalcTextSize(buttonComponent.text.data());
+
         ImVec2 textPos = ImVec2(
-            posOfButton.x + (buttonTexture.width - textSize.x) * 0.5f,
-            posOfButton.y + (buttonTexture.height - textSize.y) * 0.5f
+            buttonComponent.position.x + (buttonSize.x - textSize.x) * 0.5f,
+            buttonComponent.position.y + (buttonSize.y - textSize.y) * 0.5f
             );
 
         ImGui::SetCursorScreenPos(textPos);
-
         ImGui::Text(buttonComponent.text.data());
+
         ImGui::PopFont();
+
 
         ImGui::End();
     }

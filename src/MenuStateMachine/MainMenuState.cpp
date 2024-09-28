@@ -11,12 +11,12 @@ extern Coordinator gCoordinator;
 void MainMenuState::init()
 {
     gCoordinator.getRegisterSystem<ButtonSystem>()->loadData(std::string(ASSET_PATH) + "/ui/uiHigh.png",
-                                                             ASSET_PATH + std::string("/ui/uiFont.ttf"), 30.f);
+                                                             ASSET_PATH + std::string("/ui/uiFont.ttf"), 40.f);
 
     const Entity buttonEntity = gCoordinator.createEntity();
     gCoordinator.addComponent(buttonEntity, ButtonComponent{std::string(ASSET_PATH) + "/ui/uiHigh.png",
                                                             ASSET_PATH + std::string("/ui/uiFont.ttf"), "Multiplayer",
-                                                            30.f, 2.f,
+                                                            40.f, 2.f,
                                                             {100, 100}, {0, 387, 144, 42},
                                                             {144, 387, 144, 42}, {288, 387, 144, 42},
                                                             {0, 0}, {1, 1}, [this]()
