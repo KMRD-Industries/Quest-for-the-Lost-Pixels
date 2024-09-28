@@ -21,6 +21,7 @@ public:
 private:
     std::unordered_map<glm::ivec2, bool> m_lootedRooms{};
     bool m_isCurrentRoomLooted{};
+    bool m_isCurrentRoomClear{};
     bool m_toLoot{};
     glm::ivec2 m_currentRoom{};
 };
