@@ -1,5 +1,6 @@
 #include "ChestSpawnerSystem.h"
 
+#include "AnimationComponent.h"
 #include "CharacterComponent.h"
 #include "ChestComponent.h"
 #include "ColliderComponent.h"
@@ -34,12 +35,12 @@ void ChestSpawnerSystem::spawnChest() const
 void ChestSpawnerSystem::spawnWeapon(const TransformComponent& spawnerTransformComponent) const
 {
     const Entity newWeaponEntity = gCoordinator.createEntity();
-    const auto& id = getRandomElement(m_weaponsIDs);
+    const auto& weaponDesc = getRandomElement(m_weaponsIDs);
 
     gCoordinator.addComponents(newWeaponEntity,
-        WeaponComponent{.id = id},
-        TileComponent{static_cast<uint32_t>(id), "Weapons", 7},
-        spawnerTransformComponent,
+        WeaponComponent{.id = weaponDesc.first, .type =  weaponDesc.second},
+        TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", 7},
+        TransformComponent{spawnerTransformComponent},
         RenderComponent{},
         ColliderComponent{},
         AnimationComponent{},

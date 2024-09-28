@@ -62,6 +62,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
             if (renderComponent.dirty)
             {
                 renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
+                renderComponent.sprite.setRotation(transformComponent.rotation);
                 setOrigin(entity);
                 setSpritePosition(entity);
                 displayDamageTaken(entity);
@@ -81,7 +82,6 @@ void RenderSystem::draw(sf::RenderWindow& window)
     setWeapon();
 
     GameUtility::mapOffset = (static_cast<sf::Vector2f>(windowSize) - GameUtility::mapOffset) * 0.5f;
-    const bool offsetChanged = oldMapOffset != GameUtility::mapOffset;
 
     for (auto& layer : tiles)
     {
@@ -89,7 +89,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
         {
             if(*isDirty == true) sprite->setPosition({sprite->getPosition() + GameUtility::mapOffset});
             window.draw(*sprite);
-            *isDirty = offsetChanged;
+            *isDirty = oldMapOffset != GameUtility::mapOffset;
         }
     }
 

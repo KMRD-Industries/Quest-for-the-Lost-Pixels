@@ -1,5 +1,6 @@
 #pragma once
 #include "Coordinator.h"
+#include "GameTypes.h"
 #include "System.h"
 #include "TileComponent.h"
 #include "Tileset.h"
@@ -39,7 +40,7 @@ private:
     void spawnPotion(const TransformComponent&) const;
 
     std::vector<AnimationData> m_itemsToAnimate;
-    std::vector<int> m_weaponsIDs;
+    std::vector<std::pair<int, GameType::WeaponType>> m_weaponsIDs;
     Collision m_chestCollision;
     Collision m_potionCollision;
     TileComponent m_chestTile;

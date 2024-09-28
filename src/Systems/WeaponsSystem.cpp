@@ -32,7 +32,7 @@ void WeaponSystem::update()
 
         const float distanceX = transformComponent.position.x - playerTransformComponent.position.x;
         const float distanceY = transformComponent.position.y - playerTransformComponent.position.y;
-        const double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2) <= minDistance);
+        const double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2));
 
         if(distance <= minDistance)
         {
