@@ -42,6 +42,8 @@ glm::ivec2 DungeonGenerator::getBossRoom() const
     return m_startingRoom;
 }
 
+glm::ivec2 DungeonGenerator::getEndingRoom() const { return m_endingRoom; }
+
 bool DungeonGenerator::isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const
 {
     if (m_uGraph.contains(firstNode))
@@ -92,6 +94,7 @@ void DungeonGenerator::generateMainPath(const PathConfig& pathConfig)
         m_roomCount[pathNode] = nodeIndex;
         ++nodeIndex;
     }
+
     for (int i = 0; i < path.size() - 1; i++)
     {
         m_graph[path[i]].insert(path[i + 1]);
@@ -100,6 +103,8 @@ void DungeonGenerator::generateMainPath(const PathConfig& pathConfig)
         m_nodeEnterEdgesCount[path[i + 1]]++;
         m_nodeOutEdgesCount[path[i]]++;
     }
+
+    m_endingRoom = path[pathConfig.pathLength - 1];
 }
 
 void DungeonGenerator::generateSidePath(const sidePathConfig& pathConfigToCheck)

@@ -1,7 +1,8 @@
-#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <TextureSystem.h>
+#include <imgui-SFML.h>
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
@@ -20,7 +21,7 @@ void handleInput(sf::RenderWindow& window)
 
     while (window.pollEvent(event))
     {
-        ImGui::SFML::ProcessEvent(event);
+        ImGui::SFML::ProcessEvent(window, event);
 
         if (event.type == sf::Event::KeyPressed)
         {
@@ -47,14 +48,13 @@ void handleInput(sf::RenderWindow& window)
             const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
-        if (event.type == sf::Event::Closed)
-            window.close();
+        if (event.type == sf::Event::Closed) window.close();
     }
 }
 
 sf::Color hexStringToSfmlColor(const std::string& hexColor)
 {
-    const std::string hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
+    const std::string& hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
 
     std::istringstream iss(hex);
     int rgbValue = 0;
@@ -75,27 +75,28 @@ int main()
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config::frameCycle);
+    window.setFramerateLimit(config::frameCycle * (config::debugMode ? 100 : 1));
 
     sf::Clock deltaClock;
     Game game;
     game.init();
 
-    sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
+    RenderSystem* m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
+    TextTagSystem* m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
+    TextureSystem* m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
 
     while (window.isOpen())
     {
         sf::Time deltaTime = deltaClock.restart();
-        // Clear the window before drawing
-        window.clear(customColor);
+        window.clear(hexStringToSfmlColor(m_textureSystem->getBackgroundColor()));
         ImGui::SFML::Update(window, deltaTime);
 
-        game.handleCollision();
         game.update(deltaTime.asSeconds());
+        game.handleCollision();
         game.draw();
 
-        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
-        gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
+        m_renderSystem->draw(window);
+        m_textTagSystem->render(window);
 
         ImGui::SFML::Render(window);
         window.display();

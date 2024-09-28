@@ -7,14 +7,16 @@
 class WeaponSystem : public System
 {
 public:
-    void update() const;
+    void init();
+    void update();
+    void markClosest();
+    void displayStats(Entity);
+    void weaponInput(Entity);
+    void deleteItems();
 
 private:
-    static void updateWeaponAngle(WeaponComponent&, const RenderComponent&);
-    static void updateStartingAngle(WeaponComponent&, const RenderComponent&);
-    static void rotateForward(WeaponComponent&);
-    static void rotateBackward(WeaponComponent&, const RenderComponent&);
-    static void setAngle(WeaponComponent&, const RenderComponent&);
-
-    static constexpr int MAX_LEFT_FACING_ANGLE = 420;
+    void updateWeaponAngle(Entity);
+    void updateStartingAngle(Entity);
+    void setAngle(Entity);
+    void rotateWeapon(Entity, bool);
 };

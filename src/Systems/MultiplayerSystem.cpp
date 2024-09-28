@@ -23,6 +23,8 @@ extern Coordinator gCoordinator;
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
 
+void MultiplayerSystem::init(){};
+
 void MultiplayerSystem::setup(const std::string& ip, const std::string& port) noexcept
 {
     try

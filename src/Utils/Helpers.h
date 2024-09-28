@@ -2,15 +2,16 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <cstdint>
 #include <functional>
+#include <glm/glm.hpp>
 #include <imgui.h>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <random>
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#include <glm/glm.hpp>
-#include <nlohmann/json.hpp>
 #include "Config.h"
+#include "GameTypes.h"
 #include "glm/gtx/hash.hpp"
 
 static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& enemyType)
@@ -19,8 +20,7 @@ static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& e
 
     auto enemyConfig = config::enemyData.equal_range(enemyType);
     std::vector<config::EnemyConfig> enemiesConfig;
-    for (auto it = enemyConfig.first; it != enemyConfig.second; ++it)
-        enemiesConfig.push_back(it->second);
+    for (auto it = enemyConfig.first; it != enemyConfig.second; ++it) enemiesConfig.push_back(it->second);
 
     if (enemiesConfig.empty())
     {
@@ -46,12 +46,8 @@ static inline config::ItemConfig getRandomItemData()
 
 static inline ImVec4 interpolateColor(const ImVec4& color1, const ImVec4& color2, const float t)
 {
-    return ImVec4(
-        color1.x + t * (color2.x - color1.x),
-        color1.y + t * (color2.y - color1.y),
-        color1.z + t * (color2.z - color1.z),
-        color1.w + t * (color2.w - color1.w)
-        );
+    return ImVec4(color1.x + t * (color2.x - color1.x), color1.y + t * (color2.y - color1.y),
+                  color1.z + t * (color2.z - color1.z), color1.w + t * (color2.w - color1.w));
 }
 
 static inline std::string base64_decode(const std::string& encoded_string)
@@ -62,9 +58,7 @@ static inline std::string base64_decode(const std::string& encoded_string)
         "0123456789+/";
 
     std::function<bool(unsigned char)> is_base64 = [](unsigned char c) -> bool
-    {
-        return (isalnum(c) || (c == '+') || (c == '/'));
-    };
+    { return (isalnum(c) || (c == '+') || (c == '/')); };
 
     auto in_len = encoded_string.size();
     int i = 0;
@@ -79,15 +73,13 @@ static inline std::string base64_decode(const std::string& encoded_string)
         in_++;
         if (i == 4)
         {
-            for (i = 0; i < 4; i++)
-                char_array_4[i] = static_cast<unsigned char>(base64_chars.find(char_array_4[i]));
+            for (i = 0; i < 4; i++) char_array_4[i] = static_cast<unsigned char>(base64_chars.find(char_array_4[i]));
 
             char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
             char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
             char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-            for (i = 0; (i < 3); i++)
-                ret += char_array_3[i];
+            for (i = 0; (i < 3); i++) ret += char_array_3[i];
 
             i = 0;
         }
@@ -95,19 +87,16 @@ static inline std::string base64_decode(const std::string& encoded_string)
 
     if (i)
     {
-        for (j = i; j < 4; j++)
-            char_array_4[j] = 0;
+        for (j = i; j < 4; j++) char_array_4[j] = 0;
 
 
-        for (j = 0; j < 4; j++)
-            char_array_4[j] = static_cast<unsigned char>(base64_chars.find(char_array_4[j]));
+        for (j = 0; j < 4; j++) char_array_4[j] = static_cast<unsigned char>(base64_chars.find(char_array_4[j]));
 
         char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
         char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
         char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-        for (j = 0; (j < i - 1); j++)
-            ret += char_array_3[j];
+        for (j = 0; (j < i - 1); j++) ret += char_array_3[j];
     }
 
     return ret;
@@ -183,20 +172,18 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
         // Sprawdzamy, czy aktualny tileset zawiera "SpecialBlocks.json"
         if (tileset["source"].get<std::string>().find("SpecialBlocks.json") != std::string::npos)
             specialBlocksFirstGID = tileset["firstgid"];
-            // Znajdujemy pierwszy identyfikator GID nast�pnego tilesetu
+        // Znajdujemy pierwszy identyfikator GID nast�pnego tilesetu
         else if (tileset["firstgid"] > specialBlocksFirstGID && specialBlocksFirstGID != -1)
         {
             nextTilesetFirstGID = tileset["firstgid"];
             break;
         }
 
-    if (specialBlocksFirstGID == -1)
-        return result;
+    if (specialBlocksFirstGID == -1) return result;
 
     for (const auto& layer : json["layers"])
     {
-        if (layer["type"] != "tilelayer")
-            continue;
+        if (layer["type"] != "tilelayer") continue;
         static constexpr std::uint32_t mask = 0xf0000000;
 
         int x = 0;
@@ -210,8 +197,7 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
             if (tileID >= specialBlocksFirstGID && tileID < nextTilesetFirstGID)
             {
                 int localTileID = tileID - specialBlocksFirstGID;
-                if (localTileID >= 0)
-                    result.emplace(glm::ivec2{x, y}, localTileID);
+                if (localTileID >= 0) result.emplace(glm::ivec2{x, y}, localTileID);
             }
             ++x;
             if (x >= width)
@@ -232,6 +218,13 @@ static T roundTo(T value, int places)
     return std::round(value * factor) / factor;
 }
 
+static GameType::MyVec2 roundTo(const GameType::MyVec2& vec, int places)
+{
+    auto factor = static_cast<float>(std::pow(10.0f, places));
+    return GameType::MyVec2{std::round(vec.x * factor) / factor, std::round(vec.y * factor) / factor};
+}
+
+
 template <typename T>
 static T convertMetersToPixel(const T meterValue)
 {
@@ -244,4 +237,26 @@ static T convertPixelsToMeters(const T pixelValue)
 {
     T result = pixelValue * config::pixelToMeterRatio;
     return roundTo(result, 10);
+}
+
+static sf::Vector2f convertPixelsToMeters(const sf::Vector2f& pixelValue)
+{
+    sf::Vector2f result = {};
+    result.x = static_cast<float>(pixelValue.x * config::pixelToMeterRatio);
+    result.y = static_cast<float>(pixelValue.y * config::pixelToMeterRatio);
+
+    result.x = roundTo(result.x, 10);
+    result.y = roundTo(result.y, 10);
+
+    return result;
+}
+
+template <typename T>
+T getRandomElement(const std::vector<T>& vec)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, vec.size() - 1);
+
+    return vec[dis(gen)];
 }
