@@ -3,6 +3,7 @@
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "EquipWeaponSystem.h"
+#include "EquippedWeaponComponent.h"
 #include "InventoryComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
@@ -30,9 +31,9 @@ void InventorySystem::dropWeapon(const Entity player)
     inventory.weapons.clear();
 }
 
-void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon) const
+void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon)
 {
-    if(auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(weapon))
+    if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(weapon))
     {
         if (colliderComponent->body != nullptr)
         {
@@ -42,12 +43,32 @@ void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon) con
         }
     }
 
+    if (const auto* equippedWeaponComponent = gCoordinator.tryGetComponent<EquippedWeaponComponent>(player))
+    {
+        if (gCoordinator.hasComponent<TransformComponent>(equippedWeaponComponent->currentWeapon))
+        {
+            const auto& equippedWeaponCollisionComponent =
+                gCoordinator.getComponent<ColliderComponent>(equippedWeaponComponent->currentWeapon);
+            const auto& newWeaponCollisionComponent = gCoordinator.getComponent<ColliderComponent>(weapon);
+
+            auto& equippedTransformComponent =
+                gCoordinator.getComponent<TransformComponent>(equippedWeaponComponent->currentWeapon);
+
+            equippedTransformComponent = gCoordinator.getComponent<TransformComponent>(weapon);
+
+            equippedTransformComponent.position.y +=
+                (newWeaponCollisionComponent.collision.height - equippedWeaponCollisionComponent.collision.height) *
+                config::gameScale / 2;
+
+            dropWeapon(player);
+        }
+    }
+
     auto& inventory = gCoordinator.getComponent<InventoryComponent>(player);
     inventory.weapons.push_back(weapon);
     gCoordinator.getComponent<WeaponComponent>(weapon).equipped = true;
 
-    if (gCoordinator.hasComponent<ItemComponent>(weapon))
-        gCoordinator.removeComponent<ItemComponent>(weapon);
+    if (gCoordinator.hasComponent<ItemComponent>(weapon)) gCoordinator.removeComponent<ItemComponent>(weapon);
 
     if (gCoordinator.hasComponent<ItemAnimationComponent>(weapon))
         gCoordinator.removeComponent<ItemAnimationComponent>(weapon);

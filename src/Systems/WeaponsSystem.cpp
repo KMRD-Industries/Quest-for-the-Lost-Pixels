@@ -96,7 +96,7 @@ void WeaponSystem::weaponInput(const Entity player)
 
     if (minDistance < config::weaponInteractionDistance)
     {
-        gCoordinator.getRegisterSystem<InventorySystem>()->dropWeapon(player);
+        // gCoordinator.getRegisterSystem<InventorySystem>()->dropWeapon(player);
         gCoordinator.getRegisterSystem<InventorySystem>()->pickUpWeapon(player, closestWeaponEntity);
     }
 }
