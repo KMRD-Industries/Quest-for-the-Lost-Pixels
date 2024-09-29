@@ -314,13 +314,13 @@ void Dungeon::moveDownDungeon()
         position.x = transformComponent.position.x * static_cast<float>(config::pixelToMeterRatio);
         position.y = transformComponent.position.y * static_cast<float>(config::pixelToMeterRatio);
 
-        gCoordinator.getComponent<ColliderComponent>(player).body->SetTransform(position, 0);
+        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(player);
+        colliderComponent.body->SetTransform(position, colliderComponent.body->GetAngle());
     }
 
     m_roomListenerSystem->reset();
 
-    if (m_multiplayerSystem->isInsideInitialRoom(false))
-        m_multiplayerSystem->roomChanged(m_currentPlayerPos);
+    if (m_multiplayerSystem->isInsideInitialRoom(false)) m_multiplayerSystem->roomChanged(m_currentPlayerPos);
 }
 
 inline void Dungeon::loadMap(const std::string& path) const

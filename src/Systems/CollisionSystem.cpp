@@ -5,6 +5,7 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "DoorComponent.h"
 #include "ItemComponent.h"
+#include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
@@ -74,7 +75,8 @@ void CollisionSystem::createMapCollision()
         auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
-            gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
+            gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
+            gCoordinator.hasComponent<MultiplayerComponent>(entity))
         {
             continue;
         }
