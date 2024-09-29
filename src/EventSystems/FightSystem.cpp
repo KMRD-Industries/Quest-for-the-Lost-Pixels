@@ -14,7 +14,7 @@
 
 FightSystem::FightSystem() { init(); }
 
-void FightSystem::init() {}
+void FightSystem::init() const {}
 
 void FightSystem::update()
 {
@@ -24,20 +24,20 @@ void FightSystem::update()
 
         // Start attack animation
         const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);
-        auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
+        const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
 
         switch (weaponComponent.type)
         {
         case GameType::WeaponType::MELE:
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         case GameType::WeaponType::WAND:
             // TODO: Wand attack support
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         case GameType::WeaponType::BOW:
             // TODO: Bow attack support
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         default:
             break;
@@ -49,16 +49,16 @@ void FightSystem::update()
 
 void FightSystem::handleBowAttack(Entity) {}
 
-void FightSystem::handleMeleAttack(Entity eventEntity)
+void FightSystem::handleMeleeAttack(const Entity playerEntity) const
 {
-    auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventEntity);
-    const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);
-    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
+    const auto& playerRenderComponent = gCoordinator.getComponent<RenderComponent>(playerEntity);
+    const auto& [playerEquippedWeapon] = gCoordinator.getComponent<EquippedWeaponComponent>(playerEntity);
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(playerEntity);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(playerEquippedWeapon);
 
-    weaponComponent.isFacingRight = renderComponent.sprite.getScale().x > 0;
+    weaponComponent.isFacingRight = playerRenderComponent.sprite.getScale().x > 0;
     weaponComponent.queuedAttack = true;
 
-    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(eventEntity);
     const auto center = glm::vec2{transformComponent.position.x, transformComponent.position.y};
 
     // Calculate the direction vector using the angle in degrees
@@ -70,7 +70,7 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
     const auto range = direction * (config::playerAttackRange * std::abs(transformComponent.scale.x));
     const auto point2 = center + range;
 
-    const auto targetInBox = Physics::rayCast(center, point2, eventEntity);
+    const auto targetInBox = Physics::rayCast(center, point2, playerEntity);
 
     if (targetInBox.tag == "Enemy")
     {
@@ -85,7 +85,7 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
         characterComponent.attacked = true;
         characterComponent.hp -= config::playerAttackDamage;
 
-        const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(eventEntity).body->GetPosition();
+        const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(playerEntity).body->GetPosition();
         const b2Vec2& targetPos = colliderComponent.body->GetPosition();
 
         b2Vec2 recoilDirection = targetPos - attackerPos;

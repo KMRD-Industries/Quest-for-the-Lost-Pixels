@@ -1,13 +1,13 @@
 {
-    "activeFile": "assets/maps/floor_01/map_110.json",
+    "activeFile": "assets/tileSets/Armour.json",
     "expandedProjectPaths": [
-        "build",
-        "assets",
-        "assets/maps/floor_01",
         "assets/tileSets",
+        "assets/maps",
+        "assets",
+        "build",
         ".",
         "assets/maps/floor_00",
-        "assets/maps"
+        "assets/maps/floor_01"
     ],
     "file.lastUsedOpenFilter": "Wszystkie pliki (*)",
     "fileStates": {
@@ -43,8 +43,8 @@
             "scale": 3.0726562499999996,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 159.95931858632088,
-                "y": 111.95525044495295
+                "x": 168.90922959572848,
+                "y": 146.9412662090008
             }
         },
         "assets/maps/floor_01/map_12.json": {
@@ -425,7 +425,7 @@
         },
         "assets/tileSets/Characters.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 1.5
+            "scaleInEditor": 8
         },
         "assets/tileSets/CosmicLilac.json": {
             "scaleInDock": 1
@@ -467,11 +467,11 @@
     "project": "bez nazwy.tiled-project",
     "recentFiles": [
         "assets/tileSets/Weapons.json",
-        "assets/tileSets/Armour.json",
-        "assets/tileSets/Items.json",
-        "assets/tileSets/Characters.json",
-        "assets/tileSets/SpecialBlocks.json",
         "assets/maps/floor_01/map_110.json",
+        "assets/tileSets/SpecialBlocks.json",
+        "assets/tileSets/Characters.json",
+        "assets/tileSets/Items.json",
+        "assets/tileSets/Armour.json",
         "assets/maps/floor_01/map_12.json",
         "C:/Users/domin/Desktop/xp.tsx",
         "assets/maps/floor_01/map_15.json",

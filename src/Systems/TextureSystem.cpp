@@ -143,7 +143,7 @@ void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedT
                         if (property.name == "helmetPlacement")
                         {
                             m_mapHelmetPlacements.emplace(adjusted_id, object);
-                            m_helmets.push_back(id);
+                            if (id <= 180) m_helmets.push_back(id);
                         }
 
                         if (property.name == "weaponPlacement")
