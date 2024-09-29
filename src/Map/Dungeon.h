@@ -54,7 +54,7 @@ private:
     void makeStartFloor();
     void moveDownDungeon();
     void loadMap(const std::string& path) const;
-    float getSpawnOffset(float, int);
+    float getSpawnOffset(const float, const uint32_t);
 
     std::string m_asset_path;
     FloorGenerator m_floorGenerator;

@@ -16,6 +16,7 @@ class MultiplayerSystem : public System
 {
 private:
     bool m_connected = false;
+    bool m_inside_initial_room = true;
     Entity m_player_entity = 0;
     uint32_t m_player_id = 1;
     boost::asio::io_context m_io_context;
@@ -38,11 +39,11 @@ public:
     void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
     void entityDisconnected(const std::uint32_t id) noexcept;
     void roomChanged(const glm::ivec2& room);
-    void init();
     void update();
     void disconnect();
 
     bool isConnected() const noexcept;
+    bool isInsideInitialRoom(const bool change) noexcept;
     std::uint32_t playerID() const noexcept;
     glm::ivec2& getRoom() noexcept;
     comm::GameState registerPlayer(const Entity player);

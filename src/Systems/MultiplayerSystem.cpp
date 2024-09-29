@@ -15,15 +15,11 @@
 #include "Types.h"
 
 #include "boost/system/system_error.hpp"
-#include "box2d/b2_body.h"
-#include "glm/ext/vector_int2.hpp"
 
 extern Coordinator gCoordinator;
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
-
-void MultiplayerSystem::init(){};
 
 void MultiplayerSystem::setup(const std::string& ip, const std::string& port) noexcept
 {
@@ -85,6 +81,14 @@ void MultiplayerSystem::roomChanged(const glm::ivec2& room)
     auto serialized = m_state.SerializeAsString();
 
     m_tcp_socket.send(boost::asio::buffer(serialized));
+}
+
+bool MultiplayerSystem::isInsideInitialRoom(const bool change) noexcept
+{
+    bool ret = m_inside_initial_room;
+    if (change)
+        m_inside_initial_room = false;
+    return ret;
 }
 
 bool MultiplayerSystem::isConnected() const noexcept { return m_connected; }

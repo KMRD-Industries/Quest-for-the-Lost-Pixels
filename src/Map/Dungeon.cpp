@@ -67,16 +67,16 @@ void Dungeon::init()
         m_id = gameState.player_id();
         m_seed = gameState.seed();
 
-        std::cout << "Connected to server with id: " << m_id << "\n";
+        std::cout << "Connected to server with id: " << m_id << '\n';
 
         for (uint32_t id : gameState.connected_players())
         {
             createRemotePlayer(id);
-            std::cout << "Connected remote player: " << m_id << "\n";
+            std::cout << "Connected remote player: " << m_id << '\n';
         }
     }
     else
-        std::cout << "Starting in single-player mode";
+        std::cout << "Starting in single-player mode\n";
 
     const std::string tag = std::format("Player {}", m_id);
 
@@ -97,7 +97,9 @@ void Dungeon::addPlayerComponents(const Entity player)
 {
     gCoordinator.addComponent(player, TileComponent{config::playerAnimation, "Characters", 6});
     gCoordinator.addComponent(player, RenderComponent{});
-    gCoordinator.addComponent(player, TransformComponent{GameUtility::startingPosition});
+    gCoordinator.addComponent(player,
+                              TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, m_id),
+                                                              getSpawnOffset(config::startingPosition.y, m_id))));
     gCoordinator.addComponent(player, AnimationComponent{});
     gCoordinator.addComponent(player, CharacterComponent{.hp = config::defaultCharacterHP});
     gCoordinator.addComponent(player, PlayerComponent{});
@@ -117,8 +119,7 @@ void Dungeon::createRemotePlayer(const uint32_t id)
 
     gCoordinator.addComponent(m_entities[id],
                               TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, id),
-                                                              getSpawnOffset(config::startingPosition.y, id)),
-                                                 0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
+                                                              getSpawnOffset(config::startingPosition.y, id))));
     gCoordinator.addComponent(m_entities[id], TileComponent{config::playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[id], RenderComponent{});
     gCoordinator.addComponent(m_entities[id], AnimationComponent{});
@@ -231,16 +232,24 @@ void Dungeon::update(const float deltaTime)
         switch (stateUpdate.variant())
         {
         case comm::DISCONNECTED:
-            gCoordinator.destroyEntity(m_entities[id]);
             m_multiplayerSystem->entityDisconnected(id);
             m_players.erase(id);
+            gCoordinator.getComponent<ColliderComponent>(m_entities[id]).toDestroy = true;
             break;
         case comm::CONNECTED:
             createRemotePlayer(id);
             m_players.insert(id);
             break;
         case comm::ROOM_CHANGED:
-            changeRoom(m_multiplayerSystem->getRoom());
+            if (m_multiplayerSystem->isInsideInitialRoom(true))
+            {
+                gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
+                moveDownDungeon();
+            }
+            else
+            {
+                changeRoom(m_multiplayerSystem->getRoom());
+            }
             break;
         default:
             break;
@@ -293,15 +302,25 @@ void Dungeon::moveDownDungeon()
     m_passageSystem->setPassages(false);
     loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
 
-    gCoordinator.getComponent<TransformComponent>(config::playerEntity).position = {pos.x, pos.y};
-    gCoordinator.getComponent<TransformComponent>(config::playerEntity).velocity = {};
+    for (uint32_t id : m_players)
+    {
+        Entity player = m_entities[id];
+        auto transformComponent = gCoordinator.getComponent<TransformComponent>(player);
 
-    b2Vec2 position{};
-    position.x = GameUtility::startingPosition.x * static_cast<float>(config::pixelToMeterRatio);
-    position.y = GameUtility::startingPosition.y * static_cast<float>(config::pixelToMeterRatio);
+        transformComponent.position = {getSpawnOffset(pos.x, id), getSpawnOffset(pos.y, id)};
+        transformComponent.velocity = {};
 
-    gCoordinator.getComponent<ColliderComponent>(config::playerEntity).body->SetTransform(position, 0);
+        b2Vec2 position{};
+        position.x = transformComponent.position.x * static_cast<float>(config::pixelToMeterRatio);
+        position.y = transformComponent.position.y * static_cast<float>(config::pixelToMeterRatio);
+
+        gCoordinator.getComponent<ColliderComponent>(player).body->SetTransform(position, 0);
+    }
+
     m_roomListenerSystem->reset();
+
+    if (m_multiplayerSystem->isInsideInitialRoom(false))
+        m_multiplayerSystem->roomChanged(m_currentPlayerPos);
 }
 
 inline void Dungeon::loadMap(const std::string& path) const
@@ -380,7 +399,7 @@ void Dungeon::changeRoom(const glm::ivec2& room)
     }
 }
 
-float Dungeon::getSpawnOffset(const float position, const int id)
+float Dungeon::getSpawnOffset(const float position, const uint32_t id)
 {
     if (id % 2 == 0) return position + id * config::spawnOffset;
     return position - id * config::spawnOffset;
