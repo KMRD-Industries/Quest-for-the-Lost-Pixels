@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+
+#include "BackgroundSystem.h"
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
@@ -73,7 +75,7 @@ int main()
     sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!");
 
     // W³aœciwa inicjalizacja okna
-    window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
+    window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Fullscreen);
 
     // Inicjalizacja ImGui
     int _ = ImGui::SFML::Init(window);
@@ -95,7 +97,6 @@ int main()
 
         // Upewnij siê, ¿e ImGui wchodzi w now¹ ramkê
         ImGui::SFML::Update(window, deltaTime);
-        //ImGui::NewFrame(); // Nowa ramka dla ImGui
 
         // Logika gry
         game.handleCollision();
@@ -104,10 +105,10 @@ int main()
 
         // Rysowanie systemów
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
+        gCoordinator.getRegisterSystem<BackgroundSystem>()->draw(window);
         gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
 
         // Renderowanie ImGui
-        //ImGui::Render(); // Wywo³anie Render
         ImGui::SFML::Render(window); // Renderowanie UI SFML
 
         // Wyœwietlenie okna

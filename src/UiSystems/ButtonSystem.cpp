@@ -10,19 +10,19 @@ extern Coordinator gCoordinator;
 
 void ButtonSystem::render()
 {
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
+    ImGui::Begin("ButtonWindow", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+                 ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
+                 ImGuiWindowFlags_NoSavedSettings);
+
+
     for (const auto entity : m_entities)
     {
         if (m_entities.empty())
             return;
         auto& buttonComponent = gCoordinator.getComponent<ButtonComponent>(entity);
-
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(ImVec2(0, 0));
-
-        ImGui::Begin("ButtonWindow", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-                     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
-                     ImGuiWindowFlags_NoSavedSettings);
 
         ImGui::SetCursorPos(buttonComponent.position);
 
@@ -37,8 +37,6 @@ void ButtonSystem::render()
             atlasID, ImVec2(buttonTexture.width * buttonComponent.scale, buttonTexture.height * buttonComponent.scale),
             buttonComponent.m_uv0, buttonComponent.m_uv1))
         {
-            if (buttonComponent.m_onClickedFunction)
-                buttonComponent.m_onClickedFunction();
         }
 
         ImGui::PopStyleColor(3);
@@ -55,6 +53,11 @@ void ButtonSystem::render()
                 buttonComponent.m_uv1 = ImVec2(
                     static_cast<float>(clickedRect.left + clickedRect.width) / buttonAtlasX,
                     static_cast<float>(clickedRect.top + clickedRect.height) / buttonAtlasY);
+            }
+            else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+            {
+                if (buttonComponent.m_onClickedFunction)
+                    buttonComponent.m_onClickedFunction();
             }
             else
             {
@@ -90,10 +93,8 @@ void ButtonSystem::render()
         ImGui::Text(buttonComponent.text.data());
 
         ImGui::PopFont();
-
-
-        ImGui::End();
     }
+    ImGui::End();
 }
 
 void ButtonSystem::loadData(const std::string& atlasPath, const std::string& fontPath, const float fontSize)

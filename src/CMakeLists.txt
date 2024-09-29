@@ -55,6 +55,7 @@ set(COMPONENTS
 
 set(UI_COMPONENTS
 		UiComponents/ButtonComponent.h
+		UiComponents/UiComponent.h
 )
 
 set(ATLAS_COMPONENTS
@@ -118,7 +119,9 @@ set(UI_SYSTEMS
         UiSystems/HealthBarSystem.cpp
         UiSystems/HealthBarSystem.h        
 		UiSystems/ButtonSystem.cpp
-        UiSystems/ButtonSystem.h
+        UiSystems/ButtonSystem.h		
+		UiSystems/BackgroundSystem.cpp
+        UiSystems/BackgroundSystem.h
 )
 
 set(UTILS

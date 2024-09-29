@@ -22,6 +22,7 @@
 #include "EquipWeaponSystem.h"
 #include "EquippedWeaponComponent.h"
 #include "HealthBarSystem.h"
+#include "InputHandler.h"
 #include "InventoryComponent.h"
 #include "InventorySystem.h"
 #include "ItemAnimationComponent.h"
@@ -168,6 +169,11 @@ void Dungeon::render()
 
 void Dungeon::update(const float deltaTime)
 {
+    if (InputHandler::getInstance()->isPressed(InputType::MoveDown))
+    {
+        m_stateChangeCallback(MenuStateMachine::StateAction::Pop, std::nullopt);
+        return;
+    }
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
     gCoordinator.getRegisterSystem<WeaponSystem>()->update();
     gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
