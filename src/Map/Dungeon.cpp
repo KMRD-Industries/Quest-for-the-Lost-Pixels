@@ -10,6 +10,7 @@
 #include "ChestSystem.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "Config.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
@@ -59,7 +60,7 @@ void Dungeon::init()
     config::playerEntity = gCoordinator.createEntity();
     m_id = 0;
     m_seed = std::chrono::system_clock::now().time_since_epoch().count();
-    m_multiplayerSystem->setup("127.0.0.1", "9001");
+    m_multiplayerSystem->setup(config::defaultIP, config::defaultPort);
 
     if (m_multiplayerSystem->isConnected())
     {

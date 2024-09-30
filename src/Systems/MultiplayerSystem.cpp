@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdint>
 #include <iostream>
 
@@ -21,7 +22,14 @@ extern Coordinator gCoordinator;
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
 
-void MultiplayerSystem::setup(const std::string& ip, const std::string& port) noexcept
+using sysClock = std::chrono::system_clock;
+
+inline bool readyToTick(sysClock::time_point older, sysClock::time_point newer)
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(newer - older).count() > config::millisPerTick;
+}
+
+void MultiplayerSystem::setup(const std::string_view& ip, const std::string_view& port) noexcept
 {
     try
     {
@@ -43,6 +51,7 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port) no
     }
 
     m_connected = true;
+    m_last_tick = sysClock::now();
 
     auto r1 = new comm::Room();
     m_state.set_allocated_room(r1);
@@ -86,13 +95,12 @@ void MultiplayerSystem::roomChanged(const glm::ivec2& room)
 bool MultiplayerSystem::isInsideInitialRoom(const bool change) noexcept
 {
     bool ret = m_inside_initial_room;
-    if (change)
-        m_inside_initial_room = false;
+    if (change) m_inside_initial_room = false;
     return ret;
 }
 
 bool MultiplayerSystem::isConnected() const noexcept { return m_connected; }
-std::uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
+uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
 
 comm::GameState MultiplayerSystem::registerPlayer(const Entity player)
 {
@@ -179,11 +187,14 @@ void MultiplayerSystem::update()
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
 
+    auto tick = sysClock::now();
+    if (!readyToTick(m_last_tick, tick)) return;
 
     sf::Vector3<float> next = {transformComponent.position.x, transformComponent.position.y,
                                transformComponent.scale.x};
     if (m_last_sent == next) return;
 
+    m_last_tick = tick;
     m_last_sent = next;
     m_position.set_entity_id(m_player_id);
     m_position.set_x(next.x);

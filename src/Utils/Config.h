@@ -94,6 +94,11 @@ namespace config
     static constexpr float ROTATION_270 = 270.0f;
     static constexpr int MAX_LEFT_FACING_ANGLE = 420;
 
+    // Multiplayer config
+    static constexpr std::string_view defaultIP = "127.0.0.1";
+    static constexpr std::string_view defaultPort = "10823";
+    static constexpr uint32_t millisPerTick = 10;
+
     // Color balance structure
     struct ColorBalance
     {

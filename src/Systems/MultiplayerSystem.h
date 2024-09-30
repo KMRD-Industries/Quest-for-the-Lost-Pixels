@@ -24,6 +24,7 @@ private:
     udp::socket m_udp_socket;
     std::array<char, 4096> m_buf{};
     sf::Vector3<float> m_last_sent{};
+    std::chrono::system_clock::time_point m_last_tick;
     glm::ivec2 m_current_room{};
     int m_prefix_size{};
     std::vector<char> m_prefix_buf{};
@@ -33,8 +34,8 @@ private:
     std::unordered_map<std::uint32_t, Entity> m_entity_map{};
 
 public:
-    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
-    void setup(const std::string& ip, const std::string& port) noexcept;
+    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
+    void setup(const std::string_view& ip, const std::string_view& port) noexcept;
     void setRoom(const glm::ivec2& room) noexcept;
     void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
     void entityDisconnected(const std::uint32_t id) noexcept;
@@ -44,7 +45,7 @@ public:
 
     bool isConnected() const noexcept;
     bool isInsideInitialRoom(const bool change) noexcept;
-    std::uint32_t playerID() const noexcept;
+    uint32_t playerID() const noexcept;
     glm::ivec2& getRoom() noexcept;
     comm::GameState registerPlayer(const Entity player);
     comm::StateUpdate pollStateUpdates();
