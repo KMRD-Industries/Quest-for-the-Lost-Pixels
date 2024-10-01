@@ -20,10 +20,10 @@ void StateManager::update(const float deltaTime)
         m_states.top()->update(deltaTime);
 }
 
-void StateManager::render()
+void StateManager::render(sf::RenderWindow& window)
 {
     if (!m_states.empty())
-        m_states.top()->render();
+        m_states.top()->render(window);
 }
 
 void StateManager::handleStateChange(const MenuStateMachine::StateAction action,

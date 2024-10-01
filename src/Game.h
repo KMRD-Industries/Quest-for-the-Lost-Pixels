@@ -6,7 +6,7 @@ class Game
 {
 public:
     void init();
-    void draw();
+    void draw(sf::RenderWindow& window);
     void update(float deltaTime);
     void handleCollision();
 

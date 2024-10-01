@@ -160,7 +160,7 @@ void Dungeon::init()
     gCoordinator.getRegisterSystem<CollisionSystem>()->createMapCollision();
 }
 
-void Dungeon::render()
+void Dungeon::render(sf::RenderWindow& window)
 {
     gCoordinator.getRegisterSystem<HealthBarSystem>()->drawHealthBar();
     gCoordinator.getRegisterSystem<TextureSystem>()->loadTextures();
@@ -169,11 +169,6 @@ void Dungeon::render()
 
 void Dungeon::update(const float deltaTime)
 {
-    if (InputHandler::getInstance()->isPressed(InputType::MoveDown))
-    {
-        m_stateChangeCallback(MenuStateMachine::StateAction::Pop, std::nullopt);
-        return;
-    }
     gCoordinator.getRegisterSystem<PlayerMovementSystem>()->update();
     gCoordinator.getRegisterSystem<WeaponSystem>()->update();
     gCoordinator.getRegisterSystem<SpawnerSystem>()->update();
@@ -214,6 +209,8 @@ void Dungeon::update(const float deltaTime)
     }
 
     m_roomMap.at(m_currentPlayerPos).update();
+    if (InputHandler::getInstance()->isPressed(InputType::MoveDown))
+        m_stateChangeCallback(MenuStateMachine::StateAction::Pop, std::nullopt);
 }
 
 void Dungeon::createRemotePlayer(uint32_t id)

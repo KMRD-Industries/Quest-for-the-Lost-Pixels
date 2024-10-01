@@ -18,7 +18,7 @@ public:
     };
 
     void init() override;
-    void render() override;
+    void render(sf::RenderWindow& window) override;
     void update(float deltaTime) override;
 
 private:

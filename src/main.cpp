@@ -101,7 +101,7 @@ int main()
         // Logika gry
         game.handleCollision();
         game.update(deltaTime.asSeconds());
-        game.draw();
+        game.draw(window);
 
         // Rysowanie systemów
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
