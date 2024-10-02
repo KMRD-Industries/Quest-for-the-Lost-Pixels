@@ -75,7 +75,7 @@ int main()
     sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!");
 
     // W³aœciwa inicjalizacja okna
-    window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Fullscreen);
+    window.create(desktopMode, "Quest for the lost pixels!");
 
     // Inicjalizacja ImGui
     int _ = ImGui::SFML::Init(window);
@@ -99,7 +99,6 @@ int main()
         ImGui::SFML::Update(window, deltaTime);
 
         // Logika gry
-        game.handleCollision();
         game.update(deltaTime.asSeconds());
         game.draw(window);
 

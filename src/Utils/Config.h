@@ -15,7 +15,7 @@
 
 namespace config
 {
-    static constexpr bool debugMode{false};
+    static constexpr bool debugMode{true};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};

@@ -10,16 +10,23 @@
 #include "State.h"
 #include "Types.h"
 
-class Dungeon : public State
+namespace sf
+{
+    class RenderWindow;
+}
+
+class Dungeon
 {
 public:
     Dungeon() : m_entities(MAX_ENTITIES - 1)
     {
     };
 
-    void init() override;
-    void render(sf::RenderWindow& window) override;
-    void update(float deltaTime) override;
+    void init();
+    void render(sf::RenderWindow& window);
+    void update(float deltaTime);
+
+    StateChangeCallback m_stateChangeCallback;
 
 private:
     void setECS();

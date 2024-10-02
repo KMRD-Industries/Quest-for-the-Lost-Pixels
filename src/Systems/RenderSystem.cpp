@@ -7,15 +7,15 @@
 #include "MultiplayerComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
-#include "SFML/Graphics/CircleShape.hpp"
-#include "SFML/Graphics/ConvexShape.hpp"
-#include "SFML/Graphics/RenderWindow.hpp"
 #include "TextTagComponent.h"
 #include "TextTagSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
+#include "SFML/Graphics/CircleShape.hpp"
+#include "SFML/Graphics/ConvexShape.hpp"
+#include "SFML/Graphics/RenderWindow.hpp"
 
 #include "imgui.h"
 
@@ -27,7 +27,6 @@ void RenderSystem::draw(sf::RenderWindow& window)
     const sf::Vector2<unsigned int> windowSize = window.getSize();
 
     for (const auto entity : m_entities)
-    {
         if (auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
             renderComponent.layer > 0 && renderComponent.layer < config::maximumNumberOfLayers)
         {
@@ -55,19 +54,16 @@ void RenderSystem::draw(sf::RenderWindow& window)
 
             tiles[renderComponent.layer].push_back(&gCoordinator.getComponent<RenderComponent>(entity).sprite);
         }
-    }
 
     mapOffset.x = (static_cast<float>(windowSize.x) - mapOffset.x) * 0.5f;
     mapOffset.y = (static_cast<float>(windowSize.y) - mapOffset.y) * 0.5f;
 
     for (auto& layer : tiles)
-    {
         for (const auto& sprite : layer)
         {
             sprite->setPosition(sprite->getPosition() + mapOffset);
             window.draw(*sprite);
         }
-    }
 
     for (const auto& entity : gCoordinator.getRegisterSystem<TextTagSystem>()->m_entities)
     {
@@ -86,9 +82,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
     }
 
     if (config::debugMode)
-    {
         debugBoundingBoxes(window);
-    }
 }
 
 /**
@@ -98,7 +92,8 @@ void RenderSystem::draw(sf::RenderWindow& window)
  * */
 void RenderSystem::setOrigin(const Entity entity)
 {
-    if (gCoordinator.hasComponent<WeaponComponent>(entity)) return;
+    if (gCoordinator.hasComponent<WeaponComponent>(entity))
+        return;
 
     // Get all necessary components
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
@@ -134,7 +129,8 @@ void RenderSystem::setOrigin(const Entity entity)
  * */
 void RenderSystem::setSpritePosition(const Entity entity)
 {
-    if (gCoordinator.hasComponent<WeaponComponent>(entity)) return;
+    if (gCoordinator.hasComponent<WeaponComponent>(entity))
+        return;
 
     // Get all necessary parts
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
@@ -188,15 +184,14 @@ void RenderSystem::setSpritePosition(const Entity entity)
 
 void RenderSystem::displayDamageTaken(const Entity entity)
 {
-    if (!gCoordinator.hasComponent<CharacterComponent>(entity)) return;
+    if (!gCoordinator.hasComponent<CharacterComponent>(entity))
+        return;
 
     auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
     if (!characterComponent.attacked)
-    {
         renderComponent.sprite.setColor(sf::Color::White);
-    }
     else
     {
         characterComponent.timeSinceAttacked++;
@@ -215,7 +210,7 @@ void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const
     ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always); // Set the width to 250, height is auto
     ImGui::Begin("abc", nullptr,
                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
-                     ImGuiWindowFlags_NoTitleBar);
+                 ImGuiWindowFlags_NoTitleBar);
 
     const auto pos = gCoordinator.getComponent<TransformComponent>(entity);
     const auto& tile = gCoordinator.getComponent<TileComponent>(entity);
@@ -250,7 +245,7 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
     ImGui::SetNextWindowSize(ImVec2(250, 0), ImGuiCond_Always); // Set the width to 250, height is auto
     ImGui::Begin("Weapon Stats", nullptr,
                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
-                     ImGuiWindowFlags_NoTitleBar);
+                 ImGuiWindowFlags_NoTitleBar);
 
     ImGui::Separator();
     ImGui::Text("Weapon Details");
@@ -292,6 +287,10 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
 
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
 {
+    if (!gCoordinator.hasComponent<RenderComponent>(config::playerEntity) ||
+        !gCoordinator.hasComponent<TileComponent>(config::playerEntity) ||
+        !gCoordinator.hasComponent<TransformComponent>(config::playerEntity))
+        return;
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
     auto transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
@@ -344,16 +343,12 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
         if (!gCoordinator.hasComponent<ColliderComponent>(entity) ||
             !gCoordinator.hasComponent<TransformComponent>(entity) ||
             !gCoordinator.hasComponent<RenderComponent>(entity))
-        {
             continue;
-        };
 
         if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
             gCoordinator.hasComponent<MultiplayerComponent>(entity) ||
             gCoordinator.hasComponent<EnemyComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
-        {
             drawSprite(entity);
-        }
 
         if (gCoordinator.hasComponent<EquippedWeaponComponent>(entity))
         {
@@ -379,9 +374,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window) const
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (colliderComponent.body == nullptr)
-        {
             continue;
-        }
 
         for (b2Fixture* fixture = colliderComponent.body->GetFixtureList(); fixture; fixture = fixture->GetNext())
         {

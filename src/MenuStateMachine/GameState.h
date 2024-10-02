@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Button.h"
-#include "Graphics.h"
+#include "Dungeon.h"
 #include "State.h"
 
-class MainMenuState : public State
+class GameState : public State
 {
 public:
-    MainMenuState()
+    GameState()
     {
     };
 
@@ -16,7 +15,6 @@ public:
     void init() override;
 
 private:
-    Button m_playButton{};
-    Button m_quitButton{};
-    Graphics m_backgroundGraphics{};
+    Dungeon m_dungeon{};
+    void handleCollision(float deltaTime);
 };

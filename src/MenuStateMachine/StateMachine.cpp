@@ -5,6 +5,7 @@
 void StateManager::pushState(std::unique_ptr<State> newState)
 {
     m_states.push(std::move(newState));
+    m_states.top()->beforeInit();
     m_states.top()->init();
 }
 
@@ -12,6 +13,11 @@ void StateManager::popState()
 {
     if (!m_states.empty())
         m_states.pop();
+    if (!m_states.empty())
+    {
+        m_states.top()->beforeInit();
+        m_states.top()->init();
+    }
 }
 
 void StateManager::update(const float deltaTime)

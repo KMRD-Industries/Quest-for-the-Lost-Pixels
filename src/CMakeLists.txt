@@ -138,6 +138,9 @@ set(UTILS
 set(MENU_STATE_MACHINE
         MenuStateMachine/MainMenuState.cpp
         MenuStateMachine/MainMenuState.h
+        MenuStateMachine/GameState.cpp
+        MenuStateMachine/GameState.h
+        MenuStateMachine/State.cpp       
         MenuStateMachine/State.h        
         MenuStateMachine/StateMachine.cpp        
         MenuStateMachine/StateMachine.h        

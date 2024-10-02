@@ -1,9 +1,8 @@
 #include "MainMenuState.h"
 
 #include "ButtonDTO.h"
-#include "Coordinator.h"
-
-extern Coordinator gCoordinator;
+#include "GameState.h"
+#include "Paths.h"
 
 void MainMenuState::init()
 {
@@ -16,7 +15,7 @@ void MainMenuState::init()
                                 {
                                     m_stateChangeCallback(
                                         MenuStateMachine::StateAction::Push,
-                                        std::make_unique<Dungeon>());
+                                        std::make_unique<GameState>());
                                 }});
 
     m_quitButton.init(ButtonDTO{std::string(ASSET_PATH) + "/ui/uiHigh.png",
