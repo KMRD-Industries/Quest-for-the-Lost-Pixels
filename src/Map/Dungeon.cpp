@@ -37,6 +37,7 @@
 #include "PlayerComponent.h"
 #include "PlayerMovementSystem.h"
 #include "RenderComponent.h"
+#include "ResourceManager.h"
 #include "RoomListenerSystem.h"
 #include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
@@ -60,9 +61,18 @@ void Dungeon::init()
     config::playerEntity = gCoordinator.createEntity();
     m_id = 0;
     m_seed = std::chrono::system_clock::now().time_since_epoch().count();
-
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
-    multiplayerSystem->setup("127.0.0.1", "9001");
+
+    const std::string IP = ResourceManager::getInstance().getIP();
+    size_t colonPos = IP.find(':');
+    if (colonPos == std::string::npos)
+        std::cout << "[WARNING]: BAD IP";
+    else
+    {
+        std::string ip = IP.substr(0, colonPos);
+        std::string port = IP.substr(colonPos + 1);
+        multiplayerSystem->setup(ip, port);
+    }
 
     if (multiplayerSystem->isConnected())
     {

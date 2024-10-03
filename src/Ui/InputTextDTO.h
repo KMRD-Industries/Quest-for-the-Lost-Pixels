@@ -1,11 +1,10 @@
 #pragma once
-#include <functional>
 #include <imgui.h>
 #include <string>
 
 #include "SFML/Graphics/Rect.hpp"
 
-struct ButtonDTO
+struct InputTextDTO
 {
     std::string m_atlasPath{};
     std::string m_fontPath{};
@@ -14,14 +13,11 @@ struct ButtonDTO
     float m_textSize{};
     float m_scale{};
 
+    int m_leftOffset{};
+    int m_topOffset{};
+    int m_inputTextWidth{};
+
     ImVec2 m_position{};
 
     sf::IntRect m_texture{};
-    sf::IntRect m_hooveredTexture{};
-    sf::IntRect m_clickedTexture{};
-
-    ImVec2 m_uv0{};
-    ImVec2 m_uv1{};
-
-    std::function<void()> m_onClickedFunction{};
 };

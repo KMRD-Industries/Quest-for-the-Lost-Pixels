@@ -46,9 +46,20 @@ public:
         return m_loadedFonts[fontKey];
     }
 
+    void setIP(const std::string& serverIp)
+    {
+        m_serverIp = serverIp;
+    }
+
+    std::string getIP()
+    {
+        return m_serverIp;
+    }
+
 private:
     ResourceManager() = default;
 
     std::unordered_map<std::string, sf::Texture> m_loadedTextures;
     std::unordered_map<std::string, ImFont*> m_loadedFonts;
+    std::string m_serverIp{"127.0.0.1:9001"};
 };

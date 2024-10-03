@@ -153,6 +153,9 @@ set(UI
 		Ui/ResourceManager.h
 		Ui/Graphics.h
 		Ui/Graphics.cpp
+		Ui/InputTextDTO.h
+		Ui/InputText.h
+		Ui/InputText.cpp
 )
 
 
