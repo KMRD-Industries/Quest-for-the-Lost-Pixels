@@ -8,11 +8,12 @@
 #include "Room.h"
 #include "Types.h"
 #include <map>
+#include "Timer.h"
 
 class Dungeon
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1) {}
+    Dungeon() : m_entities(MAX_ENTITIES - 1), m_timer(nullptr) {}
 
     void init();
     void draw() const;
@@ -34,4 +35,6 @@ private:
     std::map<Entity, ObstacleData> m_obstaclePositions;
     float counter = 0;
     bool m_passedBy = false;
+    Timer* m_timer;
+    float elapsedTime = 0.0f;
 };

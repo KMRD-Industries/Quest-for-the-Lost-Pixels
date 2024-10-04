@@ -6,10 +6,13 @@
 #include <vector>
 
 #include "Coordinator.h"
+#include "EnemyComponent.h"
 #include "MultiplayerSystem.h"
+
+#include <boost/container/detail/block_list.hpp>
+
 #include "TransformComponent.h"
 #include "boost/system/system_error.hpp"
-#include "EnemyComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -57,7 +60,7 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
 {
     const std::size_t available = m_tcp_socket.available();
     comm::StateUpdate state;
-//    std::cout << "[pollStateUpdate] Bytes available: " << available << std::endl;
+    //    std::cout << "[pollStateUpdate] Bytes available: " << available << std::endl;
     if (available > 0)
     {
         // temporary solution - msg length should always be 4
@@ -67,7 +70,6 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
 
         state.ParseFromArray(buf.data(), received);
         std::cout << state.ShortDebugString() << '\n';
-        std::cout << "halo\n";
     }
     else
     {
@@ -85,30 +87,36 @@ void MultiplayerSystem::update()
     std::size_t received = 0;
     const std::size_t available = m_udp_socket.available();
 
-//    std::cout << "[update] Bytes available: " << available << std::endl;
+    //    std::cout << "[update] Bytes available: " << available << std::endl;
     if (available > 0)
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
-        comm::WrapperMessage wrappedMessage;
-        wrappedMessage.ParseFromArray(&m_buf, received);
-//        m_position.ParseFromArray(&m_buf, received);
+        comm::StateUpdate stateUpdate;
+        stateUpdate.ParseFromArray(&m_buf, received);
+        //        m_position.ParseFromArray(&m_buf, received);
         std::cout << "Received message...";
-        switch(wrappedMessage.type()) {
-            case comm::MessageType::MAP_UPDATE:
-                std::cout << "Map update...\n";
-            case comm::MessageType::POSITION_UPDATE:
-                m_position.ParseFromString(wrappedMessage.payload());
-                std::uint32_t id = m_position.entity_id();
-                std::cout << "Position update from: " << "id\n";
+        switch (stateUpdate.variant())
+        {
+        case comm::StateVariant::MAP_UPDATE:
+            std::cout << "Map update...\n";
+            break;
+        case comm::StateVariant::PLAYER_POSITION_UPDATE:
+            //idk czy git
+            m_position = stateUpdate.positionupdate();
+            const std::uint32_t id = m_position.entity_id();
+            std::cout << "Position update from: " << "id:" << id <<"\n";
 
-                if (m_entity_map.contains(id))
-                {
-                    Entity& target = m_entity_map[id];
-                    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
+            if (m_entity_map.contains(id))
+            {
+                Entity& target = m_entity_map[id];
+                auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
 
-                    transformComponent.position = {m_position.x(), m_position.y()};
-                }
-                break;
+                transformComponent.position = {m_position.x(), m_position.y()};
+            }
+            break;
+            // default:
+            //     std::cout << "Unknown type!\n";
+            //     break;
         }
     }
 
@@ -122,13 +130,12 @@ void MultiplayerSystem::update()
     m_position.set_y(transformComponent.position.y);
 
     std::cout << "Player: " << m_player_id << " is moving to: " << m_position.x() << ", " << m_position.y() << "\n";
-
-    comm::WrapperMessage message;
-    message.set_type(comm::MessageType::POSITION_UPDATE);
-    message.set_payload(m_position.SerializeAsString());
-
-    auto serializedMessage = message.SerializeAsString();
-    m_udp_socket.send(boost::asio::buffer(serializedMessage));
+//idk
+    comm::StateUpdate update;
+    update.set_variant(comm::PLAYER_POSITION_UPDATE);
+    *(update.mutable_positionupdate()) = m_position;
+    auto serialized = update.SerializeAsString();
+    m_udp_socket.send(boost::asio::buffer(serialized));
 }
 
 void MultiplayerSystem::disconnect()
@@ -138,16 +145,38 @@ void MultiplayerSystem::disconnect()
     m_udp_socket.close();
 }
 
-void MultiplayerSystem::updateMap(std::map<Entity, sf::Vector2<int>> enemies, std::map<Entity, ObstacleData> obstacles)
+void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<int>>& enemies,
+                                  const std::map<Entity, ObstacleData>& obstacles)
 {
-//    std::cout << "another update!!!!\n";
-//    for (const auto& enemy : enemies) {
-//        std::cout << "enemy's position: x: " << enemy.second.x << " y: " << enemy.second.y << "\n";
-//    }
-//
-//    for (const auto& obstacle : obstacles) {
-//       std::cout << "obstacle's position left: " << obstacle.second.left << " top: " << obstacle.second.top << "\n";
-//    }
-    const std::size_t available = m_udp_socket.available();
-//    if (available > 0)
+    comm::MapPositionsUpdate mapUpdate;
+    std::cout << "another update!!!!\n";
+    // for (const auto& enemy : enemies)
+    // {
+    //     std::cout << "enemy's position: x: " << enemy.second.x << " y: " << enemy.second.y << "\n";
+    //     comm::Enemy* enemy_position = mapUpdate.add_enemies();
+    //     enemy_position->set_x(enemy.second.x);
+    //     enemy_position->set_y(enemy.second.y);
+    //     enemy_position->set_id(enemy.first);
+    // }
+
+    for (const auto& obstacle : obstacles)
+    {
+        // std::cout << "obstacle's position left: " << obstacle.second.left << " top: " << obstacle.second.top << "\n";
+        comm::Obstacle* obstacle_position = mapUpdate.add_obstacles();
+
+        obstacle_position->set_height(obstacle.second.height);
+        obstacle_position->set_width(obstacle.second.width);
+        obstacle_position->set_left(obstacle.second.left);
+        obstacle_position->set_top(obstacle.second.top);
+    }
+
+    comm::StateUpdate message;
+    message.set_variant(comm::StateVariant::MAP_UPDATE);
+    *(message.mutable_mappositionsupdate()) = mapUpdate;
+
+    auto serializedMessage = message.SerializeAsString();
+    std::cout << "Sending map updated message, size: " << serializedMessage.size() << "\n";
+
+    // TODO dodaj wiadomość ile danych chcesz przesłać żeby zapiać całość na raz
+    m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }

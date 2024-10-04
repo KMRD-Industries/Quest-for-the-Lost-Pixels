@@ -5,9 +5,10 @@
 #include <boost/asio.hpp>
 #include <comm.pb.h>
 
-#include "System.h"
-#include "Types.h"
 #include "GameTypes.h"
+#include "System.h"
+#include "Timer.h"
+#include "Types.h"
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
@@ -27,12 +28,12 @@ private:
     std::unordered_map<std::uint32_t, Entity> m_entity_map{};
 
 public:
-    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
+    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
     void setup(const std::string& ip, const std::string& port) noexcept;
     void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
     void entityDisconnected(const std::uint32_t id) noexcept;
     void update();
-    void updateMap(std::map<Entity, sf::Vector2<int>> enemies, std::map<Entity, ObstacleData> obstacles);
+    void updateMap(const std::map<Entity, sf::Vector2<int>>& enemies, const std::map<Entity, ObstacleData>& obstacles);
     void disconnect();
 
     std::uint32_t registerPlayer(const Entity player);

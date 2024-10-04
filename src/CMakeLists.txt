@@ -92,6 +92,8 @@ set(UTILS
         Utils/MapParser.h
         Utils/Config.h
         Utils/TextureParser.h
+        Utils/Timer.cpp
+        Utils/Timer.h
 )
 
 source_group("Core" FILES ${CORE})

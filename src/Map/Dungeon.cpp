@@ -12,6 +12,9 @@
 #include "DoorComponent.h"
 #include "DoorSystem.h"
 #include "Dungeon.h"
+
+#include <map>
+
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
@@ -35,6 +38,7 @@ void Dungeon::init()
 {
     setECS();
 
+    m_timer = Timer::Instance();
     m_id = 0;
     const Entity player = gCoordinator.createEntity();
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
@@ -43,7 +47,7 @@ void Dungeon::init()
     if (multiplayerSystem->isConnected())
     {
         m_id = multiplayerSystem->registerPlayer(player);
-        std::cout << "Connected to server with id: {" <<  m_id << "}";
+        std::cout << "Connected to server with id: {" << m_id << "}";
     }
     else
     {
@@ -140,7 +144,6 @@ void Dungeon::update()
             break;
         case comm::CONNECTED:
             m_entities[id] = gCoordinator.createEntity();
-
             gCoordinator.addComponent(m_entities[id], TileComponent{playerAnimationTile, "Characters", 4});
             gCoordinator.addComponent(m_entities[id], RenderComponent{});
             gCoordinator.addComponent(m_entities[id],
@@ -159,11 +162,12 @@ void Dungeon::update()
 
         multiplayerSystem->update();
 
-        clock_t lastUpdatedTime = 0;
-        if (((clock() - lastUpdatedTime) / CLOCKS_PER_SEC) % 5 == 0)
+        elapsedTime += m_timer->DeltaTime();
+        if (elapsedTime == m_timer->DeltaTime())
         {
-//            std::cout << (clock() - lastUpdatedTime) / CLOCKS_PER_SEC << "\n";
-            lastUpdatedTime = clock();
+            std::cout << elapsedTime << std::endl;
+            //            std::cout << (clock() - lastUpdatedTime) / CLOCKS_PER_SEC << "\n";
+            // elapsedTime = 0.0f;
             for (const auto entity : m_entities)
             {
                 if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
@@ -173,14 +177,15 @@ void Dungeon::update()
                 {
                     if (gCoordinator.hasComponent<EnemyComponent>(entity))
                     {
-//                        std::cout << "enemy: x " << position.x << " y : " << position.y << "\n";
+                        //                        std::cout << "enemy: x " << position.x << " y : " << position.y <<
+                        //                        "\n";
                         m_enemyPositions.insert({entity, {static_cast<int>(position.x), static_cast<int>(position.y)}});
                     }
-//                    else if (gCoordinator.hasComponent<PlayerComponent>(entity))
-//                    {
-//                        std::cout << "player: x " << position.x << " y : " << position.y << "\n";
-//
-//                    }
+                    //                    else if (gCoordinator.hasComponent<PlayerComponent>(entity))
+                    //                    {
+                    //                        std::cout << "player: x " << position.x << " y : " << position.y << "\n";
+                    //
+                    //                    }
                     else if (gCoordinator.hasComponent<ColliderComponent>(entity))
                     {
                         auto collider = gCoordinator.getComponent<ColliderComponent>(entity);
@@ -193,8 +198,8 @@ void Dungeon::update()
                         }
                     }
                 }
-
             }
+            std::cout << "Length of the table sent to the server: " << m_obstaclePositions.size() << std::endl;
             multiplayerSystem->updateMap(m_enemyPositions, m_obstaclePositions);
         }
     }

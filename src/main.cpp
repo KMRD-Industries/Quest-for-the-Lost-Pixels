@@ -11,6 +11,7 @@
 #include "Paths.h"
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
+#include "Timer.h"
 
 Coordinator gCoordinator;
 
@@ -42,6 +43,7 @@ void handleInput(sf::RenderWindow& window)
         {
             window.close();
         }
+        // std::cout << 1 / timer->DeltaTime() << std::endl;
     }
 }
 
@@ -64,6 +66,7 @@ int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
+    Timer* timer = Timer::Instance();
 
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
@@ -78,6 +81,8 @@ int main()
 
     while (window.isOpen())
     {
+        timer->Tick();
+        timer->Reset();
         // Clear the window before drawing
         window.clear(customColor);
 
