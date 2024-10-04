@@ -4,7 +4,9 @@ bool InputHandler::isHeld(const InputType input) const { return m_keysHeld.conta
 
 bool InputHandler::isPressed(const InputType input) const { return m_keysPressed.contains(input); }
 
-void InputHandler::handleKeyboardInput(sf::Keyboard::Key key, bool isPressed)
+sf::Vector2f InputHandler::getMousePosition() const { return m_mousePosition; }
+
+void InputHandler::handleKeyboardInput(const InputKey& key, const bool& isPressed)
 {
     const auto [fst, snd]{m_keyToMapInput.equal_range(key)};
     if (fst == m_keyToMapInput.end())
@@ -15,6 +17,11 @@ void InputHandler::handleKeyboardInput(sf::Keyboard::Key key, bool isPressed)
     {
         updateKey(it->second, isPressed);
     }
+}
+
+void InputHandler::updateMousePosition(const sf::Vector2f& newMousePosition)
+{
+    this->m_mousePosition = newMousePosition;
 }
 
 void InputHandler::clearPressedInputs() { m_keysPressed.clear(); }
@@ -31,6 +38,7 @@ void InputHandler::updateKey(const InputType input, const bool isPressed)
     {
         m_keysPressed.erase(input);
     }
+
     if (isPressed)
     {
         m_keysHeld.insert(input);

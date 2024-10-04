@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 project(qlp LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 if (WIN32)
@@ -17,11 +16,6 @@ FetchContent_Declare(box2d
 	GIT_REPOSITORY https://github.com/erincatto/box2d.git
 	GIT_TAG 411acc3)
 FetchContent_MakeAvailable(box2d)
-
-FetchContent_Declare(glm
-	GIT_REPOSITORY	https://github.com/g-truc/glm.git
-	GIT_TAG 	1.0.1)
-FetchContent_MakeAvailable(glm)
 
 FetchContent_Declare(SFML
         GIT_REPOSITORY https://github.com/SFML/SFML.git
@@ -60,7 +54,7 @@ FetchContent_MakeAvailable(Boost)
 
 FetchContent_Declare(qlp-proto
     GIT_REPOSITORY https://github.com/kmrd-industries/qlp-proto-bindings
-    GIT_TAG e0496a74)
+    GIT_TAG dafffe9)
 FetchContent_MakeAvailable(qlp-proto)
 
 add_subdirectory(src)

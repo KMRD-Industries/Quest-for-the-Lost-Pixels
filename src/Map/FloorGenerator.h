@@ -6,6 +6,8 @@
 #include "DungeonGenerator.h"
 #include "GameTypes.h"
 #include "Room.h"
+#include "SFML/Graphics/Font.hpp"
+#include "SFML/Graphics/RectangleShape.hpp"
 
 class FloorGenerator
 {
@@ -17,21 +19,27 @@ class FloorGenerator
 
 public:
     FloorGenerator() = default;
-    void generateFloor(int h, int w);
+    void generateFloor(const int height, const int width, const int64_t seed);
     void generateMainPath(const int mainPathLen) { m_generator.generateMainPath(mainPathLen); }
     void generateSidePath(const DungeonGenerator::sidePathConfig& path) { m_generator.generateSidePath(path); }
     void makeLockAndKey() { m_generator.makeLockAndKey(); }
     bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
+    void setFloorID(const int id) { m_floorID = id; }
 
     std::unordered_map<glm::ivec2, Room> getFloor(bool generate);
     glm::ivec2 getStartingRoom() const { return m_generator.getStartingRoom(); }
+    glm::ivec2 getEndingRoom() const { return m_generator.getEndingRoom(); }
+    static void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangles,
+                                 std::vector<sf::Text>& texts);
+    glm::ivec2 getBossRoom() const { return m_generator.getBossRoom(); }
 
 private:
-    std::vector<GameType::MapInfo> getMapInfo();
+    std::vector<GameType::MapInfo> getMapInfo() const;
     static void checkSingleFile(const std::filesystem::directory_entry& entry, std::vector<GameType::MapInfo>& mapInfo);
 
     DungeonGenerator m_generator{};
     std::unordered_map<glm::ivec2, Room> m_floorMap{};
+    int m_floorID{0};
 
     /* This code will be used to show minimap of the dungeon
     void previevGenerator(sf::Font& font, std::vector<sf::RectangleShape>& rectangles, std::vector<sf::Text>& texts)

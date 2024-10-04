@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include "AnimationFrame.h"
@@ -15,16 +14,23 @@ struct ObjectProperty
 struct Collision
 {
     int id{};
-    double x{};
-    double y{};
-    double width{};
-    double height{};
+    float x{};
+    float y{};
+    float width{16};
+    float height{16};
     std::vector<ObjectProperty> properties;
+
+    // Equality operator
+    bool operator==(const Collision& other) const
+    {
+        return x == other.x && y == other.y && width == other.width && height == other.height;
+    }
 };
 
 struct Tile
 {
     int id;
+    std::vector<ObjectProperty> properties;
     std::vector<AnimationFrame> animation;
     std::vector<Collision> objects;
 };

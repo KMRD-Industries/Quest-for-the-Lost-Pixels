@@ -8,27 +8,44 @@
 #include "AnimationComponent.h"
 #include "AnimationFrame.h"
 #include "AtlasComponents/Texture.h"
+#include "GameTypes.h"
 #include "System.h"
 #include "Tileset.h"
 
 class TextureSystem : public System
 {
-private:
-    std::vector<std::string> texture_files{"CosmicLilac", "Decorative",    "DungeonWalls", "Jungle",
-                                           "Graveyard",   "SpecialBlocks", "AnimSlimes",   "Characters"};
-    std::unordered_map<std::string, sf::Texture> textures;
-    std::unordered_map<long, sf::IntRect> texture_map;
-    std::unordered_map<std::string, long> texture_indexes;
-    std::unordered_map<long, std::vector<AnimationFrame>> map_animations;
-    std::unordered_map<long, Collision> map_collisions;
-    long no_textures = 0;
+    std::unordered_set<std::string> m_setTextureFiles{"Items",      "CosmicLilac", "Decorative",    "DungeonWalls",
+                                                      "Jungle",     "Graveyard",   "SpecialBlocks", "AnimSlimes",
+                                                      "Characters", "Weapons",     "CosmicLegacy",  "Portal"};
+
+    //------------------------------------------
+    std::unordered_map<std::string, sf::Texture> m_mapTextures;
+    std::unordered_map<std::string, sf::Texture> m_mapTexturesWithColorSchemeApplied;
+
+    std::unordered_map<long, sf::IntRect> m_mapTextureRects;
+    std::unordered_map<std::string, long> m_mapTextureIndexes;
+    std::unordered_map<long, std::vector<AnimationFrame>> m_mapAnimations;
+    std::unordered_map<long, Collision> m_mapCollisions;
+    std::string m_currentBackgroundColor = "#331541";
+    std::unordered_map<long, Collision> m_mapWeaponPlacements;
+    long m_lNoTextures = 0;
+
+    void loadTilesIntoSystem(const Tileset &, long &);
+    void loadAnimationsAndCollisionsIntoSystem(const Tileset &, const long &firstGid);
 
 public:
-    int loadFromFile(const std::string&);
+    TextureSystem() { init(); }
+    int loadFromFile(const std::string &);
+    long initializeTileSet(const Tileset &);
     void loadTexturesFromFiles();
     void loadTextures();
+    void init();
+    void update();
 
-    sf::Sprite getTile(const std::string&, const long);
-    std::vector<AnimationFrame> getAnimations(const std::string&, const long);
-    Collision getCollision(const std::string& tileset_name, long id);
+    sf::Sprite getTile(const std::string &, long) const;
+    std::vector<AnimationFrame> getAnimations(const std::string &, long);
+    Collision getCollision(const std::string &, long);
+    void modifyColorScheme(int);
+    std::string getBackgroundColor();
+    std::vector<std::pair<int, GameType::WeaponType>> m_weaponsIDs;
 };

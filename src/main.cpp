@@ -1,16 +1,16 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <TextureSystem.h>
 #include <imgui-SFML.h>
-
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
-#include "Paths.h"
 #include "RenderSystem.h"
 #include "SpawnerSystem.h"
+#include "TextTagSystem.h"
 #include "Timer.h"
 
 Coordinator gCoordinator;
@@ -22,11 +22,16 @@ void handleInput(sf::RenderWindow& window)
 
     while (window.pollEvent(event))
     {
-        ImGui::SFML::ProcessEvent(event);
+        ImGui::SFML::ProcessEvent(window, event);
 
         if (event.type == sf::Event::KeyPressed)
         {
             const auto keyCode = event.key.code;
+            InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+        }
+        else if (event.type == sf::Event::MouseButtonPressed)
+        {
+            const auto keyCode = event.mouseButton.button;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
         }
         else if (event.type == sf::Event::KeyReleased)
@@ -34,65 +39,68 @@ void handleInput(sf::RenderWindow& window)
             const auto keyCode = event.key.code;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
         }
-        else if (event.type == sf::Event::MouseMoved && config::debugMode)
+        else if (event.type == sf::Event::MouseButtonReleased)
         {
-            sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-//            std::cout << "Pozycja myszki: x=" << mousePosition.x << " y=" << mousePosition.y << std::endl;
+            const auto keyCode = event.mouseButton.button;
+            InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
         }
-        if (event.type == sf::Event::Closed)
+        else if (event.type == sf::Event::MouseMoved)
         {
-            window.close();
+            const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+            InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
-        // std::cout << 1 / timer->DeltaTime() << std::endl;
+        if (event.type == sf::Event::Closed) window.close();
     }
 }
 
 sf::Color hexStringToSfmlColor(const std::string& hexColor)
 {
-    std::string hex = (hexColor[0] == '#') ? hexColor.substr(1) : hexColor;
+    const std::string& hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
 
     std::istringstream iss(hex);
     int rgbValue = 0;
     iss >> std::hex >> rgbValue;
 
-    const int red = (rgbValue >> 16) & 0xFF;
-    const int green = (rgbValue >> 8) & 0xFF;
-    const int blue = rgbValue & 0xFF;
+    const uint8 red = rgbValue >> 16 & 0xFF;
+    const uint8 green = rgbValue >> 8 & 0xFF;
+    const uint8 blue = rgbValue & 0xFF;
 
-    return sf::Color(red, green, blue);
+    return {red, green, blue};
 }
 
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Quest for the lost pixels!");
+    sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!");
     Timer* timer = Timer::Instance();
 
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(config::frameCycle * (config::debugMode ? 100 : 1));
 
     sf::Clock deltaClock;
     Game game;
     game.init();
 
-    sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
+    RenderSystem* m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
+    TextTagSystem* m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
+    TextureSystem* m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
 
     while (window.isOpen())
     {
+        sf::Time deltaTime = deltaClock.restart();
+        window.clear(hexStringToSfmlColor(m_textureSystem->getBackgroundColor()));
+        ImGui::SFML::Update(window, deltaTime);
         timer->Tick();
         timer->Reset();
-        // Clear the window before drawing
-        window.clear(customColor);
 
-        game.update();
-        game.draw();
+        game.update(deltaTime.asSeconds());
         game.handleCollision();
-        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
+        game.draw();
 
-
-        ImGui::SFML::Update(window, deltaClock.restart());
+        m_renderSystem->draw(window);
+        m_textTagSystem->render(window);
 
         ImGui::SFML::Render(window);
         window.display();

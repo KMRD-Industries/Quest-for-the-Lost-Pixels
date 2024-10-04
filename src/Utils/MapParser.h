@@ -1,6 +1,8 @@
 #pragma once
 
 #include <fstream>
+#include <iostream>
+
 #include "Map.h"
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -60,7 +62,7 @@ void from_json(const json& json, Map& map)
     for (const auto& [key, value] : json.at("tilesets").items())
     {
         long first_gid = value.at("firstgid").get<int>();
-        std::string source = value.at("source").get<std::string>();
+        const std::string source = value.at("source").get<std::string>();
         map.tilesets.emplace(extractFileName(source, "/", "."), first_gid);
     }
 }
@@ -73,12 +75,11 @@ Map parseMap(const std::string& path)
         std::ifstream jsonFile(path);
 
         jsonFile >> parsed_file;
-        Map map = parsed_file.get<Map>();
-
-        return map;
+        return parsed_file.get<Map>();
     }
     catch (...)
     {
         std::cerr << "Caught an unknown exception" << '\n';
+        return {};
     }
 }

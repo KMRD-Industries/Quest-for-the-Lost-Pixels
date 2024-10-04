@@ -1,18 +1,19 @@
+#pragma once
 #include "AnimationComponent.h"
 #include "Coordinator.h"
+#include "TileComponent.h"
 
 extern Coordinator gCoordinator;
 
 class AnimationSystem : public System
 {
 public:
-    void updateFrames();
-    void updateFrameTime();
-    void updateEntityAnimation(const Entity) const;
-    static int calculateFrameDuration(const AnimationComponent&);
-    bool isTimeForNextFrame(const int frameDuration) const;
-    static void loadNextFrame(const Entity, AnimationComponent&);
+    AnimationSystem();
+    void init();
+    void update(float timeStep) const;
+    void updateEntityAnimationFrame(AnimationComponent&, TileComponent&, float) const;
+    void loadNextFrame(AnimationComponent&, TileComponent&) const;
 
 private:
-    long frame_time{};
+    float m_frameTime{};
 };
