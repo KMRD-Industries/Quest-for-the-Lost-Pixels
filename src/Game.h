@@ -21,20 +21,23 @@
 #include "TravellingSystem.h"
 #include "WeaponsSystem.h"
 
-class Game
-{
+class Game {
 public:
     void init();
+
     void draw();
-    void update(float deltaTime);
-    void handleCollision();
-    std::string getBackground();
+
+    void update(const float &deltaTime);
+
+    void handleCollision(const float &deltaTime) const;
+
+    sf::Color getBackground();
 
 private:
     Dungeon m_dungeon;
 
-    CollisionSystem* m_collisionSystem;
-    RenderSystem* m_renderSystem;
-    ObjectCreatorSystem* m_objectCreatorSystem;
-    FightSystem* m_fightSystem;
+    CollisionSystem *m_collisionSystem;
+    RenderSystem *m_renderSystem;
+    ObjectCreatorSystem *m_objectCreatorSystem;
+    FightSystem *m_fightSystem;
 };

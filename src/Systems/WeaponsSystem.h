@@ -4,19 +4,22 @@
 #include "System.h"
 #include "WeaponComponent.h"
 
-class WeaponSystem : public System
-{
+class WeaponSystem : public System {
 public:
-    void init();
-    void update();
-    void markClosest();
-    void displayStats(Entity);
-    void input(Entity);
-    void deleteItems();
+    void update(const float &deltaTime);
+
+    void performFixedUpdate();
+
+    void deleteItems() const;
 
 private:
     void updateWeaponAngle(Entity);
+
     void updateStartingAngle(Entity);
+
     void setAngle(Entity);
+
     void rotateWeapon(Entity, bool);
+
+    float m_frameTime{};
 };

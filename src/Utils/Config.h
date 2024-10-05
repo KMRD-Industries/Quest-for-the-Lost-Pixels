@@ -16,14 +16,15 @@
 #include "Tileset.h"
 #include "Types.h"
 
-namespace config
-{
+namespace config {
     static constexpr bool debugMode{true};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};
     static constexpr float tileHeight{16.f};
     static constexpr float oneFrameTime{1 / 60.f};
+    static constexpr float oneFrameTimeMs{1000.0f / 60.f};
+
     static constexpr int frameCycle{60};
     static constexpr int maximumNumberOfLayers{10};
     static constexpr float playerAttackRange{1000.f};
@@ -98,26 +99,23 @@ namespace config
     static constexpr int MAX_LEFT_FACING_ANGLE = 420;
 
     // Color balance structure
-    struct ColorBalance
-    {
+    struct ColorBalance {
         int redBalance{0};
         int greenBalance{0};
         int blueBalance{0};
     };
 
     // Function to convert floor ID to color string
-    static std::string colorToString(int floorID)
-    {
-        switch (floorID)
-        {
-        case 0:
-            return "#331541";
-        case 1:
-            return "#18215d";
-        case 2:
-            return "#25392e";
-        default:
-            return backgroundColor;
+    static std::string colorToString(int floorID) {
+        switch (floorID) {
+            case 0:
+                return "#331541";
+            case 1:
+                return "#18215d";
+            case 2:
+                return "#25392e";
+            default:
+                return backgroundColor;
         }
     }
 
@@ -127,18 +125,17 @@ namespace config
     static const std::unordered_map<long, long> m_mapDungeonLevelToFloorInfo{{1, 1}, {2, 1}, {3, 1}, {4, 2}, {5, 2}};
 
     static const std::unordered_map<long, ColorBalance> m_mapColorScheme{
-        {1, {25, 0, 0}}, {2, {0, 25, 0}}, {3, {0, 15, 15}}, {4, {45, 6, 35}}, {5, {15, 62, 35}}};
+        {1, {25, 0, 0}}, {2, {0, 25, 0}}, {3, {0, 15, 15}}, {4, {45, 6, 35}}, {5, {15, 62, 35}}
+    };
 
 
-    enum class SpecialRoomTypes
-    {
+    enum class SpecialRoomTypes {
         NormalRoom,
         SpawnRoom,
         BossRoom
     };
 
-    struct EnemyConfig
-    {
+    struct EnemyConfig {
         const std::string name{};
         const float hp{};
         const float damage{};
@@ -146,37 +143,47 @@ namespace config
         const Collision collisionData{};
     };
 
-    const std::unordered_map<SpecialRoomTypes, char> prefixesForSpecialRooms{{SpecialRoomTypes::SpawnRoom, 's'},
-                                                                             {SpecialRoomTypes::BossRoom, 'b'}};
-
-    const std::unordered_multimap<Enemies::EnemyType, EnemyConfig> enemyData{
-        {Enemies::EnemyType::MELEE,
-         {.name = "Slime",
-          .hp = 20.f,
-          .damage = 5.f,
-          .textureData{18, "AnimSlimes", 4},
-          .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
-        {Enemies::EnemyType::BOSS,
-         {.name = "Boss",
-          .hp = 200.f,
-          .damage = 30.f,
-          .textureData{54, "AnimSlimes", 4},
-          .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}}},
+    const std::unordered_map<SpecialRoomTypes, char> prefixesForSpecialRooms{
+        {SpecialRoomTypes::SpawnRoom, 's'},
+        {SpecialRoomTypes::BossRoom, 'b'}
     };
 
-    struct ItemConfig
-    {
+    const std::unordered_multimap<Enemies::EnemyType, EnemyConfig> enemyData{
+        {
+            Enemies::EnemyType::MELEE,
+            {
+                .name = "Slime",
+                .hp = 20.f,
+                .damage = 5.f,
+                .textureData{18, "AnimSlimes", 4},
+                .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}
+            }
+        },
+        {
+            Enemies::EnemyType::BOSS,
+            {
+                .name = "Boss",
+                .hp = 200.f,
+                .damage = 30.f,
+                .textureData{54, "AnimSlimes", 4},
+                .collisionData{1, 8.5625, 13.24865, 16.375, 8.5227000004}
+            }
+        },
+    };
+
+    struct ItemConfig {
         const std::string name{};
         const float value{};
         const Items::Behaviours behaviour{};
         const TileComponent textureData{};
     };
 
-    const std::vector<ItemConfig> itemsData{{"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
-                                            {"DMGPotion", 2.f, Items::Behaviours::DMGUP, {693, "Items", 4}}};
+    const std::vector<ItemConfig> itemsData{
+        {"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
+        {"DMGPotion", 2.f, Items::Behaviours::DMGUP, {693, "Items", 4}}
+    };
 
-    enum _entityCategory
-    {
+    enum _entityCategory {
         BOUNDARY = 0x0001,
         PLAYER = 0x0002,
         DOOR = 0x0003,
@@ -188,7 +195,8 @@ namespace config
 
     inline std::unordered_map<std::string, _entityCategory> categoriesLookup{
         {"Wall", BOUNDARY}, {"Bullet", BULLET}, {"Enemy", ENEMY}, {"Passage", PASSAGE},
-        {"Item", ITEM},     {"Player", PLAYER}, {"Door", DOOR}};
+        {"Item", ITEM}, {"Player", PLAYER}, {"Door", DOOR}
+    };
 
     inline std::unordered_map<std::string, uint16> bitMaskLookup{
         {"Wall", BOUNDARY | PLAYER | ENEMY | BULLET | ITEM}, // Wall collides with everything
@@ -200,8 +208,7 @@ namespace config
         {"Door", BOUNDARY | PLAYER} // Door collides with walls and players
     };
 
-    inline uint16 stringToCategoryBits(const std::string& str)
-    {
+    inline uint16 stringToCategoryBits(const std::string &str) {
         if (categoriesLookup.contains(str)) return categoriesLookup[str];
 
         if (std::regex_match(str, playerRegexTag)) return categoriesLookup["Player"];
@@ -211,8 +218,7 @@ namespace config
         return 0x0000;
     }
 
-    inline uint16 stringToMaskBits(const std::string& str)
-    {
+    inline uint16 stringToMaskBits(const std::string &str) {
         if (bitMaskLookup.contains(str)) return bitMaskLookup[str];
 
         if (std::regex_match(str, playerRegexTag)) return bitMaskLookup["Player"];
@@ -222,11 +228,8 @@ namespace config
         return 0x0000;
     }
 
-    inline int16 stringToIndexGroup(const std::string& str)
-    {
+    inline int16 stringToIndexGroup(const std::string &str) {
         if (str == "Bullet") return -8;
         return 0;
     }
-
-
 } // namespace config
