@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <variant>
 #include "Helpers.h"
+#include "SFML/Window/Event.hpp"
 #include "SFML/Window/Keyboard.hpp"
 #include "SFML/Window/Mouse.hpp"
 
@@ -47,6 +48,7 @@ class InputHandler
 
     inline static InputHandler* m_instance{};
     sf::Vector2f m_mousePosition{};
+    sf::Vector2u m_windowSize{};
     InputHandler() = default;
 
 public:
@@ -60,9 +62,11 @@ public:
     };
     [[nodiscard]] bool isHeld(InputType input) const;
     [[nodiscard]] bool isPressed(InputType input) const;
-    sf::Vector2f getMousePosition() const;
+    [[nodiscard]] const sf::Vector2f& getMousePosition() const;
+    [[nodiscard]] const sf::Vector2u& getWindowSize() const;
     void handleKeyboardInput(const InputKey&, const bool&);
     void updateMousePosition(const sf::Vector2f&);
+    void updateWindowSize(const sf::Vector2u&);
     void clearPressedInputs();
     void update();
 

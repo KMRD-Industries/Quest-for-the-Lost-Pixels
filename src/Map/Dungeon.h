@@ -36,7 +36,7 @@ class Dungeon
 public:
     Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
-    void setupWeaponEntity(Entity player) const;
+    void setupWeaponEntity(Entity player, int id) const;
     void init();
     void addPlayerComponents(Entity player);
     void setupPlayerCollision(Entity player);

@@ -5,10 +5,10 @@
 #include <SFML/System/Vector3.hpp>
 #include <boost/asio.hpp>
 #include <comm.pb.h>
+#include <glm/ext/vector_int2.hpp>
 
 #include "System.h"
 #include "Types.h"
-#include "glm/ext/vector_int2.hpp"
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
@@ -29,9 +29,10 @@ private:
     int m_prefix_size{};
     std::vector<char> m_prefix_buf{};
     comm::BytePrefix m_prefix{};
-    comm::PositionUpdate m_position{};
+    comm::MovementUpdate m_incomming_movement{};
+    comm::MovementUpdate m_outgoing_movement{};
     comm::StateUpdate m_state{};
-    std::unordered_map<std::uint32_t, Entity> m_entity_map{};
+    std::unordered_map<uint32_t, Entity> m_entity_map{};
 
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};

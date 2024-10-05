@@ -28,16 +28,16 @@ void FightSystem::update()
 
         switch (weaponComponent.type)
         {
-        case GameType::WeaponType::MELE:
-            handleMeleAttack(eventEntity);
+        case GameType::WeaponType::MELEE:
+            handleMeleeAttack(eventEntity);
             break;
         case GameType::WeaponType::WAND:
             // TODO: Wand attack support
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         case GameType::WeaponType::BOW:
             // TODO: Bow attack support
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         default:
             break;
@@ -49,7 +49,7 @@ void FightSystem::update()
 
 void FightSystem::handleBowAttack(Entity) {}
 
-void FightSystem::handleMeleAttack(Entity eventEntity)
+void FightSystem::handleMeleeAttack(Entity eventEntity)
 {
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventEntity);
     const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);

@@ -90,7 +90,7 @@ void Dungeon::init()
 
     addPlayerComponents(m_entities[m_id]);
     setupPlayerCollision(m_entities[m_id]);
-    setupWeaponEntity(m_entities[m_id]);
+    setupWeaponEntity(m_entities[m_id], 19);
 }
 
 
@@ -127,6 +127,8 @@ void Dungeon::createRemotePlayer(const uint32_t id)
     gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = config::defaultCharacterHP});
     gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
     gCoordinator.addComponent(m_entities[id], ColliderComponent{});
+    gCoordinator.addComponent(m_entities[id], InventoryComponent{});
+    gCoordinator.addComponent(m_entities[id], EquippedWeaponComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
@@ -138,6 +140,7 @@ void Dungeon::createRemotePlayer(const uint32_t id)
 
     gCoordinator.addComponent(entity, newEvent);
 
+    setupWeaponEntity(m_entities[id], 20);
 
     m_multiplayerSystem->entityConnected(id, m_entities[id]);
 }
@@ -190,11 +193,11 @@ void Dungeon::setupPlayerCollision(const Entity player)
     gCoordinator.addComponent(entity, newEvent);
 }
 
-void Dungeon::setupWeaponEntity(const Entity player) const
+void Dungeon::setupWeaponEntity(const Entity player, const int id) const
 {
     const Entity weaponEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19});
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = id});
     gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
@@ -321,7 +324,8 @@ void Dungeon::moveDownDungeon()
 
     m_roomListenerSystem->reset();
 
-    if (m_multiplayerSystem->isInsideInitialRoom(false)) m_multiplayerSystem->roomChanged(m_currentPlayerPos);
+    if (m_multiplayerSystem->isConnected() && m_multiplayerSystem->isInsideInitialRoom(false))
+        m_multiplayerSystem->roomChanged(m_currentPlayerPos);
 }
 
 inline void Dungeon::loadMap(const std::string& path) const

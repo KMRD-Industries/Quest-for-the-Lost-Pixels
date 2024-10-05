@@ -9,12 +9,14 @@
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
+#include "EquippedWeaponComponent.h"
 #include "Helpers.h"
+#include "InputHandler.h"
 #include "MultiplayerSystem.h"
-#include "SFML/System/Vector3.hpp"
 #include "TransformComponent.h"
 #include "Types.h"
 
+#include "WeaponComponent.h"
 #include "boost/system/system_error.hpp"
 
 extern Coordinator gCoordinator;
@@ -53,11 +55,9 @@ void MultiplayerSystem::setup(const std::string_view& ip, const std::string_view
     m_connected = true;
     m_last_tick = sysClock::now();
 
-    auto r1 = new comm::Room();
-    m_state.set_allocated_room(r1);
-
-    auto r2 = new comm::Room();
-    m_position.set_allocated_curr_room(r2);
+    m_state.set_allocated_room(new comm::Room());
+    m_outgoing_movement.set_allocated_curr_room(new comm::Room());
+    m_incomming_movement.set_allocated_curr_room(new comm::Room());
 
     comm::BytePrefix prefixDummy;
     prefixDummy.set_bytes(1);
@@ -74,10 +74,10 @@ void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
     r1->set_y(room.y);
     m_state.set_allocated_room(r1);
 
-    auto r2 = m_position.release_curr_room();
+    auto r2 = m_outgoing_movement.release_curr_room();
     r2->set_x(room.x);
     r2->set_y(room.y);
-    m_position.set_allocated_curr_room(r2);
+    m_outgoing_movement.set_allocated_curr_room(r2);
 }
 
 glm::ivec2& MultiplayerSystem::getRoom() noexcept { return m_current_room; }
@@ -163,19 +163,31 @@ void MultiplayerSystem::update()
     if (available > 0)
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
-        m_position.ParseFromArray(&m_buf, int(received));
-        std::uint32_t id = m_position.entity_id();
-        auto r = m_position.curr_room();
+        m_incomming_movement.ParseFromArray(&m_buf, int(received));
+        uint32_t id = m_incomming_movement.entity_id();
+        auto r = m_incomming_movement.curr_room();
 
-        if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
+        // if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
+        if (m_entity_map.contains(id))
         {
             Entity& target = m_entity_map[id];
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
 
-            float x = m_position.x();
-            float y = m_position.y();
-            float r = m_position.direction();
+            if (const auto equippedWeapon = gCoordinator.tryGetComponent<EquippedWeaponComponent>(target))
+            {
+                auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon->currentWeapon);
+                const auto& windowSize = InputHandler::getInstance()->getWindowSize();
+
+                weaponComponent.pivotPoint.x = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
+                weaponComponent.pivotPoint.y = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
+
+                weaponComponent.isAttacking = m_incomming_movement.attack();
+            }
+
+            float x = m_incomming_movement.position_x();
+            float y = m_incomming_movement.position_y();
+            float r = m_incomming_movement.direction();
 
             transformComponent.position.x = x;
             transformComponent.position.y = y;
@@ -185,23 +197,27 @@ void MultiplayerSystem::update()
         }
     }
 
-    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
-
     auto tick = sysClock::now();
     if (!readyToTick(m_last_tick, tick)) return;
-
-    sf::Vector3<float> next = {transformComponent.position.x, transformComponent.position.y,
-                               transformComponent.scale.x};
-    if (m_last_sent == next) return;
-
     m_last_tick = tick;
-    m_last_sent = next;
-    m_position.set_entity_id(m_player_id);
-    m_position.set_x(next.x);
-    m_position.set_y(next.y);
-    m_position.set_direction(next.z);
 
-    auto serialized = m_position.SerializeAsString();
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
+    const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(m_player_entity);
+    const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
+
+    const auto& windowSize = InputHandler::getInstance()->getWindowSize();
+    float scaledPivotX = weaponComponent.pivotPoint.x / static_cast<float>(windowSize.x);
+    float scaledPivotY = weaponComponent.pivotPoint.y / static_cast<float>(windowSize.y);
+
+    m_outgoing_movement.set_entity_id(m_player_id);
+    m_outgoing_movement.set_position_x(transformComponent.position.x);
+    m_outgoing_movement.set_position_y(transformComponent.position.y);
+    m_outgoing_movement.set_weapon_pivot_x(scaledPivotX);
+    m_outgoing_movement.set_weapon_pivot_y(scaledPivotY);
+    m_outgoing_movement.set_direction(transformComponent.scale.x);
+    m_outgoing_movement.set_attack(weaponComponent.isAttacking);
+
+    auto serialized = m_outgoing_movement.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
 }
 
@@ -209,7 +225,8 @@ void MultiplayerSystem::disconnect()
 {
     if (!m_connected) return;
     delete m_state.release_room();
-    delete m_position.release_curr_room();
+    delete m_incomming_movement.release_curr_room();
+    delete m_outgoing_movement.release_curr_room();
     m_tcp_socket.close();
     m_udp_socket.close();
 }

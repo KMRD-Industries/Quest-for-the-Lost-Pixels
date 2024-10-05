@@ -101,43 +101,49 @@ void RenderSystem::draw(sf::RenderWindow& window)
 
 void RenderSystem::setWeapon()
 {
-    if (const auto equippedWeaponComponent = gCoordinator.tryGetComponent<EquippedWeaponComponent>(config::playerEntity))
+    for (const Entity playerEntity : m_entities)
     {
-        const Entity weaponEntity = equippedWeaponComponent->currentWeapon;
+        if ((gCoordinator.hasComponent<PlayerComponent>(playerEntity) ||
+             gCoordinator.hasComponent<MultiplayerComponent>(playerEntity)) &&
+            gCoordinator.hasComponent<EquippedWeaponComponent>(playerEntity))
+        {
+            const auto& equippedWeaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(playerEntity);
+            const Entity weaponEntity = equippedWeaponComponent.currentWeapon;
 
-        const auto& playerRenderComponent   = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
-        const auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(config::playerEntity);
-        auto& weaponColliderComponent       = gCoordinator.getComponent<ColliderComponent>(weaponEntity);
-        auto& weaponRenderComponent         = gCoordinator.getComponent<RenderComponent>(weaponEntity);
-        auto& weaponComponent               = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
-        auto& weaponTransformComponent      = gCoordinator.getComponent<TransformComponent>(weaponEntity);
+            const auto& playerRenderComponent = gCoordinator.getComponent<RenderComponent>(playerEntity);
+            const auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(playerEntity);
+            auto& weaponColliderComponent = gCoordinator.getComponent<ColliderComponent>(weaponEntity);
+            auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
+            auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
+            auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
 
-        const auto originXWeapon        = weaponColliderComponent.specialCollision.x;
-        const auto originYWeapon        = weaponColliderComponent.specialCollision.y;
-        const auto originXPlayer        = playerColliderComponent.specialCollision.x;
-        const auto originYPlayer        = playerColliderComponent.specialCollision.y;
+            const auto originXWeapon = weaponColliderComponent.specialCollision.x;
+            const auto originYWeapon = weaponColliderComponent.specialCollision.y;
+            const auto originXPlayer = playerColliderComponent.specialCollision.x;
+            const auto originYPlayer = playerColliderComponent.specialCollision.y;
 
-        // Set Weapon Sprite origin in WeaponPlacement component.
-        weaponRenderComponent.sprite.setOrigin(originXWeapon, originYWeapon);
+            // Set Weapon Sprite origin in WeaponPlacement component.
+            weaponRenderComponent.sprite.setOrigin(originXWeapon, originYWeapon);
 
-        // Adjust the weapon's display position based on the relative positions of player and weapon colliders
-        // The WeaponPlacement object (object from Tiled) helps in aligning the weapon correctly with the player's
-        // sprite
-        sf::Vector2f weaponPlacement = {};
-        weaponPlacement.x += (originXWeapon - originXPlayer) * config::gameScale;
-        weaponPlacement.y += (originYWeapon - originYPlayer) * config::gameScale;
+            // Adjust the weapon's display position based on the relative positions of player and weapon colliders
+            // The WeaponPlacement object (object from Tiled) helps in aligning the weapon correctly with the player's
+            // sprite
+            sf::Vector2f weaponPlacement = {};
+            weaponPlacement.x += (originXWeapon - originXPlayer) * config::gameScale;
+            weaponPlacement.y += (originYWeapon - originYPlayer) * config::gameScale;
 
-        // Calculate the weapon's position relative to the player's sprite and game scale
-        sf::Vector2f weaponPosition{};
-        weaponPosition.x = playerRenderComponent.sprite.getGlobalBounds().left + originXWeapon * config::gameScale;
-        weaponPosition.y = playerRenderComponent.sprite.getGlobalBounds().top + originYWeapon * config::gameScale;
+            // Calculate the weapon's position relative to the player's sprite and game scale
+            sf::Vector2f weaponPosition{};
+            weaponPosition.x = playerRenderComponent.sprite.getGlobalBounds().left + originXWeapon * config::gameScale;
+            weaponPosition.y = playerRenderComponent.sprite.getGlobalBounds().top + originYWeapon * config::gameScale;
 
-        // Update the weapon sprite's position and scale according to the transform component and game scale
-        weaponTransformComponent.position = weaponPosition - weaponPlacement;
-        weaponTransformComponent.rotation = weaponComponent.currentAngle;
+            // Update the weapon sprite's position and scale according to the transform component and game scale
+            weaponTransformComponent.position = weaponPosition - weaponPlacement;
+            weaponTransformComponent.rotation = weaponComponent.currentAngle;
 
-        weaponRenderComponent.sprite.setPosition(weaponTransformComponent.position);
-        weaponRenderComponent.sprite.setRotation(weaponTransformComponent.rotation);
+            weaponRenderComponent.sprite.setPosition(weaponTransformComponent.position);
+            weaponRenderComponent.sprite.setRotation(weaponTransformComponent.rotation);
+        }
     }
 }
 
@@ -391,13 +397,15 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
             displayPlayerStatsTable(window, entity);
         }
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) &&
+        if ((gCoordinator.hasComponent<PlayerComponent>(entity) ||
+             gCoordinator.hasComponent<MultiplayerComponent>(entity)) &&
             gCoordinator.hasComponent<EquippedWeaponComponent>(entity))
         {
-            auto& weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+            const auto& weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+            const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
             sf::VertexArray swordLine(sf::Lines, 2);
-            swordLine[0].position = center;
+            swordLine[0].position = transformComponent.position + GameUtility::mapOffset;
             swordLine[0].color = sf::Color::Red;
             swordLine[1].position =
                 gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon).pivotPoint;
