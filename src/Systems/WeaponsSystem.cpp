@@ -3,7 +3,7 @@
 #include <cmath>
 #include "AnimationSystem.h"
 #include "ColliderComponent.h"
-#include "EquippedWeaponComponent.h"
+#include "EquipmentComponent.h"
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
@@ -34,12 +34,10 @@ void WeaponSystem::deleteItems() const {
     std::deque<Entity> entityToRemove;
 
     for (const auto entity: m_entities) {
-        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == false) {
-            if (gCoordinator.hasComponent<ColliderComponent>(entity))
-                gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
-            else
-                entityToRemove.push_back(entity);
-        }
+        if (gCoordinator.hasComponent<ColliderComponent>(entity))
+            gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
+        else
+            entityToRemove.push_back(entity);
     }
 
     for (const auto entity: entityToRemove) gCoordinator.destroyEntity(entity);

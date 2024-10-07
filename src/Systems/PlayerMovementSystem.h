@@ -10,6 +10,9 @@ class PlayerMovementSystem : public System
 public:
     void init();
     void update(float);
+
+    void handleSpecialKeys();
+
     PlayerMovementSystem();
 
 private:

@@ -1,8 +1,7 @@
 #pragma once
 #include "Config.h"
 
-struct WeaponComponent
-{
+struct WeaponComponent {
     int id{};
     int damageAmount{config::weaponComponentDefaultDamageAmount};
     bool isAttacking{config::weaponComponentDefaultIsAttacking};
@@ -23,6 +22,5 @@ struct WeaponComponent
     sf::Vector2f pivotPoint{};
     sf::Vector2f targetPoint{};
     float targetAngleDegrees{};
-    bool equipped{false};
     GameType::WeaponType type{GameType::WeaponType::MELE};
 };

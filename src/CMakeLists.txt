@@ -49,14 +49,15 @@ set(COMPONENTS
         Components/EnemyComponent.h
         Components/WeaponComponent.h
         Components/InventoryComponent.h
-        Components/EquippedWeaponComponent.h
+        Components/EquipmentComponent.h
         Components/TextTagComponent.h
         Components/PassageComponent.h
         Components/FloorComponent.h
         Components/CreateBodyWithCollisionEvent.h
         Components/FightActionEvent.h
-        Components/EquippedHelmetComponent.h
         Components/HelmetComponent.h
+        Components/PotionComponent.h
+        Components/BodyArmourComponent.h
 )
 
 set(MAP
@@ -106,8 +107,6 @@ set(SYSTEMS
         Systems/WeaponsSystem.h
         Systems/InventorySystem.cpp
         Systems/InventorySystem.h
-        Systems/EquipWeaponSystem.cpp
-        Systems/EquipWeaponSystem.h
         Systems/TextTagSystem.cpp
         Systems/TextTagSystem.h
         Systems/PassageSystem.cpp

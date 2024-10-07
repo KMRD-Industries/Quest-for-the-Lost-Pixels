@@ -1,6 +1,5 @@
 #pragma once
 
-struct HelmetComponent
-{
+struct BodyArmourComponent {
     int id{};
 };

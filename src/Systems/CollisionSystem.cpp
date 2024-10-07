@@ -1,11 +1,10 @@
 #include "CollisionSystem.h"
 
+#include "BodyArmourComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
-#include "DoorComponent.h"
 #include "HelmetComponent.h"
-#include "ItemComponent.h"
 #include "MultiplayerSystem.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
@@ -71,7 +70,8 @@ void CollisionSystem::createMapCollision() {
 
         if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
             gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
-            gCoordinator.hasComponent<HelmetComponent>(entity)) {
+            gCoordinator.hasComponent<HelmetComponent>(entity) ||
+            gCoordinator.hasComponent<BodyArmourComponent>(entity)) {
             continue;
         }
 

@@ -165,6 +165,28 @@
                      "width":1,
                      "x":8,
                      "y":26.5
+                    }, 
+                    {
+                     "height":1,
+                     "id":4,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"185"
+                            }],
+                     "rotation":0,
+                     "type":"BodyArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":25
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -241,6 +263,28 @@
                      "width":1,
                      "x":8,
                      "y":27.5
+                    }, 
+                    {
+                     "height":1,
+                     "id":4,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"186"
+                            }],
+                     "rotation":0,
+                     "type":"BodyArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":27
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -317,6 +361,28 @@
                      "width":1,
                      "x":7,
                      "y":26.5
+                    }, 
+                    {
+                     "height":1,
+                     "id":4,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"187"
+                            }],
+                     "rotation":0,
+                     "type":"BodyArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":25
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -393,6 +459,28 @@
                      "width":1,
                      "x":8,
                      "y":25
+                    }, 
+                    {
+                     "height":1,
+                     "id":4,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"188"
+                            }],
+                     "rotation":0,
+                     "type":"BodyArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":23
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -469,6 +557,28 @@
                      "width":1,
                      "x":8,
                      "y":23.5
+                    }, 
+                    {
+                     "height":1,
+                     "id":4,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"189"
+                            }],
+                     "rotation":0,
+                     "type":"BodyArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":22
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -545,6 +655,28 @@
                      "width":1,
                      "x":8,
                      "y":25.5
+                    }, 
+                    {
+                     "height":1,
+                     "id":4,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"190"
+                            }],
+                     "rotation":0,
+                     "type":"BodyArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":24
                     }],
              "opacity":1,
              "type":"objectgroup",
