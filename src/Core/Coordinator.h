@@ -39,6 +39,12 @@ public:
     }
 
     template<typename T>
+    void addComponentIfNotExists(const Entity entity, const T &component) {
+        if (!hasComponent<T>(entity))
+            addComponent(entity, component);
+    }
+
+    template<typename T>
     void removeComponent(const Entity entity) {
         m_componentManager->removeComponent<T>(entity);
 
