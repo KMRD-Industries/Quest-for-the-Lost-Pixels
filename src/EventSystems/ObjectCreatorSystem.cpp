@@ -5,59 +5,53 @@
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 
-void ObjectCreatorSystem::update()
-{
-    for (const auto entity : m_entities)
-    {
-        const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
+void ObjectCreatorSystem::update() {
+    for (const auto entity: m_entities) {
+        const auto &eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
 
         if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity)) continue;
         if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity)) continue;
         if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity)) continue;
 
-        switch (eventInfo.type)
-        {
-        case GameType::ObjectType::NORMAL:
-            createBasicObject(eventInfo);
-            break;
-        case GameType::ObjectType::BULLET:
-            // TODO: Bullets support
-            createBasicObject(eventInfo);
-            break;
-        default:
-            break;
+        switch (eventInfo.type) {
+            case GameType::ObjectType::NORMAL:
+                createBasicObject(eventInfo);
+                break;
+            case GameType::ObjectType::BULLET:
+                // TODO: Bullets support
+                createBasicObject(eventInfo);
+                break;
+            default:
+                break;
         }
     }
 
     clear();
 }
 
-b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& eventInfo) const
-{
-    const auto& objectRenderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
-    const auto& objectTransformComponent = gCoordinator.getComponent<TransformComponent>(eventInfo.entity);
-    const auto& objectColliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
+
+b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent &eventInfo) const {
+    const auto &objectRenderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
+    const auto &objectTransformComponent = gCoordinator.getComponent<TransformComponent>(eventInfo.entity);
+    const auto &objectColliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
     sf::Vector2f objectPosition{};
     b2BodyDef bodyDef;
     auto spriteBounds = objectRenderComponent.sprite.getGlobalBounds();
 
-    spriteBounds.height = std::min(spriteBounds.height, 16.0f);
-    spriteBounds.width = std::min(spriteBounds.width, 16.0f);
+    spriteBounds.height = std::min(spriteBounds.height, config::tileHeight);
+    spriteBounds.width = std::min(spriteBounds.width, config::tileHeight);
 
     // Calculate position of object
-    if (eventInfo.useTextureSize)
-    {
+    if (eventInfo.useTextureSize) {
         objectPosition.x = convertPixelsToMeters(objectTransformComponent.position.x);
         objectPosition.y = convertPixelsToMeters(objectTransformComponent.position.y);
-    }
-    else
-    {
+    } else {
         // Calculate body position given offset of Collider in sprite aka (collision.x, collision.y)
         const float offsetX = spriteBounds.width / 2.f -
-            (objectColliderComponent.collision.x + objectColliderComponent.collision.width / 2.f);
+                              (objectColliderComponent.collision.x + objectColliderComponent.collision.width / 2.f);
 
         const float offsetY = spriteBounds.height / 2.f -
-            (objectColliderComponent.collision.y + objectColliderComponent.collision.height / 2);
+                              (objectColliderComponent.collision.y + objectColliderComponent.collision.height / 2);
 
         objectPosition.x = convertPixelsToMeters(objectTransformComponent.position.x - offsetX * config::gameScale);
         objectPosition.y = convertPixelsToMeters(objectTransformComponent.position.y - offsetY * config::gameScale);
@@ -70,8 +64,7 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
     return bodyDef;
 }
 
-b2FixtureDef ObjectCreatorSystem::defineFixture(const CreateBodyWithCollisionEvent& eventInfo) const
-{
+b2FixtureDef ObjectCreatorSystem::defineFixture(const CreateBodyWithCollisionEvent &eventInfo) const {
     b2FixtureDef fixtureDef;
 
     // DEFAULT PHYSIC BEHAVIOUR
@@ -87,24 +80,20 @@ b2FixtureDef ObjectCreatorSystem::defineFixture(const CreateBodyWithCollisionEve
     return fixtureDef;
 }
 
-b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEvent& eventInfo) const
-{
-    const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
-    const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
+b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEvent &eventInfo) const {
+    const auto &renderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
+    const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
     auto spriteBounds = renderComponent.sprite.getGlobalBounds();
     b2PolygonShape boxShape;
     sf::Vector2f objectSize{};
 
-    spriteBounds.height = std::min(spriteBounds.height, 16.f);
-    spriteBounds.width = std::min(spriteBounds.width, 16.f);
+    spriteBounds.height = std::min(spriteBounds.height, config::tileHeight);
+    spriteBounds.width = std::min(spriteBounds.width, config::tileHeight);
 
-    if (eventInfo.useTextureSize)
-    {
+    if (eventInfo.useTextureSize) {
         objectSize.x = convertPixelsToMeters(spriteBounds.width * config::gameScale) / 2;
         objectSize.y = convertPixelsToMeters(spriteBounds.height * config::gameScale) / 2;
-    }
-    else
-    {
+    } else {
         objectSize.x = convertPixelsToMeters(colliderComponent.collision.width * config::gameScale) / 2;
         objectSize.y = convertPixelsToMeters(colliderComponent.collision.height * config::gameScale) / 2;
     }
@@ -114,10 +103,9 @@ b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEve
 }
 
 
-void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& eventInfo) const
-{
-    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
-    auto* collisionData = new GameType::CollisionData{.entityID = eventInfo.entity, .tag = eventInfo.tag};
+void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent &eventInfo) const {
+    auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
+    auto *collisionData = new GameType::CollisionData{.entityID = eventInfo.entity, .tag = eventInfo.tag};
 
     // Create all components
     const b2PolygonShape shape = defineShape(eventInfo);
@@ -128,12 +116,12 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
     fixtureDef.shape = &shape;
     bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(collisionData);
 
-    b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
+    b2Body *body = Physics::getWorld()->CreateBody(&bodyDef);
 
     // TODO: Physic!
     if (collisionData->tag != "Item") body->SetFixedRotation(true);
 
-    colliderComponent.fixture = body->CreateFixture(&fixtureDef);
+    body->CreateFixture(&fixtureDef);
     colliderComponent.body = body;
     colliderComponent.onCollisionEnter = eventInfo.onCollisionEnter;
     colliderComponent.onCollisionOut = eventInfo.onCollisionOut;
@@ -141,14 +129,12 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
 }
 
 
-void ObjectCreatorSystem::clear()
-{
+void ObjectCreatorSystem::clear() {
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity : m_entities) entityToRemove.push_back(entity);
+    for (const auto entity: m_entities) entityToRemove.push_back(entity);
 
-    while (!entityToRemove.empty())
-    {
+    while (!entityToRemove.empty()) {
         gCoordinator.destroyEntity(entityToRemove.front());
         entityToRemove.pop_front();
     }

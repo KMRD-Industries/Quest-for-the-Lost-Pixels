@@ -9,34 +9,20 @@
 
 class b2Body;
 
-struct ColliderComponent
-{
-    b2Body* body{nullptr};
-    b2Fixture* fixture{nullptr};
-
+struct ColliderComponent {
+    b2Body *body{nullptr};
     std::string tag{};
     std::function<void(GameType::CollisionData)> onCollisionEnter;
     std::function<void(GameType::CollisionData)> onCollisionOut;
     Collision collision{};
     Collision weaponPlacement{};
     Collision helmetPlacement{};
+    Collision bodyArmourPlacement{};
 
     bool toDestroy{false};
 
     ColliderComponent() = default;
 
-    explicit ColliderComponent(Collision collision) : collision(std::move(collision))
-    {
-        weaponPlacement.height = 0;
-        weaponPlacement.width = 0;
-    }
-
-    explicit ColliderComponent(b2Body* body, std::string tag,
-                               const std::function<void(GameType::CollisionData)>& onCollisionEnter,
-                               const std::function<void(GameType::CollisionData)>& onCollisionOut) :
-        body{body}, tag{std::move(tag)}, onCollisionEnter{onCollisionEnter}, onCollisionOut{onCollisionOut}
-    {
-        weaponPlacement.height = 0;
-        weaponPlacement.width = 0;
+    explicit ColliderComponent(Collision collision) : collision(std::move(collision)) {
     }
 };

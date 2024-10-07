@@ -14,7 +14,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":3,
              "name":"",
              "objects":[
                     {
@@ -114,7 +113,7 @@
                      "visible":true,
                      "width":1,
                      "x":7.5,
-                     "y":7.5
+                     "y":6.5
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -173,8 +172,8 @@
                      "type":"ArmourPlacement",
                      "visible":true,
                      "width":1,
-                     "x":7.5,
-                     "y":8
+                     "x":7.25,
+                     "y":4
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -190,11 +189,70 @@
                 }]
         }, 
         {
-         "id":8,
+         "id":5,
          "objectgroup":
             {
              "draworder":"index",
              "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":9,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"5"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":14,
+                     "x":1,
+                     "y":3
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"5"
+                            }],
+                     "rotation":0,
+                     "type":"ArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":7.5,
+                     "y":4
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"bodyArmour"
+                }]
+        }, 
+        {
+         "id":8,
+         "objectgroup":
+            {
+             "draworder":"index",
              "name":"",
              "objects":[
                     {
@@ -294,7 +352,7 @@
                      "visible":true,
                      "width":1,
                      "x":7.5,
-                     "y":7.5
+                     "y":6.5
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -353,8 +411,8 @@
                      "type":"ArmourPlacement",
                      "visible":true,
                      "width":1,
-                     "x":7.5,
-                     "y":8
+                     "x":7.75,
+                     "y":4
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -367,6 +425,186 @@
                  "name":"type",
                  "type":"string",
                  "value":"helmet"
+                }]
+        }, 
+        {
+         "id":13,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":9,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"13"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":14,
+                     "x":1,
+                     "y":3
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"13"
+                            }],
+                     "rotation":0,
+                     "type":"ArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":7.5,
+                     "y":4
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"bodyArmour"
+                }]
+        }, 
+        {
+         "id":16,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":6,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"16"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":14,
+                     "x":1,
+                     "y":2
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"16"
+                            }],
+                     "rotation":0,
+                     "type":"ArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":2
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"bodyArmour"
+                }]
+        }, 
+        {
+         "id":24,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":6,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"24"
+                            }],
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":14,
+                     "x":1,
+                     "y":2
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"24"
+                            }],
+                     "rotation":0,
+                     "type":"ArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":2
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"type",
+                 "type":"string",
+                 "value":"bodyArmour"
                 }]
         }],
  "tilewidth":16,

@@ -1,11 +1,10 @@
 #pragma once
+#include "Config.h"
 #include "System.h"
 
-class InventorySystem : public System
-{
+class InventorySystem : public System {
 public:
-    void pickUpWeapon(Entity, Entity);
-    void dropWeapon(Entity);
-    void dropItem(Entity);
-    void pickUpItem(Entity player, Entity helmet);
+    void pickUpItem(Entity player, Entity item, config::slotType) const;
+
+    void dropItem(Entity player, Entity item, config::slotType) const;
 };

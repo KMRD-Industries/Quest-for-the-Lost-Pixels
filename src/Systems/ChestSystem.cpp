@@ -2,23 +2,15 @@
 
 #include "AnimationSystem.h"
 #include "ColliderComponent.h"
-#include "HelmetComponent.h"
+#include "ItemComponent.h"
 #include "WeaponComponent.h"
 
-void ChestSystem::deleteItems() const
-{
-    std::vector<Entity> entitiesToKill;
-    entitiesToKill.reserve(m_entities.size());
+void ChestSystem::deleteItems() const {
+    for (const auto entity: m_entities) {
+        if (gCoordinator.getComponent<ItemComponent>(entity).equipped == true) continue;
 
-    for (const auto entity : m_entities)
-    {
-        if (const auto* weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(entity))
-            if (weaponComponent->equipped == true) continue;
-
-        if (const auto* itemComponent = gCoordinator.tryGetComponent<HelmetComponent>(entity))
-            if (itemComponent->equipped == true) continue;
-
-        if (auto* collisionComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+        if (auto *collisionComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity)) {
             collisionComponent->toDestroy = true;
+        }
     }
 }

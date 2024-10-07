@@ -17,7 +17,7 @@
 #include "Types.h"
 
 namespace config {
-    static constexpr bool debugMode{true};
+    inline bool debugMode{true};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};
@@ -34,10 +34,6 @@ namespace config {
     constexpr auto defaultFriction{1.f};
     constexpr auto defaultRestitution{0.05f};
 
-    static constexpr int mapFirstEntity{1000};
-    static constexpr int numberOfMapEntities{500};
-    static constexpr int enemyFirstEntity{2000};
-    static constexpr int numberOfEnemyEntities{100};
     static Entity playerEntity{1};
     static constexpr int playerAnimation{184};
 
@@ -64,6 +60,9 @@ namespace config {
     static constexpr float textTagDefaultAcceleration{10.0f};
     static constexpr int textTagDefaultFadeValue{20};
 
+    static constexpr int armourLayer{6};
+    static constexpr int weaponLayer{7};
+
     // Weapon component defaults
     static constexpr int weaponComponentDefaultDamageAmount{0};
     static constexpr bool weaponComponentDefaultIsAttacking{false};
@@ -81,7 +80,7 @@ namespace config {
     static constexpr float weaponComponentDefaultRemainingDistance{0.0f};
     static constexpr float weaponComponentDefaultRecoilAmount{10.0f};
 
-    static constexpr int weaponInteractionDistance{200};
+    static constexpr double weaponInteractionDistance{200.f};
 
     static constexpr glm::vec2 startingPosition{325.f, 325.f};
     static constexpr float spawnOffset{25};
@@ -183,6 +182,7 @@ namespace config {
         {"DMGPotion", 2.f, Items::Behaviours::DMGUP, {693, "Items", 4}}
     };
 
+
     enum _entityCategory {
         BOUNDARY = 0x0001,
         PLAYER = 0x0002,
@@ -203,7 +203,7 @@ namespace config {
         {"Bullet", BOUNDARY | ENEMY}, // Bullet only collides with walls and enemies
         {"Enemy", BOUNDARY | PLAYER}, // Enemy collides with walls and players
         {"Passage", BOUNDARY | PLAYER}, // Passage collides with walls and players
-        {"Item", BOUNDARY | PLAYER}, // Item only collides with walls and players
+        {"Item", BOUNDARY}, // Item only collides with walls and players
         {"Player", BOUNDARY | ENEMY | ITEM}, // Player collides with walls, enemies, and items
         {"Door", BOUNDARY | PLAYER} // Door collides with walls and players
     };
@@ -213,7 +213,7 @@ namespace config {
 
         if (std::regex_match(str, playerRegexTag)) return categoriesLookup["Player"];
 
-        if (str == "Chest") return categoriesLookup["Item"];
+        if (str == "Chest" || str == "Potion") return categoriesLookup["Passage"];
 
         return 0x0000;
     }
@@ -223,7 +223,7 @@ namespace config {
 
         if (std::regex_match(str, playerRegexTag)) return bitMaskLookup["Player"];
 
-        if (str == "Chest") return bitMaskLookup["Item"];
+        if (str == "Chest" || str == "Potion") return bitMaskLookup["Passage"];
 
         return 0x0000;
     }
@@ -232,4 +232,17 @@ namespace config {
         if (str == "Bullet") return -8;
         return 0;
     }
+
+    enum slotType : int {
+        WEAPON = 1,
+        HELMET = 2,
+        BODY_ARMOUR = 3
+    };
+
+    struct slotTypeHash {
+        template<typename T>
+        std::size_t operator()(T t) const {
+            return static_cast<std::size_t>(t);
+        }
+    };
 } // namespace config

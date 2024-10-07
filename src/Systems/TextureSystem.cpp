@@ -134,6 +134,11 @@ void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset &parsedT
                             if (id <= 180)
                                 m_weaponsIDs.emplace_back(id, GameType::stringToWeaponType(properties[0].value));
                         }
+
+                        if (property.name == "bodyArmourPlacement") {
+                            m_mapBodyArmourPlacement.emplace(adjusted_id, object);
+                            if (id <= 180) m_bodyArmours.push_back(id);
+                        }
                     }
                 } else {
                     m_mapCollisions.emplace(adjusted_id, object);
@@ -220,6 +225,7 @@ void TextureSystem::loadTextures() {
         auto collisionsIter = m_mapCollisions.find(adjusted_id);
         auto weaponPlacementsIter = m_mapWeaponPlacements.find(adjusted_id);
         auto helmetPlacementsIter = m_mapHelmetPlacements.find(adjusted_id);
+        auto bodyArmourPlacementsIter = m_mapBodyArmourPlacement.find(adjusted_id);
 
         // Load animations from a system if tile is animated
         if (animationsIter != m_mapAnimations.end()) {
@@ -255,14 +261,19 @@ void TextureSystem::loadTextures() {
             colliderComponent.collision = cc;
         }
 
+        if (helmetPlacementsIter != m_mapHelmetPlacements.end()) {
+            auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            colliderComponent.helmetPlacement = m_mapHelmetPlacements.at(adjusted_id);
+        }
+
         if (weaponPlacementsIter != m_mapWeaponPlacements.end()) {
             auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.weaponPlacement = m_mapWeaponPlacements.at(adjusted_id);
         }
 
-        if (helmetPlacementsIter != m_mapHelmetPlacements.end()) {
+        if (bodyArmourPlacementsIter != m_mapBodyArmourPlacement.end()) {
             auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-            colliderComponent.helmetPlacement = m_mapHelmetPlacements.at(adjusted_id);
+            colliderComponent.bodyArmourPlacement = m_mapBodyArmourPlacement.at(adjusted_id);
         }
 
         // Load texture of tile with that id to render component
