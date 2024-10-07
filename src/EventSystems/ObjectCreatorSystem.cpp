@@ -29,7 +29,6 @@ void ObjectCreatorSystem::update() {
     clear();
 }
 
-
 b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent &eventInfo) const {
     const auto &objectRenderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
     const auto &objectTransformComponent = gCoordinator.getComponent<TransformComponent>(eventInfo.entity);
