@@ -8,6 +8,7 @@
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "PotionComponent.h"
+#include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
@@ -46,6 +47,7 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime) {
         } else {
             animationComponent.currentAnimationTime += deltaTime * 4.f / 1000.f;
             auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
             const float newPositionY =
                     animationComponent.currentAnimationTime * (animationComponent.currentAnimationTime - 2.f) * 100;
@@ -53,6 +55,7 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime) {
 
             transformComponent.position.y = animationComponent.startingPositionY + newPositionY;
             transformComponent.position.x += 1.f;
+            renderComponent.dirty = true;
         }
     }
 }

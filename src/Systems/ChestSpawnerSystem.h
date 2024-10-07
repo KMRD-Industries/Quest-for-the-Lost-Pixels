@@ -1,4 +1,5 @@
 #pragma once
+#include "Config.h"
 #include "Coordinator.h"
 #include "GameTypes.h"
 #include "System.h"
@@ -40,11 +41,13 @@ public:
 private:
     void clearSpawners() const;
 
+    void spawnItem(const TransformComponent &spawnerTransformComponent, config::itemLootType) const;
+
     void processSpawn(const TransformComponent &) const;
 
     void handleChestCollision(Entity chest, const GameType::CollisionData &) const;
 
-    void spawnPotion(const TransformComponent &) const;
+    void spawnItem(const TransformComponent &) const;
 
     std::vector<AnimationData> m_itemsToAnimate;
     std::vector<std::pair<int, GameType::WeaponType> > m_weaponsIDs;
