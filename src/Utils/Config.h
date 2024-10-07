@@ -127,7 +127,6 @@ namespace config {
         {1, {25, 0, 0}}, {2, {0, 25, 0}}, {3, {0, 15, 15}}, {4, {45, 6, 35}}, {5, {15, 62, 35}}
     };
 
-
     enum class SpecialRoomTypes {
         NormalRoom,
         SpawnRoom,
@@ -181,7 +180,6 @@ namespace config {
         {"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
         {"DMGPotion", 2.f, Items::Behaviours::DMGUP, {693, "Items", 4}}
     };
-
 
     enum _entityCategory {
         BOUNDARY = 0x0001,
@@ -237,6 +235,13 @@ namespace config {
         WEAPON = 1,
         HELMET = 2,
         BODY_ARMOUR = 3
+    };
+
+    enum itemLootType : int {
+        WEAPON_LOOT = 1,
+        BODY_ARMOUR_LOOT = 2,
+        POTION_LOOT = 3,
+        HELMET_LOOT = 4
     };
 
     struct slotTypeHash {

@@ -33,64 +33,74 @@ void ChestSpawnerSystem::spawnChest() const {
     }
 }
 
-void ChestSpawnerSystem::spawnWeapon(const TransformComponent &spawnerTransformComponent) const {
-    const Entity newWeaponEntity = gCoordinator.createEntity();
-    const auto weaponDesc = getRandomElement(m_weaponsIDs);
-
-    gCoordinator.addComponents(
-        newWeaponEntity,
-        WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second},
-        TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", config::weaponLayer},
-        TransformComponent{spawnerTransformComponent},
-        RenderComponent{},
-        ColliderComponent{},
-        AnimationComponent{},
-        ItemComponent{},
-        ItemAnimationComponent{
-            .animationDuration = 1,
-            .startingPositionY = spawnerTransformComponent.position.y - 75
-        });
-}
-
-void ChestSpawnerSystem::spawnHelmet(const TransformComponent &spawnerTransformComponent) const {
-    const Entity newHelmetEntity = gCoordinator.createEntity();
-    const auto &helmetDesc = getRandomElement(m_helmetsIDs);
-
-    gCoordinator.addComponents(
-        newHelmetEntity,
-        HelmetComponent{.id = helmetDesc},
-        TileComponent{static_cast<uint32_t>(helmetDesc), "Armour", config::armourLayer},
-        TransformComponent{spawnerTransformComponent},
-        RenderComponent{},
-        ColliderComponent{},
-        AnimationComponent{},
-        ItemComponent{},
-        ItemAnimationComponent{
-            .animationDuration = 1,
-            .startingPositionY = spawnerTransformComponent.position.y - 75
-        });
-}
-
-void ChestSpawnerSystem::spawnBodyArmour(const TransformComponent &spawnerTransformComponent) const {
-    const Entity newBodyArmourEntity = gCoordinator.createEntity();
-    const auto &bodyArmourDesc = getRandomElement(m_bodyArmoursIDs);
-
-    gCoordinator.addComponents(
-        newBodyArmourEntity,
-        BodyArmourComponent{.id = bodyArmourDesc},
-        TileComponent{static_cast<uint32_t>(bodyArmourDesc), "Armour", config::armourLayer},
-        TransformComponent{spawnerTransformComponent},
-        RenderComponent{},
-        ColliderComponent{},
-        AnimationComponent{},
-        ItemComponent{},
-        ItemAnimationComponent{
-            .animationDuration = 1,
-            .startingPositionY = spawnerTransformComponent.position.y - 75
-        });
-}
-
 void ChestSpawnerSystem::clearSpawners() const {
+}
+
+void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformComponent,
+                                   const config::itemLootType itemType) const {
+    const Entity newItemEntity = gCoordinator.createEntity();
+
+    gCoordinator.addComponents(
+        newItemEntity,
+        TransformComponent{spawnerTransformComponent},
+        RenderComponent{},
+        ColliderComponent{},
+        AnimationComponent{},
+        ItemComponent{});
+
+    switch (itemType) {
+        case config::itemLootType::HELMET_LOOT: {
+            const auto &helmetDesc = getRandomElement(m_helmetsIDs);
+            gCoordinator.addComponents(
+                newItemEntity,
+                HelmetComponent{.id = helmetDesc},
+                TileComponent{static_cast<uint32_t>(helmetDesc), "Armour", config::armourLayer},
+                ItemAnimationComponent{
+                    .animationDuration = 1,
+                    .startingPositionY = spawnerTransformComponent.position.y
+                });
+            break;
+        }
+        case config::itemLootType::WEAPON_LOOT: {
+            const auto weaponDesc = getRandomElement(m_weaponsIDs);
+            gCoordinator.addComponents(
+                newItemEntity,
+                WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second},
+                TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", config::weaponLayer},
+                ItemAnimationComponent{
+                    .animationDuration = 1,
+                    .startingPositionY = spawnerTransformComponent.position.y - 75
+                });
+            break;
+        }
+        case config::itemLootType::BODY_ARMOUR_LOOT: {
+            const auto &bodyArmourDesc = getRandomElement(m_bodyArmoursIDs);
+            gCoordinator.addComponents(
+                newItemEntity,
+                BodyArmourComponent{.id = bodyArmourDesc},
+                TileComponent{static_cast<uint32_t>(bodyArmourDesc), "Armour", config::armourLayer},
+                ItemAnimationComponent{
+                    .animationDuration = 1,
+                    .startingPositionY = spawnerTransformComponent.position.y
+                });
+            break;
+        }
+        case config::itemLootType::POTION_LOOT: {
+            const config::ItemConfig itemConfig = getRandomItemData();
+            gCoordinator.addComponents(
+                newItemEntity,
+                PotionComponent{},
+                ChestComponent{},
+                CharacterComponent{},
+                itemConfig.textureData,
+                ItemAnimationComponent{
+                    .animationDuration = 1,
+                    .startingPositionY = spawnerTransformComponent.position.y
+                });
+            break;
+        }
+        default: ;
+    }
 }
 
 void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransformComponent) const {
@@ -112,10 +122,10 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransform
 
     auto spawnFunction = [this, spawnerTransformComponent](const GameType::CollisionData &) {
         // TODO: Spawning Logic
-        spawnPotion(spawnerTransformComponent);
-        spawnWeapon(spawnerTransformComponent);
-        spawnHelmet(spawnerTransformComponent);
-        spawnBodyArmour(spawnerTransformComponent);
+        spawnItem(spawnerTransformComponent, config::itemLootType::POTION_LOOT);
+        spawnItem(spawnerTransformComponent, config::itemLootType::WEAPON_LOOT);
+        spawnItem(spawnerTransformComponent, config::itemLootType::HELMET_LOOT);
+        spawnItem(spawnerTransformComponent, config::itemLootType::BODY_ARMOUR_LOOT);
     };
 
     // Create new object with special eventComponent
@@ -132,7 +142,7 @@ void ChestSpawnerSystem::handleChestCollision(const Entity chest, const GameType
     gCoordinator.getComponent<CharacterComponent>(chest).hp = -1;
 }
 
-void ChestSpawnerSystem::spawnPotion(const TransformComponent &spawnerTransformComponent) const {
+void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformComponent) const {
     const config::ItemConfig itemConfig = getRandomItemData();
 
     gCoordinator.addComponents(
