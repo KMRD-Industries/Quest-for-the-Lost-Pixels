@@ -16,6 +16,7 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const con
 
     gCoordinator.getComponent<ItemComponent>(item).equipped = false;
 
+    //TODO: Dropping item position logic
     equipmentComponent.slots.erase(slot);
 
     const auto newItem = gCoordinator.createEntity();
@@ -29,21 +30,29 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const con
 }
 
 void InventorySystem::pickUpItem(const Entity player, const Entity item, const config::slotType type) const {
-    if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(item))
-        if (colliderComponent->body != nullptr)
-            Physics::getWorld()->DestroyBody(colliderComponent->body);
-
     gCoordinator.removeComponentIfExists<ItemAnimationComponent>(item);
     gCoordinator.getComponent<ItemComponent>(item).equipped = true;
 
     auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(player);
 
     if (const auto it = equipment.find(type); it != equipment.end()) {
-        gCoordinator.getComponent<TransformComponent>(item).position =
-                gCoordinator.getComponent<TransformComponent>(player).position;
+        // Adjust dropped body position
+        if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(item)) {
+            if (colliderComponent->body != nullptr) {
+                gCoordinator.getComponent<TransformComponent>(equipment.at(type)).position = {
+                    convertMetersToPixel(colliderComponent->body->GetPosition().x),
+                    convertMetersToPixel(colliderComponent->body->GetPosition().y)
+                };
+            }
+        }
 
         dropItem(player, equipment.at(type), type);
     }
+
+    if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(item))
+        if (colliderComponent->body != nullptr)
+            Physics::getWorld()->DestroyBody(colliderComponent->body);
+
 
     equipment.emplace(type, item);
 }
