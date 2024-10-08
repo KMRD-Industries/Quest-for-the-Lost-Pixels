@@ -18,8 +18,6 @@ public:
 
     void displayBodyArmourStats(Entity entity);
 
-    void performFixedUpdate();
-
     void input(Entity player);
 
     void deleteItems() const;

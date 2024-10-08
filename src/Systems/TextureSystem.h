@@ -41,25 +41,16 @@ public:
     TextureSystem() { init(); }
 
     int loadFromFile(const std::string &);
-
     long initializeTileSet(const Tileset &);
-
     void loadTexturesFromFiles();
-
     void loadTextures();
-
     void init();
-
     void update();
 
     sf::Sprite getTile(const std::string &, long) const;
-
     std::vector<AnimationFrame> getAnimations(const std::string &, long);
-
     Collision getCollision(const std::string &, long);
-
     void modifyColorScheme(int);
-
     sf::Color getBackgroundColor();
 
     std::vector<std::pair<int, GameType::WeaponType> > m_weaponsIDs;

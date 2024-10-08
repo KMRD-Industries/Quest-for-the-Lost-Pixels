@@ -28,12 +28,6 @@ class ChestSpawnerSystem : public System {
 public:
     void spawnChest() const;
 
-    void spawnWeapon(const TransformComponent &spawnerTransformComponent) const;
-
-    void spawnHelmet(const TransformComponent &spawnerTransformComponent) const;
-
-    void spawnBodyArmour(const TransformComponent &spawnerTransformComponent) const;
-
     ChestSpawnerSystem();
 
     void init();
