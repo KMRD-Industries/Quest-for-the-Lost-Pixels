@@ -1,8 +1,8 @@
 #pragma once
 
 #include <random>
-#include <stdint.h>
 #include "Coordinator.h"
+#include "SFML/System/Vector2.hpp"
 
 extern Coordinator gCoordinator;
 
@@ -11,7 +11,7 @@ class EnemySystem : public System
 public:
     EnemySystem();
     void init();
-    void update();
+    void update(std::unordered_map<Entity, sf::Vector2<float>>&);
     void deleteEnemies() const;
 
 private:

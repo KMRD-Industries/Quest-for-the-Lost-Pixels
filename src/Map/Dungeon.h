@@ -3,14 +3,14 @@
 #include <unordered_map>
 #include <vector>
 
+#include <map>
 #include "Dungeon.h"
 #include "FightSystem.h"
 #include "FloorGenerator.h"
 #include "PlayerMovementSystem.h"
 #include "Room.h"
-#include "Types.h"
-#include <map>
 #include "Timer.h"
+#include "Types.h"
 
 #include <TextureSystem.h>
 
@@ -57,6 +57,7 @@ private:
     void loadMap(const std::string& path) const;
     float getSpawnOffset(float, int);
     void changeRoom(const glm::ivec2& dir);
+    void updateEnemyPositions(const comm::EnemyPositionsUpdate& enemyPositionsUpdate);
 
     std::string m_asset_path;
     FloorGenerator m_floorGenerator;
@@ -69,10 +70,12 @@ private:
     std::deque<glm::ivec2> m_moveInDungeon;
     float counter;
     bool m_passedBy;
-    std::map<Entity, sf::Vector2<int>> m_enemyPositions;
+    std::map<Entity, sf::Vector2<float>> m_enemyPositions;
     std::map<Entity, ObstacleData> m_obstaclePositions;
+    std::map<Entity, sf::Vector2<int>> m_playersPositions;
     Timer* m_timer;
     float elapsedTime = 0.0f;
+    std::unordered_map<Entity, sf::Vector2<float>> m_enemyPositionsUpdate;
 
     PlayerMovementSystem* m_playerMovementSystem;
     MultiplayerSystem* m_multiplayerSystem;

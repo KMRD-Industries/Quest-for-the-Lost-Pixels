@@ -161,32 +161,32 @@ void MultiplayerSystem::update()
                                                  colliderComponent.body->GetAngle());
         }
 
-       // comm::StateUpdate stateUpdate;
-       // stateUpdate.ParseFromArray(&m_buf, received);
-       // //        m_position.ParseFromArray(&m_buf, received);
-       // std::cout << "Received message...";
-       // switch (stateUpdate.variant())
-       // {
-       // case comm::StateVariant::MAP_UPDATE:
-       //     std::cout << "Map update...\n";
-       //     break;
-       // case comm::StateVariant::PLAYER_POSITION_UPDATE:
-       //     //idk czy git
-       //     m_position = stateUpdate.positionupdate();
-       //     const std::uint32_t id = m_position.entity_id();
-       //     std::cout << "Position update from: " << "id:" << id <<"\n";
+        // comm::StateUpdate stateUpdate;
+        // stateUpdate.ParseFromArray(&m_buf, received);
+        // //        m_position.ParseFromArray(&m_buf, received);
+        // std::cout << "Received message...";
+        // switch (stateUpdate.variant())
+        // {
+        // case comm::StateVariant::MAP_UPDATE:
+        //     std::cout << "Map update...\n";
+        //     break;
+        // case comm::StateVariant::PLAYER_POSITION_UPDATE:
+        //     //idk czy git
+        //     m_position = stateUpdate.positionupdate();
+        //     const std::uint32_t id = m_position.entity_id();
+        //     std::cout << "Position update from: " << "id:" << id <<"\n";
 
-       //     if (m_entity_map.contains(id))
-       //     {
-       //         Entity& target = m_entity_map[id];
-       //         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
+        //     if (m_entity_map.contains(id))
+        //     {
+        //         Entity& target = m_entity_map[id];
+        //         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
 
-       //         transformComponent.position = {m_position.x(), m_position.y()};
-       //     }
-       //     break;
-            // default:
-            //     std::cout << "Unknown type!\n";
-            //     break;
+        //         transformComponent.position = {m_position.x(), m_position.y()};
+        //     }
+        //     break;
+        // default:
+        //     std::cout << "Unknown type!\n";
+        //     break;
         // }
     }
 
@@ -206,11 +206,11 @@ void MultiplayerSystem::update()
     auto serialized = m_position.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
 
-    //std::cout << "Player: " << m_player_id << " is moving to: " << m_position.x() << ", " << m_position.y() << "\n";
-    //comm::StateUpdate update;
-    //update.set_variant(comm::PLAYER_POSITION_UPDATE);
+    // std::cout << "Player: " << m_player_id << " is moving to: " << m_position.x() << ", " << m_position.y() << "\n";
+    // comm::StateUpdate update;
+    // update.set_variant(comm::PLAYER_POSITION_UPDATE);
     //*(update.mutable_positionupdate()) = m_position;
-    //auto serialized = update.SerializeAsString();
+    // auto serialized = update.SerializeAsString();
 }
 
 void MultiplayerSystem::disconnect()
@@ -222,38 +222,63 @@ void MultiplayerSystem::disconnect()
     m_udp_socket.close();
 }
 
-void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<int>>& enemies,
-                                  const std::map<Entity, ObstacleData>& obstacles)
+void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& enemies,
+                                  const std::map<Entity, ObstacleData>& obstacles,
+                                  const std::map<Entity, sf::Vector2<int>>& players)
 {
     comm::MapPositionsUpdate mapUpdate;
     std::cout << "another update!!!!\n";
-    // for (const auto& enemy : enemies)
-    // {
-    //     std::cout << "enemy's position: x: " << enemy.second.x << " y: " << enemy.second.y << "\n";
-    //     comm::Enemy* enemy_position = mapUpdate.add_enemies();
-    //     enemy_position->set_x(enemy.second.x);
-    //     enemy_position->set_y(enemy.second.y);
-    //     enemy_position->set_id(enemy.first);
-    // }
+    for (const auto& enemy : enemies)
+    {
+        std::cout << "enemy's position: x: " << enemy.second.x << " y: " << enemy.second.y << "\n";
+        comm::Enemy* enemy_position = mapUpdate.add_enemies();
+        enemy_position->set_x(enemy.second.x);
+        enemy_position->set_y(enemy.second.y);
+        enemy_position->set_id(enemy.first);
+    }
 
+    for (const auto& player : players)
+    {
+        comm::Player* player_position = mapUpdate.add_players();
+        player_position->set_id(player.first);
+        player_position->set_x(player.second.x);
+        player_position->set_y(player.second.y);
+    }
+
+    comm::StateUpdate message;
+    message.set_variant(comm::StateVariant::MAP_UPDATE);
+    *message.mutable_mappositionsupdate() = mapUpdate;
+
+    auto serializedMessage = message.SerializeAsString();
+    std::cout << "Sending map updated message, size: " << serializedMessage.size() << "\n";
+
+    m_tcp_socket.send(boost::asio::buffer(serializedMessage));
+}
+
+void MultiplayerSystem::setMapDimensions(const std::map<Entity, ObstacleData>& obstacles){
+    comm::MapDimensionsUpdate mapDimensionsUpdate;
     for (const auto& obstacle : obstacles)
     {
-        // std::cout << "obstacle's position left: " << obstacle.second.left << " top: " << obstacle.second.top << "\n";
-        comm::Obstacle* obstacle_position = mapUpdate.add_obstacles();
+        comm::Obstacle* obstacle_position = mapDimensionsUpdate.add_obstacles();
 
         obstacle_position->set_height(obstacle.second.height);
         obstacle_position->set_width(obstacle.second.width);
         obstacle_position->set_left(obstacle.second.left);
         obstacle_position->set_top(obstacle.second.top);
     }
-
     comm::StateUpdate message;
-    message.set_variant(comm::StateVariant::MAP_UPDATE);
-    *(message.mutable_mappositionsupdate()) = mapUpdate;
+    message.set_variant(comm::StateVariant::MAP_DIMENSIONS_UPDATE);
+    *message.mutable_mapdimensionsupdate() = mapDimensionsUpdate;
 
     auto serializedMessage = message.SerializeAsString();
-    std::cout << "Sending map updated message, size: " << serializedMessage.size() << "\n";
+    std::cout << "Sending map dimension update message, size: " << serializedMessage.size() << "\n";
 
-    // TODO dodaj wiadomość ile danych chcesz przesłać żeby zapiać całość na raz
     m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
+
+
+void MultiplayerSystem::setEnemyPositions() {
+    std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
+
+}
+

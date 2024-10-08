@@ -3,6 +3,7 @@
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
+#include "EnemyComponent.h"
 #include "Physics.h"
 #include "TransformComponent.h"
 
@@ -14,21 +15,21 @@ void EnemySystem::init()
     dis = std::uniform_real_distribution<float>(-1, 1); // Range between -1 and 1
 }
 
-void EnemySystem::update()
+void EnemySystem::update(std::unordered_map<Entity, sf::Vector2<float>> &enemies)
 {
-    for (const auto entity : m_entities)
+    for (const auto enemy : enemies)
     {
-        if (gCoordinator.hasComponent<TransformComponent>(entity))
+        if (gCoordinator.hasComponent<TransformComponent>(enemy.first))
         {
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(enemy.first);
 
-            // Generate random numbers and update velocity
-            const float randX = dis(gen); // Generate random number for x between -1 and 1
-            const float randY = dis(gen); // Generate random number for y between -1 and 1
-            transformComponent.velocity.x += randX * config::enemyAcc;
-            transformComponent.velocity.y += randY * config::enemyAcc;
+            transformComponent.velocity.x = enemy.second.x * 250;
+            transformComponent.velocity.y = -enemy.second.y * 250;
+
+            printf("[Adding new positions] x: %f, y: %f\n", enemy.second.x, enemy.second.y);
         }
     }
+    enemies.clear();
 }
 
 void EnemySystem::deleteEnemies() const

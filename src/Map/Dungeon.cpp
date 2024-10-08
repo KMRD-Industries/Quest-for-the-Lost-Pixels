@@ -225,7 +225,7 @@ void Dungeon::update(const float deltaTime)
 {
     m_playerMovementSystem->update(deltaTime);
     m_weaponSystem->update();
-    m_enemySystem->update();
+    m_enemySystem->update(m_enemyPositionsUpdate);
     m_travellingSystem->update();
     m_passageSystem->update();
     m_characterSystem->update();
@@ -253,51 +253,67 @@ void Dungeon::update(const float deltaTime)
         case comm::ROOM_CHANGED:
             changeRoom(m_multiplayerSystem->getRoom());
             break;
+        case comm::MAP_UPDATE:
+            updateEnemyPositions(stateUpdate.enemypositionsupdate());
         default:
             break;
         }
 
         m_multiplayerSystem->update();
 
-        elapsedTime += m_timer->DeltaTime();
-        if (elapsedTime == m_timer->DeltaTime())
+        // TODO na pewno da się zrobić to lepiej
+        if (elapsedTime < m_timer->DeltaTime())
         {
             std::cout << elapsedTime << std::endl;
-            //            std::cout << (clock() - lastUpdatedTime) / CLOCKS_PER_SEC << "\n";
-            // elapsedTime = 0.0f;
-            for (const auto entity : m_entities)
+            for (const auto entity : m_collisionSystem->m_entities)
             {
                 if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
 
                 auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
+                auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+                auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
                 if (position.x != 0 && position.y != 0)
                 {
-                    if (gCoordinator.hasComponent<EnemyComponent>(entity))
+                    if (colliderComponent.tag == "Wall")
                     {
-                        //                        std::cout << "enemy: x " << position.x << " y : " << position.y <<
-                        //                        "\n";
-                        m_enemyPositions.insert({entity, {static_cast<int>(position.x), static_cast<int>(position.y)}});
+                        auto sprite = renderComponent.sprite.getGlobalBounds();
+                        ObstacleData obstacle{sprite.height, sprite.width, position.x, position.y};
+                        m_obstaclePositions.insert({entity, obstacle});
                     }
-                    //                    else if (gCoordinator.hasComponent<PlayerComponent>(entity))
-                    //                    {
-                    //                        std::cout << "player: x " << position.x << " y : " << position.y << "\n";
-                    //
-                    //                    }
-                    else if (gCoordinator.hasComponent<ColliderComponent>(entity))
+
+                }
+            }
+            m_multiplayerSystem->setMapDimensions(m_obstaclePositions);
+        }
+
+        elapsedTime += m_timer->DeltaTime();
+        if (elapsedTime > m_timer->DeltaTime() * 10)
+        {
+            //            std::cout << (clock() - lastUpdatedTime) / CLOCKS_PER_SEC << "\n";
+            elapsedTime = m_timer->DeltaTime() * 3;
+            for (const auto entity : m_collisionSystem->m_entities)
+            {
+                if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
+
+                auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
+                auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+                if (position.x != 0 && position.y != 0)
+                {
+                    if (colliderComponent.tag == "Enemy")
                     {
-                        auto collider = gCoordinator.getComponent<ColliderComponent>(entity);
-                        if (collider.body != nullptr)
-                        {
-                            auto renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-                            auto sprite = renderComponent.sprite.getGlobalBounds();
-                            ObstacleData obstacle{sprite.height, sprite.width, position.x, position.y};
-                            m_obstaclePositions.insert({entity, obstacle});
-                        }
+                        // m_enemyPositions.insert({entity, {position.x, position.y}});
+                        m_enemyPositions[entity] = {position.x, position.y};
+                    }
+                    else if (std::regex_match(colliderComponent.tag, config::playerRegexTag))
+                    {
+                        printf("Nowa pozycja gracza: x %f, y %f\n", position.x, position.y);
+                       // m_playersPositions.insert({entity, {static_cast<int>(position.x), static_cast<int>(position.y)}});
+                        m_playersPositions[entity] = {static_cast<int>(position.x), static_cast<int>(position.y)};
                     }
                 }
             }
             std::cout << "Length of the table sent to the server: " << m_obstaclePositions.size() << std::endl;
-            m_multiplayerSystem->updateMap(m_enemyPositions, m_obstaclePositions);
+            m_multiplayerSystem->updateMap(m_enemyPositions, m_obstaclePositions, m_playersPositions);
         }
     }
 
@@ -331,7 +347,7 @@ void Dungeon::changeRoom(const glm::ivec2& room)
 
 void Dungeon::makeStartFloor()
 {
-    Room room{"0", 0};
+    Room room{"110", 0};
     m_roomMap.clear();
     m_roomMap.emplace(glm::ivec2{0, 0}, room);
     m_currentPlayerPos = {0.f, 0.f};
@@ -439,6 +455,15 @@ float Dungeon::getSpawnOffset(const float position, const int id)
     if (id % 2 == 0) return position + id * config::spawnOffset;
     return position - id * config::spawnOffset;
 }
+
+void Dungeon::updateEnemyPositions(const comm::EnemyPositionsUpdate& enemyPositionsUpdate)
+{
+    for (auto enemy: enemyPositionsUpdate.enemypositions())
+    {
+        m_enemyPositionsUpdate[enemy.id()] = {enemy.x(), enemy.y()};
+    }
+}
+
 
 void Dungeon::setECS()
 {

@@ -23,7 +23,6 @@ void SpawnerSystem::init() {}
 
 void SpawnerSystem::update(const float timeStamp)
 {
-    m_spawnTime += timeStamp * 1000.f;
 
     for (const auto entity : m_entities)
     {
@@ -32,6 +31,8 @@ void SpawnerSystem::update(const float timeStamp)
 
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
+
+    m_spawnTime += timeStamp * 1000.f;
 
     if (m_spawnTime >= SPAWN_RATE) m_spawnTime -= SPAWN_RATE;
 
@@ -42,7 +43,7 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
                                    const TransformComponent& spawnerTransformComponent) const
 {
     // Check if the spawner is ready to spawn the enemy.
-    if (m_spawnTime < SPAWN_RATE) return;
+    if (m_spawnTime != 0) return;
 
     // Spawn the enemy and increment the spawn count.
     spawnerComponent.noSpawns++;
