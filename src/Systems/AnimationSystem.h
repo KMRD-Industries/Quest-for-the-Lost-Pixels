@@ -11,19 +11,11 @@ public:
 
     void update(const float &deltaTime) const;
 
-    void init();
-
-    void performFixedUpdate(float timeStep) const;
-
     void updateEntityAnimation(AnimationComponent &, TileComponent &, float) const;
 
     void advanceFrame(AnimationComponent &animationComponent) const;
 
     void updateTileComponent(TileComponent &tileComponent, const AnimationComponent &animationComponent) const;
-
-    void updateEntityAnimationFrame(AnimationComponent &, TileComponent &, float) const;
-
-    void loadNextFrame(AnimationComponent &, TileComponent &) const;
 
 private:
     float m_animationFrameTime{};

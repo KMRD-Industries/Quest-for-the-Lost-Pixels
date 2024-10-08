@@ -8,6 +8,7 @@
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "Physics.h"
+#include "PotionComponent.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
@@ -51,6 +52,8 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const con
 }
 
 void InventorySystem::pickUpItem(const Entity player, const Entity item, const config::slotType type) const {
+    if (gCoordinator.hasComponent<PotionComponent>(item)) return;
+
     if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(item))
         if (colliderComponent->body != nullptr)
             Physics::getWorld()->DestroyBody(colliderComponent->body);
