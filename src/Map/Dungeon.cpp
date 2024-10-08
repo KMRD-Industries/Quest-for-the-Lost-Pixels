@@ -73,13 +73,12 @@ void Dungeon::init()
         for (uint32_t id : gameState.connected_players())
         {
             createRemotePlayer(id);
+            m_players.insert(id);
             std::cout << "Connected remote player: " << m_id << '\n';
         }
     }
     else
         std::cout << "Starting in single-player mode\n";
-
-    const std::string tag = std::format("Player {}", m_id);
 
     makeStartFloor();
     m_roomMap.at(m_currentPlayerPos).init();
@@ -245,15 +244,7 @@ void Dungeon::update(const float deltaTime)
             m_players.insert(id);
             break;
         case comm::ROOM_CHANGED:
-            if (m_multiplayerSystem->isInsideInitialRoom(true))
-            {
-                gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
-                moveDownDungeon();
-            }
-            else
-            {
-                changeRoom(m_multiplayerSystem->getRoom());
-            }
+            changeRoom(m_multiplayerSystem->getRoom());
             break;
         default:
             break;
@@ -306,6 +297,8 @@ void Dungeon::moveDownDungeon()
     m_passageSystem->setPassages(false);
     loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
 
+    b2Vec2 colliderPosition{};
+
     for (uint32_t id : m_players)
     {
         Entity player = m_entities[id];
@@ -314,17 +307,16 @@ void Dungeon::moveDownDungeon()
         transformComponent.position = {getSpawnOffset(pos.x, id), getSpawnOffset(pos.y, id)};
         transformComponent.velocity = {};
 
-        b2Vec2 position{};
-        position.x = transformComponent.position.x * static_cast<float>(config::pixelToMeterRatio);
-        position.y = transformComponent.position.y * static_cast<float>(config::pixelToMeterRatio);
+        colliderPosition.x = transformComponent.position.x * static_cast<float>(config::pixelToMeterRatio);
+        colliderPosition.y = transformComponent.position.y * static_cast<float>(config::pixelToMeterRatio);
 
         auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(player);
-        colliderComponent.body->SetTransform(position, colliderComponent.body->GetAngle());
+        colliderComponent.body->SetTransform(colliderPosition, colliderComponent.body->GetAngle());
     }
 
     m_roomListenerSystem->reset();
 
-    if (m_multiplayerSystem->isConnected() && m_multiplayerSystem->isInsideInitialRoom(false))
+    if (m_multiplayerSystem->isConnected() && m_multiplayerSystem->isInsideInitialRoom(true))
         m_multiplayerSystem->roomChanged(m_currentPlayerPos);
 }
 
@@ -354,53 +346,86 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         m_currentPlayerPos += dir;
         m_roomListenerSystem->changeRoom(m_currentPlayerPos);
 
-        m_mapSystem->loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
-        m_textureSystem->loadTextures();
+        loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
         m_passageSystem->setPassages(m_currentPlayerPos == m_floorGenerator.getEndingRoom());
-        m_collisionSystem->createMapCollision();
 
         const auto newDoor = dir * -1;
         const auto doorType = GameType::geoToMapDoors.at(newDoor);
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
         const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
 
+        b2Vec2 colliderPosition{};
+
         for (const auto id : m_players)
         {
-            const sf::Vector2f newPosition = position + offset + GameType::MyVec2(id, id);
+            const Entity player = m_entities[id];
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(player);
 
-            gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
-            const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
-            colliderComponent.body->SetTransform(
-                {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
-                colliderComponent.body->GetAngle());
+            transformComponent.position = position + offset + GameType::MyVec2(id, id);
+            transformComponent.velocity = {};
+
+            colliderPosition.x = transformComponent.position.x * static_cast<float>(config::pixelToMeterRatio);
+            colliderPosition.y = transformComponent.position.y * static_cast<float>(config::pixelToMeterRatio);
+
+            auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(player);
+            colliderComponent.body->SetTransform(colliderPosition, colliderComponent.body->GetAngle());
         }
 
         if (m_multiplayerSystem->isConnected()) m_multiplayerSystem->roomChanged(m_currentPlayerPos);
     }
 }
 
+// when room is changed by remote player
 void Dungeon::changeRoom(const glm::ivec2& room)
 {
-    clearDungeon();
-    auto dir = room - m_currentPlayerPos;
-    m_currentPlayerPos = room;
+    GameType::MyVec2 position{0.0, 0.0};
+    b2Vec2 colliderPosition{};
+    glm::vec2 offset{};
 
-    loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
+    bool insideInitialRoom = m_multiplayerSystem->isInsideInitialRoom(true);
+    if (insideInitialRoom)
+    {
+        gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
+        makeSimpleFloor();
+        clearDungeon();
+        m_passageSystem->setPassages(false);
+        loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
+        m_roomListenerSystem->reset();
 
-    const auto newDoor = dir * -1;
-    const auto doorType = GameType::geoToMapDoors.at(newDoor);
-    const auto position = m_doorSystem->getDoorPosition(doorType);
-    const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
+        position = config::startingPosition;
+    }
+    else
+    {
+        clearDungeon();
+        auto dir = room - m_currentPlayerPos;
+        m_currentPlayerPos = room;
+        m_roomListenerSystem->changeRoom(m_currentPlayerPos);
+        loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
+        m_passageSystem->setPassages(m_currentPlayerPos == m_floorGenerator.getEndingRoom());
+
+        const auto newDoor = dir * -1;
+        const auto doorType = GameType::geoToMapDoors.at(newDoor);
+        position = m_doorSystem->getDoorPosition(doorType);
+        offset = glm::vec2{dir.x * 100, -dir.y * 100};
+    }
 
     for (const auto id : m_players)
     {
-        const sf::Vector2f newPosition = position + offset + GameType::MyVec2(id, id);
-        gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
-        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+        const Entity player = m_entities[id];
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(player);
 
-        colliderComponent.body->SetTransform(
-            {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
-            colliderComponent.body->GetAngle());
+        if (insideInitialRoom)
+            transformComponent.position = {getSpawnOffset(position.x, id), getSpawnOffset(position.y, id)};
+        else
+            transformComponent.position = position + offset + GameType::MyVec2(id, id);
+
+        transformComponent.velocity = {};
+
+        colliderPosition.x = transformComponent.position.x * static_cast<float>(config::pixelToMeterRatio);
+        colliderPosition.y = transformComponent.position.y * static_cast<float>(config::pixelToMeterRatio);
+
+        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(player);
+        colliderComponent.body->SetTransform(colliderPosition, colliderComponent.body->GetAngle());
     }
 }
 

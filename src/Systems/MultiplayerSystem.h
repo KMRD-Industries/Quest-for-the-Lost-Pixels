@@ -18,21 +18,23 @@ private:
     bool m_connected = false;
     bool m_inside_initial_room = true;
     Entity m_player_entity = 0;
-    uint32_t m_player_id = 1;
+    uint32_t m_player_id = 0;
+
     boost::asio::io_context m_io_context;
     tcp::socket m_tcp_socket;
     udp::socket m_udp_socket;
     std::array<char, 4096> m_buf{};
-    sf::Vector3<float> m_last_sent{};
-    std::chrono::system_clock::time_point m_last_tick;
+
+    std::chrono::system_clock::time_point m_last_tick{};
     glm::ivec2 m_current_room{};
+    std::unordered_map<uint32_t, Entity> m_entity_map{};
+
     int m_prefix_size{};
     std::vector<char> m_prefix_buf{};
     comm::BytePrefix m_prefix{};
     comm::MovementUpdate m_incomming_movement{};
     comm::MovementUpdate m_outgoing_movement{};
     comm::StateUpdate m_state{};
-    std::unordered_map<uint32_t, Entity> m_entity_map{};
 
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};

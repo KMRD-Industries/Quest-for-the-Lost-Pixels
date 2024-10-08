@@ -104,7 +104,7 @@ uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
 
 comm::GameState MultiplayerSystem::registerPlayer(const Entity player)
 {
-    std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
+    size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
 
     comm::GameState gameState;
     gameState.ParseFromArray(&m_buf, static_cast<int>(received));
@@ -140,8 +140,7 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
         if (m_state.variant() == comm::ROOM_CHANGED)
         {
             auto r = m_state.room();
-            m_current_room.x = r.x();
-            m_current_room.y = r.y();
+            setRoom({r.x(), r.y()});
         }
     }
     else
@@ -167,8 +166,7 @@ void MultiplayerSystem::update()
         uint32_t id = m_incomming_movement.entity_id();
         auto r = m_incomming_movement.curr_room();
 
-        // if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
-        if (m_entity_map.contains(id))
+        if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
         {
             Entity& target = m_entity_map[id];
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
