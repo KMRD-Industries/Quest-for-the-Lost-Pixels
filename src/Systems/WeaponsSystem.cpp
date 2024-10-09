@@ -11,10 +11,14 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-void WeaponSystem::init() {}
+void WeaponSystem::init()
+{
+}
 
 void WeaponSystem::update()
 {
+    if (!gCoordinator.hasComponent<TransformComponent>(config::playerEntity))
+        return;
     const auto& playerTransformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
     double minDistance = std::numeric_limits<float>::max();
     Entity closestWeaponEntity{};
@@ -24,7 +28,8 @@ void WeaponSystem::update()
         updateStartingAngle(entity);
         updateWeaponAngle(entity);
 
-        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) continue;
+        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true)
+            continue;
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
@@ -79,7 +84,8 @@ void WeaponSystem::weaponInput(const Entity player)
 
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) continue;
+        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true)
+            continue;
 
         const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         float distanceX = transformComponent.position.x - playerTransformComponent.position.x;
@@ -105,7 +111,8 @@ inline void WeaponSystem::updateWeaponAngle(const Entity entity)
 {
     auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
 
-    if (!weaponComponent.isAttacking) return;
+    if (!weaponComponent.isAttacking)
+        return;
     rotateWeapon(entity, weaponComponent.isSwingingForward);
 }
 
@@ -114,7 +121,6 @@ void WeaponSystem::deleteItems()
     std::deque<Entity> entityToRemove;
 
     for (const auto entity : m_entities)
-    {
         if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == false)
         {
             if (gCoordinator.hasComponent<ColliderComponent>(entity))
@@ -122,9 +128,9 @@ void WeaponSystem::deleteItems()
             else
                 entityToRemove.push_back(entity);
         }
-    }
 
-    for (const auto entity : entityToRemove) gCoordinator.destroyEntity(entity);
+    for (const auto entity : entityToRemove)
+        gCoordinator.destroyEntity(entity);
 }
 
 
@@ -137,9 +143,7 @@ inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward)
     const float isMovingForward = forward ? 1.f : -1.f;
 
     if (weaponComponent.remainingDistance > 0)
-    {
         weaponComponent.currentAngle += weaponComponent.rotationSpeed * direction * isMovingForward;
-    }
     else
     {
         weaponComponent.currentAngle -= weaponComponent.remainingDistance * direction * isMovingForward;
@@ -205,7 +209,8 @@ inline void WeaponSystem::updateStartingAngle(const Entity entity)
         return;
     }
 
-    if (weaponComponent.queuedAttack || weaponComponent.isAttacking) return;
+    if (weaponComponent.queuedAttack || weaponComponent.isAttacking)
+        return;
 
     setAngle(entity);
 }

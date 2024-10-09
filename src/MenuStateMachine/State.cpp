@@ -9,6 +9,9 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
+#include "FightActionEvent.h"
+#include "FightSystem.h"
+#include "ObjectCreatorSystem.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "UiComponent.h"
@@ -25,6 +28,8 @@ void State::beforeInit()
     gCoordinator.registerComponent<RenderComponent>();
     gCoordinator.registerComponent<TransformComponent>();
     gCoordinator.registerComponent<UiComponent>();
+    gCoordinator.registerComponent<CreateBodyWithCollisionEvent>();
+    gCoordinator.registerComponent<FightActionEvent>();
 
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     {
@@ -56,5 +61,19 @@ void State::beforeInit()
         Signature signature;
         signature.set(gCoordinator.getComponentType<ButtonComponent>());
         gCoordinator.setSystemSignature<ButtonSystem>(signature);
+    }
+
+    auto objectCreatorSystem = gCoordinator.getRegisterSystem<ObjectCreatorSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<CreateBodyWithCollisionEvent>());
+        gCoordinator.setSystemSignature<ObjectCreatorSystem>(signature);
+    }
+
+    auto fightSystem = gCoordinator.getRegisterSystem<FightSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<FightActionEvent>());
+        gCoordinator.setSystemSignature<FightSystem>(signature);
     }
 }
