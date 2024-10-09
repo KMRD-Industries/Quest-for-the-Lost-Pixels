@@ -8,16 +8,14 @@
 
 struct ColliderComponent;
 
-namespace GameType
-{
+namespace GameType {
     struct CollisionData;
 }
 
 struct TransformComponent;
 extern Coordinator gCoordinator;
 
-struct AnimationData
-{
+struct AnimationData {
     float animationDuration{};
     float currentAnimationTime{};
     Entity entityToAnimate{};
@@ -26,18 +24,23 @@ struct AnimationData
     bool shouldAnimate{true};
 };
 
-class ChestSpawnerSystem : public System
-{
+class ChestSpawnerSystem : public System {
 public:
     void spawnChest() const;
+
     ChestSpawnerSystem();
+
     void init();
 
 private:
     void clearSpawners() const;
+
     void spawnItem(const TransformComponent &spawnerTransformComponent, config::itemLootType) const;
+
     void processSpawn(const TransformComponent &) const;
+
     void handleChestCollision(Entity chest, const GameType::CollisionData &) const;
+
     void spawnItem(const TransformComponent &) const;
 
     std::vector<AnimationData> m_itemsToAnimate;

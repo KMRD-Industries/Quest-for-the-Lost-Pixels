@@ -8,7 +8,7 @@ class FightSystem : public System
 {
 public:
     FightSystem();
-    void init();
+    void init() const;
     void update();
     void clear();
 

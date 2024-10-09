@@ -19,7 +19,8 @@ extern Coordinator gCoordinator;
 
 void TextureSystem::init() { loadTexturesFromFiles(); }
 
-void TextureSystem::update() {}
+void TextureSystem::update() {
+}
 
 /**
  * Load JSON files to atlases.
@@ -27,10 +28,8 @@ void TextureSystem::update() {}
  * @param path path to JSON Tile set.
  * @return status of operation
  */
-int TextureSystem::loadFromFile(const std::string& path)
-{
-    try
-    {
+int TextureSystem::loadFromFile(const std::string &path) {
+    try {
         const Tileset parsedTileSet = parseTileSet(path);
 
         // Get the first ID of newly loaded Set.
@@ -41,14 +40,11 @@ int TextureSystem::loadFromFile(const std::string& path)
         loadAnimationsAndCollisionsIntoSystem(parsedTileSet, firstGidCopy);
 
         return 1;
-    }
-    catch (const std::exception& e)
-    {
+    } catch (const std::exception &e) {
         std::cout << "Caught an exception: " << e.what() << '\n';
         return 0;
     }
-    catch (...)
-    {
+    catch (...) {
         std::cout << "Caught an unknown exception" << '\n';
         return 1;
     }
@@ -61,8 +57,7 @@ int TextureSystem::loadFromFile(const std::string& path)
  * @param parsedTileSet Tile Set parsed with nlohmann::json.
  * @return First Tile ID of a newly loaded set.
  */
-long TextureSystem::initializeTileSet(const Tileset& parsedTileSet)
-{
+long TextureSystem::initializeTileSet(const Tileset &parsedTileSet) {
     sf::Image image;
     sf::Texture tex;
 
@@ -70,8 +65,7 @@ long TextureSystem::initializeTileSet(const Tileset& parsedTileSet)
     long gid = static_cast<long>(m_mapTextureRects.size());
 
     // Load image from assets folder
-    if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlas/" + parsedTileSet.image + ".png"))
-    {
+    if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlas/" + parsedTileSet.image + ".png")) {
         throw std::runtime_error("Cannot open image: " + parsedTileSet.image);
     }
 
@@ -93,17 +87,14 @@ long TextureSystem::initializeTileSet(const Tileset& parsedTileSet)
  * @param parsedTileSet Tile Set parsed with nlohmann::json.
  * @param gid Actually processed tile.
  */
-void TextureSystem::loadTilesIntoSystem(const Tileset& parsedTileSet, long& gid)
-{
+void TextureSystem::loadTilesIntoSystem(const Tileset &parsedTileSet, long &gid) {
     // Calculate the number of tiles to load.
     const int numTilesHorizontally = parsedTileSet.imagewidth / parsedTileSet.tilewidth;
     const int numTilesVertically = parsedTileSet.imageheight / parsedTileSet.tileheight;
 
     // Load all tiles into the system
-    for (int row = 0; row < numTilesVertically; ++row)
-    {
-        for (int col = 0; col < numTilesHorizontally; ++col)
-        {
+    for (int row = 0; row < numTilesVertically; ++row) {
+        for (int col = 0; col < numTilesHorizontally; ++col) {
             m_mapTextureRects.emplace(gid++,
                                       sf::IntRect(col * parsedTileSet.tilewidth, row * parsedTileSet.tileheight,
                                                   parsedTileSet.tilewidth, parsedTileSet.tileheight));
@@ -119,49 +110,37 @@ void TextureSystem::loadTilesIntoSystem(const Tileset& parsedTileSet, long& gid)
  * @param parsedTileSet Tile Set parsed with nlohmann::json.
  * @param firstGid First ID of a tile set.
  */
-void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedTileSet, const long& firstGid)
-{
-    for (const auto& [id,properties, animation, objects] : parsedTileSet.tiles)
-    {
+void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset &parsedTileSet, const long &firstGid) {
+    for (const auto &[id, properties, animation, objects]: parsedTileSet.tiles) {
         // Adjust tile with a tile set id.
         const long adjusted_id = firstGid + id;
 
-        if (!animation.empty())
-        {
+        if (!animation.empty()) {
             m_mapAnimations.emplace(adjusted_id, animation);
         }
 
-        if (!objects.empty())
-        {
-            for (const auto& object : objects)
-            {
+        if (!objects.empty()) {
+            for (const auto &object: objects) {
                 // If an object contains more than one property, it's a weapon placement object.
-                if (object.properties.size() >= 2)
-                {
-                    for (auto &property : object.properties)
-                    {
-                        if (property.name == "helmetPlacement")
-                        {
+                if (object.properties.size() >= 2) {
+                    for (auto &property: object.properties) {
+                        if (property.name == "helmetPlacement") {
                             m_mapHelmetPlacements.emplace(adjusted_id, object);
                             if (id <= 180) m_helmets.push_back(id);
                         }
 
-                        if (property.name == "weaponPlacement")
-                        {
+                        if (property.name == "weaponPlacement") {
                             m_mapWeaponPlacements.emplace(adjusted_id, object);
                             if (id <= 180)
                                 m_weaponsIDs.emplace_back(id, GameType::stringToWeaponType(properties[0].value));
                         }
 
-                        if (property.name == "bodyArmourPlacement")
-                        {
+                        if (property.name == "bodyArmourPlacement") {
                             m_mapBodyArmourPlacement.emplace(adjusted_id, object);
                             if (id <= 180) m_bodyArmours.push_back(id);
                         }
                     }
-                }
-                else
-                {
+                } else {
                     m_mapCollisions.emplace(adjusted_id, object);
                 }
             }
@@ -169,27 +148,22 @@ void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedT
     }
 }
 
-void TextureSystem::loadTexturesFromFiles()
-{
+void TextureSystem::loadTexturesFromFiles() {
     const auto prefix = std::string(ASSET_PATH) + "/tileSets/";
     const auto sufix = ".json";
 
-    for (const auto& texture : m_setTextureFiles)
-    {
+    for (const auto &texture: m_setTextureFiles) {
         loadFromFile(prefix + texture + sufix);
     }
 }
 
-sf::Sprite TextureSystem::getTile(const std::string& tileSetName, const long id) const
-{
+sf::Sprite TextureSystem::getTile(const std::string &tileSetName, const long id) const {
     const auto textureIter = m_mapTexturesWithColorSchemeApplied.find(tileSetName);
     const auto indexIter = m_mapTextureIndexes.find(tileSetName);
 
-    if (textureIter != m_mapTexturesWithColorSchemeApplied.end() && indexIter != m_mapTextureIndexes.end())
-    {
+    if (textureIter != m_mapTexturesWithColorSchemeApplied.end() && indexIter != m_mapTextureIndexes.end()) {
         const auto rectIter = m_mapTextureRects.find(id + indexIter->second);
-        if (rectIter != m_mapTextureRects.end())
-        {
+        if (rectIter != m_mapTextureRects.end()) {
             return {textureIter->second, rectIter->second};
         }
     }
@@ -198,15 +172,12 @@ sf::Sprite TextureSystem::getTile(const std::string& tileSetName, const long id)
     return {};
 }
 
-Collision TextureSystem::getCollision(const std::string& tileSetName, const long id)
-{
+Collision TextureSystem::getCollision(const std::string &tileSetName, const long id) {
     auto indexIter = m_mapTextureIndexes.find(tileSetName);
 
-    if (indexIter != m_mapTextureIndexes.end())
-    {
+    if (indexIter != m_mapTextureIndexes.end()) {
         auto collisionIter = m_mapCollisions.find(id + indexIter->second);
-        if (collisionIter != m_mapCollisions.end())
-        {
+        if (collisionIter != m_mapCollisions.end()) {
             return collisionIter->second;
         }
     }
@@ -215,15 +186,12 @@ Collision TextureSystem::getCollision(const std::string& tileSetName, const long
     return {};
 }
 
-std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tileSetName, const long id)
-{
+std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string &tileSetName, const long id) {
     auto indexIter = m_mapTextureIndexes.find(tileSetName);
 
-    if (indexIter != m_mapTextureIndexes.end())
-    {
+    if (indexIter != m_mapTextureIndexes.end()) {
         auto animIter = m_mapAnimations.find(id + indexIter->second);
-        if (animIter != m_mapAnimations.end())
-        {
+        if (animIter != m_mapAnimations.end()) {
             return animIter->second;
         }
     }
@@ -235,20 +203,17 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
 /**
  * Load textures into tiles.
  */
-void TextureSystem::loadTextures()
-{
-    for (const auto entity : m_entities)
-    {
-        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+void TextureSystem::loadTextures() {
+    for (const auto entity: m_entities) {
+        auto &tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
         if (tileComponent.id < 0 || tileComponent.id > m_lNoTextures) // Ignore invalid values
         {
             continue;
         }
 
-        if (m_setTextureFiles.find(tileComponent.tileSet) == m_setTextureFiles.end())
-        {
+        if (m_setTextureFiles.find(tileComponent.tileSet) == m_setTextureFiles.end()) {
             continue;
         }
 
@@ -263,28 +228,24 @@ void TextureSystem::loadTextures()
         auto bodyArmourPlacementsIter = m_mapBodyArmourPlacement.find(adjusted_id);
 
         // Load animations from a system if tile is animated
-        if (animationsIter != m_mapAnimations.end())
-        {
+        if (animationsIter != m_mapAnimations.end()) {
             if (!gCoordinator.hasComponent<AnimationComponent>(entity))
                 gCoordinator.addComponent(entity, AnimationComponent{});
 
-            auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
+            auto &animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
             animation_component.frames = getAnimations(tileComponent.tileSet, tileComponent.id);
         }
 
-        if (collisionsIter != m_mapCollisions.end())
-        {
+        if (collisionsIter != m_mapCollisions.end()) {
             if (!gCoordinator.hasComponent<ColliderComponent>(entity))
                 gCoordinator.addComponent(entity, ColliderComponent{});
 
-            auto& cc = m_mapCollisions.at(adjusted_id);
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            auto &cc = m_mapCollisions.at(adjusted_id);
+            auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-            if (colliderComponent.body != nullptr && colliderComponent.collision != cc)
-            {
-                if (cc.x != colliderComponent.collision.x || cc.y != colliderComponent.collision.y)
-                {
+            if (colliderComponent.body != nullptr && colliderComponent.collision != cc) {
+                if (cc.x != colliderComponent.collision.x || cc.y != colliderComponent.collision.y) {
                     b2Vec2 offset = {(cc.x - colliderComponent.collision.x), (cc.y - colliderComponent.collision.y)};
 
                     offset.x = convertPixelsToMeters(offset.x * config::gameScale);
@@ -300,20 +261,17 @@ void TextureSystem::loadTextures()
             colliderComponent.collision = cc;
         }
 
-        if (helmetPlacementsIter != m_mapHelmetPlacements.end())
-        {
+        if (helmetPlacementsIter != m_mapHelmetPlacements.end()) {
             auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.helmetPlacement = m_mapHelmetPlacements.at(adjusted_id);
         }
 
-        if (weaponPlacementsIter != m_mapWeaponPlacements.end())
-        {
-            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        if (weaponPlacementsIter != m_mapWeaponPlacements.end()) {
+            auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.weaponPlacement = m_mapWeaponPlacements.at(adjusted_id);
         }
 
-        if (bodyArmourPlacementsIter != m_mapBodyArmourPlacement.end())
-        {
+        if (bodyArmourPlacementsIter != m_mapBodyArmourPlacement.end()) {
             auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.bodyArmourPlacement = m_mapBodyArmourPlacement.at(adjusted_id);
         }
@@ -326,28 +284,24 @@ void TextureSystem::loadTextures()
 }
 
 
-void TextureSystem::modifyColorScheme(const int playerFloor)
-{
+void TextureSystem::modifyColorScheme(const int playerFloor) {
     // One floor layout can be used for multiple levels
     const auto floorId = config::m_mapDungeonLevelToFloorInfo.at(playerFloor);
-    const std::string& tileSet = config::m_mapFloorToTextureFile.at(floorId);
+    const std::string &tileSet = config::m_mapFloorToTextureFile.at(floorId);
 
     // Copy image to apply color scheme
     sf::Image image = m_mapTextures.at(tileSet).copyToImage();
 
     const sf::Vector2u size = image.getSize();
-    const auto& [redBalance, greenBalance, blueBalance] = config::m_mapColorScheme.at(playerFloor);
+    const auto &[redBalance, greenBalance, blueBalance] = config::m_mapColorScheme.at(playerFloor);
 
-    auto applySemitoneFilter = [](const int value, const int shift) -> int
-    {
+    auto applySemitoneFilter = [](const int value, const int shift) -> int {
         return std::min(255, std::max(0, value + shift * 2)); // Simplified approximation for semitone effect
     };
 
     // Apply semitone filter for each pixel
-    for (unsigned int x = 0; x < size.x; ++x)
-    {
-        for (unsigned int y = 0; y < size.y; ++y)
-        {
+    for (unsigned int x = 0; x < size.x; ++x) {
+        for (unsigned int y = 0; y < size.y; ++y) {
             sf::Color pixel = image.getPixel(x, y);
 
             const int r = applySemitoneFilter(pixel.r, redBalance);
@@ -385,8 +339,8 @@ void TextureSystem::modifyColorScheme(const int playerFloor)
 
     std::stringstream stringHex;
     stringHex << "#" << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << red << std::setw(2)
-              << std::setfill('0') << std::hex << std::uppercase << green << std::setw(2) << std::setfill('0')
-              << std::hex << std::uppercase << blue;
+            << std::setfill('0') << std::hex << std::uppercase << green << std::setw(2) << std::setfill('0')
+            << std::hex << std::uppercase << blue;
 
     m_currentBackgroundColor = stringHex.str();
 }

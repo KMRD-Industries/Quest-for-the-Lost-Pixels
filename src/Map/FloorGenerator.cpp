@@ -8,23 +8,21 @@
 #include "Utils/Helpers.h"
 #include "Utils/Paths.h"
 
-void FloorGenerator::generateFloor(const int height, const int width, const int64_t seed)
-{
+void FloorGenerator::generateFloor(const int height, const int width, const int64_t seed) {
     m_generator = DungeonGenerator(height, width, seed);
 }
 
-bool FloorGenerator::isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const
-{
+bool FloorGenerator::isConnected(const glm::ivec2 &firstNode, const glm::ivec2 &secondNode) const {
     return m_generator.isConnected(firstNode, secondNode);
 }
 
-std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generate)
-{
+std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generate) {
     const auto firstRoom = getStartingRoom();
     const auto bossRoom = getBossRoom();
 
     const std::unordered_map<glm::ivec2, config::SpecialRoomTypes> coordRoomToTypes{
-        {firstRoom, config::SpecialRoomTypes::SpawnRoom}, {bossRoom, config::SpecialRoomTypes::BossRoom}};
+        {firstRoom, config::SpecialRoomTypes::SpawnRoom}, {bossRoom, config::SpecialRoomTypes::BossRoom}
+    };
 
     if (!generate) return m_floorMap;
 
@@ -36,34 +34,32 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
 
     const auto graphMap = m_generator.getGraph();
 
-    for (const auto& [nodePosition, nodeNeighbors] : graphMap)
-    {
+    for (const auto &[nodePosition, nodeNeighbors]: graphMap) {
         std::unordered_set<GameType::DoorEntraces> doorsForRoom;
-        for (const auto& neighbor : nodeNeighbors)
+        for (const auto &neighbor: nodeNeighbors)
             if (const auto dir = neighbor - nodePosition; m_mapDirOnGraphToEntrance.contains(dir))
                 doorsForRoom.insert(m_mapDirOnGraphToEntrance.at(dir));
 
         std::vector<GameType::MapInfo> availableMapsForRoom;
 
-        const auto correctRoomType{[&nodePosition, &coordRoomToTypes](const GameType::MapInfo& mapInfo)
-                                   {
-                                       if (!coordRoomToTypes.contains(nodePosition))
-                                       {
-                                           for (const auto& specialRoomPrefix :
-                                                config::prefixesForSpecialRooms | std::views::values)
-                                               if (mapInfo.mapID[0] == specialRoomPrefix) return false;
-                                           return true;
-                                       }
-                                       const auto roomType{coordRoomToTypes.at(nodePosition)};
-                                       const auto roomPrefix{config::prefixesForSpecialRooms.at(roomType)};
-                                       return mapInfo.mapID[0] == roomPrefix;
-                                   }};
+        const auto correctRoomType{
+            [&nodePosition, &coordRoomToTypes](const GameType::MapInfo &mapInfo) {
+                if (!coordRoomToTypes.contains(nodePosition)) {
+                    for (const auto &specialRoomPrefix:
+                         config::prefixesForSpecialRooms | std::views::values)
+                        if (mapInfo.mapID[0] == specialRoomPrefix) return false;
+                    return true;
+                }
+                const auto roomType{coordRoomToTypes.at(nodePosition)};
+                const auto roomPrefix{config::prefixesForSpecialRooms.at(roomType)};
+                return mapInfo.mapID[0] == roomPrefix;
+            }
+        };
 
         std::vector<GameType::MapInfo> availableMapsForRoomType;
         std::ranges::copy_if(availableMaps, std::back_inserter(availableMapsForRoomType), correctRoomType);
 
-        const auto haveSameDoorsPlacement = [&doorsForRoom](const GameType::MapInfo& mapInfo)
-        {
+        const auto haveSameDoorsPlacement = [&doorsForRoom](const GameType::MapInfo &mapInfo) {
             const std::unordered_set<GameType::DoorEntraces> mapDoors(mapInfo.doorsLoc.begin(), mapInfo.doorsLoc.end());
             return mapDoors == doorsForRoom;
         };
@@ -73,11 +69,12 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
 
         int minVal = std::numeric_limits<int>::max();
 
-        for (const auto& mapInfo : availableMapsForRoom) minVal = choosesMap[mapInfo];
+        for (const auto &mapInfo: availableMapsForRoom) minVal = choosesMap[mapInfo];
 
         std::vector<GameType::MapInfo> mapToChoose;
-        const auto haveMinimalValueOfDoors = [&choosesMap, &minVal](const GameType::MapInfo& mapInfo)
-        { return choosesMap[mapInfo] == minVal; };
+        const auto haveMinimalValueOfDoors = [&choosesMap, &minVal](const GameType::MapInfo &mapInfo) {
+            return choosesMap[mapInfo] == minVal;
+        };
 
         std::ranges::copy_if(availableMapsForRoom, std::back_inserter(mapToChoose), haveMinimalValueOfDoors);
 
@@ -94,35 +91,28 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
     return m_floorMap;
 }
 
-std::vector<GameType::MapInfo> FloorGenerator::getMapInfo() const
-{
+std::vector<GameType::MapInfo> FloorGenerator::getMapInfo() const {
     namespace fs = std::filesystem;
     const std::string path = std::string(ASSET_PATH) + "/maps/floor_0" + std::to_string(m_floorID) + "/";
 
     std::vector<GameType::MapInfo> mapInfo{};
 
-    try
-    {
-        if (!fs::exists(path) || !fs::is_directory(path))
-        {
+    try {
+        if (!fs::exists(path) || !fs::is_directory(path)) {
             std::cerr << "Directory does not exist or is not a directory: " << path << std::endl;
             return mapInfo;
         }
 
-        for (const auto& entry : fs::directory_iterator(path)) checkSingleFile(entry, mapInfo);
-    }
-    catch (const fs::filesystem_error& e)
-    {
+        for (const auto &entry: fs::directory_iterator(path)) checkSingleFile(entry, mapInfo);
+    } catch (const fs::filesystem_error &e) {
         std::cerr << "Filesystem error: " << e.what() << std::endl;
         return mapInfo;
     }
-    catch (const std::regex_error& e)
-    {
+    catch (const std::regex_error &e) {
         std::cerr << "Regex error: " << e.what() << std::endl;
         return mapInfo;
     }
-    catch (const std::exception& e)
-    {
+    catch (const std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
         return mapInfo;
     }
@@ -130,9 +120,8 @@ std::vector<GameType::MapInfo> FloorGenerator::getMapInfo() const
     return mapInfo;
 }
 
-void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& entry,
-                                     std::vector<GameType::MapInfo>& mapInfo)
-{
+void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry &entry,
+                                     std::vector<GameType::MapInfo> &mapInfo) {
     namespace fs = std::filesystem;
     using json = nlohmann::json;
 
@@ -144,16 +133,13 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     const size_t dotPos = filename.find_last_of('.');
     const std::string mapID = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
     const std::string numberStr = filename.substr(underscorePos + 1, dotPos - underscorePos - 1);
-    // const int mapID = std::stoi(numberStr);
-    // const int mapID = 110;
 
     if (!std::regex_match(filename, pattern)) return;
 
     std::cout << "Found matching file: " << filename << std::endl;
 
     std::ifstream file(entry.path());
-    if (!file.is_open())
-    {
+    if (!file.is_open()) {
         std::cerr << "Unable to open file: " << filename << std::endl;
         return;
     }
@@ -161,23 +147,21 @@ void FloorGenerator::checkSingleFile(const std::filesystem::directory_entry& ent
     json parsed_file;
     file >> parsed_file;
 
-    const auto& doorData = findSpecialBlocks(parsed_file);
+    const auto &doorData = findSpecialBlocks(parsed_file);
 
     const int mapWidth = parsed_file["width"];
     const int mapHeight = parsed_file["height"];
 
     std::vector<glm::ivec2> doorsPositions;
 
-    for (const auto& [doorPosition, blockType] : doorData)
-    {
+    for (const auto &[doorPosition, blockType]: doorData) {
         if (blockType != static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER)) continue;
         doorsPositions.push_back(doorPosition);
     }
 
     std::unordered_set<GameType::DoorEntraces> doorsLoc;
 
-    for (const auto& doorPosition : doorsPositions)
-    {
+    for (const auto &doorPosition: doorsPositions) {
         if (doorPosition.y == 0)
             doorsLoc.insert(GameType::DoorEntraces::NORTH);
         else if (doorPosition.y == mapHeight - 1)
