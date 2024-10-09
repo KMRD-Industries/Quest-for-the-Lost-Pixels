@@ -17,7 +17,6 @@ private:
     void handleMovement();
     void handleAttack() const;
     void handlePickUpAction();
-
-    InputHandler *inputHandler = nullptr;
+    InputHandler* inputHandler = nullptr;
     float m_frameTime{};
 };

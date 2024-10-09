@@ -11,7 +11,8 @@ class b2Body;
 
 struct ColliderComponent
 {
-    b2Body *body{nullptr};
+    b2Body* body{nullptr};
+
     std::string tag{};
     std::function<void(GameType::CollisionData)> onCollisionEnter;
     std::function<void(GameType::CollisionData)> onCollisionOut;

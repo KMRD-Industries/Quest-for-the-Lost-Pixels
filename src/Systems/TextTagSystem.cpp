@@ -16,10 +16,10 @@ void TextTagSystem::init() { this->loadFont(std::string(ASSET_PATH) + "/fonts/Pi
 
 void TextTagSystem::performFixedUpdate() const
 {
-    for (const auto &entity : m_entities)
+    for (const auto entity : m_entities)
     {
-        auto &textTagComponent = gCoordinator.getComponent<TextTagComponent>(entity);
-        auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& textTagComponent = gCoordinator.getComponent<TextTagComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         textTagComponent.text.setFont(this->font);
         textTagComponent.text.setOutlineColor(sf::Color(0, 0, 0, 128));
@@ -47,12 +47,12 @@ void TextTagSystem::loadFont(const std::string &path)
 
 void TextTagSystem::initPresets() {}
 
-void TextTagSystem::render(sf::RenderTarget &window)
+void TextTagSystem::render(sf::RenderTarget& window)
 {
-    for (const auto &entity : m_entities)
+    for (const auto entity : m_entities)
     {
-        auto &textTag = gCoordinator.getComponent<TextTagComponent>(entity);
-        const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& textTag = gCoordinator.getComponent<TextTagComponent>(entity);
+        const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         textTag.text.setPosition(transformComponent.position + GameUtility::mapOffset);
         textTag.text.setString(std::to_string(config::playerAttackDamage));
@@ -70,7 +70,7 @@ void TextTagSystem::deleteTags()
 
     for (const auto entity : m_entities)
     {
-        const auto &textTag = gCoordinator.getComponent<TextTagComponent>(entity);
+        const auto& textTag = gCoordinator.getComponent<TextTagComponent>(entity);
         if (textTag.lifetime <= 0) entityToRemove.push_back(entity);
     }
 

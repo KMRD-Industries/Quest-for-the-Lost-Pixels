@@ -11,7 +11,7 @@ template <typename T>
 class ComponentArray final : public IComponentArray
 {
 public:
-    void insertData(const Entity entity, const T &component)
+    void insertData(const Entity entity, const T& component)
     {
         assert(!m_entityToIndex.contains(entity) && "Component added to same entity more than once.");
         const size_t newIndex{m_size};
@@ -39,15 +39,18 @@ public:
         --m_size;
     }
 
-    bool hasComponent(const Entity entity) const { return m_entityToIndex.contains(entity); }
-
-    T *tryGetData(const Entity entity)
+    bool hasComponent(const Entity entity) const
     {
-        if (!m_entityToIndex.contains(entity)) return nullptr;
+        return m_entityToIndex.contains(entity);
+    }
+
+    T* tryGetData(const Entity entity)
+    {
+        if(!m_entityToIndex.contains(entity)) return nullptr;
         return &m_componentArray[m_entityToIndex[entity]];
     }
 
-    T &getData(const Entity entity)
+    T& getData(const Entity entity)
     {
         assert(m_entityToIndex.contains(entity) && "Retrieving non-existent component.");
         return m_componentArray[m_entityToIndex[entity]];

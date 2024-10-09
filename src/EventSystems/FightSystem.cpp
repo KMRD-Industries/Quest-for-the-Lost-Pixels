@@ -14,13 +14,13 @@
 
 FightSystem::FightSystem() { init(); }
 
-void FightSystem::init() const {}
+void FightSystem::init() {}
 
 void FightSystem::update()
 {
     for (const auto entity : m_entities)
     {
-        const auto &[eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
+        const auto& [eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
 
         // Start attack animation
         const auto &equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(eventEntity);
@@ -73,13 +73,13 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
     const auto range = direction * (config::playerAttackRange * std::abs(transformComponent.scale.x));
     const auto point2 = center + range;
 
-    const auto targetInBox = Physics::rayCast(center, point2, playerEntity);
+    const auto targetInBox = Physics::rayCast(center, point2, eventEntity);
 
     if (targetInBox.tag == "Enemy")
     {
-        auto &characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
-        const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(targetInBox.entityID);
-        auto &secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(targetInBox.entityID);
+        auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(targetInBox.entityID);
+        auto& secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(targetInBox.entityID);
 
         const Entity tag = gCoordinator.createEntity();
         gCoordinator.addComponent(tag, TextTagComponent{});
@@ -88,13 +88,13 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
         characterComponent.attacked = true;
         characterComponent.hp -= config::playerAttackDamage;
 
-        const b2Vec2 &attackerPos = gCoordinator.getComponent<ColliderComponent>(playerEntity).body->GetPosition();
-        const b2Vec2 &targetPos = colliderComponent.body->GetPosition();
+        const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(eventEntity).body->GetPosition();
+        const b2Vec2& targetPos = colliderComponent.body->GetPosition();
 
         b2Vec2 recoilDirection = targetPos - attackerPos;
         recoilDirection.Normalize();
 
-        const float &recoilMagnitude = 20.0f;
+        const float& recoilMagnitude = 20.0f;
         const b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
 
         secondPlayertransformComponent.velocity.x += static_cast<float>(recoilVelocity.x * config::meterToPixelRatio);
@@ -105,15 +105,15 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
     }
 }
 
-void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData &collisionData) const
+void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData& collisionData) const
 {
     if (std::regex_match(collisionData.tag, config::playerRegexTag)) return;
     if (collisionData.tag == "Bullet") return;
 
     if (collisionData.tag == "Enemy")
     {
-        auto &characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
-        auto &enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);
+        auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
+        auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);
 
         const Entity tag = gCoordinator.createEntity();
         gCoordinator.addComponent(tag, TextTagComponent{});
@@ -126,7 +126,7 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
     gCoordinator.getComponent<CharacterComponent>(bullet).hp = -1;
 }
 
-float FightSystem::calculateAngle(const sf::Vector2f &pivotPoint, const sf::Vector2f &targetPoint) const
+float FightSystem::calculateAngle(const sf::Vector2f& pivotPoint, const sf::Vector2f& targetPoint) const
 {
     const sf::Vector2f direction = targetPoint - pivotPoint;
     return std::atan2(direction.y, direction.x);

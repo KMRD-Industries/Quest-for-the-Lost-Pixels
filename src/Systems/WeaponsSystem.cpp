@@ -29,13 +29,13 @@ void WeaponSystem::performFixedUpdate()
 
 inline void WeaponSystem::updateWeaponAngle(const Entity entity)
 {
-    auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
 
     if (!weaponComponent.isAttacking) return;
     rotateWeapon(entity, weaponComponent.isSwingingForward);
 }
 
-void WeaponSystem::deleteItems() const
+void WeaponSystem::deleteItems()
 {
     std::deque<Entity> entityToRemove;
 
@@ -50,9 +50,10 @@ void WeaponSystem::deleteItems() const
     for (const auto entity : entityToRemove) gCoordinator.destroyEntity(entity);
 }
 
+
 inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward)
 {
-    auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
 
     weaponComponent.remainingDistance -= weaponComponent.rotationSpeed;
     const float direction = weaponComponent.isFacingRight ? 1.f : -1.f;

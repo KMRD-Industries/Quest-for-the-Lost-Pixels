@@ -73,8 +73,8 @@ void PlayerMovementSystem::handleMovement()
     for (const auto entity : m_entities)
     {
         // Handle Movement
-        auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto &equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        const auto& equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
         const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
         const auto playerSpeed = glm::vec2{normalizedDir.x * config::playerAcc, normalizedDir.y * config::playerAcc};
 
@@ -93,11 +93,10 @@ void PlayerMovementSystem::handleMovement()
 
                 weaponComponent->pivotPoint = inputHandler->getMousePosition();
                 weaponRenderComponent.dirty = true;
-
-                transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
-                                            transformComponent.scale.y};
-                weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+                transformComponent.scale = {weaponComponent.targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y};
+                weaponTransformComponent.scale = {weaponComponent.targetPoint.x <= 0 ? -1.f : 1.f,
                                                   weaponTransformComponent.scale.y};
+
             }
         }
 
@@ -126,7 +125,7 @@ void PlayerMovementSystem::handleAttack() const
 {
     const auto inputHandler{InputHandler::getInstance()};
 
-    for (const auto &entity : m_entities)
+    for (const auto& entity : m_entities)
     {
         if (!inputHandler->isPressed(InputType::Attack)) continue;
 

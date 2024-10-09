@@ -24,10 +24,10 @@ class InputHandler
 
     struct InputKeyHash
     {
-        std::size_t operator()(const InputKey &key) const
+        std::size_t operator()(const InputKey& key) const
         {
             return std::visit(
-                []<typename T0>(T0 &&k) -> std::size_t
+                []<typename T0>(T0&& k) -> std::size_t
                 {
                     return std::hash<std::underlying_type_t<std::decay_t<T0>>>{}(
                         static_cast<std::underlying_type_t<std::decay_t<T0>>>(k));
@@ -50,13 +50,12 @@ class InputHandler
         {sf::Keyboard::F1, InputType::DebugMode} // Handling for the right mouse button
     };
 
-    inline static InputHandler *m_instance{};
+    inline static InputHandler* m_instance{};
     sf::Vector2f m_mousePosition{};
-
     InputHandler() = default;
 
 public:
-    static InputHandler *getInstance()
+    static InputHandler* getInstance()
     {
         if (m_instance == nullptr)
         {
@@ -64,13 +63,11 @@ public:
         }
         return m_instance;
     };
-
     [[nodiscard]] bool isHeld(InputType input) const;
     [[nodiscard]] bool isPressed(InputType input) const;
-
     sf::Vector2f getMousePosition() const;
-    void handleKeyboardInput(const InputKey &, const bool &);
-    void updateMousePosition(const sf::Vector2f &);
+    void handleKeyboardInput(const InputKey&, const bool&);
+    void updateMousePosition(const sf::Vector2f&);
     void clearPressedInputs();
     void update();
 

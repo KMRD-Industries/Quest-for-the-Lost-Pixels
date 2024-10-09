@@ -130,6 +130,7 @@ namespace config
     static const std::unordered_map<long, ColorBalance> m_mapColorScheme{
         {1, {25, 0, 0}}, {2, {0, 25, 0}}, {3, {0, 15, 15}}, {4, {45, 6, 35}}, {5, {15, 62, 35}}};
 
+
     enum class SpecialRoomTypes
     {
         NormalRoom,
@@ -222,7 +223,7 @@ namespace config
         return 0x0000;
     }
 
-    inline int16 stringToIndexGroup(const std::string &str)
+    inline uint16 stringToIndexGroup(const std::string& str)
     {
         if (str == "Bullet") return -8;
         return 0;

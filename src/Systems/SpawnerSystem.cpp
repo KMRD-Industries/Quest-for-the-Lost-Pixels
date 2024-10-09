@@ -28,8 +28,8 @@ void SpawnerSystem::update(const float timeStamp)
 
     for (const auto entity : m_entities)
     {
-        auto &spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto &spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
+        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
@@ -39,8 +39,8 @@ void SpawnerSystem::update(const float timeStamp)
     cleanUpUnnecessarySpawners();
 }
 
-void SpawnerSystem::processSpawner(SpawnerComponent &spawnerComponent,
-                                   const TransformComponent &spawnerTransformComponent) const
+void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
+                                   const TransformComponent& spawnerTransformComponent) const
 {
     // Check if the spawner is ready to spawn the enemy.
     if (m_spawnTime < SPAWN_RATE) return;
@@ -50,7 +50,7 @@ void SpawnerSystem::processSpawner(SpawnerComponent &spawnerComponent,
     spawnEnemy(spawnerTransformComponent, spawnerComponent.enemyType);
 }
 
-void SpawnerSystem::spawnEnemy(const TransformComponent &spawnerTransformComponent,
+void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent,
                                const Enemies::EnemyType enemyType) const
 {
     const auto enemyConfig = getRandomEnemyData(enemyType);
@@ -70,12 +70,13 @@ void SpawnerSystem::spawnEnemy(const TransformComponent &spawnerTransformCompone
 
     auto newEvent = CreateBodyWithCollisionEvent(
         newMonsterEntity, "Enemy",
-        [&, newMonsterEntity, enemyConfig](const GameType::CollisionData &collisionData)
+        [&, newMonsterEntity, enemyConfig](const GameType::CollisionData& collisionData)
         {
             if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
-            auto &playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
+            auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;
+
             playerCharacterComponent.hp -= enemyConfig.damage;
 
             const Entity tag = gCoordinator.createEntity();
@@ -85,8 +86,8 @@ void SpawnerSystem::spawnEnemy(const TransformComponent &spawnerTransformCompone
 
             if (!config::applyKnockback) return;
 
-            auto &playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
-            auto &myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
+            auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
+            auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
 
             b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -
                                       myCollisionComponent.body->GetPosition()};
@@ -95,7 +96,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent &spawnerTransformCompone
             const auto knockbackForce{config::defaultEnemyKnockbackForce * knockbackDirection};
             playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
         },
-        [&](const GameType::CollisionData &) {}, false, false);
+        [&](const GameType::CollisionData&) {}, false, false);
 
     gCoordinator.addComponent(newEventEntity, newEvent);
 }
@@ -117,8 +118,8 @@ void SpawnerSystem::spawnEnemies()
 {
     for (const auto entity : m_entities)
     {
-        auto &spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto &spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
+        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
     cleanUpUnnecessarySpawners();
@@ -131,7 +132,7 @@ void SpawnerSystem::cleanUpUnnecessarySpawners()
 
     for (const auto entity : m_entities)
     {
-        if (const auto &spawner = gCoordinator.getComponent<SpawnerComponent>(entity);
+        if (const auto& spawner = gCoordinator.getComponent<SpawnerComponent>(entity);
             !spawner.loopSpawn && spawner.noSpawns >= 1)
         {
             entityToKill.insert(entity);

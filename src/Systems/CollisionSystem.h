@@ -13,8 +13,8 @@ struct TransformComponent;
 
 class MyContactListener : public b2ContactListener
 {
-    void BeginContact(b2Contact *contact) override;
-    void EndContact(b2Contact *contact) override;
+    void BeginContact(b2Contact* contact) override;
+    void EndContact(b2Contact* contact) override;
 };
 
 class CollisionSystem : public System
@@ -31,10 +31,10 @@ public:
     CollisionSystem();
 
     void createBody(
-        Entity entity, const std::string &tag, const glm::vec2 &colliderSize = {},
-        const std::function<void(GameType::CollisionData)> &onCollisionEnter = [](const GameType::CollisionData &) {},
-        const std::function<void(GameType::CollisionData)> &onCollisionOut = [](const GameType::CollisionData &) {},
-        bool isStatic = true, bool useTextureSize = true, const glm::vec2 &offset = {0., 0.});
+        Entity entity, const std::string& tag, const glm::vec2& colliderSize = {},
+        const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&) {},
+        const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&) {},
+        bool isStatic = true, bool useTextureSize = true, const glm::vec2& offset = {0., 0.});
 
 private:
     MyContactListener m_myContactListenerInstance;

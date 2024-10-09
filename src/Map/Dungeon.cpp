@@ -96,6 +96,7 @@ void Dungeon::init()
     setupHelmetEntity(m_entities[m_id]);
 }
 
+
 void Dungeon::addPlayerComponents(const Entity player)
 {
     gCoordinator.addComponent(player, TileComponent{config::playerAnimation, "Characters", 5});
@@ -109,7 +110,7 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, EquipmentComponent{});
     gCoordinator.addComponent(player, FloorComponent{});
     gCoordinator.addComponent(
-        player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2 &dir) { moveInDungeon(dir); }});
+        player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
     gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
 
@@ -134,7 +135,7 @@ void Dungeon::createRemotePlayer(const uint32_t id)
 
     const Entity entity = gCoordinator.createEntity();
     const auto newEvent = CreateBodyWithCollisionEvent(
-        m_entities[id], tag, [&](const GameType::CollisionData &) {}, [&](const GameType::CollisionData &) {}, false,
+        m_entities[id], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false,
         false);
 
     gCoordinator.addComponent(entity, newEvent);
@@ -145,16 +146,16 @@ void Dungeon::createRemotePlayer(const uint32_t id)
 
 void Dungeon::setupPlayerCollision(const Entity player)
 {
-    const auto &cc = m_textureSystem->getCollision("Characters", config::playerAnimation);
+    const auto& cc = m_textureSystem->getCollision("Characters", config::playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(player).collision = cc;
     const std::string tag = std::format("Player {}", m_id);
 
-    auto onCollisionIn = [&](const GameType::CollisionData &entityT)
+    auto onCollisionIn = [&](const GameType::CollisionData& entityT)
     {
         if (entityT.tag == "Door")
         {
-            const auto &doorComponent = gCoordinator.getComponent<DoorComponent>(entityT.entityID);
-            auto &travellingDungeonComponent = gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[m_id]);
+            const auto& doorComponent = gCoordinator.getComponent<DoorComponent>(entityT.entityID);
+            auto& travellingDungeonComponent = gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[m_id]);
 
             if (travellingDungeonComponent.doorsPassed == 0)
             {
@@ -166,7 +167,7 @@ void Dungeon::setupPlayerCollision(const Entity player)
 
         if (entityT.tag == "Passage")
         {
-            auto &passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
+            auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
 
             if (!passageComponent.activePassage) return;
 
@@ -176,11 +177,11 @@ void Dungeon::setupPlayerCollision(const Entity player)
         }
     };
 
-    auto onCollisionOut = [&](const GameType::CollisionData &entityT)
+    auto onCollisionOut = [&](const GameType::CollisionData& entityT)
     {
         if (entityT.tag == "Door")
         {
-            auto &travellingDungeonComponent = gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[m_id]);
+            auto& travellingDungeonComponent = gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[m_id]);
             --travellingDungeonComponent.doorsPassed;
         }
     };
@@ -234,17 +235,16 @@ void Dungeon::draw()
 
 void Dungeon::update(const float deltaTime)
 {
-    m_itemSystem->update();
     m_playerMovementSystem->update(deltaTime);
     m_weaponSystem->update(deltaTime);
-    m_animationSystem->update(deltaTime);
-    m_textTagSystem->update(deltaTime);
-    m_roomListenerSystem->update(deltaTime);
-    m_itemSpawnerSystem->updateAnimation(deltaTime);
     m_enemySystem->update();
     m_travellingSystem->update();
     m_passageSystem->update();
     m_characterSystem->update();
+    m_animationSystem->update(deltaTime);
+    m_textTagSystem->update(deltaTime);
+    m_roomListenerSystem->update(deltaTime);
+    m_itemSpawnerSystem->updateAnimation(deltaTime);
 
     if (m_multiplayerSystem->isConnected())
     {
@@ -275,7 +275,7 @@ void Dungeon::update(const float deltaTime)
     m_roomMap.at(m_currentPlayerPos).update();
 }
 
-void Dungeon::changeRoom(const glm::ivec2 &room)
+void Dungeon::changeRoom(const glm::ivec2& room)
 {
     clearDungeon();
     auto dir = room - m_currentPlayerPos;
@@ -292,7 +292,7 @@ void Dungeon::changeRoom(const glm::ivec2 &room)
     {
         const sf::Vector2f newPosition = position + offset + GameType::MyVec2(id, id);
         gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
-        const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
 
         colliderComponent.body->SetTransform(
             {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
@@ -335,7 +335,7 @@ void Dungeon::makeSimpleFloor()
 void Dungeon::moveDownDungeon()
 {
     makeSimpleFloor();
-    const auto &pos = GameUtility::startingPosition;
+    const auto& pos = GameUtility::startingPosition;
 
     clearDungeon();
     m_passageSystem->setPassages(false);
@@ -352,7 +352,7 @@ void Dungeon::moveDownDungeon()
     m_roomListenerSystem->reset();
 }
 
-inline void Dungeon::loadMap(const std::string &path) const
+inline void Dungeon::loadMap(const std::string& path) const
 {
     m_mapSystem->loadMap(path);
     m_textureSystem->loadTextures();
@@ -366,13 +366,13 @@ inline void Dungeon::clearDungeon() const
     m_enemySystem->deleteEnemies();
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
-    m_itemSystem->deleteItems();
+    m_weaponSystem->deleteItems();
     m_collisionSystem->deleteMarkedBodies();
     gCoordinator.getRegisterSystem<ObjectCreatorSystem>()->clear();
     gCoordinator.getRegisterSystem<FightSystem>()->clear();
 }
 
-void Dungeon::moveInDungeon(const glm::ivec2 &dir)
+void Dungeon::moveInDungeon(const glm::ivec2& dir)
 {
     if (m_roomMap.contains(m_currentPlayerPos + dir))
     {
@@ -397,7 +397,7 @@ void Dungeon::moveInDungeon(const glm::ivec2 &dir)
             const sf::Vector2f newPosition = {position.x + offset.x + id, position.y + offset.y + id};
 
             gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
-            const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+            const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
             colliderComponent.body->SetTransform(
                 {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
                 colliderComponent.body->GetAngle());

@@ -19,7 +19,7 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const con
 
     // Create new item Entity with ItemAnimationComponent and all unique
     // components from equipped item. Since new entity contains ItemAnimationComponent
-    // spawning will be handled in similay way to spawning from ItemSpawnerSystem.
+    // spawning will be handled in similar way to spawning from ItemSpawnerSystem.
     const Entity newItemEntity = gCoordinator.createEntity();
 
     gCoordinator.addComponents(

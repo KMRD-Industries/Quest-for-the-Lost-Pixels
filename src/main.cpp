@@ -14,7 +14,7 @@
 
 Coordinator gCoordinator;
 
-void handleInput(sf::RenderWindow &window)
+void handleInput(sf::RenderWindow& window)
 {
     sf::Event event{};
     InputHandler::getInstance()->update();
@@ -66,9 +66,9 @@ int main()
     Game game;
     game.init();
 
-    RenderSystem *m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
-    TextTagSystem *m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
-    TextureSystem *m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
+    RenderSystem* m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
+    TextTagSystem* m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
+    TextureSystem* m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
 
     while (window.isOpen())
     {

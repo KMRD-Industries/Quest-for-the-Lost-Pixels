@@ -11,9 +11,9 @@
 
 class DungeonGenerator
 {
-    using DirectedGraph = std::unordered_map<glm::ivec2, std::unordered_set<glm::ivec2> >;
-    using UnDirectedGraph = std::unordered_map<glm::ivec2, std::unordered_set<glm::ivec2> >;
-    using PathsNodes = std::unordered_map<std::string, std::unordered_set<glm::ivec2> >;
+    using DirectedGraph = std::unordered_map<glm::ivec2, std::unordered_set<glm::ivec2>>;
+    using UnDirectedGraph = std::unordered_map<glm::ivec2, std::unordered_set<glm::ivec2>>;
+    using PathsNodes = std::unordered_map<std::string, std::unordered_set<glm::ivec2>>;
     using NodesPath = std::unordered_map<glm::ivec2, std::string>;
     using RoomCount = std::unordered_map<glm::ivec2, int>;
     using NodeEnterEdgesCount = std::unordered_map<glm::ivec2, int>;
@@ -38,33 +38,19 @@ public:
     };
 
     DungeonGenerator() = default;
-
-    DungeonGenerator(const int height, const int width, const int64_t seed) :
-        m_height(height), m_width(width), gen(seed) {};
-
+    DungeonGenerator(const int height, const int width, const int64_t seed) : m_height(height), m_width(width), gen(seed) {};
     void generateMainPath(int pathLength);
-
-    void generateSidePath(const sidePathConfig &pathConfig);
-
+    void generateSidePath(const sidePathConfig& pathConfig);
     void makeLockAndKey();
-
     NodesPath getNodes();
-
     RoomCount getCount();
-
     [[nodiscard]] UnDirectedGraph getGraph() const;
-
-    [[nodiscard]] std::optional<char> getLock(const glm::ivec2 &node) const;
-
-    [[nodiscard]] std::optional<char> getKey(const glm::ivec2 &node) const;
-
+    [[nodiscard]] std::optional<char> getLock(const glm::ivec2& node) const;
+    [[nodiscard]] std::optional<char> getKey(const glm::ivec2& node) const;
     [[nodiscard]] glm::ivec2 getStartingRoom() const;
-
     [[nodiscard]] glm::ivec2 getBossRoom() const;
-
     [[nodiscard]] glm::ivec2 getEndingRoom() const;
-
-    [[nodiscard]] bool isConnected(const glm::ivec2 &firstNode, const glm::ivec2 &secondNode) const;
+    [[nodiscard]] bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
 
     int getOutEdgesCount(int i, int j) const
     {
@@ -72,25 +58,22 @@ public:
         {
             return m_nodeOutEdgesCount.at({i, j});
         }
-        catch (const std::out_of_range &e)
+        catch (const std::out_of_range& e)
         {
             return {};
         }
     };
 
 private:
-    void generateMainPath(const PathConfig &pathConfig);
-
+    void generateMainPath(const PathConfig& pathConfig);
     std::optional<glm::ivec2> getRandomNeighbor(
-        const glm::ivec2 &current, const std::unordered_set<glm::ivec2> &nodesInPath,
-        const std::unordered_map<glm::ivec2, std::unordered_set<glm::ivec2> > &visitedNeighbors, int minL, int maxL,
-        const std::string &endPath = "");
+        const glm::ivec2& current, const std::unordered_set<glm::ivec2>& nodesInPath,
+        const std::unordered_map<glm::ivec2, std::unordered_set<glm::ivec2>>& visitedNeighbors, int minL, int maxL,
+        const std::string& endPath = "");
 
-    sidePathConfig validateAndRepairSidePathConfig(const sidePathConfig &pathConfig);
-
-    void validateMainPath(const PathConfig &pathConfig) const;
-
-    void findPlaceForKey(const glm::ivec2 &lock);
+    sidePathConfig validateAndRepairSidePathConfig(const sidePathConfig& pathConfig);
+    void validateMainPath(const PathConfig& pathConfig) const;
+    void findPlaceForKey(const glm::ivec2& lock);
 
     int m_height{}, m_width{};
     PathsNodes m_paths{};
