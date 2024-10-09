@@ -119,8 +119,6 @@ void CollisionSystem::updateCollision() const
 void CollisionSystem::updateSimulation(const float timeStep, const int32 velocityIterations,
                                        const int32 positionIterations) const
 {
-    if (config::debugMode)
-        std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
     Physics::getWorld()->Step(timeStep, velocityIterations, positionIterations);
     for (const auto entity : m_entities)
     {
@@ -239,6 +237,9 @@ void CollisionSystem::createBody(const Entity entity, const std::string& tag, co
     colliderComponent.onCollisionEnter = onCollisionEnter;
     colliderComponent.onCollisionOut = onCollisionOut;
     colliderComponent.tag = tag;
+
+    if (config::debugMode)
+        std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
 }
 
 void CollisionSystem::deleteBody(const Entity entity)
