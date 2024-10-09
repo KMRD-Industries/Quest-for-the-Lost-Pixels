@@ -241,6 +241,7 @@ void Dungeon::update(const float deltaTime)
     m_travellingSystem->update();
     m_passageSystem->update();
     m_characterSystem->update();
+    m_itemSystem->update();
     m_animationSystem->update(deltaTime);
     m_textTagSystem->update(deltaTime);
     m_roomListenerSystem->update(deltaTime);
@@ -366,7 +367,7 @@ inline void Dungeon::clearDungeon() const
     m_enemySystem->deleteEnemies();
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
-    m_weaponSystem->deleteItems();
+    m_itemSystem->deleteItems();
     m_collisionSystem->deleteMarkedBodies();
     gCoordinator.getRegisterSystem<ObjectCreatorSystem>()->clear();
     gCoordinator.getRegisterSystem<FightSystem>()->clear();

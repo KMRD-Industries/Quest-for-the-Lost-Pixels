@@ -78,10 +78,10 @@ private:
     WeaponSystem* m_weaponSystem;
     TextTagSystem* m_textTagSystem;
     HealthBarSystem* m_healthBarSystem;
-    EquipWeaponSystem* m_equipWeaponSystem;
     InventorySystem* m_inventorySystem;
     CollisionSystem* m_collisionSystem;
     ChestSystem* m_chestSystem;
     RoomListenerSystem* m_roomListenerSystem;
     ItemSpawnerSystem* m_itemSpawnerSystem;
+    ItemSystem* m_itemSystem;
 };

@@ -23,8 +23,8 @@ void FightSystem::update()
         const auto& [eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
 
         // Start attack animation
-        const auto &equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(eventEntity);
-        const auto &weaponComponent =
+        const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(eventEntity);
+        const auto& weaponComponent =
             gCoordinator.getComponent<WeaponComponent>(equippedWeapon.slots.at(config::slotType::WEAPON));
 
         switch (weaponComponent.type)
@@ -53,10 +53,10 @@ void FightSystem::handleBowAttack(Entity) {}
 
 void FightSystem::handleMeleeAttack(const Entity playerEntity) const
 {
-    const auto &playerRenderComponent = gCoordinator.getComponent<RenderComponent>(playerEntity);
-    const auto &[playerEquippedWeapon] = gCoordinator.getComponent<EquipmentComponent>(playerEntity);
-    const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(playerEntity);
-    auto &weaponComponent =
+    const auto& playerRenderComponent = gCoordinator.getComponent<RenderComponent>(playerEntity);
+    const auto& [playerEquippedWeapon] = gCoordinator.getComponent<EquipmentComponent>(playerEntity);
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(playerEntity);
+    auto& weaponComponent =
         gCoordinator.getComponent<WeaponComponent>(playerEquippedWeapon.at(config::slotType::WEAPON));
 
     weaponComponent.isFacingRight = playerRenderComponent.sprite.getScale().x > 0;
@@ -73,7 +73,7 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
     const auto range = direction * (config::playerAttackRange * std::abs(transformComponent.scale.x));
     const auto point2 = center + range;
 
-    const auto targetInBox = Physics::rayCast(center, point2, eventEntity);
+    const auto targetInBox = Physics::rayCast(center, point2, playerEntity);
 
     if (targetInBox.tag == "Enemy")
     {
@@ -88,7 +88,7 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
         characterComponent.attacked = true;
         characterComponent.hp -= config::playerAttackDamage;
 
-        const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(eventEntity).body->GetPosition();
+        const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(playerEntity).body->GetPosition();
         const b2Vec2& targetPos = colliderComponent.body->GetPosition();
 
         b2Vec2 recoilDirection = targetPos - attackerPos;

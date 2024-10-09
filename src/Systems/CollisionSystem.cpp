@@ -74,7 +74,9 @@ void CollisionSystem::createMapCollision()
         auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
-            gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
+            gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
+            gCoordinator.hasComponent<HelmetComponent>(entity) ||
+            gCoordinator.hasComponent<BodyArmourComponent>(entity))
         {
             continue;
         }
@@ -99,7 +101,7 @@ void CollisionSystem::createMapCollision()
     }
 }
 
-void CollisionSystem::update(const float &deltaTime)
+void CollisionSystem::update(const float& deltaTime)
 {
     if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs)
     {

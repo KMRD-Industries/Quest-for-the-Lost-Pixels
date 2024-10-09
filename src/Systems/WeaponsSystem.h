@@ -13,4 +13,5 @@ private:
     void updateStartingAngle(Entity);
     void setAngle(Entity);
     void rotateWeapon(Entity, bool);
+    float m_frameTime{};
 };

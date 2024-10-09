@@ -148,6 +148,7 @@ void ItemSystem::update()
 
 void ItemSystem::input(const Entity player)
 {
+    if (m_closestEntity == Entity{} || m_closestEntitySlotType == config::slotType{}) return;
     gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(player, m_closestEntity, m_closestEntitySlotType);
 }
 

@@ -86,17 +86,17 @@ void PlayerMovementSystem::handleMovement()
         {
             const Entity weaponEntity = equipment.slots.at(config::slotType::WEAPON);
 
-            if (auto *weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(weaponEntity))
+            if (auto* weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(weaponEntity))
             {
-                auto &weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
-                auto &weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
+                auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
+                auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
 
                 weaponComponent->pivotPoint = inputHandler->getMousePosition();
                 weaponRenderComponent.dirty = true;
-                transformComponent.scale = {weaponComponent.targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y};
-                weaponTransformComponent.scale = {weaponComponent.targetPoint.x <= 0 ? -1.f : 1.f,
+                transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+                                            transformComponent.scale.y};
+                weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
                                                   weaponTransformComponent.scale.y};
-
             }
         }
 
@@ -125,7 +125,7 @@ void PlayerMovementSystem::handleAttack() const
 {
     const auto inputHandler{InputHandler::getInstance()};
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
         if (!inputHandler->isPressed(InputType::Attack)) continue;
 

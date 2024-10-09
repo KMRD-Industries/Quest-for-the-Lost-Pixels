@@ -23,14 +23,14 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
 {
     for (const auto entity : m_entities)
     {
-        auto& animationComponent = gCoordinator.getComponent<ItemAnimationComponent>(entity);
+        auto &animationComponent = gCoordinator.getComponent<ItemAnimationComponent>(entity);
         const auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (animationComponent.destroy) continue;
         if (!animationComponent.shouldAnimate)
         {
-            const auto& itemBehaviour = gCoordinator.getComponent<ItemComponent>(entity).behaviour;
-            auto& itemValue = gCoordinator.getComponent<ItemComponent>(entity).value;
+            const auto &itemBehaviour = gCoordinator.getComponent<ItemComponent>(entity).behaviour;
+            auto &itemValue = gCoordinator.getComponent<ItemComponent>(entity).value;
 
             const Entity newItemEntity = gCoordinator.createEntity();
             const std::string itemTag = gCoordinator.hasComponent<PotionComponent>(entity) ? "Potion" : "Item";
@@ -38,7 +38,7 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
             const auto newEvent = CreateBodyWithCollisionEvent(
                 entity, itemTag, [this, entity, itemBehaviour, itemValue](const GameType::CollisionData &collisionData)
                 { handlePotionCollision(entity, collisionData, itemBehaviour, itemValue); },
-                [&](const GameType::CollisionData&) {}, false, false);
+                [&](const GameType::CollisionData &) {}, false, false);
 
             gCoordinator.addComponent(newItemEntity, newEvent);
 
@@ -46,9 +46,9 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
         }
         else
         {
-            animationComponent.currentAnimationTime += deltaTime * 4;
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+            animationComponent.currentAnimationTime += deltaTime * 4.f / 1000.f;
+            auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
             const float newPositionY =
                 animationComponent.currentAnimationTime * (animationComponent.currentAnimationTime - 2.f) * 100;
@@ -66,11 +66,9 @@ void ItemSpawnerSystem::deleteItems()
     for (const auto entity : m_entities)
     {
         if (const auto *itemComponent = gCoordinator.tryGetComponent<ItemComponent>(entity))
-            if (itemComponent->equipped == true)
-                continue;
+            if (itemComponent->equipped == true) continue;
 
-        if (auto *collision = gCoordinator.tryGetComponent<ColliderComponent>(entity))
-            collision->toDestroy = true;
+        if (auto *collision = gCoordinator.tryGetComponent<ColliderComponent>(entity)) collision->toDestroy = true;
     }
 }
 
