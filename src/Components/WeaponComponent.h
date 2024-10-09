@@ -1,8 +1,7 @@
 #pragma once
 #include "Config.h"
 
-struct WeaponComponent
-{
+struct WeaponComponent {
     int id{};
     int damageAmount{config::weaponComponentDefaultDamageAmount};
     bool isAttacking{config::weaponComponentDefaultIsAttacking};

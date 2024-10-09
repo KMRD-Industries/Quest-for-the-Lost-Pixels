@@ -5,13 +5,16 @@
 
 extern Coordinator gCoordinator;
 
-class AnimationSystem : public System
-{
+class AnimationSystem : public System {
 public:
     AnimationSystem() = default;
+
     void update(const float &deltaTime) const;
+
     void updateEntityAnimation(AnimationComponent &, TileComponent &, float) const;
+
     void advanceFrame(AnimationComponent &animationComponent) const;
+
     void updateTileComponent(TileComponent &tileComponent, const AnimationComponent &animationComponent) const;
 
 private:
