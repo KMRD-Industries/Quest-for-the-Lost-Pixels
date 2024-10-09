@@ -62,8 +62,6 @@ inline void from_json(const json& json, Tile& tile)
             objectgroup.at("objects").get_to(tile.objects);
         }
     }
-
-
 }
 
 inline void from_json(const json& json, Tileset& tileSet)

@@ -13,13 +13,16 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-void ItemSystem::init() {
+void ItemSystem::init()
+{
+    m_closestEntity = {};
+    m_closestEntitySlotType = {};
 }
 
-void ItemSystem::markClosest() {
-}
+void ItemSystem::markClosest() {}
 
-void ItemSystem::displayWeaponStats(const Entity entity) {
+void ItemSystem::displayWeaponStats(const Entity entity)
+{
     const auto &weapon = gCoordinator.getComponent<WeaponComponent>(entity);
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.5f)); // Semi-transparent background
@@ -40,7 +43,8 @@ void ItemSystem::displayWeaponStats(const Entity entity) {
     ImGui::PopStyleColor();
 }
 
-void ItemSystem::displayHelmetStats(const Entity entity) {
+void ItemSystem::displayHelmetStats(const Entity entity)
+{
     const auto &helmet = gCoordinator.getComponent<HelmetComponent>(entity);
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.5f)); // Semi-transparent background
@@ -57,8 +61,8 @@ void ItemSystem::displayHelmetStats(const Entity entity) {
     ImGui::PopStyleColor();
 }
 
-
-void ItemSystem::displayBodyArmourStats(const Entity entity) {
+void ItemSystem::displayBodyArmourStats(const Entity entity)
+{
     const auto &bodyArmour = gCoordinator.getComponent<BodyArmourComponent>(entity);
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.5f)); // Semi-transparent background
@@ -75,97 +79,86 @@ void ItemSystem::displayBodyArmourStats(const Entity entity) {
     ImGui::PopStyleColor();
 }
 
-
-void ItemSystem::update() {
+void ItemSystem::update()
+{
     const auto &playerTransformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
     double minDistance = std::numeric_limits<int>::max();
-    Entity closestItemEntity{};
-    config::slotType entityType{};
+    m_closestEntity = {};
+    m_closestEntitySlotType = {};
 
-    for (const auto entity: m_entities) {
+    for (const auto entity : m_entities)
+    {
         if (const auto &item = gCoordinator.getComponent<ItemComponent>(entity); item.equipped == true) continue;
 
         const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         const float distanceX = transformComponent.position.x - playerTransformComponent.position.x;
         const float distanceY = transformComponent.position.y - playerTransformComponent.position.y;
 
-        if (const double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2));
-            distance <= minDistance) {
+        if (const double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2)); distance <= minDistance)
+        {
             minDistance = distance;
-            closestItemEntity = entity;
+            m_closestEntity = entity;
 
-            if (gCoordinator.hasComponent<WeaponComponent>(entity)) {
-                entityType = config::slotType::WEAPON;
-            } else if (gCoordinator.hasComponent<HelmetComponent>(entity)) {
-                entityType = config::slotType::HELMET;
-            } else if (gCoordinator.hasComponent<BodyArmourComponent>(entity)) {
-                entityType = config::slotType::BODY_ARMOUR;
-            } else {
-                entityType = {};
+            if (gCoordinator.hasComponent<WeaponComponent>(entity))
+            {
+                m_closestEntitySlotType = config::slotType::WEAPON;
+            }
+            else if (gCoordinator.hasComponent<HelmetComponent>(entity))
+            {
+                m_closestEntitySlotType = config::slotType::HELMET;
+            }
+            else if (gCoordinator.hasComponent<BodyArmourComponent>(entity))
+            {
+                m_closestEntitySlotType = config::slotType::BODY_ARMOUR;
+            }
+            else
+            {
+                m_closestEntitySlotType = {};
             }
         }
     }
 
-    if (closestItemEntity == 0) return;
+    if (m_closestEntity == Entity{}) return;
 
-    if (minDistance <= config::weaponInteractionDistance) {
-        gCoordinator.getComponent<RenderComponent>(closestItemEntity).color = sf::Color(255, 102, 102);
+    if (minDistance <= config::weaponInteractionDistance)
+    {
+        gCoordinator.getComponent<RenderComponent>(m_closestEntity).color = sf::Color(255, 102, 102);
 
-        switch (entityType) {
-            case config::slotType::HELMET:
-                displayHelmetStats(closestItemEntity);
-                break;
-            case config::slotType::WEAPON:
-                displayWeaponStats(closestItemEntity);
-                break;
-            case config::slotType::BODY_ARMOUR:
-                displayBodyArmourStats(closestItemEntity);
-                break;
-            default:
-                return;
+        switch (m_closestEntitySlotType)
+        {
+        case config::slotType::HELMET:
+            displayHelmetStats(m_closestEntity);
+            break;
+        case config::slotType::WEAPON:
+            displayWeaponStats(m_closestEntity);
+            break;
+        case config::slotType::BODY_ARMOUR:
+            displayBodyArmourStats(m_closestEntity);
+            break;
+        default:
+            break;
         }
+    }
+    else
+    {
+        m_closestEntitySlotType = {};
+        m_closestEntity = {};
     }
 }
 
-void ItemSystem::input(const Entity player) {
-    const auto &playerTransformComponent = gCoordinator.getComponent<TransformComponent>(player);
-
-    double minDistance = std::numeric_limits<float>::max();
-    Entity closestWeaponEntity{};
-
-    config::slotType entityType = {};
-
-    for (const auto entity: m_entities) {
-        if (gCoordinator.getComponent<ItemComponent>(entity).equipped == true) continue;
-        const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const float distanceX = transformComponent.position.x - playerTransformComponent.position.x;
-        const float distanceY = transformComponent.position.y - playerTransformComponent.position.y;
-
-        if (const double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2));
-            distance <= minDistance) {
-            minDistance = distance;
-            closestWeaponEntity = entity;
-
-            if (gCoordinator.hasComponent<WeaponComponent>(entity)) {
-                entityType = config::slotType::WEAPON;
-            } else if (gCoordinator.hasComponent<BodyArmourComponent>(entity)) {
-                entityType = config::slotType::BODY_ARMOUR;
-            } else if (gCoordinator.hasComponent<HelmetComponent>(entity)) {
-                entityType = config::slotType::HELMET;
-            }
-        }
-    }
-
-    if (minDistance < config::weaponInteractionDistance) {
-        gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(player, closestWeaponEntity, entityType);
-    }
+void ItemSystem::input(const Entity player)
+{
+    gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(player, m_closestEntity, m_closestEntitySlotType);
 }
 
-void ItemSystem::deleteItems() const {
-    for (const auto entity: m_entities) {
+void ItemSystem::deleteItems() const
+{
+    for (const auto entity : m_entities)
+    {
         if (gCoordinator.getComponent<ItemComponent>(entity).equipped == true) continue;
 
-        if (auto *collisionComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity)) {
+        if (auto *collisionComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+        {
             collisionComponent->toDestroy = true;
         }
     }

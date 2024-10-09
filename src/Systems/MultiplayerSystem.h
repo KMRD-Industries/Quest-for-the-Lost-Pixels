@@ -29,7 +29,7 @@ private:
     std::unordered_map<std::uint32_t, Entity> m_entity_map{};
 
 public:
-    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
+    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
     void setup(const std::string& ip, const std::string& port) noexcept;
     void setRoom(const glm::ivec2& room) noexcept;
     void entityConnected(const std::uint32_t id, const Entity entity) noexcept;

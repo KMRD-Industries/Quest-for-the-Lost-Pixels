@@ -1,6 +1,3 @@
-//
-// Created by dominiq on 5/11/24.
-//
 #pragma once
 
 #include <unordered_map>
@@ -12,11 +9,11 @@
 #include "System.h"
 #include "Tileset.h"
 
-class TextureSystem : public System {
+class TextureSystem : public System
+{
     std::unordered_set<std::string> m_setTextureFiles{
-        "Items", "CosmicLilac", "Decorative", "DungeonWalls", "Jungle", "Graveyard", "SpecialBlocks",
-        "AnimSlimes", "Characters", "Weapons", "CosmicLegacy", "Portal", "Armour"
-    };
+        "Items",      "CosmicLilac", "Decorative", "DungeonWalls", "Jungle", "Graveyard", "SpecialBlocks",
+        "AnimSlimes", "Characters",  "Weapons",    "CosmicLegacy", "Portal", "Armour"};
 
     //------------------------------------------
     std::unordered_map<std::string, sf::Texture> m_mapTextures;

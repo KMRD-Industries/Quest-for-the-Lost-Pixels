@@ -3,9 +3,9 @@
 #include "Helpers.h"
 #include "box2d/b2_circle_shape.h"
 #include "box2d/b2_distance.h"
-#include "box2d/b2_world.h"
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_world.h"
 
 class RayCastCallback : public b2RayCastCallback
 {
@@ -16,8 +16,7 @@ public:
     {
         if (fixture)
         {
-            const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().
-                pointer);
+            const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
             if (m_ignoreYourself && bodyData->entityID == m_myEntity)
             {
                 return -1.0f;
@@ -48,10 +47,9 @@ public:
         if (fixture)
         {
             const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
-            if (m_ignoreYourself && bodyData->entityID == m_myEntity)
-                return true;
+            if (m_ignoreYourself && bodyData->entityID == m_myEntity) return true;
 
-            //TODO: HOW TO CHECK IF CIRCLE OVERLAP POLYGON ?????
+            // TODO: HOW TO CHECK IF CIRCLE OVERLAP POLYGON ?????
         }
         return true;
     }
@@ -74,8 +72,7 @@ public:
         if (fixture)
         {
             const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
-            if (m_ignoreYourself && bodyData->entityID == m_myEntity)
-                return true;
+            if (m_ignoreYourself && bodyData->entityID == m_myEntity) return true;
 
             m_fixtures.push_back(fixture);
         }
@@ -103,11 +100,11 @@ public:
     }
 
     /**
-     * \brief 
+     * \brief
      * \param point1 starting point of ray
      * \param point2 ening point of ray
      * \param entity entity to ignore, default nothing
-     * \return RaycastData of raycasted object 
+     * \return RaycastData of raycasted object
      */
     static GameType::RaycastData rayCast(const GameType::MyVec2& point1, const GameType::MyVec2& point2,
                                          const int entity = -10)
@@ -121,16 +118,14 @@ public:
             callback.m_ignoreYourself = true;
         }
         getInstance()->getWorld()->RayCast(&callback, newPoint1, newPoint2);
-        if (!callback.m_fixture)
-            return {0, "", {0, 0}};
+        if (!callback.m_fixture) return {0, "", {0, 0}};
         const auto bodyData =
             reinterpret_cast<GameType::CollisionData*>(callback.m_fixture->GetBody()->GetUserData().pointer);
         return {bodyData->entityID, bodyData->tag, callback.m_point};
     }
 
     static std::vector<GameType::RaycastData> boxCast(const GameType::MyVec2& lowerBound,
-                                                      const GameType::MyVec2& upperBound,
-                                                      const int entity = -10)
+                                                      const GameType::MyVec2& upperBound, const int entity = -10)
     {
         b2AABB aabb;
         aabb.lowerBound = {convertPixelsToMeters(lowerBound.x), convertPixelsToMeters(lowerBound.y)};
@@ -149,8 +144,7 @@ public:
 
         for (const auto fixture : callback.m_fixtures)
         {
-            const auto bodyData =
-                reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
+            const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
             GameType::RaycastData data{bodyData->entityID, bodyData->tag, fixture->GetBody()->GetPosition()};
             results.push_back(data);
         }
@@ -194,8 +188,7 @@ public:
 
         for (const auto fixture : callback.m_fixtures)
         {
-            const auto bodyData =
-                reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
+            const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
             GameType::RaycastData data{bodyData->entityID, bodyData->tag, fixture->GetBody()->GetPosition()};
             results.push_back(data);
         }
@@ -205,8 +198,7 @@ public:
 
     static std::vector<GameType::RaycastData> coneCast(const GameType::MyVec2& center,
                                                        const GameType::MyVec2& forwardVector, const float radius,
-                                                       const float angle,
-                                                       const int entity = -10)
+                                                       const float angle, const int entity = -10)
     {
         const auto resultFromCircle = circleCast(center, radius, entity);
 
@@ -221,23 +213,16 @@ public:
             vectorToTarget.Normalize();
 
             const auto elementAngle = b2Dot(vectorToTarget, newForward);
-            if (elementAngle <= angle && elementAngle >= -angle)
-                elementsInCone.push_back(element);
+            if (elementAngle <= angle && elementAngle >= -angle) elementsInCone.push_back(element);
         }
 
         return elementsInCone;
     }
 
-    static b2World* getWorld()
-    {
-        return &getInstance()->m_world;
-    }
+    static b2World* getWorld() { return &getInstance()->m_world; }
 
 private:
-    Physics() :
-        m_world(b2Vec2(0.f, 0.f))
-    {
-    }
+    Physics() : m_world(b2Vec2(0.f, 0.f)) {}
 
     b2World m_world;
     static Physics* m_physics;

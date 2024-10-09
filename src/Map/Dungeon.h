@@ -3,18 +3,14 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Dungeon.h"
-#include "FloorGenerator.h"
-#include "PlayerMovementSystem.h"
-#include "Room.h"
-#include "Types.h"
-#include "TextureSystem.h"
 #include "AnimationSystem.h"
 #include "CharacterSystem.h"
 #include "ChestSystem.h"
 #include "CollisionSystem.h"
 #include "DoorSystem.h"
+#include "Dungeon.h"
 #include "EnemySystem.h"
+#include "FloorGenerator.h"
 #include "HealthBarSystem.h"
 #include "InventorySystem.h"
 #include "ItemSpawnerSystem.h"
@@ -22,50 +18,38 @@
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
 #include "PassageSystem.h"
+#include "PlayerMovementSystem.h"
+#include "Room.h"
 #include "RoomListenerSystem.h"
 #include "SpawnerSystem.h"
 #include "TextTagSystem.h"
+#include "TextureSystem.h"
 #include "TravellingSystem.h"
+#include "Types.h"
 #include "WeaponsSystem.h"
 
-class Dungeon {
+class Dungeon
+{
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1) {
-    }
-
+    Dungeon() : m_entities(MAX_ENTITIES - 1) {}
     void setupWeaponEntity(Entity player) const;
-
     void setupHelmetEntity(Entity player) const;
-
     void init();
-
     void addPlayerComponents(Entity player);
-
     void setupPlayerCollision(Entity player);
-
     void createRemotePlayer(uint32_t);
-
     void draw();
-
     void update(float);
 
 private:
     void setECS();
-
     void makeSimpleFloor();
-
     void moveInDungeon(const glm::ivec2 &dir);
-
     void clearDungeon() const;
-
     void makeStartFloor();
-
     void moveDownDungeon();
-
     void loadMap(const std::string &path) const;
-
     float getSpawnOffset(float, int);
-
     void changeRoom(const glm::ivec2 &dir);
 
     std::string m_asset_path;

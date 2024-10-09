@@ -6,10 +6,7 @@
 
 extern Coordinator gCoordinator;
 
-void CharacterSystem::update() const
-{
-    cleanUpDeadEntities();
-}
+void CharacterSystem::update() const { cleanUpDeadEntities(); }
 
 void CharacterSystem::cleanUpDeadEntities() const
 {
@@ -23,7 +20,7 @@ void CharacterSystem::cleanUpDeadEntities() const
 
         if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
         {
-           colliderComponent->toDestroy = true;
+            colliderComponent->toDestroy = true;
         }
         else
         {

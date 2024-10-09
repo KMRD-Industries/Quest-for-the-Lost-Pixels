@@ -16,5 +16,4 @@ struct TileComponent
     }
 
     TileComponent() = default;
-
 };

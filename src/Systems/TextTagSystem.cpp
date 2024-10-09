@@ -12,12 +12,12 @@
 
 TextTagSystem::TextTagSystem() { init(); }
 
-void TextTagSystem::init() {
-    this->loadFont(std::string(ASSET_PATH) + "/fonts/PixellettersFull.ttf");
-}
+void TextTagSystem::init() { this->loadFont(std::string(ASSET_PATH) + "/fonts/PixellettersFull.ttf"); }
 
-void TextTagSystem::performFixedUpdate() const {
-    for (const auto &entity: m_entities) {
+void TextTagSystem::performFixedUpdate() const
+{
+    for (const auto &entity : m_entities)
+    {
         auto &textTagComponent = gCoordinator.getComponent<TextTagComponent>(entity);
         auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
@@ -29,24 +29,28 @@ void TextTagSystem::performFixedUpdate() const {
     }
 }
 
-void TextTagSystem::update(const float &deltaTime) {
-    if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs) {
+void TextTagSystem::update(const float &deltaTime)
+{
+    if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs)
+    {
         m_frameTime -= config::oneFrameTimeMs;
         performFixedUpdate();
         deleteTags();
     }
 }
 
-void TextTagSystem::loadFont(const std::string &path) {
+void TextTagSystem::loadFont(const std::string &path)
+{
     if (!this->font.loadFromFile(path))
         std::cout << "ERROR::TEXT_TAG_SYSTEM::CONSTRUCTOR::Failed to load font " << path << "\n";
 }
 
-void TextTagSystem::initPresets() {
-}
+void TextTagSystem::initPresets() {}
 
-void TextTagSystem::render(sf::RenderTarget &window) {
-    for (const auto &entity: m_entities) {
+void TextTagSystem::render(sf::RenderTarget &window)
+{
+    for (const auto &entity : m_entities)
+    {
         auto &textTag = gCoordinator.getComponent<TextTagComponent>(entity);
         const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
@@ -60,15 +64,18 @@ void TextTagSystem::render(sf::RenderTarget &window) {
     }
 }
 
-void TextTagSystem::deleteTags() {
+void TextTagSystem::deleteTags()
+{
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity: m_entities) {
+    for (const auto entity : m_entities)
+    {
         const auto &textTag = gCoordinator.getComponent<TextTagComponent>(entity);
         if (textTag.lifetime <= 0) entityToRemove.push_back(entity);
     }
 
-    while (!entityToRemove.empty()) {
+    while (!entityToRemove.empty())
+    {
         gCoordinator.destroyEntity(entityToRemove.front());
         entityToRemove.pop_front();
     }
