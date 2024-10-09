@@ -1,63 +1,75 @@
 {
-  "version": 3,
-  "configurePresets": [
-    {
-      "name": "default",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/default",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "linux",
-      "inherits": "default",
-      "binaryDir": "${sourceDir}/build/debug/linux",
-      "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_CXX_COMPILER": "clang++-18",
-        "CMAKE_C_COMPILER": "clang-18",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++"
-      }
-    },
-    {
-      "name": "linux-release",
-      "inherits": "linux",
-      "binaryDir": "${sourceDir}/build/release/linux",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "VS",
-      "inherits": "default",
-      "generator": "Visual Studio 17 2022",
-      "binaryDir": "${sourceDir}/build/debug/VS",
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "/MP /EHsc"
-      }
-    },
-    {
-      "name": "VS-release",
-      "inherits": "VS",
-      "binaryDir": "${sourceDir}/build/release/VS",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_FLAGS": "/MP /EHsc"
-      }
-    },
-    {
-      "name": "Win11",
-      "displayName": "Clang 18.1.3 x86_64-pc-linux-gnu",
-      "inherits": "default",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_C_COMPILER": "clang",
-        "BOX2D_BUILD_UNIT_TESTS": "OFF",
-        "CMAKE_CXX_FLAGS": "-stdlib=libc++"
-      }
-    }
-  ]
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "default",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "linux",
+            "inherits": "default",
+            "binaryDir": "${sourceDir}/build/debug/linux",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_CXX_COMPILER": "clang++-18",
+                "CMAKE_C_COMPILER": "clang-18",
+                "CMAKE_CXX_FLAGS": "-stdlib=libc++"
+            }
+        },
+        {
+            "name": "linux-release",
+            "inherits": "linux",
+            "binaryDir": "${sourceDir}/build/release/linux",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "VS",
+            "inherits": "default",
+            "generator": "Visual Studio 17 2022",
+            "binaryDir": "${sourceDir}/build/debug/VS",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "/MP /EHsc"
+            }
+        },
+        {
+            "name": "VS-release",
+            "inherits": "VS",
+            "binaryDir": "${sourceDir}/build/release/VS",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_FLAGS": "/MP /EHsc"
+            }
+        },
+        {
+            "name": "Win11",
+            "displayName": "Clang 18.1.3 x86_64-pc-linux-gnu",
+            "inherits": "default",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_C_COMPILER": "clang",
+                "BOX2D_BUILD_UNIT_TESTS": "OFF",
+                "CMAKE_CXX_FLAGS": "-stdlib=libc++"
+            }
+        },
+        {
+            "name": "linux-clang",
+            "displayName": "Clang 18.1.8 x86_64-pc-linux-gnu",
+            "description": "Using compilers: C = /usr/bin/clang, CXX = /usr/bin/clang++",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        }
+    ]
 }

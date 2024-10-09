@@ -15,7 +15,8 @@
 
 extern Coordinator gCoordinator;
 
-void Game::init() {
+void Game::init()
+{
     gCoordinator.init();
 
     gCoordinator.registerComponent<ColliderComponent>();
@@ -24,7 +25,8 @@ void Game::init() {
     gCoordinator.registerComponent<CreateBodyWithCollisionEvent>();
     gCoordinator.registerComponent<FightActionEvent>();
 
-    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>(); {
+    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+    {
         Signature signature;
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
@@ -32,20 +34,23 @@ void Game::init() {
         gCoordinator.setSystemSignature<CollisionSystem>(signature);
     }
 
-    auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>(); {
+    auto renderSystem = gCoordinator.getRegisterSystem<RenderSystem>();
+    {
         Signature signature;
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 
-    auto objectCreatorSystem = gCoordinator.getRegisterSystem<ObjectCreatorSystem>(); {
+    auto objectCreatorSystem = gCoordinator.getRegisterSystem<ObjectCreatorSystem>();
+    {
         Signature signature;
         signature.set(gCoordinator.getComponentType<CreateBodyWithCollisionEvent>());
         gCoordinator.setSystemSignature<ObjectCreatorSystem>(signature);
     }
 
-    auto fightSystem = gCoordinator.getRegisterSystem<FightSystem>(); {
+    auto fightSystem = gCoordinator.getRegisterSystem<FightSystem>();
+    {
         Signature signature;
         signature.set(gCoordinator.getComponentType<FightActionEvent>());
         gCoordinator.setSystemSignature<FightSystem>(signature);
@@ -61,7 +66,8 @@ void Game::init() {
 
 void Game::draw() { m_dungeon.draw(); }
 
-void Game::update(const float &deltaTime) {
+void Game::update(const float& deltaTime)
+{
     m_objectCreatorSystem->update();
     m_fightSystem->update();
     m_dungeon.update(deltaTime);
