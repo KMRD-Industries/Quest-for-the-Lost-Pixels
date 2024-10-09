@@ -66,17 +66,12 @@ public:
     };
 
     [[nodiscard]] bool isHeld(InputType input) const;
-
     [[nodiscard]] bool isPressed(InputType input) const;
 
     sf::Vector2f getMousePosition() const;
-
     void handleKeyboardInput(const InputKey &, const bool &);
-
     void updateMousePosition(const sf::Vector2f &);
-
     void clearPressedInputs();
-
     void update();
 
 protected:
