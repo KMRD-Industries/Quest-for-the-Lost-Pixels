@@ -4,6 +4,6 @@
 class InventorySystem : public System
 {
 public:
-    static void pickUpWeapon(Entity, Entity);
-    void dropWeapon(Entity, Entity);
+    void pickUpWeapon(Entity, Entity);
+    void dropWeapon(Entity);
 };

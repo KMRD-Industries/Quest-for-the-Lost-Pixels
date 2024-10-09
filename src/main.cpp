@@ -1,3 +1,4 @@
+#include <TextureSystem.h>
 #include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
@@ -22,7 +23,7 @@ void handleInput(sf::RenderWindow& window)
 
     while (window.pollEvent(event))
     {
-        ImGui::SFML::ProcessEvent(event);
+        ImGui::SFML::ProcessEvent(window, event);
 
         if (event.type == sf::Event::KeyPressed)
         {
@@ -56,7 +57,7 @@ void handleInput(sf::RenderWindow& window)
 
 sf::Color hexStringToSfmlColor(const std::string& hexColor)
 {
-    const std::string hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
+    const std::string& hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
 
     std::istringstream iss(hex);
     int rgbValue = 0;
@@ -76,45 +77,35 @@ int main()
                             sf::Style::Fullscreen);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config::frameCycle);
+    window.setFramerateLimit(config::frameCycle * (config::debugMode ? 100 : 1));
     ImGui::CreateContext();
 
     sf::Clock deltaClock;
     Game game;
     game.init();
 
-    sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
-
     while (window.isOpen())
     {
         sf::Time deltaTime = deltaClock.restart();
 
-        // Clear the window before drawing
-        window.clear(customColor);
+        window.clear(hexStringToSfmlColor(gCoordinator.getRegisterSystem<TextureSystem>().get()->getBackgroundColor()));
 
-        // Upewnij siê, ¿e ImGui wchodzi w now¹ ramkê
         ImGui::SFML::Update(window, deltaTime);
 
-        // Logika gry
         game.update(deltaTime.asSeconds());
         game.draw(window);
 
-        // Rysowanie systemów
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         gCoordinator.getRegisterSystem<BackgroundSystem>()->draw(window);
         gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
 
-        // Renderowanie ImGui
-        ImGui::SFML::Render(window); // Renderowanie UI SFML
+        ImGui::SFML::Render(window);
 
-        // Wyœwietlenie okna
         window.display();
 
-        // Obs³uga wejœcia
         handleInput(window);
     }
 
-    // Zakoñczenie po³¹czenia i zamkniêcie ImGui
     gCoordinator.getRegisterSystem<MultiplayerSystem>()->disconnect();
     ImGui::SFML::Shutdown();
     return 0;

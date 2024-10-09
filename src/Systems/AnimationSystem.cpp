@@ -1,45 +1,36 @@
 #include "AnimationSystem.h"
 
 #include "Config.h"
+#include "RenderComponent.h"
 #include "TileComponent.h"
-#include "TransformComponent.h"
 
-void AnimationSystem::updateFrames()
+AnimationSystem::AnimationSystem() { init(); }
+
+void AnimationSystem::init() { m_frameTime = {}; }
+
+void AnimationSystem::update(const float timeStep) const
 {
-    m_frameTime = (m_frameTime + 1) % config::frameCycle;
-
     for (const auto entity : m_entities)
-        updateEntityAnimation(entity);
+    {
+        auto& animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
+        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+
+        if (animationComponent.frames.empty()) continue;
+        updateEntityAnimationFrame(animationComponent, tileComponent, timeStep);
+    }
 }
 
-void AnimationSystem::updateEntityAnimation(const Entity entity) const
+void AnimationSystem::updateEntityAnimationFrame(AnimationComponent& tileAnimationComponent,
+                                                 TileComponent& tileComponent, const float timeStep) const
 {
-    if (auto& animation = gCoordinator.getComponent<AnimationComponent>(entity);
-        !animation.frames.empty() && isTimeForNextFrame(calculateFrameDuration(animation)))
-        loadNextFrame(entity, animation);
+    tileAnimationComponent.timeUntilNextFrame -= timeStep * 1000;
+    if (tileAnimationComponent.timeUntilNextFrame <= 0) loadNextFrame(tileAnimationComponent, tileComponent);
 }
 
-inline int AnimationSystem::calculateFrameDuration(const AnimationComponent& animation)
+void AnimationSystem::loadNextFrame(AnimationComponent& animation, TileComponent& tile) const
 {
-    // Ensure that the division and the addition are done in long, then cast to int
-    const long duration{animation.frames[animation.currentFrame].duration};
-
-    // Explicitly cast to int after all calculations to avoid narrowing conversions
-    return static_cast<int>(duration / static_cast<long>(config::oneFrameTime) + 1);
-}
-
-inline bool AnimationSystem::isTimeForNextFrame(const int frameDuration) const
-{
-    return m_frameTime % frameDuration == 0;
-}
-
-void AnimationSystem::loadNextFrame(const Entity entity, AnimationComponent& animation)
-{
-    auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
     ++animation.currentFrame %= animation.frames.size();
+    animation.timeUntilNextFrame = animation.frames[animation.currentFrame].duration;
 
-    tileComponent.id = animation.frames[animation.currentFrame].tileid;
-    transformComponent.rotation = animation.frames[animation.currentFrame].rotation;
+    tile.id = animation.frames[animation.currentFrame].tileID;
 }

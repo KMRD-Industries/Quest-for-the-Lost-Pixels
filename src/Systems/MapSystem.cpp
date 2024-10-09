@@ -1,7 +1,6 @@
 #include "MapSystem.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
-
 #include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
@@ -9,10 +8,12 @@
 #include "Coordinator.h"
 #include "DoorComponent.h"
 #include "EnemySystem.h"
+#include "GameUtility.h"
 #include "LootComponent.h"
 #include "MapComponent.h"
 #include "MapParser.h"
 #include "MultiplayerComponent.h"
+#include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
@@ -22,44 +23,44 @@
 
 extern Coordinator gCoordinator;
 
+void MapSystem::init() {}
+
+void MapSystem::update() {}
+
 /**
  * @brief Load room layout from given path of Tiled Json map format
  * @param path The path to JSON formatted Tiled map
  */
-void MapSystem::loadMap(const std::string& path) const
+void MapSystem::loadMap(const std::string& path)
 {
     // Remove old room entites before creating new ones
     resetMap();
+
+    int index{};
+    int x_position = {};
+    int y_position = {};
 
     // Iterate over room layers
     for (const Map& parsedMap = parseMap(path); const Layer& layer : parsedMap.layers)
     {
         // Index to retrieve position of Tile. Layer contains all tiles in correct order,
         // and with number of tiles in rows and cols we can model room layout.
-        int index{};
-
-        // Tiles info is stored in 32 bits format where first 4 bits describe flips of tile, and the rest stands for
-        // tile id
-        static constexpr std::uint32_t mask = 0xf0000000;
+        index = {};
 
         // Process base64 layer data into vector of tiles
         for (const uint32_t tile : processDataString(layer.data, static_cast<size_t>(layer.width) * layer.height, 0))
         {
-            // Decode flip flags and tile ID
-            const uint32_t flipFlags = (tile & mask) >> 28;
-            const uint32_t tileID = tile & ~mask;
+            m_flipFlags = (tile & m_mask) >> 28;
+            m_tileID = tile & ~m_mask;
 
-            // Calculate Tile position
-            const int x_position = index % layer.width;
-            const int y_position = index / layer.width;
+            x_position = index % layer.width;
+            y_position = index / layer.width;
 
-            if (tileID < 1)
+            if (m_tileID > 0)
             {
-                index++;
-                continue;
+                processTile(m_tileID, m_flipFlags, layer.id, x_position, y_position, parsedMap);
             }
 
-            processTile(tileID, flipFlags, layer.id, x_position, y_position, parsedMap);
             index++;
         }
     }
@@ -88,33 +89,33 @@ void MapSystem::doFlips(const std::uint8_t& flags, float& rotation, sf::Vector2f
 
     switch (flags)
     {
-    case VerticalFlip:
+    case GameType::VerticalFlip:
         scale.y *= -1;
         break;
 
-    case HorizontalFlip:
+    case GameType::HorizontalFlip:
         scale.x *= -1;
         break;
 
-    case HorizontalVerticalFlip:
+    case GameType::HorizontalVerticalFlip:
         scale = -scale;
         break;
 
-    case DiagonalFlip:
+    case GameType::DiagonalFlip:
         scale.x *= -1;
-        rotation += ROTATION_90;
+        rotation += config::ROTATION_90;
         break;
 
-    case DiagonalVerticalFlip:
-        rotation += ROTATION_270;
+    case GameType::DiagonalVerticalFlip:
+        rotation += config::ROTATION_270;
         break;
 
-    case DiagonalHorizontalFlip:
-        rotation += ROTATION_90;
+    case GameType::DiagonalHorizontalFlip:
+        rotation += config::ROTATION_90;
         break;
 
-    case AllFlips:
-        rotation += ROTATION_90;
+    case GameType::AllFlips:
+        rotation += config::ROTATION_90;
         scale.x *= -1;
         break;
     default:
@@ -135,35 +136,24 @@ void MapSystem::doFlips(const std::uint8_t& flags, float& rotation, sf::Vector2f
 void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, const int layerID, const int xPos,
                             const int yPos, const Map& parsedMap)
 {
-    // Create new Entity which will describe Tile of map
     const Entity mapEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponent(mapEntity, RenderComponent{});
-    gCoordinator.addComponent(mapEntity, AnimationComponent{});
-    gCoordinator.addComponent(mapEntity, ColliderComponent{});
-    gCoordinator.addComponent(mapEntity, MapComponent{});
+    const auto tileComponent = TileComponent{
+        static_cast<unsigned>(tileID - parsedMap.tilesets.at(findKeyLessThan(parsedMap.tilesets, tileID))),
+        findKeyLessThan(parsedMap.tilesets, static_cast<signed>(tileID)), layerID};
+    auto transformComponent = TransformComponent(getPosition(xPos + 1, yPos + 1, parsedMap.tileheight));
 
-    TileComponent tile_component{};
-    TransformComponent transform_component{};
+    doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
-    // Set up Tile Component
-    tile_component.tileset = findKeyLessThan(parsedMap.tilesets, tileID);
-    tile_component.id = tileID - parsedMap.tilesets.at(tile_component.tileset);
-    tile_component.layer = layerID;
+    gCoordinator.addComponents(mapEntity,
+        RenderComponent{},
+        MapComponent{},
+        transformComponent,
+        tileComponent);
 
-    // Set up the correct position, rotation, scale of tile
-    transform_component.position = getPosition(xPos, yPos, parsedMap.tileheight);
-    transform_component.scale = {1.f, 1.f};
-
-    doFlips(flipFlags, transform_component.rotation, transform_component.scale);
-
-    gCoordinator.addComponent(mapEntity, tile_component);
-    gCoordinator.addComponent(mapEntity, transform_component);
-
-    // Handle special Tiles
-    if (tile_component.tileset == "SpecialBlocks")
+    if (tileComponent.tileSet == "SpecialBlocks") // Handle special Tiles
     {
-        switch (tile_component.id)
+        switch (tileComponent.id)
         {
         case static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER):
             {
@@ -194,15 +184,26 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
                 if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
                     gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::BOSS});
 
-            break;
-        }
+                break;
+            }
+        case static_cast<int>(SpecialBlocks::Blocks::STARTINGPOINT):
+            {
+                const sf::Vector2f pos = getPosition(xPos, yPos, parsedMap.tileheight);
+                GameUtility::startingPosition = {pos.x, pos.y};
+                break;
+            }
+        case static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR):
+            {
+                gCoordinator.addComponent(mapEntity, PassageComponent{});
+                break;
+            }
         case static_cast<int>(SpecialBlocks::Blocks::CHESTSPAWNERBLOCK):
-        {
-            if (!gCoordinator.hasComponent<LootComponent>(mapEntity))
-                gCoordinator.addComponent(mapEntity, LootComponent{});
+            {
+                if (!gCoordinator.hasComponent<LootComponent>(mapEntity))
+                    gCoordinator.addComponent(mapEntity, LootComponent{});
 
-            break;
-        }
+                break;
+            }
         default:
             {
             }
@@ -226,19 +227,17 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
 
 void MapSystem::resetMap() const
 {
-    const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-
     std::deque<Entity> entityToRemove;
 
     for (const auto& entity : m_entities)
         if (!gCoordinator.hasComponent<PlayerComponent>(entity) &&
-            !gCoordinator.hasComponent<MultiplayerComponent>(entity) &&
-            !gCoordinator.hasComponent<DoorComponent>(entity))
+            !gCoordinator.hasComponent<MultiplayerComponent>(entity))
             entityToRemove.push_back(entity);
+
 
     while (!entityToRemove.empty())
     {
-        CollisionSystem::deleteBody(entityToRemove.front());
+        gCoordinator.getRegisterSystem<CollisionSystem>()->deleteBody(entityToRemove.front());
         gCoordinator.destroyEntity(entityToRemove.front());
         entityToRemove.pop_front();
     }
@@ -246,7 +245,7 @@ void MapSystem::resetMap() const
     entityToRemove.clear();
 }
 
-sf::Vector2f MapSystem::getPosition(const int x_axis, const int y_axis, const int map_tile_width)
+sf::Vector2f MapSystem::getPosition(const int x_axis, const int y_axis, const int map_tile_width) const
 {
     return sf::Vector2f(static_cast<float>(x_axis), static_cast<float>(y_axis)) * static_cast<float>(map_tile_width) *
         config::gameScale;

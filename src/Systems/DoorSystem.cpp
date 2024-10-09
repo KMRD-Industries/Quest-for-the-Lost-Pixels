@@ -5,6 +5,10 @@
 
 extern Coordinator gCoordinator;
 
+void DoorSystem::init() {}
+
+void DoorSystem::update() {}
+
 void DoorSystem::clearDoors() const
 {
     std::deque<Entity> entityToRemove;

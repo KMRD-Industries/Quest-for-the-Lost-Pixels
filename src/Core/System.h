@@ -8,4 +8,5 @@ class System
 {
 public:
     std::unordered_set<Entity> m_entities;
+    virtual ~System() = default;
 };

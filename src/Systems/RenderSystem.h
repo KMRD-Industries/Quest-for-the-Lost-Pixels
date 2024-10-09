@@ -1,7 +1,12 @@
 #pragma once
 
+#include "Config.h"
+#include "SFML/Graphics/Sprite.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "System.h"
+
+#include <functional>
+#include <vector>
 
 namespace sf
 {
@@ -11,16 +16,25 @@ namespace sf
 class RenderSystem : public System
 {
 public:
+    RenderSystem();
+    void init();
+    void update();
+    void displayPortal(Entity entity);
     void draw(sf::RenderWindow& window);
-    static float calculateShade(const sf::Vector2f&, sf::Vector2f);
-    sf::Vector2f mapOffset = {};
+    void setWeapon();
+    void setWeaponOrigin();
 
 private:
-    void debugBoundingBoxes(sf::RenderWindow& window) const;
-    void drawEquipment(Entity) const;
-    static void setOrigin(Entity);
-    static void setSpritePosition(Entity);
-    static void displayDamageTaken(Entity);
-    static void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);
-    static void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity);
+    void displayEnemiesTable(const sf::RenderWindow& window);
+    void debugBoundingBoxes(sf::RenderWindow& window);
+    void drawEquipment(Entity);
+    void setOrigin(Entity);
+    void setSpritePosition(Entity);
+    void displayDamageTaken(Entity);
+    void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);
+    void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity) const;
+
+    std::vector<std::vector<std::pair<sf::Sprite*, bool*>>> tiles;
+    sf::Sprite portalSprite;
+    std::vector<std::function<void(Entity)>> actions;
 };

@@ -17,7 +17,7 @@ class MultiplayerSystem : public System
 private:
     bool m_connected = false;
     Entity m_player_entity = 0;
-    std::uint32_t m_player_id = 0;
+    std::uint32_t m_player_id = 1;
     boost::asio::io_context m_io_context;
     tcp::socket m_tcp_socket;
     udp::socket m_udp_socket;
@@ -29,12 +29,13 @@ private:
     std::unordered_map<std::uint32_t, Entity> m_entity_map{};
 
 public:
-    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
+    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
     void setup(const std::string& ip, const std::string& port) noexcept;
     void setRoom(const glm::ivec2& room) noexcept;
     void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
     void entityDisconnected(const std::uint32_t id) noexcept;
     void roomChanged(const glm::ivec2& room);
+    void init();
     void update();
     void disconnect();
 

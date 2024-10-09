@@ -14,7 +14,6 @@ void GameState::init()
 void GameState::handleCollision(const float deltaTime)
 {
     const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-    collisionSystem->updateCollision();
     constexpr auto timeStep = 1.f / 60.f;
     collisionSystem->updateSimulation(timeStep, 8, 3);
 }

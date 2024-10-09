@@ -1,9 +1,9 @@
 #include <cstdint>
 #include <iostream>
 
+#include <boost/asio.hpp>
 #include <comm.pb.h>
 #include <vector>
-#include <boost/asio.hpp>
 
 #include "ColliderComponent.h"
 #include "Config.h"
@@ -22,6 +22,8 @@ extern Coordinator gCoordinator;
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
+
+void MultiplayerSystem::init(){};
 
 void MultiplayerSystem::setup(const std::string& ip, const std::string& port) noexcept
 {
