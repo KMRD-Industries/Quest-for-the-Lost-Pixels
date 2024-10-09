@@ -103,11 +103,11 @@ public:
     }
 
     /**
-     * \brief 
+     * \brief
      * \param point1 starting point of ray
      * \param point2 ening point of ray
      * \param entity entity to ignore, default nothing
-     * \return RaycastData of raycasted object 
+     * \return RaycastData of raycasted object
      */
     static GameType::RaycastData rayCast(const GameType::MyVec2& point1, const GameType::MyVec2& point2,
                                          const int entity = -10)

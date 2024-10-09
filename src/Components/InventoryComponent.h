@@ -1,6 +1,7 @@
 #pragma once
 #include "Config.h"
 
-struct InventoryComponent {
+struct InventoryComponent
+{
     std::unordered_map<config::slotType, Entity, config::slotTypeHash> slots{};
 };

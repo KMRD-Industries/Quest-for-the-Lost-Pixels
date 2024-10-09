@@ -19,35 +19,41 @@ PlayerMovementSystem::PlayerMovementSystem() { init(); }
 
 void PlayerMovementSystem::init() { inputHandler = InputHandler::getInstance(); }
 
-void PlayerMovementSystem::update(const float deltaTime) {
+void PlayerMovementSystem::update(const float deltaTime)
+{
     handleAttack();
     handlePickUpAction();
     handleSpecialKeys();
 
-    if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs) {
+    if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs)
+    {
         handleMovement();
         m_frameTime -= config::oneFrameTimeMs;
     }
 }
 
-void PlayerMovementSystem::handleSpecialKeys() {
+void PlayerMovementSystem::handleSpecialKeys()
+{
     const auto inputHandler{InputHandler::getInstance()};
 
     if (!inputHandler->isPressed(InputType::DebugMode)) return;
     config::debugMode = !config::debugMode;
 }
 
-void PlayerMovementSystem::handlePickUpAction() {
+void PlayerMovementSystem::handlePickUpAction()
+{
     const auto inputHandler{InputHandler::getInstance()};
 
     if (!inputHandler->isPressed(InputType::PickUpItem)) return;
 
-    for (auto const entity: m_entities) {
+    for (auto const entity : m_entities)
+    {
         gCoordinator.getRegisterSystem<ItemSystem>()->input(entity);
     }
 }
 
-void PlayerMovementSystem::handleMovement() {
+void PlayerMovementSystem::handleMovement()
+{
     const auto inputHandler{InputHandler::getInstance()};
 
     glm::vec2 dir{};
@@ -64,10 +70,11 @@ void PlayerMovementSystem::handleMovement() {
     if (inputHandler->isHeld(InputType::MoveLeft)) // Move Left
         dir.x -= 1;
 
-    for (const auto entity: m_entities) {
+    for (const auto entity : m_entities)
+    {
         // Handle Movement
-        auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto &equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        const auto& equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
         const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
         const auto playerSpeed = glm::vec2{normalizedDir.x * config::playerAcc, normalizedDir.y * config::playerAcc};
 
@@ -75,23 +82,21 @@ void PlayerMovementSystem::handleMovement() {
 
         if (!gCoordinator.hasComponent<EquipmentComponent>(entity)) continue;
 
-        if (equipment.slots.contains(config::slotType::WEAPON)) {
+        if (equipment.slots.contains(config::slotType::WEAPON))
+        {
             const Entity weaponEntity = equipment.slots.at(config::slotType::WEAPON);
 
-            if (auto *weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(weaponEntity)) {
-                auto &weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
-                auto &weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
+            if (auto* weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(weaponEntity))
+            {
+                auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
+                auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
 
                 weaponComponent->pivotPoint = inputHandler->getMousePosition();
                 weaponRenderComponent.dirty = true;
-
-                transformComponent.scale = {
-                    weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y
-                };
-                weaponTransformComponent.scale = {
-                    weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
-                    weaponTransformComponent.scale.y
-                };
+                transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+                                            transformComponent.scale.y};
+                weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+                                                  weaponTransformComponent.scale.y};
             }
         }
 
@@ -107,8 +112,8 @@ void PlayerMovementSystem::handleMovement() {
         //     weaponComponent->pivotPoint = inputHandler->getMousePosition();
         //     weaponRenderComponent.dirty = true;
         //
-        //     transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y};
-        //     weaponTransformComponent.scale = {
+        //     transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+        //     transformComponent.scale.y}; weaponTransformComponent.scale = {
         //         weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
         //         weaponTransformComponent.scale.y
         //     };
@@ -116,10 +121,12 @@ void PlayerMovementSystem::handleMovement() {
     }
 }
 
-void PlayerMovementSystem::handleAttack() const {
+void PlayerMovementSystem::handleAttack() const
+{
     const auto inputHandler{InputHandler::getInstance()};
 
-    for (const auto &entity: m_entities) {
+    for (const auto entity : m_entities)
+    {
         if (!inputHandler->isPressed(InputType::Attack)) continue;
 
         const Entity fightAction = gCoordinator.createEntity();
