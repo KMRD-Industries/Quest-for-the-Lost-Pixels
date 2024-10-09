@@ -10,7 +10,6 @@ extern Coordinator gCoordinator;
 
 void ButtonSystem::render()
 {
-    /*
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("ButtonWindow", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -96,12 +95,10 @@ void ButtonSystem::render()
         ImGui::PopFont();
     }
     ImGui::End();
-    */
 }
 
 void ButtonSystem::loadData(const std::string& atlasPath, const std::string& fontPath, const float fontSize)
 {
-    /*
     if (!m_loadedTextures.contains(atlasPath))
         m_loadedTextures[atlasPath].loadFromFile(atlasPath);
     if (!m_loadedFonts.contains(fontPath + std::to_string(fontSize)))
@@ -110,5 +107,5 @@ void ButtonSystem::loadData(const std::string& atlasPath, const std::string& fon
         ImFont* loadedFont = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);
         m_loadedFonts[fontPath + std::to_string(fontSize)] = loadedFont;
         ImGui::SFML::UpdateFontTexture();
-    }*/
+    }
 }

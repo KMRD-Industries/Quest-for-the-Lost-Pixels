@@ -13,7 +13,8 @@ enum class InputType
     MoveRight,
     MoveUp,
     MoveDown,
-    Attack
+    Attack,
+    ReturnInMenu
 };
 
 class InputHandler
@@ -43,6 +44,7 @@ class InputHandler
         {sf::Keyboard::Key::S, InputType::MoveDown},
         {sf::Keyboard::Key::D, InputType::MoveRight},
         {sf::Keyboard::Key::Space, InputType::Attack},
+        {sf::Keyboard::Key::Backspace, InputType::ReturnInMenu},
         {sf::Mouse::Left, InputType::Attack} // Handling for the right mouse button
     };
 
@@ -54,9 +56,7 @@ public:
     static InputHandler* getInstance()
     {
         if (m_instance == nullptr)
-        {
             m_instance = new InputHandler();
-        }
         return m_instance;
     };
     [[nodiscard]] bool isHeld(InputType input) const;

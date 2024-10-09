@@ -173,7 +173,7 @@ source_group("Ui" FILES ${UI})
 add_definitions(-D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(./AtlasComponents ./Core ./Components ./Systems ./MenuStateMachine ${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(./UiComponents ./UiSystems ./UI ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./UiComponents ./UiSystems ./Ui ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(qlp ${SOURCES} ${CORE} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS} ${MENU_STATE_MACHINE} ${UI_COMPONENTS} ${UI_SYSTEMS} ${UI})
 

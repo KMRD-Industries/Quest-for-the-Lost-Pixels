@@ -72,13 +72,9 @@ sf::Color hexStringToSfmlColor(const std::string& hexColor)
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!",
+    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!",
                             sf::Style::Fullscreen);
 
-    // W³aœciwa inicjalizacja okna
-    window.create(desktopMode, "Quest for the lost pixels!");
-
-    // Inicjalizacja ImGui
     int _ = ImGui::SFML::Init(window);
     window.setFramerateLimit(config::frameCycle);
     ImGui::CreateContext();
