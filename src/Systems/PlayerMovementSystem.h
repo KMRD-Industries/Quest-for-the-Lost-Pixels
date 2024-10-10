@@ -1,15 +1,21 @@
 #pragma once
 
+#include <memory>
+
+#include "InputHandler.h"
 #include "System.h"
 
 class PlayerMovementSystem : public System
 {
 public:
-    void update();
+    void init();
+    void update(float);
+    PlayerMovementSystem();
 
 private:
     void handleMovement();
     void handleAttack() const;
-    void handleMousePositionUpdate() const;
-    bool flip = false;
+    void handlePickUpAction();
+    InputHandler* inputHandler = nullptr;
+    float m_frameTime{};
 };

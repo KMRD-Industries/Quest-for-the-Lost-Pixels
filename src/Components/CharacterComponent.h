@@ -3,9 +3,9 @@
 
 struct CharacterComponent
 {
-    float hp{};
+    float hp{1};
     float damage{};
     bool attacked{};
     int timeSinceAttacked{};
-    b2Vec2 knockbackForce{};
+    b2Vec2 knockBackForce{};
 };

@@ -1,6 +1,9 @@
 #pragma once
 #include "Coordinator.h"
+#include "GameTypes.h"
 #include "System.h"
+#include "TileComponent.h"
+#include "Tileset.h"
 
 struct ColliderComponent;
 
@@ -25,14 +28,20 @@ struct AnimationData
 class ChestSpawnerSystem : public System
 {
 public:
-    void spawnChest();
+    void spawnChest() const;
+    void spawnWeapon(const TransformComponent& spawnerTransformComponent) const;
+    ChestSpawnerSystem();
+    void init();
 
 private:
     void clearSpawners() const;
-    void processSpawn(const TransformComponent& spawnerTransformComponent);
-    void handleChestCollision(Entity chest, const TransformComponent& spawnerTransformComponent,
-                              const GameType::CollisionData& collisionData);
-    void spawnPotion(const TransformComponent& spawnerTransformComponent);
+    void processSpawn(const TransformComponent&) const;
+    void handleChestCollision(Entity chest, const GameType::CollisionData&) const;
+    void spawnPotion(const TransformComponent&) const;
 
     std::vector<AnimationData> m_itemsToAnimate;
+    std::vector<std::pair<int, GameType::WeaponType>> m_weaponsIDs;
+    Collision m_chestCollision;
+    Collision m_potionCollision;
+    TileComponent m_chestTile;
 };

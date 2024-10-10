@@ -9,12 +9,15 @@ struct TextTag;
 class TextTagSystem : public System
 {
 public:
+
+    TextTagSystem();
+
     void init();
+    void update();
     void loadFont(const std::string&);
     void initPresets();
     void render(sf::RenderTarget&);
     void deleteTags();
-    void update();
 
     enum TextTagPresets : int
     {
