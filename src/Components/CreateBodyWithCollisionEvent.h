@@ -17,8 +17,12 @@ struct CreateBodyWithCollisionEvent
     GameType::ObjectType type{GameType::ObjectType::NORMAL};
 
     CreateBodyWithCollisionEvent() :
-        onCollisionEnter([](const GameType::CollisionData&) {}),
-        onCollisionOut([](const GameType::CollisionData&) {}),
+        onCollisionEnter([](const GameType::CollisionData&)
+        {
+        }),
+        onCollisionOut([](const GameType::CollisionData&)
+        {
+        }),
         isStatic(true),
         useTextureSize(true)
     {
@@ -26,8 +30,12 @@ struct CreateBodyWithCollisionEvent
 
     CreateBodyWithCollisionEvent(
         const Entity entity, std::string tag,
-        const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&) {},
-        const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&) {},
+        const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&)
+        {
+        },
+        const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&)
+        {
+        },
         const bool isStatic = true, const bool useTextureSize = true) :
         entity{entity},
         tag{std::move(tag)},

@@ -9,6 +9,15 @@
 
 #define M_PI 3.1415927f
 
+namespace MenuStateMachine
+{
+    enum class StateAction
+    {
+        Push,
+        Pop
+    };
+}
+
 namespace SpecialBlocks
 {
     enum class Blocks : int

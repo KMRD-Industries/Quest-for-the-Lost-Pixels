@@ -37,27 +37,24 @@ RenderSystem::RenderSystem() { init(); }
 
 void RenderSystem::init() { portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0); }
 
-void RenderSystem::draw(sf::RenderWindow& window)
+void RenderSystem::draw(sf::RenderWindow &window)
 {
     if (tiles.empty()) tiles.resize(config::maximumNumberOfLayers);
-    for (auto& layer : tiles) layer.clear();
+    for (auto &layer : tiles) layer.clear();
 
     const sf::Vector2<unsigned int> windowSize = window.getSize();
     const sf::Vector2f oldMapOffset = {GameUtility::mapOffset};
 
     for (const auto entity : m_entities)
     {
-        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        auto &tileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
         if (renderComponent.layer > 0 && renderComponent.layer < config::maximumNumberOfLayers)
         {
             GameUtility::mapOffset.x = std::max(GameUtility::mapOffset.x, transformComponent.position.x);
             GameUtility::mapOffset.y = std::max(GameUtility::mapOffset.y, transformComponent.position.y);
-
-            if(gCoordinator.hasComponent<ItemComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
-                renderComponent.dirty = true;
 
             if (renderComponent.dirty)
             {
@@ -82,12 +79,13 @@ void RenderSystem::draw(sf::RenderWindow& window)
     setWeapon();
 
     GameUtility::mapOffset = (static_cast<sf::Vector2f>(windowSize) - GameUtility::mapOffset) * 0.5f;
+    // GameUtility::mapOffset = {};
 
-    for (auto& layer : tiles)
+    for (auto &layer : tiles)
     {
-        for (auto& [sprite, isDirty] : layer)
+        for (auto &[sprite, isDirty] : layer)
         {
-            if(*isDirty == true) sprite->setPosition({sprite->getPosition() + GameUtility::mapOffset});
+            if (*isDirty == true) sprite->setPosition({sprite->getPosition() + GameUtility::mapOffset});
             window.draw(*sprite);
             *isDirty = oldMapOffset != GameUtility::mapOffset;
         }
@@ -101,21 +99,24 @@ void RenderSystem::draw(sf::RenderWindow& window)
 
 void RenderSystem::setWeapon()
 {
-    if (const auto equippedWeaponComponent = gCoordinator.tryGetComponent<EquippedWeaponComponent>(config::playerEntity))
+    if (!gCoordinator.hasComponent<TransformComponent>(config::playerEntity)) return;
+
+    if (gCoordinator.hasComponent<EquippedWeaponComponent>(config::playerEntity))
     {
-        const Entity weaponEntity = equippedWeaponComponent->currentWeapon;
+        const Entity weaponEntity =
+            gCoordinator.getComponent<EquippedWeaponComponent>(config::playerEntity).currentWeapon;
 
-        const auto& playerRenderComponent   = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
-        const auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(config::playerEntity);
-        auto& weaponColliderComponent       = gCoordinator.getComponent<ColliderComponent>(weaponEntity);
-        auto& weaponRenderComponent         = gCoordinator.getComponent<RenderComponent>(weaponEntity);
-        auto& weaponComponent               = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
-        auto& weaponTransformComponent      = gCoordinator.getComponent<TransformComponent>(weaponEntity);
+        const auto &playerRenderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
+        const auto &playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(config::playerEntity);
+        auto &weaponColliderComponent = gCoordinator.getComponent<ColliderComponent>(weaponEntity);
+        auto &weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
+        auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
+        auto &weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
 
-        const auto originXWeapon        = weaponColliderComponent.specialCollision.x;
-        const auto originYWeapon        = weaponColliderComponent.specialCollision.y;
-        const auto originXPlayer        = playerColliderComponent.specialCollision.x;
-        const auto originYPlayer        = playerColliderComponent.specialCollision.y;
+        const auto originXWeapon = weaponColliderComponent.specialCollision.x;
+        const auto originYWeapon = weaponColliderComponent.specialCollision.y;
+        const auto originXPlayer = playerColliderComponent.specialCollision.x;
+        const auto originYPlayer = playerColliderComponent.specialCollision.y;
 
         // Set Weapon Sprite origin in WeaponPlacement component.
         weaponRenderComponent.sprite.setOrigin(originXWeapon, originYWeapon);
@@ -138,6 +139,7 @@ void RenderSystem::setWeapon()
 
         weaponRenderComponent.sprite.setPosition(weaponTransformComponent.position);
         weaponRenderComponent.sprite.setRotation(weaponTransformComponent.rotation);
+        weaponRenderComponent.dirty = true;
     }
 }
 
@@ -152,10 +154,10 @@ void RenderSystem::setOrigin(const Entity entity)
         if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) return;
 
     // Get all necessary components
-    auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+    auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
     float centerX = {}, centerY = {};
 
-    if (const auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+    if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
     {
         // Calculate the center of the collision component from top left corner.
         // X & Y are collision offset from top left corner of sprite tile.
@@ -169,7 +171,6 @@ void RenderSystem::setOrigin(const Entity entity)
     }
 
     renderComponent.sprite.setOrigin(centerX, centerY);
-
 }
 
 /**
@@ -185,17 +186,16 @@ void RenderSystem::setSpritePosition(const Entity entity)
     }
 
     // Get all necessary parts
-    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-    auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+    const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+    auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
     // Set the position of the Sprite to the position of transform component
     renderComponent.sprite.setPosition(transformComponent.position);
-
 }
 
 void RenderSystem::displayPortal(const Entity entity)
 {
-    const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+    const auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
     if (gCoordinator.hasComponent<PassageComponent>(entity))
     {
@@ -218,13 +218,12 @@ void RenderSystem::displayPortal(const Entity entity)
     }
 }
 
-
 void RenderSystem::displayDamageTaken(const Entity entity)
 {
     if (!gCoordinator.hasComponent<CharacterComponent>(entity)) return;
 
-    auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
-    auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+    auto &characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
+    auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
     if (!characterComponent.attacked)
     {
@@ -242,7 +241,7 @@ void RenderSystem::displayDamageTaken(const Entity entity)
     }
 }
 
-void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const Entity entity) const
+void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow &window, const Entity entity) const
 {
     ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 370), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(270, 0), ImGuiCond_Always); // Set the width to 250, height is auto
@@ -250,8 +249,8 @@ void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const
                  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysUseWindowPadding);
 
     const auto pos = gCoordinator.getComponent<TransformComponent>(entity);
-    const auto& tile = gCoordinator.getComponent<TileComponent>(entity);
-    const auto& render = gCoordinator.getComponent<RenderComponent>(entity);
+    const auto &tile = gCoordinator.getComponent<TileComponent>(entity);
+    const auto &render = gCoordinator.getComponent<RenderComponent>(entity);
 
     ImGui::Separator();
     ImGui::Text("Player Movement");
@@ -272,10 +271,10 @@ void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const
     ImGui::End();
 }
 
-void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const Entity entity)
+void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow &window, const Entity entity)
 {
-    const auto& weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
-    const auto& weapon = gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon);
+    const auto &weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+    const auto &weapon = gCoordinator.getComponent<WeaponComponent>(weaponComponent.currentWeapon);
 
     // Display the Weapon Stats table in the top-right corner
     ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 10));
@@ -321,7 +320,7 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
 }
 
 
-void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
+void RenderSystem::debugBoundingBoxes(sf::RenderWindow &window)
 {
     if (!gCoordinator.hasComponent<RenderComponent>(config::playerEntity)) return;
 
@@ -331,7 +330,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
 
     auto drawSprite = [&](const Entity entity)
     {
-        const auto& rComponent = gCoordinator.getComponent<RenderComponent>(entity);
+        const auto &rComponent = gCoordinator.getComponent<RenderComponent>(entity);
         const auto bounds = rComponent.sprite.getGlobalBounds();
 
         sf::ConvexShape convex;
@@ -394,7 +393,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
         if (gCoordinator.hasComponent<PlayerComponent>(entity) &&
             gCoordinator.hasComponent<EquippedWeaponComponent>(entity))
         {
-            auto& weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
+            auto &weaponComponent = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
 
             sf::VertexArray swordLine(sf::Lines, 2);
             swordLine[0].position = center;
@@ -406,19 +405,19 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
         }
 
 
-        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (colliderComponent.body == nullptr)
         {
             continue;
         }
 
-        for (b2Fixture* fixture = colliderComponent.body->GetFixtureList(); fixture; fixture = fixture->GetNext())
+        for (b2Fixture *fixture = colliderComponent.body->GetFixtureList(); fixture; fixture = fixture->GetNext())
         {
-            b2Shape* shape = fixture->GetShape();
+            b2Shape *shape = fixture->GetShape();
             if (shape->GetType() == b2Shape::e_polygon)
             {
-                auto* const polygonShape = dynamic_cast<b2PolygonShape*>(shape);
+                auto *const polygonShape = dynamic_cast<b2PolygonShape *>(shape);
                 const int32 count = polygonShape->m_count;
                 sf::ConvexShape convex;
                 convex.setPointCount(count);

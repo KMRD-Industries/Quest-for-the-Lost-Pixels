@@ -25,8 +25,10 @@
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
 #include "PassageSystem.h"
+#include "Paths.h"
 #include "RoomListenerSystem.h"
 #include "SpawnerSystem.h"
+#include "State.h"
 #include "TextTagSystem.h"
 #include "TravellingSystem.h"
 #include "WeaponsSystem.h"
@@ -34,33 +36,36 @@
 class Dungeon
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1){};
+    Dungeon() : m_entities(MAX_ENTITIES - 1)
+    {
+    };
 
-    void setupWeaponEntity(Entity player) const;
     void init();
+    void render(sf::RenderWindow& window);
     void addPlayerComponents(Entity player);
+    void moveDownDungeon();
     void setupPlayerCollision(Entity player);
-    void createRemotePlayer(uint32_t);
+    void setupWeaponEntity(Entity player) const;
+    void update(float deltaTime);
+    void makeStartFloor();
 
-    void draw();
-    void update(float);
+    StateChangeCallback m_stateChangeCallback;
 
 private:
     void setECS();
     void makeSimpleFloor();
+    void createRemotePlayer(uint32_t id);
     void moveInDungeon(const glm::ivec2& dir);
-    void clearDungeon() const;
-    void makeStartFloor();
-    void moveDownDungeon();
-    void loadMap(const std::string& path) const;
-    float getSpawnOffset(float, int);
     void changeRoom(const glm::ivec2& dir);
+    void clearDungeon();
+    void loadMap(const std::string& path) const;
+    float getSpawnOffset(float position, int id);
 
-    std::string m_asset_path;
-    FloorGenerator m_floorGenerator;
-    std::unordered_map<glm::ivec2, Room> m_roomMap;
-    glm::ivec2 m_currentPlayerPos;
-    std::vector<Entity> m_entities;
+    std::string m_asset_path{ASSET_PATH};
+    FloorGenerator m_floorGenerator{};
+    std::unordered_map<glm::ivec2, Room> m_roomMap{};
+    glm::ivec2 m_currentPlayerPos{};
+    std::vector<Entity> m_entities{};
     uint32_t m_id{};
     int64_t m_seed{};
     std::set<uint32_t> m_players{};

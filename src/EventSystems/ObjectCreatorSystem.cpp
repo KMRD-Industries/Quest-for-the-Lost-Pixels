@@ -11,9 +11,14 @@ void ObjectCreatorSystem::update()
     {
         const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
 
-        if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity)) continue;
-        if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity)) continue;
-        if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity)) continue;
+        if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity))
+            continue;
+        if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity))
+            continue;
+        if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity))
+            continue;
+        if (config::debugMode)
+            std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
 
         switch (eventInfo.type)
         {
@@ -34,9 +39,9 @@ void ObjectCreatorSystem::update()
 
 b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& eventInfo) const
 {
-    const auto& renderComponent =           gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
-    const auto& transformComponent =        gCoordinator.getComponent<TransformComponent>(eventInfo.entity);
-    const auto& colliderComponent =         gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
+    const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(eventInfo.entity);
+    const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
 
     b2BodyDef bodyDef;
 
@@ -89,12 +94,12 @@ b2FixtureDef ObjectCreatorSystem::defineFixture(const CreateBodyWithCollisionEve
 
 b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEvent& eventInfo) const
 {
-    const auto& renderComponent =       gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
-    const auto& colliderComponent =     gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
+    const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
+    const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
 
     auto spriteBounds = renderComponent.sprite.getGlobalBounds();
     b2PolygonShape boxShape;
-    sf::Vector2f objectSize {};
+    sf::Vector2f objectSize{};
 
     spriteBounds.height = std::min(spriteBounds.height, 16.f);
     spriteBounds.width = std::min(spriteBounds.width, 16.f);
@@ -130,7 +135,7 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
 
     b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
 
-    if(collisionData->tag != "Item")
+    if (collisionData->tag != "Item")
         body->SetFixedRotation(true);
 
     colliderComponent.fixture = body->CreateFixture(&fixtureDef);
@@ -146,9 +151,7 @@ void ObjectCreatorSystem::clear()
     std::deque<Entity> entityToRemove;
 
     for (const auto entity : m_entities)
-    {
         entityToRemove.push_back(entity);
-    }
 
     while (!entityToRemove.empty())
     {
