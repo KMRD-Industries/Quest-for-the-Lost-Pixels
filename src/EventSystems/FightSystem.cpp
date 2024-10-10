@@ -40,6 +40,7 @@ void FightSystem::update()
             handleMeleAttack(eventEntity);
             break;
         default:
+            handleMeleAttack(eventEntity);
             break;
         }
     }

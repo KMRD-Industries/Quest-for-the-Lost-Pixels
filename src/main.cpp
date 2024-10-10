@@ -1,7 +1,7 @@
-#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <imgui-SFML.h>
 
 #include "BackgroundSystem.h"
 #include "Config.h"
@@ -15,7 +15,7 @@
 
 Coordinator gCoordinator;
 
-void handleInput(sf::RenderWindow& window)
+void handleInput(sf::RenderWindow &window)
 {
     sf::Event event{};
     InputHandler::getInstance()->update();
@@ -49,12 +49,11 @@ void handleInput(sf::RenderWindow& window)
             const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
-        if (event.type == sf::Event::Closed)
-            window.close();
+        if (event.type == sf::Event::Closed) window.close();
     }
 }
 
-sf::Color hexStringToSfmlColor(const std::string& hexColor)
+sf::Color hexStringToSfmlColor(const std::string &hexColor)
 {
     const std::string hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
 
@@ -72,15 +71,12 @@ sf::Color hexStringToSfmlColor(const std::string& hexColor)
 int main()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!",
-                            sf::Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!");
 
-    // W³aœciwa inicjalizacja okna
     window.create(desktopMode, "Quest for the lost pixels!");
 
-    // Inicjalizacja ImGui
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config::frameCycle);
+    // window.setFramerateLimit(config::frameCycle);
     ImGui::CreateContext();
 
     sf::Clock deltaClock;
@@ -93,32 +89,23 @@ int main()
     {
         sf::Time deltaTime = deltaClock.restart();
 
-        // Clear the window before drawing
         window.clear(customColor);
 
-        // Upewnij siê, ¿e ImGui wchodzi w now¹ ramkê
         ImGui::SFML::Update(window, deltaTime);
 
-        // Logika gry
         game.update(deltaTime.asSeconds());
         game.draw(window);
 
-        // Rysowanie systemów
         gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
         gCoordinator.getRegisterSystem<BackgroundSystem>()->draw(window);
         gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
 
-        // Renderowanie ImGui
-        ImGui::SFML::Render(window); // Renderowanie UI SFML
-
-        // Wyœwietlenie okna
+        ImGui::SFML::Render(window);
         window.display();
 
-        // Obs³uga wejœcia
         handleInput(window);
     }
 
-    // Zakoñczenie po³¹czenia i zamkniêcie ImGui
     gCoordinator.getRegisterSystem<MultiplayerSystem>()->disconnect();
     ImGui::SFML::Shutdown();
     return 0;

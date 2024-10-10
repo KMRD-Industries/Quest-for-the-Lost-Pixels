@@ -232,7 +232,7 @@ void TextureSystem::loadTextures()
             continue;
         }
 
-        if (renderComponent.dirty == false) continue;
+        // if (renderComponent.dirty == false) continue;
 
         // Adjust tile index
         long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
