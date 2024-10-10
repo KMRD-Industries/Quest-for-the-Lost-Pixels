@@ -69,7 +69,7 @@ void Dungeon::init()
     const std::string IP = ResourceManager::getInstance().getIP();
     size_t colonPos = IP.find(':');
     if (colonPos == std::string::npos)
-        std::cout << "[WARNING]: BAD IP";
+        std::cout << "[WARNING]: BAD IP\n";
     else
     {
         std::string ip = IP.substr(0, colonPos);
@@ -92,9 +92,10 @@ void Dungeon::init()
         }
     }
     else
-        std::cout << "Starting in single-player mode";
+        std::cout << "Starting in single-player mode\n";
 
-    if (multiplayerSystem->isConnected()) multiplayerSystem->setRoom(m_currentPlayerPos);
+    if (multiplayerSystem->isConnected())
+        multiplayerSystem->setRoom(m_currentPlayerPos);
     const std::string tag = std::format("Player {}", m_id);
 
     makeStartFloor();
@@ -154,7 +155,11 @@ void Dungeon::createRemotePlayer(const uint32_t id)
 
     const Entity entity = gCoordinator.createEntity();
     const auto newEvent = CreateBodyWithCollisionEvent(
-        m_entities[id], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false,
+        m_entities[id], tag, [&](const GameType::CollisionData&)
+        {
+        }, [&](const GameType::CollisionData&)
+        {
+        }, false,
         false);
 
     gCoordinator.addComponent(entity, newEvent);
@@ -206,7 +211,8 @@ void Dungeon::setupPlayerCollision(const Entity player)
         {
             auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
 
-            if (!passageComponent.activePassage) return;
+            if (!passageComponent.activePassage)
+                return;
 
             gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
             passageComponent.moveInDungeon.emplace_back(true);
@@ -284,6 +290,8 @@ void Dungeon::update(const float deltaTime)
     }
 
     m_roomMap.at(m_currentPlayerPos).update();
+    if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
+        m_stateChangeCallback(MenuStateMachine::StateAction::Pop, std::nullopt);
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
@@ -396,13 +404,15 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
                 colliderComponent.body->GetAngle());
         }
 
-        if (m_multiplayerSystem->isConnected()) m_multiplayerSystem->roomChanged(m_currentPlayerPos);
+        if (m_multiplayerSystem->isConnected())
+            m_multiplayerSystem->roomChanged(m_currentPlayerPos);
     }
 }
 
 float Dungeon::getSpawnOffset(const float position, const int id)
 {
-    if (id % 2 == 0) return position + id * config::spawnOffset;
+    if (id % 2 == 0)
+        return position + id * config::spawnOffset;
     return position - id * config::spawnOffset;
 }
 
@@ -424,12 +434,9 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<TextTagComponent>();
     gCoordinator.registerComponent<PassageComponent>();
     gCoordinator.registerComponent<FloorComponent>();
-    gCoordinator.registerComponent<MultiplayerComponent>();
     gCoordinator.registerComponent<LootComponent>();
     gCoordinator.registerComponent<ItemComponent>();
     gCoordinator.registerComponent<ItemAnimationComponent>();
-    gCoordinator.registerComponent<FloorComponent>();
-    gCoordinator.registerComponent<PassageComponent>();
     gCoordinator.registerComponent<ChestComponent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();

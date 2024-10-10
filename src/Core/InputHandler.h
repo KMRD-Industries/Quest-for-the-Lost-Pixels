@@ -14,7 +14,8 @@ enum class InputType
     MoveUp,
     MoveDown,
     Attack,
-    PickUpItem
+    PickUpItem,
+    ReturnInMenu
 };
 
 class InputHandler
@@ -39,10 +40,10 @@ class InputHandler
     std::unordered_set<InputType> m_keysPressed{};
 
     std::unordered_map<InputKey, InputType, InputKeyHash> m_keyToMapInput{
-        {sf::Keyboard::Key::W, InputType::MoveUp},     {sf::Keyboard::Key::A, InputType::MoveLeft},
-        {sf::Keyboard::Key::S, InputType::MoveDown},   {sf::Keyboard::Key::D, InputType::MoveRight},
+        {sf::Keyboard::Key::W, InputType::MoveUp}, {sf::Keyboard::Key::A, InputType::MoveLeft},
+        {sf::Keyboard::Key::S, InputType::MoveDown}, {sf::Keyboard::Key::D, InputType::MoveRight},
         {sf::Keyboard::Key::Space, InputType::Attack}, {sf::Keyboard::Key::E, InputType::PickUpItem},
-        {sf::Mouse::Left, InputType::Attack} // Handling for the right mouse button
+        {sf::Keyboard::Key::Escape, InputType::ReturnInMenu}, {sf::Mouse::Left, InputType::Attack}
     };
 
     inline static InputHandler* m_instance{};
@@ -53,9 +54,7 @@ public:
     static InputHandler* getInstance()
     {
         if (m_instance == nullptr)
-        {
             m_instance = new InputHandler();
-        }
         return m_instance;
     };
     [[nodiscard]] bool isHeld(InputType input) const;

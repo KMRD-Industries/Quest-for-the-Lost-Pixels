@@ -60,7 +60,11 @@ void CollisionSystem::createMapCollision()
         const Entity newMapCollisionEntity = gCoordinator.createEntity();
 
         const auto newEvent = CreateBodyWithCollisionEvent(
-            entity, type, [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, isStatic,
+            entity, type, [](const GameType::CollisionData&)
+            {
+            }, [](const GameType::CollisionData&)
+            {
+            }, isStatic,
             useTexture);
 
         gCoordinator.addComponent(newMapCollisionEntity, newEvent);
@@ -73,9 +77,7 @@ void CollisionSystem::createMapCollision()
 
         if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
             gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
-        {
             continue;
-        }
 
         if (tileComponent.tileSet == "SpecialBlocks")
         {
@@ -86,8 +88,13 @@ void CollisionSystem::createMapCollision()
                 createCollisionBody(entity, "Door", true, false);
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
+            {
                 if (const auto* passageComponent = gCoordinator.tryGetComponent<PassageComponent>(entity))
-                    if (passageComponent->activePassage) createCollisionBody(entity, "Passage", true, true);
+                {
+                    if (passageComponent->activePassage)
+                        createCollisionBody(entity, "Passage", true, true);
+                }
+            }
         }
         else
         {
@@ -105,15 +112,15 @@ void CollisionSystem::update() const
         auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-        if (!transformComponent.velocity.IsValid()) continue;
+        if (!transformComponent.velocity.IsValid())
+            continue;
 
         b2Body* body = colliderComponent.body;
-        if (body == nullptr) continue;
+        if (body == nullptr)
+            continue;
 
         if (colliderComponent.tag == "Item")
-        {
             body->ApplyForceToCenter({transformComponent.velocity.x, transformComponent.velocity.y}, true);
-        }
         else
         {
             body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
@@ -128,9 +135,6 @@ void CollisionSystem::update() const
 void CollisionSystem::updateSimulation(const float timeStep, const int32 velocityIterations,
                                        const int32 positionIterations) const
 {
-    if (config::debugMode)
-        std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
-
     Physics::getWorld()->Step(timeStep, velocityIterations, positionIterations);
 
     for (const auto entity : m_entities)
@@ -139,8 +143,9 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-        const b2Body *body = colliderComponent.body;
-        if (body == nullptr) continue;
+        const b2Body* body = colliderComponent.body;
+        if (body == nullptr)
+            continue;
         const auto position = body->GetPosition();
 
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
@@ -152,9 +157,10 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
 
 void CollisionSystem::deleteBody(const Entity entity) const
 {
-    if (auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+    if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
     {
-        if (colliderComponent->body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent->body);
+        if (colliderComponent->body != nullptr)
+            Physics::getWorld()->DestroyBody(colliderComponent->body);
         colliderComponent->body = nullptr;
         colliderComponent->collision = {};
     }
@@ -164,14 +170,16 @@ void CollisionSystem::deleteMarkedBodies() const
 {
     std::unordered_set<Entity> entityToKill{};
 
-    for (const auto &entity : m_entities)
+    for (const auto& entity : m_entities)
     {
-        const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-        if (!colliderComponent.toDestroy) continue;
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        if (!colliderComponent.toDestroy)
+            continue;
         deleteBody(entity);
         entityToKill.insert(entity);
     }
 
-    for (auto &entity : entityToKill) gCoordinator.destroyEntity(entity);
+    for (auto& entity : entityToKill)
+        gCoordinator.destroyEntity(entity);
     entityToKill.clear();
 }
