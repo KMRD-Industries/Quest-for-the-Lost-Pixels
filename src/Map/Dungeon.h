@@ -75,9 +75,6 @@ private:
     int m_dungeonDepth{1};
     bool m_endGame{};
 
-    // [] problemy z tym
-    // [] wielokrotna kolizja z portalem
-    // [] brak strza³ki
     PlayerMovementSystem* m_playerMovementSystem;
     MultiplayerSystem* m_multiplayerSystem;
     CharacterSystem* m_characterSystem;

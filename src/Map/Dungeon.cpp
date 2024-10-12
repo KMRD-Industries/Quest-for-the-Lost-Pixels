@@ -342,13 +342,11 @@ void Dungeon::makeSimpleFloor()
     m_textureSystem->modifyColorScheme(playerFloor);
 
     m_floorGenerator.generateFloor(5, 6, m_seed);
-    m_floorGenerator.generateMainPath(1);
-    /*
+    m_floorGenerator.generateMainPath(6);
     m_floorGenerator.generateSidePath(
         {.pathName{"FirstC"}, .startingPathName{"Main"}, .endPathName{"Main"}, .minPathLength{3}, .maxPathLength{5}});
     m_floorGenerator.generateSidePath(
         {.pathName{"SecondC"}, .startingPathName{"Main"}, .endPathName{""}, .minPathLength{3}, .maxPathLength{5}});
-    */
     m_floorGenerator.generateSidePath(
         {.pathName{"BossRoom"}, .startingPathName{}, .endPathName{""}, .minPathLength{0}, .maxPathLength{0}});
     m_floorGenerator.makeLockAndKey();
