@@ -19,10 +19,15 @@ class FloorGenerator
 
 public:
     FloorGenerator() = default;
-    void generateFloor(const int height, const int width, const int64_t seed);
+    void generateFloor(int height, int width, int64_t seed);
     void generateMainPath(const int mainPathLen) { m_generator.generateMainPath(mainPathLen); }
     void generateSidePath(const DungeonGenerator::sidePathConfig& path) { m_generator.generateSidePath(path); }
-    void makeLockAndKey() { m_generator.makeLockAndKey(); }
+
+    void makeLockAndKey()
+    {
+        //m_generator.makeLockAndKey();
+    }
+
     bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;
     void setFloorID(const int id) { m_floorID = id; }
 

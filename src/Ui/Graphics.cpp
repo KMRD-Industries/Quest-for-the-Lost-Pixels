@@ -6,10 +6,6 @@
 
 void Graphics::render(sf::RenderWindow& window)
 {
-    m_sprite->setPosition(m_position);
-    m_sprite->setRotation(m_rotation);
-    m_sprite->setScale(m_scale);
-
     window.draw(*m_sprite);
 }
 
@@ -20,4 +16,7 @@ void Graphics::init(const std::string& spritePath)
         return;
     m_sprite = new sf::Sprite();
     m_sprite->setTexture(*backgroundTexture);
+    m_sprite->setPosition(m_position);
+    m_sprite->setRotation(m_rotation);
+    m_sprite->setScale(m_scale);
 }

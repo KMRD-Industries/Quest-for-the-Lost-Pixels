@@ -9,7 +9,9 @@
 #include "Game.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
+#include "Paths.h"
 #include "RenderSystem.h"
+#include "ResourceManager.h"
 #include "SpawnerSystem.h"
 #include "TextTagSystem.h"
 
@@ -85,6 +87,10 @@ int main()
 
     sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
 
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 160);
+    resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 40);
+
     while (window.isOpen())
     {
         sf::Time deltaTime = deltaClock.restart();
@@ -95,10 +101,6 @@ int main()
 
         game.update(deltaTime.asSeconds());
         game.draw(window);
-
-        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
-        gCoordinator.getRegisterSystem<BackgroundSystem>()->draw(window);
-        gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
 
         ImGui::SFML::Render(window);
         window.display();

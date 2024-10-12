@@ -149,6 +149,8 @@ set(UTILS
 )
 
 set(MENU_STATE_MACHINE
+        MenuStateMachine/EndGameState.cpp
+        MenuStateMachine/EndGameState.h
         MenuStateMachine/MainMenuState.cpp
         MenuStateMachine/MainMenuState.h
         MenuStateMachine/GameState.cpp
@@ -169,6 +171,9 @@ set(UI
         Ui/InputTextDTO.h
         Ui/InputText.h
         Ui/InputText.cpp
+        Ui/TextDTO.h
+        Ui/Text.h
+        Ui/Text.cpp
 )
 
 

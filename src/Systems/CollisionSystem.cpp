@@ -88,13 +88,7 @@ void CollisionSystem::createMapCollision()
                 createCollisionBody(entity, "Door", true, false);
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
-            {
-                if (const auto* passageComponent = gCoordinator.tryGetComponent<PassageComponent>(entity))
-                {
-                    if (passageComponent->activePassage)
-                        createCollisionBody(entity, "Passage", true, true);
-                }
-            }
+                createCollisionBody(entity, "Passage", true, true);
         }
         else
         {

@@ -1,12 +1,13 @@
 {
-    "activeFile": "assets/maps/floor_01/map_s15.json",
+    "activeFile": "assets/maps/floor_01/map_b4.json",
     "expandedProjectPaths": [
+        "assets/tileSets",
+        "assets/maps/floor_02",
         "assets/maps",
         "assets/maps/floor_01",
-        "assets",
-        ".",
-        "assets/tileSets",
         "build",
+        ".",
+        "assets",
         "assets/maps/floor_00"
     ],
     "file.lastUsedOpenFilter": "Wszystkie pliki (*)",
@@ -24,219 +25,235 @@
             }
         },
         "assets/maps/floor_01/map_10.json": {
-            "scale": 1,
+            "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 189,
-                "y": 83.5
+                "x": 154.83333333333331,
+                "y": 136.99999999999997
             }
         },
         "assets/maps/floor_01/map_11.json": {
             "scale": 2.648125,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 160.11328770356386,
-                "y": 160.3021005428369
+                "x": 131.60254897333022,
+                "y": 168.42105263157896
             }
         },
         "assets/maps/floor_01/map_110.json": {
             "scale": 3.0726562499999996,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 159.79659293160438,
-                "y": 111.79252479023648
+                "x": 118.30155097889654,
+                "y": -9.112636664124068
             }
         },
         "assets/maps/floor_01/map_12.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 225.44253009204624,
-                "y": 153.64644795846118
+                "x": 119.66013688930846,
+                "y": 119.8017465187633
             }
         },
         "assets/maps/floor_01/map_13.json": {
-            "scale": 3.5308333333333333,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 120.22657540712768
+                "x": 74.25,
+                "y": 113.5
             }
         },
         "assets/maps/floor_01/map_14.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 117.39438281803163,
+                "y": 164.2671701675714
             }
         },
         "assets/maps/floor_01/map_15.json": {
-            "scale": 3.5308333333333333,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 159.75,
+                "y": 145
             }
         },
         "assets/maps/floor_01/map_16.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 200.94406419636536,
+                "y": 164.2671701675714
             }
         },
         "assets/maps/floor_01/map_3.json": {
             "scale": 3.0726562499999996,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 160.1220442410374,
-                "y": 39.867785405542854
+                "x": 146.6158148995678,
+                "y": 90.80091533180779
             }
         },
         "assets/maps/floor_01/map_4.json": {
-            "scale": 3.5308333333333333,
+            "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 163.5,
+                "y": 146.66666666666669
             }
         },
         "assets/maps/floor_01/map_5.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 208.1586575133486,
-                "y": 119.9450800915332
+                "x": 251.94813119755915,
+                "y": 185.7350622934147
             }
         },
         "assets/maps/floor_01/map_6.json": {
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 207,
-                "y": 97
+                "x": 217,
+                "y": 224.66666666666663
             }
         },
         "assets/maps/floor_01/map_7.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 208.15865751334863,
-                "y": 120.36816679379609
+                "x": 253.21739130434784,
+                "y": 186.1581489956776
             }
         },
         "assets/maps/floor_01/map_8.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 208.1586575133486,
-                "y": 120.36816679379609
+                "x": 161.40757691329776,
+                "y": 129.88761759471146
             }
         },
         "assets/maps/floor_01/map_9.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 208.15865751334863,
-                "y": 120.36816679379609
+                "x": 206.67785405542847,
+                "y": 119.31045003813884
             }
         },
         "assets/maps/floor_01/map_b1.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 120.08496577767288
+                "x": 119.66013688930846,
+                "y": 119.51852725985367
             }
         },
         "assets/maps/floor_01/map_b2.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 120.08496577767288
+                "x": 119.66013688930846,
+                "y": 119.51852725985367
             }
         },
         "assets/maps/floor_01/map_b3.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 120.08496577767288
+                "x": 119.66013688930846,
+                "y": 119.23530800094407
             }
         },
         "assets/maps/floor_01/map_b4.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 120.08496577767288
+                "x": 119.66013688930846,
+                "y": 119.51852725985367
             }
         },
         "assets/maps/floor_01/map_s1.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 119.66013688930846,
+                "y": 119.8017465187633
             }
         },
         "assets/maps/floor_01/map_s10.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 120.2265754071277,
+                "y": 120.08496577767289
             }
         },
         "assets/maps/floor_01/map_s11.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 119.37691763039888,
+                "y": 119.8017465187633
+            }
+        },
+        "assets/maps/floor_01/map_s12.json": {
+            "scale": 3.4397916666666664,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 120.21076857852341,
+                "y": 120.06541093816246
+            }
+        },
+        "assets/maps/floor_01/map_s13.json": {
+            "scale": 3.4397916666666664,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 119.92005329780147,
+                "y": 120.06541093816246
             }
         },
         "assets/maps/floor_01/map_s14.json": {
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 116.66666666666664,
-                "y": 3.3333333333333712
+                "x": 119.33333333333331,
+                "y": 119.99999999999994
             }
         },
         "assets/maps/floor_01/map_s15.json": {
-            "scale": 1,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 179.5,
-                "y": 25.5
+                "x": 157.66666666666666,
+                "y": 82.66666666666663
             }
         },
         "assets/maps/floor_01/map_s2.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 119.66013688930846,
+                "y": 119.8017465187633
             }
         },
         "assets/maps/floor_01/map_s3.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 120.2265754071277,
+                "y": 120.08496577767289
             }
         },
         "assets/maps/floor_01/map_s4.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "x": 120.2265754071277,
+                "y": 120.08496577767289
             }
         },
         "assets/maps/map_1.json": {
@@ -456,7 +473,6 @@
         "assets/tileSets/Weapons.json",
         "assets/maps/floor_01/map_10.json",
         "assets/maps/floor_01/map_11.json",
-        "assets/maps/floor_01/map_110.json",
         "assets/maps/floor_01/map_13.json",
         "assets/maps/floor_01/map_16.json",
         "assets/maps/floor_01/map_14.json",
@@ -478,14 +494,19 @@
         "assets/maps/floor_01/map_15.json",
         "assets/maps/floor_01/map_12.json",
         "assets/tileSets/Items.json",
-        "assets/tileSets/Characters.json"
+        "assets/tileSets/Characters.json",
+        "assets/maps/floor_01/map_s12.json",
+        "assets/maps/floor_01/map_s13.json",
+        "assets/maps/floor_01/map_b1.json",
+        "assets/maps/floor_01/map_b2.json",
+        "assets/maps/floor_01/map_b3.json",
+        "assets/maps/floor_01/map_b4.json"
     ],
     "project": "bez nazwy.tiled-project",
     "recentFiles": [
         "assets/tileSets/Weapons.json",
         "assets/maps/floor_01/map_10.json",
         "assets/maps/floor_01/map_11.json",
-        "assets/maps/floor_01/map_110.json",
         "assets/maps/floor_01/map_13.json",
         "assets/maps/floor_01/map_16.json",
         "assets/maps/floor_01/map_14.json",
@@ -493,7 +514,8 @@
         "assets/maps/floor_01/map_4.json",
         "assets/maps/floor_01/map_5.json",
         "assets/maps/floor_01/map_6.json",
-        "assets/maps/floor_01/map_7.json"
+        "assets/maps/floor_01/map_7.json",
+        "assets/maps/floor_01/map_8.json"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

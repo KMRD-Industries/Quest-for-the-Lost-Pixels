@@ -22,6 +22,7 @@
 #include "Config.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
+#include "EndGameState.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -112,8 +113,8 @@ void Dungeon::init()
 
 void Dungeon::render(sf::RenderWindow& window)
 {
-    m_textureSystem->loadTextures();
-    m_healthBarSystem->drawHealthBar();
+    gCoordinator.getRegisterSystem<TextureSystem>().get()->loadTextures();
+    gCoordinator.getRegisterSystem<HealthBarSystem>().get()->drawHealthBar();
     m_roomMap.at(m_currentPlayerPos).draw();
 }
 
@@ -168,6 +169,9 @@ void Dungeon::createRemotePlayer(const uint32_t id)
 
 void Dungeon::moveDownDungeon()
 {
+    if (m_dungeonDepth >= config::maxDungeonDepth)
+        m_endGame = true;
+    ++m_dungeonDepth;
     makeSimpleFloor();
     const auto& pos = GameUtility::startingPosition;
 
@@ -210,9 +214,6 @@ void Dungeon::setupPlayerCollision(const Entity player)
         if (entityT.tag == "Passage")
         {
             auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
-
-            if (!passageComponent.activePassage)
-                return;
 
             gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
             passageComponent.moveInDungeon.emplace_back(true);
@@ -291,7 +292,9 @@ void Dungeon::update(const float deltaTime)
 
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
-        m_stateChangeCallback(MenuStateMachine::StateAction::Pop, std::nullopt);
+        m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});
+    if (m_endGame)
+        m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
@@ -339,11 +342,13 @@ void Dungeon::makeSimpleFloor()
     m_textureSystem->modifyColorScheme(playerFloor);
 
     m_floorGenerator.generateFloor(5, 6, m_seed);
-    m_floorGenerator.generateMainPath(11);
+    m_floorGenerator.generateMainPath(1);
+    /*
     m_floorGenerator.generateSidePath(
         {.pathName{"FirstC"}, .startingPathName{"Main"}, .endPathName{"Main"}, .minPathLength{3}, .maxPathLength{5}});
     m_floorGenerator.generateSidePath(
         {.pathName{"SecondC"}, .startingPathName{"Main"}, .endPathName{""}, .minPathLength{3}, .maxPathLength{5}});
+    */
     m_floorGenerator.generateSidePath(
         {.pathName{"BossRoom"}, .startingPathName{}, .endPathName{""}, .minPathLength{0}, .maxPathLength{0}});
     m_floorGenerator.makeLockAndKey();
