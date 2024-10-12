@@ -40,6 +40,11 @@ namespace Items
         HEAL = 0,
         DMGUP = 1
     };
+
+    const std::unordered_map<std::string, Behaviours> behaviourMap = {
+        {"Heal", Behaviours::HEAL},
+        {"DmgUp", Behaviours::DMGUP},
+    };
 }
 
 namespace Enemies
@@ -48,6 +53,11 @@ namespace Enemies
     {
         MELEE = 0,
         BOSS = 1
+    };
+
+    const std::unordered_map<std::string, EnemyType> enemyTypeMap = {
+        {"Melee", EnemyType::MELEE},
+        {"Boss", EnemyType::BOSS},
     };
 } // namespace Enemies
 

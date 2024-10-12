@@ -3,19 +3,17 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
-#include "BackgroundSystem.h"
-#include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
 #include "Paths.h"
-#include "RenderSystem.h"
+#include "PublicConfigMenager.h"
 #include "ResourceManager.h"
 #include "SpawnerSystem.h"
-#include "TextTagSystem.h"
 
 Coordinator gCoordinator;
+PublicConfigSingleton configSingleton;
 
 void handleInput(sf::RenderWindow& window)
 {
@@ -73,19 +71,22 @@ sf::Color hexStringToSfmlColor(const std::string& hexColor)
 
 int main()
 {
+    configSingleton.LoadConfig(ASSET_PATH + std::string("/config.json"));
+    const PublicConfig& config = configSingleton.GetConfig();
+
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     sf::RenderWindow window(desktopMode, "Quest for the lost pixels!",
                             sf::Style::Fullscreen);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config::frameCycle * (config::debugMode ? 100 : 1));
+    window.setFramerateLimit(config.frameCycle * (config.debugMode ? 100 : 1));
     ImGui::CreateContext();
 
     sf::Clock deltaClock;
     Game game;
     game.init();
 
-    sf::Color customColor = hexStringToSfmlColor(config::backgroundColor);
+    sf::Color customColor = hexStringToSfmlColor(config.backgroundColor);
 
     ResourceManager& resourceManager = ResourceManager::getInstance();
     resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 160);

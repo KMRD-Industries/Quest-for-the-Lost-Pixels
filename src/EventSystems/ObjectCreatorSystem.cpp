@@ -2,8 +2,11 @@
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "Physics.h"
+#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
+
+extern PublicConfigSingleton configSingleton;
 
 void ObjectCreatorSystem::update()
 {
@@ -17,7 +20,7 @@ void ObjectCreatorSystem::update()
             continue;
         if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity))
             continue;
-        if (config::debugMode)
+        if (configSingleton.GetConfig().debugMode)
             std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
 
         switch (eventInfo.type)
@@ -62,12 +65,12 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
         objectPosition.x = convertPixelsToMeters(
             transformComponent.position.x -
             (spriteBounds.width / 2.f - (colliderComponent.collision.x + colliderComponent.collision.width / 2.f)) *
-            config::gameScale);
+            configSingleton.GetConfig().gameScale);
 
         objectPosition.y = convertPixelsToMeters(
             transformComponent.position.y -
             (spriteBounds.height / 2 - (colliderComponent.collision.y + colliderComponent.collision.height / 2)) *
-            config::gameScale);
+            configSingleton.GetConfig().gameScale);
     }
 
     bodyDef.position.Set(objectPosition.x, objectPosition.y);
@@ -106,13 +109,15 @@ b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEve
 
     if (eventInfo.useTextureSize)
     {
-        objectSize.x = convertPixelsToMeters(spriteBounds.width * config::gameScale) / 2;
-        objectSize.y = convertPixelsToMeters(spriteBounds.height * config::gameScale) / 2;
+        objectSize.x = convertPixelsToMeters(spriteBounds.width * configSingleton.GetConfig().gameScale) / 2;
+        objectSize.y = convertPixelsToMeters(spriteBounds.height * configSingleton.GetConfig().gameScale) / 2;
     }
     else
     {
-        objectSize.x = convertPixelsToMeters(colliderComponent.collision.width * config::gameScale) / 2;
-        objectSize.y = convertPixelsToMeters(colliderComponent.collision.height * config::gameScale) / 2;
+        objectSize.x = convertPixelsToMeters(colliderComponent.collision.width * configSingleton.GetConfig().gameScale)
+            / 2;
+        objectSize.y = convertPixelsToMeters(colliderComponent.collision.height * configSingleton.GetConfig().gameScale)
+            / 2;
     }
 
     boxShape.SetAsBox(objectSize.x, objectSize.y);

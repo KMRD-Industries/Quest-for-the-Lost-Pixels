@@ -11,6 +11,8 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
+extern PublicConfigSingleton configSingleton;
+
 void InventorySystem::dropWeapon(const Entity player)
 {
     auto& inventory = gCoordinator.getComponent<InventoryComponent>(player);
@@ -23,7 +25,11 @@ void InventorySystem::dropWeapon(const Entity player)
     gCoordinator.getComponent<TransformComponent>(inventory.weapons[0]).rotation = 0;
 
     const auto newEvent = CreateBodyWithCollisionEvent(
-        inventory.weapons[0], "Item", [this](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {},
+        inventory.weapons[0], "Item", [this](const GameType::CollisionData&)
+        {
+        }, [&](const GameType::CollisionData&)
+        {
+        },
         false, false);
 
     gCoordinator.addComponent(newItemEntity, newEvent);
@@ -58,7 +64,7 @@ void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon)
 
             equippedTransformComponent.position.y +=
                 (newWeaponCollisionComponent.collision.height - equippedWeaponCollisionComponent.collision.height) *
-                config::gameScale;
+                configSingleton.GetConfig().gameScale;
 
             dropWeapon(player);
         }
@@ -68,7 +74,8 @@ void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon)
     inventory.weapons.push_back(weapon);
     gCoordinator.getComponent<WeaponComponent>(weapon).equipped = true;
 
-    if (gCoordinator.hasComponent<ItemComponent>(weapon)) gCoordinator.removeComponent<ItemComponent>(weapon);
+    if (gCoordinator.hasComponent<ItemComponent>(weapon))
+        gCoordinator.removeComponent<ItemComponent>(weapon);
 
     if (gCoordinator.hasComponent<ItemAnimationComponent>(weapon))
         gCoordinator.removeComponent<ItemAnimationComponent>(weapon);

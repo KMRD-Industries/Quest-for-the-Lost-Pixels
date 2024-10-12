@@ -57,6 +57,7 @@
 #include "WeaponsSystem.h"
 
 extern Coordinator Coordinator;
+extern PublicConfigSingleton configSingleton;
 
 void Dungeon::init()
 {
@@ -120,11 +121,11 @@ void Dungeon::render(sf::RenderWindow& window)
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponent(player, TileComponent{config::playerAnimation, "Characters", 6});
+    gCoordinator.addComponent(player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 6});
     gCoordinator.addComponent(player, RenderComponent{});
     gCoordinator.addComponent(player, TransformComponent{GameUtility::startingPosition});
     gCoordinator.addComponent(player, AnimationComponent{});
-    gCoordinator.addComponent(player, CharacterComponent{.hp = config::defaultCharacterHP});
+    gCoordinator.addComponent(player, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
     gCoordinator.addComponent(player, PlayerComponent{});
     gCoordinator.addComponent(player, ColliderComponent{});
     gCoordinator.addComponent(player, InventoryComponent{});
@@ -141,17 +142,21 @@ void Dungeon::createRemotePlayer(const uint32_t id)
     m_entities[id] = gCoordinator.createEntity();
 
     gCoordinator.addComponent(m_entities[id],
-                              TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, id),
-                                                              getSpawnOffset(config::startingPosition.y, id)),
+                              TransformComponent(sf::Vector2f(
+                                                     getSpawnOffset(configSingleton.GetConfig().startingPosition.x, id),
+                                                     getSpawnOffset(configSingleton.GetConfig().startingPosition.y,
+                                                                    id)),
                                                  0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
-    gCoordinator.addComponent(m_entities[id], TileComponent{config::playerAnimation, "Characters", 3});
+    gCoordinator.addComponent(m_entities[id],
+                              TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[id], RenderComponent{});
     gCoordinator.addComponent(m_entities[id], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = config::defaultCharacterHP});
+    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
     gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
     gCoordinator.addComponent(m_entities[id], ColliderComponent{});
 
-    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
+        "Characters", configSingleton.GetConfig().playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
 
     const Entity entity = gCoordinator.createEntity();
@@ -169,7 +174,7 @@ void Dungeon::createRemotePlayer(const uint32_t id)
 
 void Dungeon::moveDownDungeon()
 {
-    if (m_dungeonDepth >= config::maxDungeonDepth)
+    if (m_dungeonDepth >= configSingleton.GetConfig().maxDungeonDepth)
         m_endGame = true;
     ++m_dungeonDepth;
     makeSimpleFloor();
@@ -183,8 +188,8 @@ void Dungeon::moveDownDungeon()
     gCoordinator.getComponent<TransformComponent>(config::playerEntity).velocity = {};
 
     b2Vec2 position{};
-    position.x = GameUtility::startingPosition.x * static_cast<float>(config::pixelToMeterRatio);
-    position.y = GameUtility::startingPosition.y * static_cast<float>(config::pixelToMeterRatio);
+    position.x = GameUtility::startingPosition.x * static_cast<float>(configSingleton.GetConfig().pixelToMeterRatio);
+    position.y = GameUtility::startingPosition.y * static_cast<float>(configSingleton.GetConfig().pixelToMeterRatio);
 
     gCoordinator.getComponent<ColliderComponent>(config::playerEntity).body->SetTransform(position, 0);
     m_roomListenerSystem->reset();
@@ -192,7 +197,7 @@ void Dungeon::moveDownDungeon()
 
 void Dungeon::setupPlayerCollision(const Entity player)
 {
-    const auto& cc = m_textureSystem->getCollision("Characters", config::playerAnimation);
+    const auto& cc = m_textureSystem->getCollision("Characters", configSingleton.GetConfig().playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(player).collision = cc;
     const std::string tag = std::format("Player {}", m_id);
 
@@ -415,8 +420,8 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 float Dungeon::getSpawnOffset(const float position, const int id)
 {
     if (id % 2 == 0)
-        return position + id * config::spawnOffset;
-    return position - id * config::spawnOffset;
+        return position + id * configSingleton.GetConfig().spawnOffset;
+    return position - id * configSingleton.GetConfig().spawnOffset;
 }
 
 void Dungeon::setECS()

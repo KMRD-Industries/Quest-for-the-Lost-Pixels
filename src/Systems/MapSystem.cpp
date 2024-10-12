@@ -15,6 +15,7 @@
 #include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
+#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
 #include "TextureSystem.h"
@@ -22,6 +23,7 @@
 #include "TransformComponent.h"
 
 extern Coordinator gCoordinator;
+extern PublicConfigSingleton configSingleton;
 
 void MapSystem::init()
 {
@@ -250,5 +252,5 @@ void MapSystem::resetMap() const
 sf::Vector2f MapSystem::getPosition(const int x_axis, const int y_axis, const int map_tile_width) const
 {
     return sf::Vector2f(static_cast<float>(x_axis), static_cast<float>(y_axis)) * static_cast<float>(map_tile_width) *
-        config::gameScale;
+        configSingleton.GetConfig().gameScale;
 }

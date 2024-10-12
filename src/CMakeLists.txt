@@ -143,6 +143,8 @@ set(UTILS
         Utils/GameTypes.h
         Utils/MapParser.h
         Utils/Config.h
+        Utils/PublicConfig.h
+        Utils/PublicConfigMenager.h
         Utils/TextureParser.h
         Utils/TextTag.h
         Utils/GameUtility.h

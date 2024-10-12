@@ -136,11 +136,11 @@ namespace config
 
     struct EnemyConfig
     {
-        const std::string name{};
-        const float hp{};
-        const float damage{};
-        const TileComponent textureData{};
-        const Collision collisionData{};
+        std::string name{};
+        float hp{};
+        float damage{};
+        TileComponent textureData{};
+        Collision collisionData{};
     };
 
     const std::unordered_map<SpecialRoomTypes, char> prefixesForSpecialRooms{{SpecialRoomTypes::SpawnRoom, 's'},
@@ -163,10 +163,10 @@ namespace config
 
     struct ItemConfig
     {
-        const std::string name{};
-        const float value{};
-        const Items::Behaviours behaviour{};
-        const TileComponent textureData{};
+        std::string name{};
+        float value{};
+        Items::Behaviours behaviour{};
+        TileComponent textureData{};
     };
 
     const std::vector<ItemConfig> itemsData{{"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
