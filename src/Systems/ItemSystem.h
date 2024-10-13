@@ -1,10 +1,13 @@
 #pragma once
 
+#include "Config.h"
 #include "RenderComponent.h"
 #include "System.h"
+#include "Types.h"
 #include "WeaponComponent.h"
 
-class ItemSystem : public System {
+class ItemSystem : public System
+{
 public:
     void init();
 
@@ -24,4 +27,6 @@ public:
 
 private:
     float m_frameTime{};
+    config::slotType closestItemEntityType{};
+    Entity closestItemEntity;
 };
