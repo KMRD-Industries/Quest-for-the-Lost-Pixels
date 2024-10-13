@@ -14,48 +14,50 @@
 
 FightSystem::FightSystem() { init(); }
 
-void FightSystem::init() const {
-}
+void FightSystem::init() const {}
 
-void FightSystem::update() {
-    for (const auto entity: m_entities) {
+void FightSystem::update()
+{
+    for (const auto entity : m_entities)
+    {
         const auto &[eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
 
         // Start attack animation
         const auto &equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(eventEntity);
-        const auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(
-            equippedWeapon.slots.at(config::slotType::WEAPON));
+        const auto &weaponComponent =
+            gCoordinator.getComponent<WeaponComponent>(equippedWeapon.slots.at(GameType::slotType::WEAPON));
 
-        switch (weaponComponent.type) {
-            case GameType::WeaponType::MELE:
-                handleMeleeAttack(eventEntity);
-                break;
-            case GameType::WeaponType::WAND:
-                // TODO: Wand attack support
-                handleMeleeAttack(eventEntity);
-                break;
-            case GameType::WeaponType::BOW:
-                // TODO: Bow attack support
-                handleMeleeAttack(eventEntity);
-                break;
-            default:
-                handleMeleeAttack(eventEntity);
-                break;
+        switch (weaponComponent.type)
+        {
+        case GameType::WeaponType::MELE:
+            handleMeleeAttack(eventEntity);
+            break;
+        case GameType::WeaponType::WAND:
+            // TODO: Wand attack support
+            handleMeleeAttack(eventEntity);
+            break;
+        case GameType::WeaponType::BOW:
+            // TODO: Bow attack support
+            handleMeleeAttack(eventEntity);
+            break;
+        default:
+            handleMeleeAttack(eventEntity);
+            break;
         }
     }
 
     clear();
 }
 
-void FightSystem::handleBowAttack(Entity) {
-}
+void FightSystem::handleBowAttack(Entity) {}
 
-void FightSystem::handleMeleeAttack(const Entity playerEntity) const {
+void FightSystem::handleMeleeAttack(const Entity playerEntity) const
+{
     const auto &playerRenderComponent = gCoordinator.getComponent<RenderComponent>(playerEntity);
     const auto &[playerEquippedWeapon] = gCoordinator.getComponent<EquipmentComponent>(playerEntity);
     const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(playerEntity);
-    auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(
-        playerEquippedWeapon.at(config::slotType::WEAPON));
+    auto &weaponComponent =
+        gCoordinator.getComponent<WeaponComponent>(playerEquippedWeapon.at(GameType::slotType::WEAPON));
 
     weaponComponent.isFacingRight = playerRenderComponent.sprite.getScale().x > 0;
     weaponComponent.queuedAttack = true;
@@ -73,7 +75,8 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const {
 
     const auto targetInBox = Physics::rayCast(center, point2, playerEntity);
 
-    if (targetInBox.tag == "Enemy") {
+    if (targetInBox.tag == "Enemy")
+    {
         auto &characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
         const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(targetInBox.entityID);
         auto &secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(targetInBox.entityID);
@@ -102,11 +105,13 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const {
     }
 }
 
-void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData &collisionData) const {
+void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData &collisionData) const
+{
     if (std::regex_match(collisionData.tag, config::playerRegexTag)) return;
     if (collisionData.tag == "Bullet") return;
 
-    if (collisionData.tag == "Enemy") {
+    if (collisionData.tag == "Enemy")
+    {
         auto &characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
         auto &enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);
 
@@ -121,23 +126,28 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
     gCoordinator.getComponent<CharacterComponent>(bullet).hp = -1;
 }
 
-float FightSystem::calculateAngle(const sf::Vector2f &pivotPoint, const sf::Vector2f &targetPoint) const {
+float FightSystem::calculateAngle(const sf::Vector2f &pivotPoint, const sf::Vector2f &targetPoint) const
+{
     const sf::Vector2f direction = targetPoint - pivotPoint;
     return std::atan2(direction.y, direction.x);
 }
 
-void FightSystem::handleWandAttack(const Entity eventEntity) const {
+void FightSystem::handleWandAttack(const Entity eventEntity) const
+{
     // TODO: Wand attack support
 }
 
-void FightSystem::clear() {
+void FightSystem::clear()
+{
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity: m_entities) {
+    for (const auto entity : m_entities)
+    {
         entityToRemove.push_back(entity);
     }
 
-    while (!entityToRemove.empty()) {
+    while (!entityToRemove.empty())
+    {
         gCoordinator.destroyEntity(entityToRemove.front());
         entityToRemove.pop_front();
     }

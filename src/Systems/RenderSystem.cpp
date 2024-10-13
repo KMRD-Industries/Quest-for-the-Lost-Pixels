@@ -30,30 +30,33 @@ RenderSystem::RenderSystem() { init(); }
 
 void RenderSystem::init() { portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0); }
 
-void RenderSystem::draw(sf::RenderWindow &window) {
+void RenderSystem::draw(sf::RenderWindow &window)
+{
     if (tiles.empty()) tiles.resize(config::maximumNumberOfLayers);
-    for (auto &layer: tiles) layer.clear();
+    for (auto &layer : tiles) layer.clear();
 
     const sf::Vector2<unsigned int> windowSize = window.getSize();
     const sf::Vector2f oldMapOffset = {GameUtility::mapOffset};
 
-    for (const auto entity: m_entities) {
+    for (const auto entity : m_entities)
+    {
         auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         auto &tileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
-        if (renderComponent.layer > 0 && renderComponent.layer < config::maximumNumberOfLayers) {
+        if (renderComponent.layer > 0 && renderComponent.layer < config::maximumNumberOfLayers)
+        {
             GameUtility::mapOffset.x = std::max(GameUtility::mapOffset.x, transformComponent.position.x);
             GameUtility::mapOffset.y = std::max(GameUtility::mapOffset.y, transformComponent.position.y);
 
             if (gCoordinator.hasComponent<ItemComponent>(entity) ||
                 gCoordinator.hasComponent<WeaponComponent>(entity) ||
                 gCoordinator.hasComponent<HelmetComponent>(entity) ||
-                gCoordinator.hasComponent<BodyArmourComponent>(entity)
-            )
+                gCoordinator.hasComponent<BodyArmourComponent>(entity))
                 renderComponent.dirty = true;
 
-            if (renderComponent.dirty) {
+            if (renderComponent.dirty)
+            {
                 renderComponent.sprite.setScale(transformComponent.scale * config::gameScale);
                 renderComponent.sprite.setRotation(transformComponent.rotation);
                 setOrigin(entity);
@@ -78,24 +81,29 @@ void RenderSystem::draw(sf::RenderWindow &window) {
 
     GameUtility::mapOffset = (static_cast<sf::Vector2f>(windowSize) - GameUtility::mapOffset) * 0.5f;
 
-    for (auto &layer: tiles) {
-        for (auto &[sprite, isDirty]: layer) {
+    for (auto &layer : tiles)
+    {
+        for (auto &[sprite, isDirty] : layer)
+        {
             if (*isDirty == true) sprite->setPosition({sprite->getPosition() + GameUtility::mapOffset});
             window.draw(*sprite);
             *isDirty = oldMapOffset != GameUtility::mapOffset;
         }
     }
 
-    if (config::debugMode) {
+    if (config::debugMode)
+    {
         debugBoundingBoxes(window);
     }
 }
 
-void RenderSystem::setHelmet() const {
+void RenderSystem::setHelmet() const
+{
     const auto &equipment = gCoordinator.getComponent<EquipmentComponent>(config::playerEntity);
 
-    if (equipment.slots.contains(config::slotType::HELMET)) {
-        const Entity helmetEntity = equipment.slots.at(config::slotType::HELMET);
+    if (equipment.slots.contains(GameType::slotType::HELMET))
+    {
+        const Entity helmetEntity = equipment.slots.at(GameType::slotType::HELMET);
 
         const auto &playerRenderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
         const auto &playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(config::playerEntity);
@@ -108,13 +116,12 @@ void RenderSystem::setHelmet() const {
         auto originXPlayer = playerColliderComponent.helmetPlacement.x;
         const auto originYPlayer = playerColliderComponent.helmetPlacement.y;
 
-        if (playerRenderComponent.sprite.getScale().x < 0) {
-            originXPlayer = config::tileHeight - playerColliderComponent.helmetPlacement.x - playerColliderComponent.
-                            helmetPlacement.
-                            width;
-            originXWeapon = config::tileHeight - weaponColliderComponent.helmetPlacement.x - weaponColliderComponent.
-                            helmetPlacement.
-                            width;
+        if (playerRenderComponent.sprite.getScale().x < 0)
+        {
+            originXPlayer = config::tileHeight - playerColliderComponent.helmetPlacement.x -
+                playerColliderComponent.helmetPlacement.width;
+            originXWeapon = config::tileHeight - weaponColliderComponent.helmetPlacement.x -
+                weaponColliderComponent.helmetPlacement.width;
         }
 
         weaponRenderComponent.sprite.setOrigin(originXWeapon, originYWeapon);
@@ -135,11 +142,13 @@ void RenderSystem::setHelmet() const {
     }
 }
 
-void RenderSystem::setBodyArmour() {
+void RenderSystem::setBodyArmour()
+{
     const auto &equipment = gCoordinator.getComponent<EquipmentComponent>(config::playerEntity);
 
-    if (equipment.slots.contains(config::slotType::BODY_ARMOUR)) {
-        const Entity bodyArmourEntity = equipment.slots.at(config::slotType::BODY_ARMOUR);
+    if (equipment.slots.contains(GameType::slotType::BODY_ARMOUR))
+    {
+        const Entity bodyArmourEntity = equipment.slots.at(GameType::slotType::BODY_ARMOUR);
 
         const auto &playerRenderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
         const auto &playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(config::playerEntity);
@@ -152,13 +161,12 @@ void RenderSystem::setBodyArmour() {
         auto originXPlayer = playerColliderComponent.bodyArmourPlacement.x;
         const auto originYPlayer = playerColliderComponent.bodyArmourPlacement.y;
 
-        if (playerRenderComponent.sprite.getScale().x < 0) {
-            originXPlayer = config::tileHeight - playerColliderComponent.bodyArmourPlacement.x - playerColliderComponent
-                            .
-                            bodyArmourPlacement.width;
+        if (playerRenderComponent.sprite.getScale().x < 0)
+        {
+            originXPlayer = config::tileHeight - playerColliderComponent.bodyArmourPlacement.x -
+                playerColliderComponent.bodyArmourPlacement.width;
             originXBodyArmour = config::tileHeight - bodyArmourColliderComponent.bodyArmourPlacement.x -
-                                bodyArmourColliderComponent.
-                                bodyArmourPlacement.width;
+                bodyArmourColliderComponent.bodyArmourPlacement.width;
         }
 
         bodyArmourRenderComponent.sprite.setOrigin(originXBodyArmour, originYBodyArmour);
@@ -168,10 +176,10 @@ void RenderSystem::setBodyArmour() {
         bodyArmourPlacement.y += (originYBodyArmour - originYPlayer) * config::gameScale;
 
         sf::Vector2f bodyArmourPosition{};
-        bodyArmourPosition.x = playerRenderComponent.sprite.getGlobalBounds().left + originXBodyArmour *
-                               config::gameScale;
-        bodyArmourPosition.y = playerRenderComponent.sprite.getGlobalBounds().top + originYBodyArmour *
-                               config::gameScale;
+        bodyArmourPosition.x =
+            playerRenderComponent.sprite.getGlobalBounds().left + originXBodyArmour * config::gameScale;
+        bodyArmourPosition.y =
+            playerRenderComponent.sprite.getGlobalBounds().top + originYBodyArmour * config::gameScale;
 
         bodyArmourTransformComponent.position = bodyArmourPosition - bodyArmourPlacement;
         bodyArmourRenderComponent.sprite.setPosition(bodyArmourTransformComponent.position);
@@ -180,11 +188,13 @@ void RenderSystem::setBodyArmour() {
     }
 }
 
-void RenderSystem::setWeapon() {
+void RenderSystem::setWeapon()
+{
     const auto &equipment = gCoordinator.getComponent<EquipmentComponent>(config::playerEntity);
 
-    if (equipment.slots.contains(config::slotType::WEAPON)) {
-        const Entity weaponEntity = equipment.slots.at(config::slotType::WEAPON);
+    if (equipment.slots.contains(GameType::slotType::WEAPON))
+    {
+        const Entity weaponEntity = equipment.slots.at(GameType::slotType::WEAPON);
 
         const auto &playerRenderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
         const auto &playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(config::playerEntity);
@@ -201,11 +211,12 @@ void RenderSystem::setWeapon() {
         auto originXPlayer = playerColliderComponent.weaponPlacement.x;
         const auto originYPlayer = playerColliderComponent.weaponPlacement.y;
 
-        if (playerRenderComponent.sprite.getScale().x < 0) {
-            originXPlayer = config::tileHeight - playerColliderComponent.weaponPlacement.x - playerColliderComponent.
-                            weaponPlacement.width;
-            originXWeapon = config::tileHeight - weaponColliderComponent.weaponPlacement.x - weaponColliderComponent.
-                            weaponPlacement.width;
+        if (playerRenderComponent.sprite.getScale().x < 0)
+        {
+            originXPlayer = config::tileHeight - playerColliderComponent.weaponPlacement.x -
+                playerColliderComponent.weaponPlacement.width;
+            originXWeapon = config::tileHeight - weaponColliderComponent.weaponPlacement.x -
+                weaponColliderComponent.weaponPlacement.width;
         }
 
         // Set Weapon Sprite origin in WeaponPlacement component.
@@ -238,17 +249,21 @@ void RenderSystem::setWeapon() {
  * If the entity has an equipped weapon, it also sets the origin for the weapon's sprite.
  * \param entity The entity to process.
  * */
-void RenderSystem::setOrigin(const Entity entity) {
+void RenderSystem::setOrigin(const Entity entity)
+{
     // Get all necessary components
     auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
     float centerX = {}, centerY = {};
 
-    if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity)) {
+    if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+    {
         // Calculate the center of the collision component from top left corner.
         // X & Y are collision offset from top left corner of sprite tile.
         centerX = colliderComponent->collision.x + colliderComponent->collision.width / 2;
         centerY = colliderComponent->collision.y + colliderComponent->collision.height / 2;
-    } else {
+    }
+    else
+    {
         centerX = config::tileHeight / 2;
         centerY = config::tileHeight / 2;
     }
@@ -261,7 +276,8 @@ void RenderSystem::setOrigin(const Entity entity) {
  * In addition, process all entities connected to entity if possible.
  * \param entity The entity currently processed.
  * */
-void RenderSystem::setSpritePosition(const Entity entity) {
+void RenderSystem::setSpritePosition(const Entity entity)
+{
     // Get all necessary parts
     const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
     auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
@@ -270,17 +286,20 @@ void RenderSystem::setSpritePosition(const Entity entity) {
     renderComponent.sprite.setPosition(transformComponent.position);
 }
 
-void RenderSystem::displayPortal(const Entity entity) {
+void RenderSystem::displayPortal(const Entity entity)
+{
     const auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-    if (gCoordinator.hasComponent<PassageComponent>(entity)) {
+    if (gCoordinator.hasComponent<PassageComponent>(entity))
+    {
         if (gCoordinator.getComponent<PassageComponent>(entity).activePassage &&
-            !gCoordinator.hasComponent<PlayerComponent>(entity)) {
+            !gCoordinator.hasComponent<PlayerComponent>(entity))
+        {
             sf::Vector2f portalPosition = {};
             portalPosition.x = renderComponent.sprite.getPosition().x - renderComponent.sprite.getLocalBounds().width -
-                               9 * config::gameScale;
+                9 * config::gameScale;
             portalPosition.y = renderComponent.sprite.getPosition().y - renderComponent.sprite.getLocalBounds().height -
-                               8 * config::gameScale;
+                8 * config::gameScale;
 
             sf::Sprite portalSpriteCopy = portalSprite;
 
@@ -293,25 +312,31 @@ void RenderSystem::displayPortal(const Entity entity) {
 }
 
 
-void RenderSystem::displayDamageTaken(const Entity entity) {
+void RenderSystem::displayDamageTaken(const Entity entity)
+{
     if (!gCoordinator.hasComponent<CharacterComponent>(entity)) return;
 
     auto &characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
     auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-    if (!characterComponent.attacked) {
+    if (!characterComponent.attacked)
+    {
         if (!gCoordinator.hasComponent<WeaponComponent>(entity)) renderComponent.sprite.setColor(sf::Color::White);
-    } else {
+    }
+    else
+    {
         characterComponent.timeSinceAttacked++;
         renderComponent.sprite.setColor(sf::Color::Red);
-        if (characterComponent.timeSinceAttacked >= 5) {
+        if (characterComponent.timeSinceAttacked >= 5)
+        {
             characterComponent.attacked = false;
             characterComponent.timeSinceAttacked = 0;
         }
     }
 }
 
-void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow &window, const Entity entity) const {
+void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow &window, const Entity entity) const
+{
     ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 370), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(270, 0), ImGuiCond_Always); // Set the width to 250, height is auto
     ImGui::Begin("Player Stats", nullptr,
@@ -340,11 +365,12 @@ void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow &window, const
     ImGui::End();
 }
 
-void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow &window, const Entity entity) {
+void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow &window, const Entity entity)
+{
     const auto &equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
-    if (!equipment.slots.contains(config::slotType::WEAPON)) return;
+    if (!equipment.slots.contains(GameType::slotType::WEAPON)) return;
 
-    const auto &weapon = gCoordinator.getComponent<WeaponComponent>(equipment.slots.at(config::slotType::WEAPON));
+    const auto &weapon = gCoordinator.getComponent<WeaponComponent>(equipment.slots.at(GameType::slotType::WEAPON));
 
     // Display the Weapon Stats table in the top-right corner
     ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 10));
@@ -390,14 +416,16 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow &window, const
 }
 
 
-void RenderSystem::debugBoundingBoxes(sf::RenderWindow &window) {
+void RenderSystem::debugBoundingBoxes(sf::RenderWindow &window)
+{
     if (!gCoordinator.hasComponent<RenderComponent>(config::playerEntity)) return;
 
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
     auto transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
 
-    auto drawSprite = [&](const Entity entity) {
+    auto drawSprite = [&](const Entity entity)
+    {
         const auto &rComponent = gCoordinator.getComponent<RenderComponent>(entity);
         const auto bounds = rComponent.sprite.getGlobalBounds();
 
@@ -419,7 +447,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow &window) {
     };
 
     Collision cc =
-            gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id);
+        gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(tileComponent.tileSet, tileComponent.id);
 
     // const auto center = GameType::MyVec2{xPosCenter + m_mapOffset.x, yPosCenter + m_mapOffset.y};
     const auto center = GameType::MyVec2{transformComponent.position + GameUtility::mapOffset};
@@ -436,35 +464,39 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow &window) {
     circle.m_radius = newRadius;
     circle.m_p = newCenter;
 
-    for (const auto entity: gCoordinator.getRegisterSystem<CollisionSystem>()->m_entities) {
+    for (const auto entity : gCoordinator.getRegisterSystem<CollisionSystem>()->m_entities)
+    {
         if (!gCoordinator.hasComponent<ColliderComponent>(entity) ||
             !gCoordinator.hasComponent<TransformComponent>(entity) ||
-            !gCoordinator.hasComponent<RenderComponent>(entity)) {
+            !gCoordinator.hasComponent<RenderComponent>(entity))
+        {
             continue;
         };
 
         if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
             gCoordinator.hasComponent<MultiplayerComponent>(entity) ||
             gCoordinator.hasComponent<EnemyComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
-            gCoordinator.hasComponent<HelmetComponent>(entity)) {
+            gCoordinator.hasComponent<HelmetComponent>(entity))
+        {
             drawSprite(entity);
         }
 
-        if (gCoordinator.hasComponent<EquipmentComponent>(entity)) {
+        if (gCoordinator.hasComponent<EquipmentComponent>(entity))
+        {
             displayWeaponStatsTable(window, entity);
             displayPlayerStatsTable(window, entity);
         }
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) &&
-            gCoordinator.hasComponent<EquipmentComponent>(entity)) {
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) && gCoordinator.hasComponent<EquipmentComponent>(entity))
+        {
             auto &weaponComponent = gCoordinator.getComponent<EquipmentComponent>(entity);
 
             sf::VertexArray swordLine(sf::Lines, 2);
             swordLine[0].position = center;
             swordLine[0].color = sf::Color::Red;
             swordLine[1].position =
-                    gCoordinator.getComponent<WeaponComponent>(weaponComponent.slots.at(config::slotType::WEAPON)).
-                    pivotPoint;
+                gCoordinator.getComponent<WeaponComponent>(weaponComponent.slots.at(GameType::slotType::WEAPON))
+                    .pivotPoint;
             swordLine[1].color = sf::Color::Blue;
             window.draw(swordLine);
         }
@@ -472,18 +504,22 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow &window) {
 
         const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-        if (colliderComponent.body == nullptr) {
+        if (colliderComponent.body == nullptr)
+        {
             continue;
         }
 
-        for (b2Fixture *fixture = colliderComponent.body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+        for (b2Fixture *fixture = colliderComponent.body->GetFixtureList(); fixture; fixture = fixture->GetNext())
+        {
             b2Shape *shape = fixture->GetShape();
-            if (shape->GetType() == b2Shape::e_polygon) {
+            if (shape->GetType() == b2Shape::e_polygon)
+            {
                 auto *const polygonShape = dynamic_cast<b2PolygonShape *>(shape);
                 const int32 count = polygonShape->m_count;
                 sf::ConvexShape convex;
                 convex.setPointCount(count);
-                for (int32 i = 0; i < count; ++i) {
+                for (int32 i = 0; i < count; ++i)
+                {
                     const b2Vec2 point = polygonShape->m_vertices[i];
                     convex.setPoint(
                         i, sf::Vector2f(point.x * config::meterToPixelRatio, point.y * config::meterToPixelRatio));
@@ -493,9 +529,9 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow &window) {
                 convex.setOutlineColor(sf::Color::Green);
                 convex.setPosition(
                     colliderComponent.body->GetPosition().x * static_cast<float>(config::meterToPixelRatio) +
-                    GameUtility::mapOffset.x,
+                        GameUtility::mapOffset.x,
                     colliderComponent.body->GetPosition().y * static_cast<float>(config::meterToPixelRatio) +
-                    GameUtility::mapOffset.y);
+                        GameUtility::mapOffset.y);
 
                 convex.setRotation(colliderComponent.body->GetAngle() * 180 / b2_pi);
                 window.draw(convex);

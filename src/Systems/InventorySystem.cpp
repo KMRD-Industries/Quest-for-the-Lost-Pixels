@@ -4,6 +4,7 @@
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "EquipmentComponent.h"
+#include "GameTypes.h"
 #include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
@@ -13,7 +14,7 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-void InventorySystem::dropItem(const Entity player, const Entity item, const config::slotType slot) const
+void InventorySystem::dropItem(const Entity player, const Entity item, const GameType::slotType slot) const
 {
     auto &equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
     const Entity newItemEntity = gCoordinator.createEntity();
@@ -28,17 +29,17 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const con
 
     switch (slot)
     {
-    case config::slotType::WEAPON:
+    case GameType::slotType::WEAPON:
         {
             gCoordinator.addComponent(newItemEntity, gCoordinator.getComponent<WeaponComponent>(item));
             break;
         }
-    case config::slotType::HELMET:
+    case GameType::slotType::HELMET:
         {
             gCoordinator.addComponent(newItemEntity, gCoordinator.getComponent<HelmetComponent>(item));
             break;
         }
-    case config::slotType::BODY_ARMOUR:
+    case GameType::slotType::BODY_ARMOUR:
         {
             gCoordinator.addComponent(newItemEntity, gCoordinator.getComponent<BodyArmourComponent>(item));
             break;
@@ -49,22 +50,22 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const con
     equipmentComponent.slots.erase(slot);
 }
 
-void InventorySystem::pickUpItem(const Entity player, const Entity item, const config::slotType type) const
+void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) const
 {
-    if (gCoordinator.hasComponent<PotionComponent>(item)) return;
+    if (gCoordinator.hasComponent<PotionComponent>(pickUpItemInfo.itemEntity)) return;
 
-    if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(item))
+    if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(pickUpItemInfo.itemEntity))
         if (colliderComponent->body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent->body);
 
-    gCoordinator.removeComponentIfExists<ItemAnimationComponent>(item);
-    gCoordinator.getComponent<ItemComponent>(item).equipped = true;
+    gCoordinator.removeComponentIfExists<ItemAnimationComponent>(pickUpItemInfo.itemEntity);
+    gCoordinator.getComponent<ItemComponent>(pickUpItemInfo.itemEntity).equipped = true;
 
-    auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(player);
+    auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(pickUpItemInfo.characterEntity);
 
-    if (const auto it = equipment.find(type); it != equipment.end())
+    if (const auto it = equipment.find(pickUpItemInfo.slot); it != equipment.end())
     {
-        dropItem(player, it->second, it->first);
+        dropItem(pickUpItemInfo.characterEntity, it->second, it->first);
     }
 
-    equipment.emplace(type, item);
+    equipment.emplace(pickUpItemInfo.slot, pickUpItemInfo.itemEntity);
 }

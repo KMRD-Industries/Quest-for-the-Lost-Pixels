@@ -85,8 +85,7 @@ void ItemSystem::update()
 {
     const auto &playerTransformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
     double minDistance = std::numeric_limits<int>::max();
-    closestItemEntity = {};
-    closestItemEntityType = {};
+    closestItem = {};
 
     for (const auto entity : m_entities)
     {
@@ -99,60 +98,63 @@ void ItemSystem::update()
         if (const double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2)); distance <= minDistance)
         {
             minDistance = distance;
-            closestItemEntity = entity;
+            closestItem.itemEntity = entity;
 
             if (gCoordinator.hasComponent<WeaponComponent>(entity))
             {
-                closestItemEntityType = config::slotType::WEAPON;
+                closestItem.slot = GameType::slotType::WEAPON;
             }
             else if (gCoordinator.hasComponent<HelmetComponent>(entity))
             {
-                closestItemEntityType = config::slotType::HELMET;
+                closestItem.slot = GameType::slotType::HELMET;
             }
             else if (gCoordinator.hasComponent<BodyArmourComponent>(entity))
             {
-                closestItemEntityType = config::slotType::BODY_ARMOUR;
+                closestItem.slot = GameType::slotType::BODY_ARMOUR;
             }
             else
             {
-                closestItemEntityType = {};
-                closestItemEntity = 0;
+                closestItem = {};
             }
         }
     }
 
-    if (closestItemEntity == 0 || gCoordinator.hasComponent<ChestComponent>(closestItemEntity))
+    if (closestItem.itemEntity == 0 || gCoordinator.hasComponent<ChestComponent>(closestItem.itemEntity))
     {
-        closestItemEntity = {};
-        closestItemEntityType = {};
+        closestItem = {};
         return;
     }
 
     if (minDistance <= config::weaponInteractionDistance)
     {
-        gCoordinator.getComponent<RenderComponent>(closestItemEntity).color = sf::Color(255, 102, 102);
+        gCoordinator.getComponent<RenderComponent>(closestItem.itemEntity).color = sf::Color(255, 102, 102);
 
-        switch (closestItemEntityType)
+        switch (closestItem.slot)
         {
-        case config::slotType::HELMET:
-            displayHelmetStats(closestItemEntity);
+        case GameType::slotType::HELMET:
+            displayHelmetStats(closestItem.itemEntity);
             break;
-        case config::slotType::WEAPON:
-            displayWeaponStats(closestItemEntity);
+        case GameType::slotType::WEAPON:
+            displayWeaponStats(closestItem.itemEntity);
             break;
-        case config::slotType::BODY_ARMOUR:
-            displayBodyArmourStats(closestItemEntity);
+        case GameType::slotType::BODY_ARMOUR:
+            displayBodyArmourStats(closestItem.itemEntity);
             break;
         default:
             return;
         }
     }
+    else
+    {
+        closestItem = {};
+    }
 }
 
 void ItemSystem::input(const Entity player)
 {
-    if (closestItemEntity != 0 && closestItemEntityType != config::slotType{})
-        gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(player, closestItemEntity, closestItemEntityType);
+    if (closestItem.itemEntity == 0 || closestItem.slot == GameType::slotType{}) return;
+    closestItem.characterEntity = player;
+    gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(closestItem);
 }
 
 void ItemSystem::deleteItems() const

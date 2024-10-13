@@ -226,6 +226,20 @@ namespace GameType
         std::string tag;
         MyVec2 position;
     };
+
+    enum slotType : int
+    {
+        WEAPON = 1,
+        HELMET = 2,
+        BODY_ARMOUR = 3
+    };
+
+    struct PickUpInfo
+    {
+        Entity characterEntity;
+        Entity itemEntity;
+        slotType slot;
+    };
 } // namespace GameType
 
 namespace std

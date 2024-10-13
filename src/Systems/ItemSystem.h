@@ -27,6 +27,5 @@ public:
 
 private:
     float m_frameTime{};
-    config::slotType closestItemEntityType{};
-    Entity closestItemEntity;
+    GameType::PickUpInfo closestItem{};
 };
