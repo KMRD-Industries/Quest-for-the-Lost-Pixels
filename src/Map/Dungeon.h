@@ -4,21 +4,24 @@
 #include <vector>
 
 #include "Dungeon.h"
+#include "FightSystem.h"
 #include "FloorGenerator.h"
 #include "PlayerMovementSystem.h"
 #include "Room.h"
 #include "Types.h"
-#include "TextureSystem.h"
+
+#include <TextureSystem.h>
+
 #include "AnimationSystem.h"
 #include "CharacterSystem.h"
 #include "ChestSystem.h"
 #include "CollisionSystem.h"
 #include "DoorSystem.h"
 #include "EnemySystem.h"
+#include "EquipWeaponSystem.h"
 #include "HealthBarSystem.h"
 #include "InventorySystem.h"
 #include "ItemSpawnerSystem.h"
-#include "ItemSystem.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
 #include "PassageSystem.h"
@@ -28,51 +31,36 @@
 #include "TravellingSystem.h"
 #include "WeaponsSystem.h"
 
-class Dungeon {
+class Dungeon
+{
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1) {
-    }
+    Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
     void setupWeaponEntity(Entity player) const;
-
-    void setupHelmetEntity(Entity player) const;
-
     void init();
-
     void addPlayerComponents(Entity player);
-
     void setupPlayerCollision(Entity player);
-
     void createRemotePlayer(uint32_t);
 
     void draw();
-
     void update(float);
 
 private:
     void setECS();
-
     void makeSimpleFloor();
-
-    void moveInDungeon(const glm::ivec2 &dir);
-
+    void moveInDungeon(const glm::ivec2& dir);
     void clearDungeon() const;
-
     void makeStartFloor();
-
     void moveDownDungeon();
-
-    void loadMap(const std::string &path) const;
-
+    void loadMap(const std::string& path) const;
     float getSpawnOffset(float, int);
+    void changeRoom(const glm::ivec2& dir);
 
-    void changeRoom(const glm::ivec2 &dir);
-
-    std::string m_asset_path;
-    FloorGenerator m_floorGenerator;
-    std::unordered_map<glm::ivec2, Room> m_roomMap;
-    glm::ivec2 m_currentPlayerPos;
-    std::vector<Entity> m_entities;
+    std::string m_asset_path{ASSET_PATH};
+    FloorGenerator m_floorGenerator{};
+    std::unordered_map<glm::ivec2, Room> m_roomMap{};
+    glm::ivec2 m_currentPlayerPos{};
+    std::vector<Entity> m_entities{};
     uint32_t m_id{};
     int64_t m_seed{};
     std::set<uint32_t> m_players{};

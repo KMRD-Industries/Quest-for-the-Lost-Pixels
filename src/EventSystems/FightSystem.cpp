@@ -3,7 +3,7 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
-#include "EquipmentComponent.h"
+#include "EquippedWeaponComponent.h"
 #include "FightActionEvent.h"
 #include "ObjectCreatorSystem.h"
 #include "Physics.h"
@@ -14,13 +14,13 @@
 
 FightSystem::FightSystem() { init(); }
 
-void FightSystem::init() const {}
+void FightSystem::init() {}
 
 void FightSystem::update()
 {
     for (const auto entity : m_entities)
     {
-        const auto &[eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
+        const auto& [eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
 
         // Start attack animation
         const auto &equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(eventEntity);
@@ -30,18 +30,17 @@ void FightSystem::update()
         switch (weaponComponent.type)
         {
         case GameType::WeaponType::MELE:
-            handleMeleeAttack(eventEntity);
+            handleMeleAttack(eventEntity);
             break;
         case GameType::WeaponType::WAND:
             // TODO: Wand attack support
-            handleMeleeAttack(eventEntity);
+            handleMeleAttack(eventEntity);
             break;
         case GameType::WeaponType::BOW:
             // TODO: Bow attack support
-            handleMeleeAttack(eventEntity);
+            handleMeleAttack(eventEntity);
             break;
         default:
-            handleMeleeAttack(eventEntity);
             break;
         }
     }
@@ -62,6 +61,7 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
     weaponComponent.isFacingRight = playerRenderComponent.sprite.getScale().x > 0;
     weaponComponent.queuedAttack = true;
 
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(eventEntity);
     const auto center = glm::vec2{transformComponent.position.x, transformComponent.position.y};
 
     // Calculate the direction vector using the angle in degrees
@@ -73,7 +73,7 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
     const auto range = direction * (config::playerAttackRange * std::abs(transformComponent.scale.x));
     const auto point2 = center + range;
 
-    const auto targetInBox = Physics::rayCast(center, point2, playerEntity);
+    const auto targetInBox = Physics::rayCast(center, point2, eventEntity);
 
     if (targetInBox.tag == "Enemy")
     {
@@ -126,7 +126,7 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
     gCoordinator.getComponent<CharacterComponent>(bullet).hp = -1;
 }
 
-float FightSystem::calculateAngle(const sf::Vector2f &pivotPoint, const sf::Vector2f &targetPoint) const
+float FightSystem::calculateAngle(const sf::Vector2f& pivotPoint, const sf::Vector2f& targetPoint) const
 {
     const sf::Vector2f direction = targetPoint - pivotPoint;
     return std::atan2(direction.y, direction.x);

@@ -16,31 +16,35 @@
 
 extern Coordinator gCoordinator;
 
-void MyContactListener::BeginContact(b2Contact *contact) {
+void MyContactListener::BeginContact(b2Contact* contact)
+{
     const auto bodyAData =
-            reinterpret_cast<GameType::CollisionData *>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
+        reinterpret_cast<GameType::CollisionData*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
 
     const auto bodyBData =
-            reinterpret_cast<GameType::CollisionData *>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
+        reinterpret_cast<GameType::CollisionData*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
 
-    if (bodyAData != nullptr && bodyBData != nullptr) {
-        const auto &colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
-        const auto &colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
+    if (bodyAData != nullptr && bodyBData != nullptr)
+    {
+        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
+        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
         colliderComponentA.onCollisionEnter({bodyBData->entityID, bodyBData->tag});
         colliderComponentB.onCollisionEnter({bodyAData->entityID, bodyAData->tag});
     }
 }
 
-void MyContactListener::EndContact(b2Contact *contact) {
+void MyContactListener::EndContact(b2Contact* contact)
+{
     const auto bodyAData =
-            reinterpret_cast<GameType::CollisionData *>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
+        reinterpret_cast<GameType::CollisionData*>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
 
     const auto bodyBData =
-            reinterpret_cast<GameType::CollisionData *>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
+        reinterpret_cast<GameType::CollisionData*>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
 
-    if (bodyAData != nullptr && bodyBData != nullptr) {
-        const auto &colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
-        const auto &colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
+    if (bodyAData != nullptr && bodyBData != nullptr)
+    {
+        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
+        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
         colliderComponentA.onCollisionOut({bodyBData->entityID, bodyBData->tag});
         colliderComponentB.onCollisionOut({bodyAData->entityID, bodyAData->tag});
     }
@@ -50,9 +54,11 @@ CollisionSystem::CollisionSystem() { init(); }
 
 void CollisionSystem::init() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
 
-void CollisionSystem::createMapCollision() {
+void CollisionSystem::createMapCollision()
+{
     auto createCollisionBody =
-            [this](const Entity entity, const std::string &type, const bool isStatic, const bool useTexture) {
+        [this](const Entity entity, const std::string& type, const bool isStatic, const bool useTexture)
+    {
         const Entity newMapCollisionEntity = gCoordinator.createEntity();
 
         const auto newEvent = CreateBodyWithCollisionEvent(
@@ -64,9 +70,10 @@ void CollisionSystem::createMapCollision() {
         gCoordinator.addComponent(newMapCollisionEntity, newEvent);
     };
 
-    for (const auto entity: m_entities) {
-        const auto &tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-        auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+    for (const auto entity : m_entities)
+    {
+        const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
             gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
@@ -75,7 +82,8 @@ void CollisionSystem::createMapCollision() {
             continue;
         }
 
-        if (tileComponent.tileSet == "SpecialBlocks") {
+        if (tileComponent.tileSet == "SpecialBlocks")
+        {
             if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::STATICWALLCOLLIDER))
                 createCollisionBody(entity, "Wall", true, true);
 
@@ -83,9 +91,11 @@ void CollisionSystem::createMapCollision() {
                 createCollisionBody(entity, "Door", true, false);
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
-                if (const auto *passageComponent = gCoordinator.tryGetComponent<PassageComponent>(entity))
+                if (const auto* passageComponent = gCoordinator.tryGetComponent<PassageComponent>(entity))
                     if (passageComponent->activePassage) createCollisionBody(entity, "Passage", true, true);
-        } else {
+        }
+        else
+        {
             if (colliderComponent.collision.width > 0 && colliderComponent.collision.height > 0)
                 createCollisionBody(entity, "Wall", true, false);
         }
@@ -133,12 +143,13 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         auto &renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-        const b2Body *body = colliderComponent.body;
+        const b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
         const auto position = body->GetPosition();
 
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
         transformComponent.rotation = body->GetAngle() * 180.f / 3.131516;
+        renderComponent.sprite.setPosition(position.x, position.y);
         renderComponent.dirty = true;
 
         if (gCoordinator.hasComponent<PlayerComponent>(entity)) {

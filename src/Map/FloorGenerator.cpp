@@ -83,6 +83,8 @@ std::unordered_map<glm::ivec2, Room> FloorGenerator::getFloor(const bool generat
 
         std::ranges::shuffle(mapToChoose, g);
 
+        if (mapToChoose.empty()) continue;
+
         auto selectedMap = mapToChoose.front();
         choosesMap[selectedMap]++;
         m_floorMap[nodePosition] = Room(selectedMap.mapID, m_floorID);

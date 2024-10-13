@@ -3,9 +3,9 @@
 #include "Helpers.h"
 #include "box2d/b2_circle_shape.h"
 #include "box2d/b2_distance.h"
-#include "box2d/b2_world.h"
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_world.h"
 
 class RayCastCallback : public b2RayCastCallback
 {
@@ -19,9 +19,7 @@ public:
             const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().
                 pointer);
             if (m_ignoreYourself && bodyData->entityID == m_myEntity)
-            {
                 return -1.0f;
-            }
         }
         m_fixture = fixture;
         m_point = point;
@@ -96,9 +94,7 @@ public:
     static Physics* getInstance()
     {
         if (m_physics == nullptr)
-        {
             m_physics = new Physics();
-        }
         return m_physics;
     }
 
@@ -231,6 +227,16 @@ public:
     static b2World* getWorld()
     {
         return &getInstance()->m_world;
+    }
+
+    void resetWorld()
+    {
+        for (b2Body* body = m_world.GetBodyList(); body != nullptr;)
+        {
+            b2Body* nextBody = body->GetNext();
+            m_world.DestroyBody(body);
+            body = nextBody;
+        }
     }
 
 private:

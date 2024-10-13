@@ -7,25 +7,29 @@
 #include "SFML/Window/Keyboard.hpp"
 #include "SFML/Window/Mouse.hpp"
 
-enum class InputType {
+enum class InputType
+{
     MoveLeft,
     MoveRight,
     MoveUp,
     MoveDown,
     Attack,
-    PickUpItem,
-    DebugMode
+    PickUpItem
 };
 
-class InputHandler {
+class InputHandler
+{
     using InputKey = std::variant<sf::Keyboard::Key, sf::Mouse::Button>;
 
-    struct InputKeyHash {
-        std::size_t operator()(const InputKey &key) const {
+    struct InputKeyHash
+    {
+        std::size_t operator()(const InputKey& key) const
+        {
             return std::visit(
-                []<typename T0>(T0 &&k) -> std::size_t {
-                    return std::hash<std::underlying_type_t<std::decay_t<T0> > >{}(
-                        static_cast<std::underlying_type_t<std::decay_t<T0> >>(k));
+                []<typename T0>(T0&& k) -> std::size_t
+                {
+                    return std::hash<std::underlying_type_t<std::decay_t<T0>>>{}(
+                        static_cast<std::underlying_type_t<std::decay_t<T0>>>(k));
                 },
                 key);
         }
@@ -40,33 +44,28 @@ class InputHandler {
         {sf::Keyboard::Key::Space, InputType::Attack}, {sf::Keyboard::Key::E, InputType::PickUpItem},
         {sf::Mouse::Left, InputType::Attack},
         {sf::Keyboard::F1, InputType::DebugMode} // Handling for the right mouse button
+        {sf::Keyboard::Key::Escape, InputType::ReturnInMenu}, {sf::Mouse::Left, InputType::Attack}
     };
 
-    inline static InputHandler *m_instance{};
+    inline static InputHandler* m_instance{};
     sf::Vector2f m_mousePosition{};
-
     InputHandler() = default;
 
 public:
-    static InputHandler *getInstance() {
-        if (m_instance == nullptr) {
+    static InputHandler* getInstance()
+    {
+        if (m_instance == nullptr)
+        {
             m_instance = new InputHandler();
         }
         return m_instance;
     };
-
     [[nodiscard]] bool isHeld(InputType input) const;
-
     [[nodiscard]] bool isPressed(InputType input) const;
-
     sf::Vector2f getMousePosition() const;
-
-    void handleKeyboardInput(const InputKey &, const bool &);
-
-    void updateMousePosition(const sf::Vector2f &);
-
+    void handleKeyboardInput(const InputKey&, const bool&);
+    void updateMousePosition(const sf::Vector2f&);
     void clearPressedInputs();
-
     void update();
 
 protected:

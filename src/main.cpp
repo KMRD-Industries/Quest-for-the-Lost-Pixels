@@ -14,26 +14,37 @@
 
 Coordinator gCoordinator;
 
-void handleInput(sf::RenderWindow &window) {
+void handleInput(sf::RenderWindow& window)
+{
     sf::Event event{};
     InputHandler::getInstance()->update();
 
-    while (window.pollEvent(event)) {
+    while (window.pollEvent(event))
+    {
         ImGui::SFML::ProcessEvent(window, event);
 
-        if (event.type == sf::Event::KeyPressed) {
+        if (event.type == sf::Event::KeyPressed)
+        {
             const auto keyCode = event.key.code;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
-        } else if (event.type == sf::Event::MouseButtonPressed) {
+        }
+        else if (event.type == sf::Event::MouseButtonPressed)
+        {
             const auto keyCode = event.mouseButton.button;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
-        } else if (event.type == sf::Event::KeyReleased) {
+        }
+        else if (event.type == sf::Event::KeyReleased)
+        {
             const auto keyCode = event.key.code;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
-        } else if (event.type == sf::Event::MouseButtonReleased) {
+        }
+        else if (event.type == sf::Event::MouseButtonReleased)
+        {
             const auto keyCode = event.mouseButton.button;
             InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
-        } else if (event.type == sf::Event::MouseMoved) {
+        }
+        else if (event.type == sf::Event::MouseMoved)
+        {
             const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
@@ -48,29 +59,28 @@ int main() {
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config::debugMode ? 144 : config::frameCycle);
+    window.setFramerateLimit(config::frameCycle * (config::debugMode ? 100 : 1));
 
     sf::Clock deltaClock;
     Game game;
     game.init();
 
-    RenderSystem *m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
-    TextTagSystem *m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
-    TextureSystem *m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
+    RenderSystem* m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
+    TextTagSystem* m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
+    TextureSystem* m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
 
-    while (window.isOpen()) {
+    while (window.isOpen())
+    {
         sf::Time deltaTime = deltaClock.restart();
-        window.clear(m_textureSystem->getBackgroundColor());
+        window.clear(hexStringToSfmlColor(m_textureSystem->getBackgroundColor()));
         ImGui::SFML::Update(window, deltaTime);
 
-        const auto deltaTimeFloat = static_cast<float>(deltaTime.asMilliseconds());
+        game.update(deltaTime.asSeconds());
+        game.draw(window);
 
-        game.update(deltaTimeFloat);
-        game.handleCollision(deltaTimeFloat);
-        game.draw();
-
-        m_renderSystem->draw(window);
-        m_textTagSystem->render(window);
+        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
+        gCoordinator.getRegisterSystem<BackgroundSystem>()->draw(window);
+        gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
 
         ImGui::SFML::Render(window);
         window.display();

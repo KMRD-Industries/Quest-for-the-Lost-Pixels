@@ -60,6 +60,17 @@ set(COMPONENTS
         Components/BodyArmourComponent.h
 )
 
+set(UI_COMPONENTS
+        UiComponents/ButtonComponent.h
+        UiComponents/UiComponent.h
+)
+
+set(ATLAS_COMPONENTS
+        AtlasComponents/Texture.h
+        AtlasComponents/Map.h
+        AtlasComponents/Tileset.h
+)
+
 set(MAP
         Map/DungeonGenerator.cpp
         Map/DungeonGenerator.h
@@ -88,8 +99,6 @@ set(SYSTEMS
         Systems/ItemSpawnerSystem.h
         Systems/ChestSystem.cpp
         Systems/ChestSystem.h
-        Systems/HealthBarSystem.cpp
-        Systems/HealthBarSystem.h
         Systems/TextureSystem.cpp
         Systems/AnimationSystem.cpp
         Systems/DoorSystem.cpp
@@ -122,10 +131,13 @@ set(EVENT_SYSTEMS
         EventSystems/FightSystem.h
 )
 
-set(ATLAS_COMPONENTS
-        AtlasComponents/Texture.h
-        AtlasComponents/Map.h
-        AtlasComponents/Tileset.h
+set(UI_SYSTEMS
+        UiSystems/HealthBarSystem.cpp
+        UiSystems/HealthBarSystem.h
+        UiSystems/ButtonSystem.cpp
+        UiSystems/ButtonSystem.h
+        UiSystems/BackgroundSystem.cpp
+        UiSystems/BackgroundSystem.h
 )
 
 set(UTILS
@@ -139,6 +151,30 @@ set(UTILS
         Utils/GameUtility.h
 )
 
+set(MENU_STATE_MACHINE
+        MenuStateMachine/MainMenuState.cpp
+        MenuStateMachine/MainMenuState.h
+        MenuStateMachine/GameState.cpp
+        MenuStateMachine/GameState.h
+        MenuStateMachine/State.cpp
+        MenuStateMachine/State.h
+        MenuStateMachine/StateMachine.cpp
+        MenuStateMachine/StateMachine.h
+)
+
+set(UI
+        Ui/ButtonDTO.h
+        Ui/Button.h
+        Ui/Button.cpp
+        Ui/ResourceManager.h
+        Ui/Graphics.h
+        Ui/Graphics.cpp
+        Ui/InputTextDTO.h
+        Ui/InputText.h
+        Ui/InputText.cpp
+)
+
+
 source_group("Core" FILES ${CORE})
 source_group("Components" FILES ${COMPONENTS})
 source_group("Systems" FILES ${SYSTEMS})
@@ -146,12 +182,17 @@ source_group("AtlasComponents" FILES ${ATLAS_COMPONENTS})
 source_group("Utils" FILES ${UTILS})
 source_group("Map" FILES ${MAP})
 source_group("EventSystems" FILES ${EVENT_SYSTEMS})
+source_group("MenuStateMachine" FILES ${MENU_STATE_MACHINE})
+source_group("UiComponents" FILES ${UI_COMPONENTS})
+source_group("UiSystems" FILES ${UI_SYSTEMS})
+source_group("Ui" FILES ${UI})
 
 add_definitions(-D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(./AtlasComponents ./Core ./Components ./Systems ./EventSystems ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./AtlasComponents ./Core ./Components ./Systems ./EventSystems ./MenuStateMachine ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./UiComponents ./UiSystems ./Ui ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(qlp ${SOURCES} ${CORE} ${EVENT_SYSTEMS} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS})
+add_executable(qlp ${SOURCES} ${CORE} ${EVENT_SYSTEMS} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS} ${MENU_STATE_MACHINE} ${UI_COMPONENTS} ${UI_SYSTEMS} ${UI})
 
 target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
 
@@ -160,44 +201,57 @@ if (WIN32)
 endif ()
 
 target_compile_features(qlp PRIVATE cxx_std_23)
+
 if (WIN32)
     set(BOX2D_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/box2d-build/bin")
     set(ADDITIONAL_DLL_DIR "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
-    set(SFML_DLL_DIR "${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>")
-
-    add_custom_target(copy_dlls ALL
-            COMMENT "Copy necessary DLLs"
-            VERBATIM
-    )
-
-    function(copy_if_exists src dest target)
-        if (EXISTS ${src})
-            add_custom_command(
-                    TARGET ${target}
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${src} ${dest}
-                    VERBATIM
-            )
-        endif ()
-    endfunction()
 
     if (EXISTS ${BOX2D_SOURCE_DIR})
         add_custom_command(
-                TARGET copy_dlls
+                TARGET qlp
+                COMMENT "Copy box2d BLLS"
+                PRE_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_directory ${BOX2D_SOURCE_DIR} $<TARGET_FILE_DIR:qlp>
                 VERBATIM
         )
     endif ()
 
-    # Copy OpenAL DLL from SFML
-    copy_if_exists(${SFML_DLL_DIR}/openal32.dll $<TARGET_FILE_DIR:qlp> copy_dlls)
+    if (EXISTS ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>)
+        add_custom_command(
+                TARGET qlp
+                COMMENT "Copy box2d BLLS"
+                PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:qlp>
+                VERBATIM
+        )
+    endif ()
 
-    # Copy abseil_dll.dll if it exists
-    copy_if_exists(${ADDITIONAL_DLL_DIR}/abseil_dll.dll $<TARGET_FILE_DIR:qlp> copy_dlls)
+    if (EXISTS ${ADDITIONAL_DLL_DIR})
+        add_custom_command(
+                TARGET qlp
+                COMMENT "Copy abseil_dll DLLs"
+                PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/abseil_dll.dll $<TARGET_FILE_DIR:qlp>
+                VERBATIM
+        )
+    endif ()
 
-    # Copy libprotobufd.dll if it exists
-    copy_if_exists(${ADDITIONAL_DLL_DIR}/libprotobufd.dll $<TARGET_FILE_DIR:qlp> copy_dlls)
+    # Dodanie komendy do kopiowania libprotobufd.dll, jeśli istnieje
+    if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobufd.dll)
+        add_custom_command(
+                TARGET qlp
+                PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobufd.dll $<TARGET_FILE_DIR:qlp>
+                VERBATIM
+        )
+    endif ()
 
-    # Copy libprotobuf.dll if it exists
-    copy_if_exists(${ADDITIONAL_DLL_DIR}/libprotobuf.dll $<TARGET_FILE_DIR:qlp> copy_dlls)
-
+    if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobuf.dll)
+        add_custom_command(
+                TARGET qlp
+                PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobuf.dll $<TARGET_FILE_DIR:qlp>
+                VERBATIM
+        )
+    endif ()
 endif ()
