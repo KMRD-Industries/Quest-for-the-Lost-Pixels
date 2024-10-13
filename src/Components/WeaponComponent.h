@@ -3,7 +3,7 @@
 
 struct WeaponComponent
 {
-    int id{};
+    uint32_t id{};
     int damageAmount{config::weaponComponentDefaultDamageAmount};
     bool isAttacking{config::weaponComponentDefaultIsAttacking};
     bool queuedAttack{config::weaponComponentDefaultQueuedAttack};

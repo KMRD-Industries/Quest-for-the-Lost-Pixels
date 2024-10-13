@@ -38,7 +38,7 @@ void ChestSpawnerSystem::spawnWeapon(const TransformComponent& spawnerTransformC
     const auto& weaponDesc = getRandomElement(m_weaponsIDs);
 
     gCoordinator.addComponents(
-        newWeaponEntity, WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second},
+        newWeaponEntity, WeaponComponent{.id = static_cast<uint32_t>(weaponDesc.first), .type = weaponDesc.second},
         TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", 7},
         TransformComponent{spawnerTransformComponent}, RenderComponent{}, ColliderComponent{}, AnimationComponent{},
         ItemComponent{},

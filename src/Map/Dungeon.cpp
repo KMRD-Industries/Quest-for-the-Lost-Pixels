@@ -1,5 +1,6 @@
 #include <comm.pb.h>
 #include <format>
+#include <vector>
 
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
@@ -58,23 +59,32 @@ void Dungeon::init()
     setECS();
     auto _ = gCoordinator.createEntity(); // Ignore Entity with ID = 0
     config::playerEntity = gCoordinator.createEntity();
+    uint32_t weaponID = 0;
+
     m_id = 0;
     m_seed = std::chrono::system_clock::now().time_since_epoch().count();
     m_multiplayerSystem->setup(config::defaultIP, config::defaultPort);
 
     if (m_multiplayerSystem->isConnected())
     {
-        const auto gameState = m_multiplayerSystem->registerPlayer(config::playerEntity);
-        m_id = gameState.player_id();
-        m_seed = gameState.seed();
+        const auto& initialInfo = m_multiplayerSystem->registerPlayer(config::playerEntity);
+        const comm::Player& player = initialInfo.player();
+        m_id = player.id();
+        weaponID = player.weapon().id();
+        m_seed = initialInfo.seed();
 
         std::cout << "Connected to server with id: " << m_id << '\n';
 
-        for (uint32_t id : gameState.connected_players())
+        std::vector<uint32_t> playerIDs{initialInfo.player_ids().begin(), initialInfo.player_ids().end()};
+        std::vector<uint32_t> weaponIDs{initialInfo.weapon_ids().begin(), initialInfo.weapon_ids().end()};
+
+        for (int i = 0; i < playerIDs.size(); ++i)
         {
-            createRemotePlayer(id);
-            m_players.insert(id);
-            std::cout << "Connected remote player: " << m_id << '\n';
+            const uint32_t playerID = playerIDs.at(i);
+            const uint32_t weaponID = weaponIDs.at(i);
+            createRemotePlayer(playerID, weaponID);
+            m_players.insert(playerID);
+            std::cout << "Connected remote player: " << playerID << '\n';
         }
     }
     else
@@ -89,7 +99,7 @@ void Dungeon::init()
 
     addPlayerComponents(m_entities[m_id]);
     setupPlayerCollision(m_entities[m_id]);
-    setupWeaponEntity(m_entities[m_id], 19);
+    setupWeaponEntity(m_id, weaponID);
 }
 
 
@@ -112,36 +122,36 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
 
-void Dungeon::createRemotePlayer(const uint32_t id)
+void Dungeon::createRemotePlayer(const uint32_t playerID, const uint32_t weaponID)
 {
-    const auto tag = std::format("Player {}", id);
-    m_entities[id] = gCoordinator.createEntity();
+    const auto tag = std::format("Player {}", playerID);
+    m_entities[playerID] = gCoordinator.createEntity();
 
-    gCoordinator.addComponent(m_entities[id],
-                              TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, id),
-                                                              getSpawnOffset(config::startingPosition.y, id))));
-    gCoordinator.addComponent(m_entities[id], TileComponent{config::playerAnimation, "Characters", 3});
-    gCoordinator.addComponent(m_entities[id], RenderComponent{});
-    gCoordinator.addComponent(m_entities[id], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = config::defaultCharacterHP});
-    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
-    gCoordinator.addComponent(m_entities[id], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[id], InventoryComponent{});
-    gCoordinator.addComponent(m_entities[id], EquippedWeaponComponent{});
+    gCoordinator.addComponent(m_entities[playerID],
+                              TransformComponent(sf::Vector2f(getSpawnOffset(config::startingPosition.x, playerID),
+                                                              getSpawnOffset(config::startingPosition.y, playerID))));
+    gCoordinator.addComponent(m_entities[playerID], TileComponent{config::playerAnimation, "Characters", 3});
+    gCoordinator.addComponent(m_entities[playerID], RenderComponent{});
+    gCoordinator.addComponent(m_entities[playerID], AnimationComponent{});
+    gCoordinator.addComponent(m_entities[playerID], CharacterComponent{.hp = config::defaultCharacterHP});
+    gCoordinator.addComponent(m_entities[playerID], MultiplayerComponent{});
+    gCoordinator.addComponent(m_entities[playerID], ColliderComponent{});
+    gCoordinator.addComponent(m_entities[playerID], InventoryComponent{});
+    gCoordinator.addComponent(m_entities[playerID], EquippedWeaponComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", config::playerAnimation);
-    gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
+    gCoordinator.getComponent<ColliderComponent>(m_entities[playerID]).collision = cc;
 
     const Entity entity = gCoordinator.createEntity();
     const auto newEvent = CreateBodyWithCollisionEvent(
-        m_entities[id], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false,
+        m_entities[playerID], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false,
         false);
 
     gCoordinator.addComponent(entity, newEvent);
 
-    setupWeaponEntity(m_entities[id], 20);
+    setupWeaponEntity(playerID, weaponID);
 
-    m_multiplayerSystem->entityConnected(id, m_entities[id]);
+    m_multiplayerSystem->entityConnected(playerID, m_entities[playerID]);
 }
 
 void Dungeon::setupPlayerCollision(const Entity player)
@@ -192,19 +202,20 @@ void Dungeon::setupPlayerCollision(const Entity player)
     gCoordinator.addComponent(entity, newEvent);
 }
 
-void Dungeon::setupWeaponEntity(const Entity player, const int id) const
+void Dungeon::setupWeaponEntity(const uint32_t playerID, const uint32_t weaponID)
 {
     const Entity weaponEntity = gCoordinator.createEntity();
+    const Entity playerEntity = m_entities[playerID];
 
-    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = id});
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = weaponID});
     gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
     gCoordinator.addComponent(weaponEntity, ColliderComponent{});
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
 
-    m_inventorySystem->pickUpWeapon(player, weaponEntity);
-    m_equipWeaponSystem->equipWeapon(player, weaponEntity);
+    m_inventorySystem->pickUpWeapon(playerEntity, weaponEntity);
+    m_equipWeaponSystem->equipWeapon(playerEntity, weaponEntity);
 }
 
 void Dungeon::draw()
@@ -229,19 +240,20 @@ void Dungeon::update(const float deltaTime)
 
     if (m_multiplayerSystem->isConnected())
     {
-        const auto stateUpdate = m_multiplayerSystem->pollStateUpdates();
-        const uint32_t id = stateUpdate.id();
+        const auto& stateUpdate = m_multiplayerSystem->pollStateUpdates();
+        const auto& player = stateUpdate.player();
+        const uint32_t playerID = player.id();
 
         switch (stateUpdate.variant())
         {
         case comm::DISCONNECTED:
-            m_multiplayerSystem->entityDisconnected(id);
-            m_players.erase(id);
-            gCoordinator.getComponent<ColliderComponent>(m_entities[id]).toDestroy = true;
+            m_multiplayerSystem->entityDisconnected(playerID);
+            m_players.erase(playerID);
+            gCoordinator.getComponent<ColliderComponent>(m_entities[playerID]).toDestroy = true;
             break;
         case comm::CONNECTED:
-            createRemotePlayer(id);
-            m_players.insert(id);
+            createRemotePlayer(playerID, player.weapon().id());
+            m_players.insert(playerID);
             break;
         case comm::ROOM_CHANGED:
             changeRoom(m_multiplayerSystem->getRoom());

@@ -102,19 +102,19 @@ bool MultiplayerSystem::isInsideInitialRoom(const bool change) noexcept
 bool MultiplayerSystem::isConnected() const noexcept { return m_connected; }
 uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
 
-comm::GameState MultiplayerSystem::registerPlayer(const Entity player)
+comm::InitialInfo MultiplayerSystem::registerPlayer(const Entity playerEntity)
 {
     size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
 
-    comm::GameState gameState;
-    gameState.ParseFromArray(&m_buf, static_cast<int>(received));
+    comm::InitialInfo initialInfo;
+    initialInfo.ParseFromArray(&m_buf, static_cast<int>(received));
 
-    uint32_t id = gameState.player_id();
-    m_entity_map[id] = player;
-    m_player_entity = player;
+    uint32_t id = initialInfo.player().id();
+    m_entity_map[id] = playerEntity;
+    m_player_entity = playerEntity;
     m_player_id = id;
 
-    return gameState;
+    return initialInfo;
 }
 
 comm::StateUpdate MultiplayerSystem::pollStateUpdates()
@@ -145,7 +145,6 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
     }
     else
     {
-        m_state.set_id(0);
         m_state.set_variant(comm::NONE);
     }
     return m_state;

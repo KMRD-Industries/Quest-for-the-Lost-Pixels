@@ -50,6 +50,6 @@ public:
     bool isInsideInitialRoom(const bool change) noexcept;
     uint32_t playerID() const noexcept;
     glm::ivec2& getRoom() noexcept;
-    comm::GameState registerPlayer(const Entity player);
+    comm::InitialInfo registerPlayer(const Entity player);
     comm::StateUpdate pollStateUpdates();
 };
