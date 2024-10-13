@@ -25,7 +25,7 @@ public:
 
     void makeLockAndKey()
     {
-        //m_generator.makeLockAndKey();
+        m_generator.makeLockAndKey();
     }
 
     bool isConnected(const glm::ivec2& firstNode, const glm::ivec2& secondNode) const;

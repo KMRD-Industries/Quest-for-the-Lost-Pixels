@@ -1,10 +1,10 @@
 #pragma once
-
-#include <PublicConfig.h>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include "config.h"
+
+#include "Config.h"
+#include "PublicConfig.h"
 
 using json = nlohmann::json;
 

@@ -57,8 +57,9 @@ void StateManager::render(sf::RenderWindow& window)
 void StateManager::handleStateChange(const std::vector<MenuStateMachine::StateAction>& actionList,
                                      std::vector<std::optional<std::shared_ptr<State>>> newStateList)
 {
-    for (const auto& [index,action] : std::views::enumerate(actionList))
+    for (int index = 0; index < actionList.size(); ++index)
     {
+        const auto& action = actionList.at(index);
         if (action == MenuStateMachine::StateAction::Pop)
             popState();
 
