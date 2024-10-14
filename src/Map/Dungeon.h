@@ -36,11 +36,11 @@ class Dungeon
 public:
     Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
-    void setupWeaponEntity(const uint32_t playerID, const uint32_t weaponID);
+    void setupWeaponEntity(const comm::Player& player);
     void init();
     void addPlayerComponents(Entity player);
     void setupPlayerCollision(Entity player);
-    void createRemotePlayer(const uint32_t playerID, const uint32_t weaponID);
+    void createRemotePlayer(const comm::Player& player);
 
     void draw();
     void update(float);
