@@ -14,7 +14,8 @@ namespace MenuStateMachine
     enum class StateAction
     {
         Push,
-        Pop
+        Pop,
+        PutOnTop
     };
 }
 
@@ -39,6 +40,11 @@ namespace Items
         HEAL = 0,
         DMGUP = 1
     };
+
+    const std::unordered_map<std::string, Behaviours> behaviourMap = {
+        {"Heal", Behaviours::HEAL},
+        {"DmgUp", Behaviours::DMGUP},
+    };
 }
 
 namespace Enemies
@@ -47,6 +53,11 @@ namespace Enemies
     {
         MELEE = 0,
         BOSS = 1
+    };
+
+    const std::unordered_map<std::string, EnemyType> enemyTypeMap = {
+        {"Melee", EnemyType::MELEE},
+        {"Boss", EnemyType::BOSS},
     };
 } // namespace Enemies
 
@@ -64,17 +75,25 @@ namespace GameType
         float x, y;
 
         // Constructors
-        MyVec2(const float x, const float y) : x{x}, y{y} {}
+        MyVec2(const float x, const float y) : x{x}, y{y}
+        {
+        }
 
-        MyVec2(const glm::vec2& vec) : x(vec.x), y(vec.y) {}
+        MyVec2(const glm::vec2& vec) : x(vec.x), y(vec.y)
+        {
+        }
 
         operator glm::vec2() const { return {x, y}; }
 
-        MyVec2(const sf::Vector2f& vec) : x(vec.x), y(vec.y) {}
+        MyVec2(const sf::Vector2f& vec) : x(vec.x), y(vec.y)
+        {
+        }
 
         operator sf::Vector2f() const { return {x, y}; }
 
-        MyVec2(const b2Vec2& vec) : x(vec.x), y(vec.y) {}
+        MyVec2(const b2Vec2& vec) : x(vec.x), y(vec.y)
+        {
+        }
 
         operator b2Vec2() const { return {x, y}; }
 
@@ -188,9 +207,12 @@ namespace GameType
 
     inline WeaponType stringToWeaponType(const std::string& type)
     {
-        if (type == "mele") return WeaponType::MELE;
-        if (type == "wand") return WeaponType::WAND;
-        if (type == "bow") return WeaponType::BOW;
+        if (type == "mele")
+            return WeaponType::MELE;
+        if (type == "wand")
+            return WeaponType::WAND;
+        if (type == "bow")
+            return WeaponType::BOW;
         return WeaponType::MELE; // Return unknown if no match found
     }
 

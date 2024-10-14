@@ -1,5 +1,8 @@
 #include "GameState.h"
 
+#include <RenderSystem.h>
+
+#include "BackgroundSystem.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
 #include "FightSystem.h"
@@ -21,7 +24,13 @@ void GameState::handleCollision(const float deltaTime)
     collisionSystem->updateSimulation(timeStep, 8, 3);
 }
 
-void GameState::render(sf::RenderWindow &window) { m_dungeon.render(window); }
+void GameState::render(sf::RenderWindow& window)
+{
+    m_dungeon.render(window);
+    gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
+    gCoordinator.getRegisterSystem<BackgroundSystem>()->draw(window);
+    gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
+}
 
 void GameState::update(const float deltaTime)
 {

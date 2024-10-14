@@ -11,12 +11,16 @@ namespace sf
 }
 
 class State;
-using StateChangeCallback = std::function<void(MenuStateMachine::StateAction action,
-                                               std::optional<std::unique_ptr<State>> newState)>;
+using StateChangeCallback = std::function<void(const std::vector<MenuStateMachine::StateAction>& actionList,
+                                               std::vector<std::optional<std::shared_ptr<State>>> newStateList)>;
 
 class State
 {
 public:
+    State(const bool resetECS = true) : m_resetECS{resetECS}
+    {
+    }
+
     virtual ~State() = default;
     void beforeInit();
     virtual void init() = 0;
@@ -24,4 +28,5 @@ public:
     virtual void render(sf::RenderWindow& window) = 0;
 
     StateChangeCallback m_stateChangeCallback;
+    bool m_resetECS{};
 };

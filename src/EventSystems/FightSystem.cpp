@@ -12,9 +12,13 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
+extern PublicConfigSingleton configSingleton;
+
 FightSystem::FightSystem() { init(); }
 
-void FightSystem::init() {}
+void FightSystem::init()
+{
+}
 
 void FightSystem::update()
 {
@@ -48,7 +52,9 @@ void FightSystem::update()
     clear();
 }
 
-void FightSystem::handleBowAttack(Entity) {}
+void FightSystem::handleBowAttack(Entity)
+{
+}
 
 void FightSystem::handleMeleAttack(Entity eventEntity)
 {
@@ -68,7 +74,8 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
         glm::sin(glm::radians(-weaponComponent.targetAngleDegrees)) // Sine of the angle
     };
 
-    const auto range = direction * (config::playerAttackRange * std::abs(transformComponent.scale.x));
+    const auto range = direction * (configSingleton.GetConfig().playerAttackRange *
+        std::abs(transformComponent.scale.x));
     const auto point2 = center + range;
 
     const auto targetInBox = Physics::rayCast(center, point2, eventEntity);
@@ -84,7 +91,7 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
         gCoordinator.addComponent(tag, TransformComponent{secondPlayertransformComponent});
 
         characterComponent.attacked = true;
-        characterComponent.hp -= config::playerAttackDamage;
+        characterComponent.hp -= configSingleton.GetConfig().playerAttackDamage;
 
         const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(eventEntity).body->GetPosition();
         const b2Vec2& targetPos = colliderComponent.body->GetPosition();
@@ -95,8 +102,10 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
         const float& recoilMagnitude = 20.0f;
         const b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
 
-        secondPlayertransformComponent.velocity.x += static_cast<float>(recoilVelocity.x * config::meterToPixelRatio);
-        secondPlayertransformComponent.velocity.y += static_cast<float>(recoilVelocity.y * config::meterToPixelRatio);
+        secondPlayertransformComponent.velocity.x += static_cast<float>(recoilVelocity.x * configSingleton.GetConfig().
+            meterToPixelRatio);
+        secondPlayertransformComponent.velocity.y += static_cast<float>(recoilVelocity.y * configSingleton.GetConfig().
+            meterToPixelRatio);
 
         b2Vec2 newPosition = colliderComponent.body->GetPosition() + 0.25 * recoilDirection;
         colliderComponent.body->SetTransform(newPosition, colliderComponent.body->GetAngle());
@@ -105,8 +114,10 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
 
 void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData& collisionData) const
 {
-    if (std::regex_match(collisionData.tag, config::playerRegexTag)) return;
-    if (collisionData.tag == "Bullet") return;
+    if (std::regex_match(collisionData.tag, config::playerRegexTag))
+        return;
+    if (collisionData.tag == "Bullet")
+        return;
 
     if (collisionData.tag == "Enemy")
     {
@@ -118,7 +129,7 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
         gCoordinator.addComponent(tag, TransformComponent{enemyTransformComponent});
 
         characterComponent.attacked = true;
-        characterComponent.hp -= config::playerAttackDamage;
+        characterComponent.hp -= configSingleton.GetConfig().playerAttackDamage;
     }
 
     gCoordinator.getComponent<CharacterComponent>(bullet).hp = -1;
@@ -140,9 +151,7 @@ void FightSystem::clear()
     std::deque<Entity> entityToRemove;
 
     for (const auto entity : m_entities)
-    {
         entityToRemove.push_back(entity);
-    }
 
     while (!entityToRemove.empty())
     {
