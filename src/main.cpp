@@ -1,9 +1,8 @@
-#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-
-#include "BackgroundSystem.h"
+#include <TextureSystem.h>
+#include <imgui-SFML.h>
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
@@ -47,8 +46,7 @@ void handleInput(sf::RenderWindow& window)
         }
         else if (event.type == sf::Event::MouseMoved)
         {
-            const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
-            InputHandler::getInstance()->updateMousePosition(mousePosition);
+            InputHandler::getInstance()->updateMousePosition(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
         }
         if (event.type == sf::Event::Closed)
             window.close();
@@ -70,23 +68,23 @@ int main() {
     RenderSystem* m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
     TextTagSystem* m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
     TextureSystem* m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
+    BackgroundSystem* m_backgroundSystem = gCoordinator.getRegisterSystem<BackgroundSystem>().get();
 
     while (window.isOpen())
     {
         sf::Time deltaTime = deltaClock.restart();
-        window.clear(hexStringToSfmlColor(m_textureSystem->getBackgroundColor()));
+        window.clear(m_textureSystem->getBackgroundColor());
         ImGui::SFML::Update(window, deltaTime);
 
-        game.update(deltaTime.asSeconds());
+        game.update(deltaTime.asMilliseconds());
         game.draw(window);
 
-        gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);
+        m_renderSystem->draw(window);
         gCoordinator.getRegisterSystem<BackgroundSystem>()->draw(window);
         gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
 
         ImGui::SFML::Render(window);
         window.display();
-
         handleInput(window);
     }
 

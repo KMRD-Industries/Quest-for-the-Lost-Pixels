@@ -1,25 +1,11 @@
 #pragma once
 #include <RenderSystem.h>
-
-
-#include "Dungeon.h"
-#include "FightSystem.h"
-#include "Game.h"
-#include "PlayerMovementSystem.h"
-
 #include <TextureSystem.h>
 
-#include "AnimationSystem.h"
-#include "CharacterSystem.h"
-#include "ColliderComponent.h"
 #include "CollisionSystem.h"
-#include "EnemySystem.h"
-#include "ObjectCreatorSystem.h"
-#include "PassageSystem.h"
-#include "SpawnerSystem.h"
-#include "TextTagSystem.h"
-#include "TravellingSystem.h"
-#include "WeaponsSystem.h"
+#include "Coordinator.h"
+#include "Game.h"
+#include "StateMachine.h"
 
 class Game
 {
@@ -30,4 +16,5 @@ public:
 
 private:
     StateManager m_stateManager;
+    CollisionSystem* m_collisionSystem{nullptr};
 };

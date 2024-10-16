@@ -3,7 +3,7 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
-#include "EquippedWeaponComponent.h"
+#include "EquipmentComponent.h"
 #include "FightActionEvent.h"
 #include "ObjectCreatorSystem.h"
 #include "Physics.h"
@@ -27,24 +27,25 @@ void FightSystem::update()
         const auto& [eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
 
         // Start attack animation
-        const auto &equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(eventEntity);
-        const auto &weaponComponent =
+        const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(eventEntity);
+        const auto& weaponComponent =
             gCoordinator.getComponent<WeaponComponent>(equippedWeapon.slots.at(GameType::slotType::WEAPON));
 
         switch (weaponComponent.type)
         {
         case GameType::WeaponType::MELE:
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         case GameType::WeaponType::WAND:
             // TODO: Wand attack support
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         case GameType::WeaponType::BOW:
             // TODO: Bow attack support
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         default:
+            handleMeleeAttack(eventEntity);
             break;
         }
     }
@@ -56,15 +57,13 @@ void FightSystem::handleBowAttack(Entity)
 {
 }
 
-void FightSystem::handleMeleeAttack(const Entity playerEntity) const
+void FightSystem::handleMeleeAttack(const Entity eventEntity)
 {
-    const auto &playerRenderComponent = gCoordinator.getComponent<RenderComponent>(playerEntity);
-    const auto &[playerEquippedWeapon] = gCoordinator.getComponent<EquipmentComponent>(playerEntity);
-    const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(playerEntity);
-    auto &weaponComponent =
-        gCoordinator.getComponent<WeaponComponent>(playerEquippedWeapon.at(GameType::slotType::WEAPON));
+    auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventEntity);
+    auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(eventEntity);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
 
-    weaponComponent.isFacingRight = playerRenderComponent.sprite.getScale().x > 0;
+    weaponComponent.isFacingRight = renderComponent.sprite.getScale().x > 0;
     weaponComponent.queuedAttack = true;
 
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(eventEntity);
@@ -84,9 +83,9 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
 
     if (targetInBox.tag == "Enemy")
     {
-        auto &characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
-        const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(targetInBox.entityID);
-        auto &secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(targetInBox.entityID);
+        auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(targetInBox.entityID);
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(targetInBox.entityID);
+        auto& secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(targetInBox.entityID);
 
         const Entity tag = gCoordinator.createEntity();
         gCoordinator.addComponent(tag, TextTagComponent{});
@@ -95,13 +94,13 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
         characterComponent.attacked = true;
         characterComponent.hp -= configSingleton.GetConfig().playerAttackDamage;
 
-        const b2Vec2 &attackerPos = gCoordinator.getComponent<ColliderComponent>(playerEntity).body->GetPosition();
-        const b2Vec2 &targetPos = colliderComponent.body->GetPosition();
+        const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(eventEntity).body->GetPosition();
+        const b2Vec2& targetPos = colliderComponent.body->GetPosition();
 
         b2Vec2 recoilDirection = targetPos - attackerPos;
         recoilDirection.Normalize();
 
-        const float &recoilMagnitude = 20.0f;
+        const float& recoilMagnitude = 20.0f;
         const b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
 
         secondPlayertransformComponent.velocity.x += static_cast<float>(recoilVelocity.x * configSingleton.GetConfig().
@@ -114,7 +113,7 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
     }
 }
 
-void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData &collisionData) const
+void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData& collisionData) const
 {
     if (std::regex_match(collisionData.tag, config::playerRegexTag))
         return;
@@ -123,8 +122,8 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
 
     if (collisionData.tag == "Enemy")
     {
-        auto &characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
-        auto &enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);
+        auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
+        auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);
 
         const Entity tag = gCoordinator.createEntity();
         gCoordinator.addComponent(tag, TextTagComponent{});

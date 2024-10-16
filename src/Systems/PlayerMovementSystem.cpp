@@ -1,22 +1,16 @@
 #include "PlayerMovementSystem.h"
 
-#include "AnimationComponent.h"
 #include "CharacterComponent.h"
-#include "ColliderComponent.h"
 #include "Coordinator.h"
-#include "EquipWeaponSystem.h"
-#include "EquippedWeaponComponent.h"
+#include "EquipmentComponent.h"
 #include "FightActionEvent.h"
 #include "InputHandler.h"
 #include "InventorySystem.h"
+#include "ItemSystem.h"
 #include "Physics.h"
-#include "PlayerComponent.h"
 #include "RenderComponent.h"
-#include "TextTagComponent.h"
-#include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
-#include "WeaponsSystem.h"
 #include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;
@@ -33,8 +27,7 @@ void PlayerMovementSystem::update(const float deltaTime)
     handleSpecialKeys();
 
     m_frameTime += deltaTime;
-    if (m_frameTime <= configSingleton.GetConfig().oneFrameTime)
-        return;
+    if (m_frameTime <= configSingleton.GetConfig().oneFrameTime) return;
     m_frameTime = 0;
 
     if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs)
@@ -46,10 +39,9 @@ void PlayerMovementSystem::update(const float deltaTime)
 
 void PlayerMovementSystem::handleSpecialKeys()
 {
-    const auto inputHandler{InputHandler::getInstance()};
-
-    if (!inputHandler->isPressed(InputType::DebugMode)) return;
-    config::debugMode = !config::debugMode;
+    if (!InputHandler::getInstance()->isPressed(InputType::DebugMode)) return;
+    // configSingleton.GetConfig().debugMode = config::debugMode = !config::debugMode;
+    // TODO: Changing config
 }
 
 void PlayerMovementSystem::handlePickUpAction()
@@ -114,14 +106,34 @@ void PlayerMovementSystem::handleMovement()
             }
         }
 
+        // Mirroring view if necessary
+        // if (auto *weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(
+        //     equipment.slots.at(config::slotType::WEAPON))) {
+        //     auto &weaponTransformComponent =
+        //             gCoordinator.getComponent<TransformComponent>(equippedWeapon.currentWeapon);
+        //     auto &weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(equippedWeapon.currentWeapon);
+        //
+        //     if (!gCoordinator.hasComponent<EquipmentComponent>(entity)) continue;
+        //
+        //     weaponComponent->pivotPoint = inputHandler->getMousePosition();
+        //     weaponRenderComponent.dirty = true;
+        //
+        //     transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+        //     transformComponent.scale.y}; weaponTransformComponent.scale = {
+        //         weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+        //         weaponTransformComponent.scale.y
+        //     };
+        // }
+    }
+}
+
 void PlayerMovementSystem::handleAttack() const
 {
     const auto inputHandler{InputHandler::getInstance()};
 
-    for (const auto& entity : m_entities)
+    for (const auto &entity : m_entities)
     {
-        if (!inputHandler->isPressed(InputType::Attack))
-            continue;
+        if (!inputHandler->isPressed(InputType::Attack)) continue;
 
         const Entity fightAction = gCoordinator.createEntity();
         gCoordinator.addComponent(fightAction, FightActionEvent{.entity = entity});

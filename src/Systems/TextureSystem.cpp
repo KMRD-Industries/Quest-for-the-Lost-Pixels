@@ -242,8 +242,11 @@ void TextureSystem::loadTextures()
 
         if (!m_setTextureFiles.contains(tileComponent.tileSet))
             continue;
+        }
 
-        // if (renderComponent.dirty == false) continue;
+        if (renderComponent.dirty == false && !gCoordinator.hasComponent<PlayerComponent>(entity) &&
+            !gCoordinator.hasComponent<ItemComponent>(entity))
+            continue;
 
         // Adjust tile index
         long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
@@ -268,9 +271,9 @@ void TextureSystem::loadTextures()
             if (!gCoordinator.hasComponent<ColliderComponent>(entity))
                 gCoordinator.addComponent(entity, ColliderComponent{});
 
-            auto& cc = m_mapCollisions.at(adjusted_id);
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            auto &cc = m_mapCollisions.at(adjusted_id);
+            auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
             if (colliderComponent.body != nullptr && colliderComponent.collision != cc)
             {

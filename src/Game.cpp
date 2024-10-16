@@ -26,18 +26,4 @@ void Game::draw(sf::RenderWindow& window)
     m_stateManager.render(window);
 }
 
-void Game::draw() { m_dungeon.draw(); }
-
-void Game::update(const float deltaTime)
-{
-    m_stateManager.update(deltaTime);
-}
-
-void Game::handleCollision()
-{
-    m_collisionSystem->update();
-    constexpr auto timeStep = 1.f / 60.f;
-    m_collisionSystem->updateSimulation(timeStep, 8, 3);
-};
-
-std::string Game::getBackground() { return gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor(); }
+void Game::update(const float deltaTime) { m_stateManager.update(deltaTime); }

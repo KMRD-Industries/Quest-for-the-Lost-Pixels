@@ -2,7 +2,6 @@
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "Physics.h"
-#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 
@@ -20,7 +19,7 @@ void ObjectCreatorSystem::update()
             continue;
         if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity))
             continue;
-        if (configSingleton.GetConfig().debugMode)
+        if (config::debugMode)
             std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
 
         switch (eventInfo.type)
@@ -65,12 +64,12 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
         objectPosition.x = convertPixelsToMeters(
             transformComponent.position.x -
             (spriteBounds.width / 2.f - (colliderComponent.collision.x + colliderComponent.collision.width / 2.f)) *
-            configSingleton.GetConfig().gameScale);
+            config::gameScale);
 
         objectPosition.y = convertPixelsToMeters(
             transformComponent.position.y -
             (spriteBounds.height / 2 - (colliderComponent.collision.y + colliderComponent.collision.height / 2)) *
-            configSingleton.GetConfig().gameScale);
+            config::gameScale);
     }
 
     bodyDef.position.Set(objectPosition.x, objectPosition.y);
@@ -140,10 +139,9 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
 
     b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
 
-    if(collisionData->tag != "Item")
-        body->SetFixedRotation(true);
+    if (collisionData->tag != "Item") body->SetFixedRotation(true);
 
-    colliderComponent.fixture = body->CreateFixture(&fixtureDef);
+    body->CreateFixture(&fixtureDef);
     colliderComponent.body = body;
     colliderComponent.onCollisionEnter = eventInfo.onCollisionEnter;
     colliderComponent.onCollisionOut = eventInfo.onCollisionOut;

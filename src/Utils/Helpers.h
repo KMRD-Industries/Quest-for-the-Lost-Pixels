@@ -10,14 +10,12 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#include <glm/glm.hpp>
-#include <nlohmann/json.hpp>
 #include "Config.h"
 #include "GameTypes.h"
+#include "PublicConfig.h"
 #include "PublicConfigMenager.h"
 #include "glm/gtx/hash.hpp"
 
-static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType &enemyType) {
 extern PublicConfigSingleton configSingleton;
 
 static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& enemyType)
@@ -26,8 +24,7 @@ static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& e
 
     auto enemyConfig = configSingleton.GetConfig().enemyData.equal_range(enemyType);
     std::vector<config::EnemyConfig> enemiesConfig;
-    for (auto it = enemyConfig.first; it != enemyConfig.second; ++it)
-        enemiesConfig.push_back(it->second);
+    for (auto it = enemyConfig.first; it != enemyConfig.second; ++it) enemiesConfig.push_back(it->second);
 
     if (enemiesConfig.empty())
     {
@@ -217,8 +214,9 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
     return result;
 }
 
-inline sf::Color hexStringToSfmlColor(const std::string &hexColor) {
-    const std::string &hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
+inline sf::Color hexStringToSfmlColor(const std::string& hexColor)
+{
+    const std::string& hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
 
     std::istringstream iss(hex);
     int rgbValue = 0;
@@ -257,6 +255,26 @@ static T convertPixelsToMeters(const T pixelValue)
 {
     T result = pixelValue * config::pixelToMeterRatio;
     return roundTo(result, 10);
+}
+
+template <typename, typename T, typename = void>
+struct has_member : std::false_type
+{
+};
+
+template <typename T, typename U>
+struct has_member<T, U, std::void_t<decltype(std::declval<U>())>> : std::true_type
+{
+};
+
+template <typename Struct, typename MemberType>
+void set(Struct& obj, MemberType Struct::*member, MemberType value)
+{
+    // Check if the member exists
+    if constexpr (has_member<Struct, decltype(obj.*member)>::value)
+    {
+        obj.*member = value; // Set the member to the new value
+    }
 }
 
 static sf::Vector2f convertPixelsToMeters(const sf::Vector2f& pixelValue)
