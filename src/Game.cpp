@@ -17,7 +17,7 @@ extern Coordinator gCoordinator;
 
 void Game::init()
 {
-    m_stateManager.handleStateChange(MenuStateMachine::StateAction::Push, std::make_unique<MainMenuState>());
+    m_stateManager.handleStateChange({MenuStateMachine::StateAction::Push}, {std::make_unique<MainMenuState>()});
 }
 
 void Game::draw(sf::RenderWindow& window)

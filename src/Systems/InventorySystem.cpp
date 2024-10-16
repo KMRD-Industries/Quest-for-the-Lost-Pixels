@@ -1,19 +1,19 @@
 #include "InventorySystem.h"
 #include "AnimationSystem.h"
-#include "BodyArmourComponent.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
-#include "EquipmentComponent.h"
-#include "GameTypes.h"
-#include "HelmetComponent.h"
+#include "EquipWeaponSystem.h"
+#include "EquippedWeaponComponent.h"
+#include "InventoryComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "Physics.h"
-#include "PotionComponent.h"
-#include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
+extern PublicConfigSingleton configSingleton;
+
+void InventorySystem::dropWeapon(const Entity player)
 void InventorySystem::dropItem(const Entity player, const Entity item, const GameType::slotType slot) const
 {
     auto &equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);

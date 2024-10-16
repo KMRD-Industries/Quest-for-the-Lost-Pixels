@@ -3,25 +3,94 @@
 #include <cmath>
 #include "AnimationSystem.h"
 #include "ColliderComponent.h"
-#include "EquipmentComponent.h"
+#include "EquippedWeaponComponent.h"
+#include "InventoryComponent.h"
+#include "InventorySystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-void WeaponSystem::update(const float &deltaTime) {
-    if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs) {
-        m_frameTime -= config::oneFrameTimeMs;
-        performFixedUpdate();
-    }
+extern PublicConfigSingleton configSingleton;
+
+void WeaponSystem::init()
+{
 }
 
 void WeaponSystem::performFixedUpdate() {
     for (const auto entity: m_entities) {
         updateStartingAngle(entity);
         updateWeaponAngle(entity);
+
+        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) continue;
+
+        const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+        const float distanceX = transformComponent.position.x - playerTransformComponent.position.x;
+        const float distanceY = transformComponent.position.y - playerTransformComponent.position.y;
+        const double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2));
+
+        if (distance <= minDistance)
+        {
+            minDistance = distance;
+            closestWeaponEntity = entity;
+        }
     }
+
+    if (minDistance <= config::weaponInteractionDistance)
+    {
+        gCoordinator.getComponent<RenderComponent>(closestWeaponEntity).color = sf::Color(255, 102, 102);
+        displayStats(closestWeaponEntity);
+    }
+
+    // markClosest();
 }
+
+void WeaponSystem::displayStats(const Entity entity)
+{
+    const auto& weapon = gCoordinator.getComponent<WeaponComponent>(entity);
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.5f)); // Semi-transparent background
+    ImGui::SetNextWindowPos(ImVec2(10, 100));
+    ImGui::SetNextWindowSize(ImVec2(250, 0));
+    ImGui::Begin("Pick Up Weapon Stats", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysUseWindowPadding);
+
+    ImGui::Separator();
+    ImGui::Text("Weapon Details");
+    ImGui::Separator();
+
+    ImGui::Text("ID: %d", weapon.id);
+    ImGui::Text("Damage: %d", weapon.damageAmount);
+    ImGui::Text("Rotation Speed: %.2f degrees/sec", weapon.rotationSpeed);
+    ImGui::Text("Recoil Amount: %.2f", weapon.recoilAmount);
+
+    ImGui::End();
+    ImGui::PopStyleColor();
+}
+
+void WeaponSystem::weaponInput(const Entity player)
+{
+    const auto& playerTransformComponent = gCoordinator.getComponent<TransformComponent>(player);
+    double minDistance = std::numeric_limits<float>::max();
+    Entity closestWeaponEntity{};
+
+    for (const auto entity : m_entities)
+    {
+        if (gCoordinator.getComponent<WeaponComponent>(entity).equipped == true) continue;
+
+        const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+        float distanceX = transformComponent.position.x - playerTransformComponent.position.x;
+        float distanceY = transformComponent.position.y - playerTransformComponent.position.y;
+
+        double distance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2));
+
+        if (distance <= minDistance)
+        {
+            minDistance = distance;
+            closestWeaponEntity = entity;
+        }
+    }
 
 inline void WeaponSystem::updateWeaponAngle(const Entity entity) {
     auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
@@ -63,7 +132,8 @@ inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward) {
                 weaponComponent.queuedAttack = false;
 
                 setAngle(entity);
-            } else
+            }
+            else
                 weaponComponent.isAttacking = false;
         }
     }
@@ -107,7 +177,8 @@ inline void WeaponSystem::updateStartingAngle(const Entity entity) {
         return;
     }
 
-    if (weaponComponent.queuedAttack || weaponComponent.isAttacking) return;
+    if (weaponComponent.queuedAttack || weaponComponent.isAttacking)
+        return;
 
     setAngle(entity);
 }

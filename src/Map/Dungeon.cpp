@@ -1,5 +1,14 @@
-#include <comm.pb.h>
+#include <chrono>
 #include <format>
+
+#include <comm.pb.h>
+
+#include "Dungeon.h"
+
+#include <CreateBodyWithCollisionEvent.h>
+#include <FloorComponent.h>
+#include <PassageComponent.h>
+#include <RenderSystem.h>
 
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
@@ -13,7 +22,7 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
-#include "Dungeon.h"
+#include "EndGameState.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "EquipWeaponSystem.h"
@@ -51,6 +60,7 @@
 #include "WeaponsSystem.h"
 
 extern Coordinator Coordinator;
+extern PublicConfigSingleton configSingleton;
 
 void Dungeon::init()
 {
@@ -91,7 +101,6 @@ void Dungeon::init()
 
     if (multiplayerSystem->isConnected())
         multiplayerSystem->setRoom(m_currentPlayerPos);
-
     const std::string tag = std::format("Player {}", m_id);
 
     makeStartFloor();
@@ -155,13 +164,14 @@ void Dungeon::createRemotePlayer(const uint32_t id)
         false);
 
     gCoordinator.addComponent(entity, newEvent);
-
-
     m_multiplayerSystem->entityConnected(id, m_entities[id]);
 }
 
 void Dungeon::moveDownDungeon()
 {
+    if (m_dungeonDepth >= configSingleton.GetConfig().maxDungeonDepth)
+        m_endGame = true;
+    ++m_dungeonDepth;
     makeSimpleFloor();
     const auto& pos = GameUtility::startingPosition;
 
@@ -205,7 +215,8 @@ void Dungeon::setupPlayerCollision(const Entity player)
         {
             auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
 
-            if (!passageComponent.activePassage) return;
+            if (!passageComponent.activePassage)
+                return;
 
             gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
             passageComponent.moveInDungeon.emplace_back(true);
@@ -309,9 +320,10 @@ void Dungeon::update(const float deltaTime)
     }
 
     m_roomMap.at(m_currentPlayerPos).update();
-
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
-        m_stateChangeCallback(MenuStateMachine::StateAction::Pop, std::nullopt);
+        m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});
+    if (m_endGame)
+        m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
@@ -349,6 +361,7 @@ void Dungeon::makeStartFloor()
     m_passageSystem->setPassages(true);
 }
 
+
 void Dungeon::makeSimpleFloor()
 {
     const int playerFloor = gCoordinator.getComponent<FloorComponent>(config::playerEntity).currentPlayerFloor;
@@ -358,12 +371,15 @@ void Dungeon::makeSimpleFloor()
     m_textureSystem->modifyColorScheme(playerFloor);
 
     m_floorGenerator.generateFloor(5, 6, m_seed);
-    m_floorGenerator.generateMainPath(11);
+    m_floorGenerator.generateMainPath(6);
     m_floorGenerator.generateSidePath(
         {.pathName{"FirstC"}, .startingPathName{"Main"}, .endPathName{"Main"}, .minPathLength{3}, .maxPathLength{5}});
     m_floorGenerator.generateSidePath(
-        {.pathName{"SecondC"}, .startingPathName{"Main"}, .endPathName{""}, .minPathLength{3}, .maxPathLength{5}});
-    m_floorGenerator.makeLockAndKey();
+        {.pathName{"BossCorridor"}, .startingPathName{"Main"}, .endPathName{""}, .minPathLength{3}, .maxPathLength{5}});
+    m_floorGenerator.generateSidePath(
+    {.pathName{"BossRoom"}, .startingPathName{"BossCorridor"}, .endPathName{""}, .minPathLength{0},
+     .maxPathLength{0}});
+    //m_floorGenerator.makeLockAndKey();
 
     m_roomMap = m_floorGenerator.getFloor(true);
     m_currentPlayerPos = m_floorGenerator.getStartingRoom();
@@ -422,6 +438,7 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
         m_passageSystem->setPassages(m_currentPlayerPos == m_floorGenerator.getEndingRoom());
         m_collisionSystem->createMapCollision();
 
+
         const auto newDoor = dir * -1;
         const auto doorType = GameType::geoToMapDoors.at(newDoor);
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
@@ -440,7 +457,8 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
                 colliderComponent.body->GetAngle());
         }
 
-        if (m_multiplayerSystem->isConnected()) m_multiplayerSystem->roomChanged(m_currentPlayerPos);
+        if (m_multiplayerSystem->isConnected())
+            m_multiplayerSystem->roomChanged(m_currentPlayerPos);
     }
 }
 
@@ -454,6 +472,7 @@ void Dungeon::setECS()
 {
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
+    gCoordinator.registerComponent<MultiplayerComponent>();
     gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
     gCoordinator.registerComponent<DoorComponent>();

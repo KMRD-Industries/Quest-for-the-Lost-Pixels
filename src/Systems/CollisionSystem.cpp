@@ -170,16 +170,20 @@ void CollisionSystem::deleteBody(const Entity entity) const {
     }
 }
 
-void CollisionSystem::deleteMarkedBodies() const {
+void CollisionSystem::deleteMarkedBodies() const
+{
     std::unordered_set<Entity> entityToKill{};
 
-    for (const auto &entity: m_entities) {
-        const auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-        if (!colliderComponent.toDestroy) continue;
+    for (const auto& entity : m_entities)
+    {
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        if (!colliderComponent.toDestroy)
+            continue;
         deleteBody(entity);
         entityToKill.insert(entity);
     }
 
-    for (auto &entity: entityToKill) gCoordinator.destroyEntity(entity);
+    for (auto& entity : entityToKill)
+        gCoordinator.destroyEntity(entity);
     entityToKill.clear();
 }

@@ -14,6 +14,7 @@
 #include "Utils/Helpers.h"
 
 extern Coordinator gCoordinator;
+extern PublicConfigSingleton configSingleton;
 
 
 void TextureSystem::init() { loadTexturesFromFiles(); }
@@ -239,12 +240,10 @@ void TextureSystem::loadTextures()
             continue;
         }
 
-        if (m_setTextureFiles.find(tileComponent.tileSet) == m_setTextureFiles.end())
-        {
+        if (!m_setTextureFiles.contains(tileComponent.tileSet))
             continue;
-        }
 
-        if (renderComponent.dirty == false && !gCoordinator.hasComponent<PlayerComponent>(entity)) continue;
+        // if (renderComponent.dirty == false) continue;
 
         // Adjust tile index
         long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
@@ -269,16 +268,18 @@ void TextureSystem::loadTextures()
             if (!gCoordinator.hasComponent<ColliderComponent>(entity))
                 gCoordinator.addComponent(entity, ColliderComponent{});
 
-            auto &cc = m_mapCollisions.at(adjusted_id);
-            auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            auto& cc = m_mapCollisions.at(adjusted_id);
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-            if (colliderComponent.body != nullptr && colliderComponent.collision != cc) {
-                if (cc.x != colliderComponent.collision.x || cc.y != colliderComponent.collision.y) {
+            if (colliderComponent.body != nullptr && colliderComponent.collision != cc)
+            {
+                if (cc.x != colliderComponent.collision.x || cc.y != colliderComponent.collision.y)
+                {
                     b2Vec2 offset = {(cc.x - colliderComponent.collision.x), (cc.y - colliderComponent.collision.y)};
 
-                    offset.x = convertPixelsToMeters(offset.x * config::gameScale);
-                    offset.y = convertPixelsToMeters(-offset.y * config::gameScale);
+                    offset.x = convertPixelsToMeters(offset.x * configSingleton.GetConfig().gameScale);
+                    offset.y = convertPixelsToMeters(-offset.y * configSingleton.GetConfig().gameScale);
 
                     colliderComponent.body->SetTransform(colliderComponent.body->GetPosition() + offset, 0);
 
@@ -372,8 +373,8 @@ void TextureSystem::modifyColorScheme(const int playerFloor)
 
     std::stringstream stringHex;
     stringHex << "#" << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << red << std::setw(2)
-              << std::setfill('0') << std::hex << std::uppercase << green << std::setw(2) << std::setfill('0')
-              << std::hex << std::uppercase << blue;
+        << std::setfill('0') << std::hex << std::uppercase << green << std::setw(2) << std::setfill('0')
+        << std::hex << std::uppercase << blue;
 
     m_currentBackgroundColor = stringHex.str();
 }

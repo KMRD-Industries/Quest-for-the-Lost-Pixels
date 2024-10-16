@@ -15,6 +15,7 @@
 #include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
+#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
 #include "TextureSystem.h"
@@ -22,6 +23,7 @@
 #include "TransformComponent.h"
 
 extern Coordinator gCoordinator;
+extern PublicConfigSingleton configSingleton;
 
 void MapSystem::init() {}
 
@@ -145,64 +147,68 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 
     doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
-    gCoordinator.addComponents(mapEntity, RenderComponent{}, MapComponent{}, transformComponent, tileComponent);
+    gCoordinator.addComponents(mapEntity,
+        RenderComponent{},
+        MapComponent{},
+        transformComponent,
+        tileComponent);
 
     if (tileComponent.tileSet == "SpecialBlocks") // Handle special Tiles
     {
         switch (tileComponent.id)
         {
         case static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER):
-            {
-                gCoordinator.addComponent(mapEntity, DoorComponent{});
-                auto& doorComponent = gCoordinator.getComponent<DoorComponent>(mapEntity);
+        {
+            gCoordinator.addComponent(mapEntity, DoorComponent{});
+            auto& doorComponent = gCoordinator.getComponent<DoorComponent>(mapEntity);
 
-                if (yPos == 0)
-                    doorComponent.entrance = GameType::DoorEntraces::NORTH;
-                else if (yPos == parsedMap.height - 1)
-                    doorComponent.entrance = GameType::DoorEntraces::SOUTH;
-                else if (xPos == 0)
-                    doorComponent.entrance = GameType::DoorEntraces::WEST;
-                else if (xPos == parsedMap.width - 1)
-                    doorComponent.entrance = GameType::DoorEntraces::EAST;
+            if (yPos == 0)
+                doorComponent.entrance = GameType::DoorEntraces::NORTH;
+            else if (yPos == parsedMap.height - 1)
+                doorComponent.entrance = GameType::DoorEntraces::SOUTH;
+            else if (xPos == 0)
+                doorComponent.entrance = GameType::DoorEntraces::WEST;
+            else if (xPos == parsedMap.width - 1)
+                doorComponent.entrance = GameType::DoorEntraces::EAST;
 
-                break;
-            }
+            break;
+        }
 
         case static_cast<int>(SpecialBlocks::Blocks::SPAWNERBLOCK):
-            {
-                if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
-                    gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::MELEE});
+        {
+            if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
+                gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::MELEE});
 
-                break;
-            }
+            break;
+        }
         case static_cast<int>(SpecialBlocks::Blocks::BOSSSPAWNERBLOCK):
-            {
-                if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
-                    gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::BOSS});
+        {
+            if (!gCoordinator.hasComponent<SpawnerComponent>(mapEntity))
+                gCoordinator.addComponent(mapEntity, SpawnerComponent{.enemyType = Enemies::EnemyType::BOSS});
 
-                break;
-            }
+            break;
+        }
         case static_cast<int>(SpecialBlocks::Blocks::STARTINGPOINT):
-            {
-                const sf::Vector2f pos = getPosition(xPos, yPos, parsedMap.tileheight);
-                GameUtility::startingPosition = {pos.x, pos.y};
-                break;
-            }
+        {
+            const sf::Vector2f pos = getPosition(xPos, yPos, parsedMap.tileheight);
+            GameUtility::startingPosition = {pos.x, pos.y};
+            break;
+        }
         case static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR):
-            {
-                gCoordinator.addComponent(mapEntity, PassageComponent{});
-                break;
-            }
+        {
+            gCoordinator.addComponent(mapEntity, PassageComponent{.activePassage = true});
+            break;
+        }
         case static_cast<int>(SpecialBlocks::Blocks::CHESTSPAWNERBLOCK):
-            {
-                if (!gCoordinator.hasComponent<LootComponent>(mapEntity))
-                    gCoordinator.addComponent(mapEntity, LootComponent{});
+        {
+            if (!gCoordinator.hasComponent<LootComponent>(mapEntity))
+                gCoordinator.addComponent(mapEntity, LootComponent{});
 
-                break;
-            }
+            break;
+        }
         default:
-            {
-            }
+        {
+        }
         }
     }
 }
@@ -250,5 +256,5 @@ void MapSystem::resetMap() const
 sf::Vector2f MapSystem::getPosition(const int x_axis, const int y_axis, const int map_tile_width) const
 {
     return sf::Vector2f(static_cast<float>(x_axis), static_cast<float>(y_axis)) * static_cast<float>(map_tile_width) *
-        config::gameScale;
+        configSingleton.GetConfig().gameScale;
 }

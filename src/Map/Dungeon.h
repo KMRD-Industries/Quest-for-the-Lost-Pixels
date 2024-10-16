@@ -67,6 +67,8 @@ private:
     std::deque<glm::ivec2> m_moveInDungeon;
     float counter;
     bool m_passedBy;
+    int m_dungeonDepth{1};
+    bool m_endGame{};
 
     PlayerMovementSystem *m_playerMovementSystem;
     MultiplayerSystem *m_multiplayerSystem;

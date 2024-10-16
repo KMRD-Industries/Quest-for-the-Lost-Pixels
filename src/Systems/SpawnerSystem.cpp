@@ -11,24 +11,26 @@
 #include "EnemySystem.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
-#include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
+
+extern PublicConfigSingleton configSingleton;
 
 constexpr float SPAWN_RATE = 3600.f;
 
 SpawnerSystem::SpawnerSystem() { init(); }
 
-void SpawnerSystem::init() {
-}
+void SpawnerSystem::init() {}
 
-void SpawnerSystem::update(const float timeStamp) {
+void SpawnerSystem::update(const float timeStamp)
+{
     m_spawnTime += timeStamp * 1000.f;
 
-    for (const auto entity: m_entities) {
-        auto &spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto &spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+    for (const auto entity : m_entities)
+    {
+        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
+        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
@@ -38,8 +40,9 @@ void SpawnerSystem::update(const float timeStamp) {
     cleanUpUnnecessarySpawners();
 }
 
-void SpawnerSystem::processSpawner(SpawnerComponent &spawnerComponent,
-                                   const TransformComponent &spawnerTransformComponent) const {
+void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
+                                   const TransformComponent& spawnerTransformComponent) const
+{
     // Check if the spawner is ready to spawn the enemy.
     if (m_spawnTime < SPAWN_RATE) return;
 
@@ -48,16 +51,17 @@ void SpawnerSystem::processSpawner(SpawnerComponent &spawnerComponent,
     spawnEnemy(spawnerTransformComponent, spawnerComponent.enemyType);
 }
 
-void SpawnerSystem::spawnEnemy(const TransformComponent &spawnerTransformComponent,
-                               const Enemies::EnemyType enemyType) const {
+void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent,
+                               const Enemies::EnemyType enemyType) const
+{
     const auto enemyConfig = getRandomEnemyData(enemyType);
     const Entity newMonsterEntity = gCoordinator.createEntity();
 
     const ColliderComponent colliderComponent{enemyConfig.collisionData};
     TransformComponent transformComponent{spawnerTransformComponent};
 
-    transformComponent.position.x -= colliderComponent.collision.x * config::gameScale;
-    transformComponent.position.y -= colliderComponent.collision.y * config::gameScale;
+    transformComponent.position.x -= colliderComponent.collision.x * configSingleton.GetConfig().gameScale;
+    transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale;
 
     gCoordinator.addComponents(newMonsterEntity, enemyConfig.textureData, transformComponent, RenderComponent{},
                                AnimationComponent{}, EnemyComponent{}, ColliderComponent{enemyConfig.collisionData},
@@ -67,11 +71,13 @@ void SpawnerSystem::spawnEnemy(const TransformComponent &spawnerTransformCompone
 
     auto newEvent = CreateBodyWithCollisionEvent(
         newMonsterEntity, "Enemy",
-        [&, newMonsterEntity, enemyConfig](const GameType::CollisionData &collisionData) {
+        [&, newMonsterEntity, enemyConfig](const GameType::CollisionData& collisionData)
+        {
             if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
             auto &playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;
+
             playerCharacterComponent.hp -= enemyConfig.damage;
 
             const Entity tag = gCoordinator.createEntity();
@@ -85,27 +91,26 @@ void SpawnerSystem::spawnEnemy(const TransformComponent &spawnerTransformCompone
             auto &playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
             auto &myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
 
-            b2Vec2 knockbackDirection{
-                playerCollisionComponent.body->GetPosition() -
-                myCollisionComponent.body->GetPosition()
-            };
+            b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -
+                                      myCollisionComponent.body->GetPosition()};
             knockbackDirection.Normalize();
 
-            const auto knockbackForce{config::defaultEnemyKnockbackForce * knockbackDirection};
+            const auto knockbackForce{configSingleton.GetConfig().defaultEnemyKnockbackForce * knockbackDirection};
             playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
         },
-        [&](const GameType::CollisionData &) {
-        }, false, false);
+        [&](const GameType::CollisionData&) {}, false, false);
 
     gCoordinator.addComponent(newEventEntity, newEvent);
 }
 
-void SpawnerSystem::clearSpawners() {
+void SpawnerSystem::clearSpawners()
+{
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity: m_entities) entityToRemove.push_back(entity);
+    for (const auto entity : m_entities) entityToRemove.push_back(entity);
 
-    while (!entityToRemove.empty()) {
+    while (!entityToRemove.empty())
+    {
         gCoordinator.removeComponent<SpawnerComponent>(entityToRemove.front());
         entityToRemove.pop_front();
     }
@@ -121,15 +126,18 @@ void SpawnerSystem::spawnEnemies() {
 }
 
 
-void SpawnerSystem::cleanUpUnnecessarySpawners() {
+void SpawnerSystem::cleanUpUnnecessarySpawners()
+{
     std::unordered_set<Entity> entityToKill{};
 
-    for (const auto entity: m_entities) {
-        if (const auto &spawner = gCoordinator.getComponent<SpawnerComponent>(entity);
-            !spawner.loopSpawn && spawner.noSpawns >= 1) {
+    for (const auto entity : m_entities)
+    {
+        if (const auto& spawner = gCoordinator.getComponent<SpawnerComponent>(entity);
+            !spawner.loopSpawn && spawner.noSpawns >= 1)
+        {
             entityToKill.insert(entity);
         }
     }
-    for (const auto entity: entityToKill) gCoordinator.destroyEntity(entity);
+    for (const auto entity : entityToKill) gCoordinator.destroyEntity(entity);
     entityToKill.clear();
 }

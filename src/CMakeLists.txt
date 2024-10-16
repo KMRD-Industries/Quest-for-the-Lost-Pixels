@@ -146,12 +146,16 @@ set(UTILS
         Utils/GameTypes.h
         Utils/MapParser.h
         Utils/Config.h
+        Utils/PublicConfig.h
+        Utils/PublicConfigMenager.h
         Utils/TextureParser.h
         Utils/TextTag.h
         Utils/GameUtility.h
 )
 
 set(MENU_STATE_MACHINE
+        MenuStateMachine/EndGameState.cpp
+        MenuStateMachine/EndGameState.h
         MenuStateMachine/MainMenuState.cpp
         MenuStateMachine/MainMenuState.h
         MenuStateMachine/GameState.cpp
@@ -172,6 +176,9 @@ set(UI
         Ui/InputTextDTO.h
         Ui/InputText.h
         Ui/InputText.cpp
+        Ui/TextDTO.h
+        Ui/Text.h
+        Ui/Text.cpp
 )
 
 

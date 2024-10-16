@@ -22,6 +22,9 @@ extern Coordinator gCoordinator;
 
 void State::beforeInit()
 {
+    if (!m_resetECS)
+        return;
+
     Physics::getInstance()->resetWorld();
     gCoordinator.init();
 

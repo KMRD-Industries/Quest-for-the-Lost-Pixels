@@ -15,15 +15,10 @@
 #include "TileComponent.h"
 #include "Tileset.h"
 #include "Types.h"
-#include "box2d/b2_types.h"
 
-namespace Enemies
-{
-    enum class EnemyType;
-}
 namespace config
 {
-    inline bool debugMode{true};
+    static constexpr bool debugMode{true};
     static constexpr float gameScale{3.f};
     static constexpr double meterToPixelRatio{30.f};
     static constexpr double pixelToMeterRatio{1 / 30.f};
@@ -40,6 +35,10 @@ namespace config
     constexpr auto defaultFriction{1.f};
     constexpr auto defaultRestitution{0.05f};
 
+    static constexpr int mapFirstEntity{1000};
+    static constexpr int numberOfMapEntities{500};
+    static constexpr int enemyFirstEntity{2000};
+    static constexpr int numberOfEnemyEntities{100};
     static Entity playerEntity{1};
     static constexpr int playerAnimation{184};
 
@@ -58,7 +57,7 @@ namespace config
 
     static constexpr float defaultEnemyKnockbackForce{300.f};
     static constexpr bool applyKnockback{false};
-
+    static constexpr int maxDungeonDepth{5};
     // Text tag defaults
     static constexpr int textTagDefaultSize{20};
     static constexpr float textTagDefaultLifetime{60.0f};
@@ -86,7 +85,7 @@ namespace config
     static constexpr float weaponComponentDefaultRemainingDistance{0.0f};
     static constexpr float weaponComponentDefaultRecoilAmount{10.0f};
 
-    static constexpr double weaponInteractionDistance{200.f};
+    static constexpr int weaponInteractionDistance{200};
 
     static constexpr glm::vec2 startingPosition{325.f, 325.f};
     static constexpr float spawnOffset{25};
@@ -135,6 +134,7 @@ namespace config
     static const std::unordered_map<long, ColorBalance> m_mapColorScheme{
         {1, {25, 0, 0}}, {2, {0, 25, 0}}, {3, {0, 15, 15}}, {4, {45, 6, 35}}, {5, {15, 62, 35}}};
 
+
     enum class SpecialRoomTypes
     {
         NormalRoom,
@@ -144,11 +144,11 @@ namespace config
 
     struct EnemyConfig
     {
-        const std::string name{};
-        const float hp{};
-        const float damage{};
-        const TileComponent textureData{};
-        const Collision collisionData{};
+        std::string name{};
+        float hp{};
+        float damage{};
+        TileComponent textureData{};
+        Collision collisionData{};
     };
 
     const std::unordered_map<SpecialRoomTypes, char> prefixesForSpecialRooms{{SpecialRoomTypes::SpawnRoom, 's'},
@@ -171,10 +171,10 @@ namespace config
 
     struct ItemConfig
     {
-        const std::string name{};
-        const float value{};
-        const Items::Behaviours behaviour{};
-        const TileComponent textureData{};
+        std::string name{};
+        float value{};
+        Items::Behaviours behaviour{};
+        TileComponent textureData{};
     };
 
     const std::vector<ItemConfig> itemsData{{"HPPotion", 10.f, Items::Behaviours::HEAL, {690, "Items", 4}},
@@ -200,12 +200,12 @@ namespace config
         {"Bullet", BOUNDARY | ENEMY}, // Bullet only collides with walls and enemies
         {"Enemy", BOUNDARY | PLAYER}, // Enemy collides with walls and players
         {"Passage", BOUNDARY | PLAYER}, // Passage collides with walls and players
-        {"Item", BOUNDARY}, // Item only collides with walls and players
+        {"Item", BOUNDARY | PLAYER}, // Item only collides with walls and players
         {"Player", BOUNDARY | ENEMY | ITEM}, // Player collides with walls, enemies, and items
         {"Door", BOUNDARY | PLAYER} // Door collides with walls and players
     };
 
-    inline uint16 stringToCategoryBits(const std::string &str)
+    inline uint16 stringToCategoryBits(const std::string& str)
     {
         if (categoriesLookup.contains(str)) return categoriesLookup[str];
 
@@ -216,7 +216,7 @@ namespace config
         return 0x0000;
     }
 
-    inline uint16 stringToMaskBits(const std::string &str)
+    inline uint16 stringToMaskBits(const std::string& str)
     {
         if (bitMaskLookup.contains(str)) return bitMaskLookup[str];
 
@@ -227,7 +227,7 @@ namespace config
         return 0x0000;
     }
 
-    inline int16 stringToIndexGroup(const std::string &str)
+    inline uint16 stringToIndexGroup(const std::string& str)
     {
         if (str == "Bullet") return -8;
         return 0;

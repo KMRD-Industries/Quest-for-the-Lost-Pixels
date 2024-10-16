@@ -18,8 +18,8 @@ void MainMenuState::init()
                                 {
                                     ResourceManager::getInstance().setIP(m_inputIP.getString());
                                     m_stateChangeCallback(
-                                        MenuStateMachine::StateAction::Push,
-                                        std::make_unique<GameState>());
+                                        {MenuStateMachine::StateAction::Push},
+                                        {std::make_unique<GameState>()});
                                 }});
 
     m_quitButton.init(ButtonDTO{std::string(ASSET_PATH) + "/ui/uiHigh.png",

@@ -2,16 +2,32 @@
 
 #include "State.h"
 
-void StateManager::pushState(std::unique_ptr<State> newState)
+void StateManager::pushState(const std::shared_ptr<State>& newState, const MenuStateMachine::StateAction action)
 {
-    m_states.push(std::move(newState));
-    m_states.top()->beforeInit();
-    m_states.top()->init();
+    if (action != MenuStateMachine::StateAction::PutOnTop)
+    {
+        m_states.push(newState);
+        m_states.top()->beforeInit();
+        m_states.top()->init();
+    }
+    else
+    {
+        m_statesToRenderOnTop.push_back(newState);
+        m_statesToRenderOnTop.back()->beforeInit();
+        m_statesToRenderOnTop.back()->init();
+    }
 }
 
 void StateManager::popState()
 {
-    if (!m_states.empty()) m_states.pop();
+    if (!m_statesToRenderOnTop.empty())
+    {
+        m_statesToRenderOnTop.pop_back();
+        return;
+    }
+
+    if (!m_states.empty())
+        m_states.pop();
     if (!m_states.empty())
     {
         m_states.top()->beforeInit();
@@ -21,26 +37,43 @@ void StateManager::popState()
 
 void StateManager::update(const float deltaTime)
 {
-    if (!m_states.empty()) m_states.top()->update(deltaTime);
+    if (!m_statesToRenderOnTop.empty())
+    {
+        m_statesToRenderOnTop.back()->update(deltaTime);
+        return;
+    }
+    if (!m_states.empty())
+        m_states.top()->update(deltaTime);
 }
 
 void StateManager::render(sf::RenderWindow& window)
 {
-    if (!m_states.empty()) m_states.top()->render(window);
+    if (!m_states.empty())
+        m_states.top()->render(window);
+    for (auto& state : m_statesToRenderOnTop)
+        state->render(window);
 }
 
-void StateManager::handleStateChange(const MenuStateMachine::StateAction action,
-                                     std::optional<std::unique_ptr<State>> newState)
+void StateManager::handleStateChange(const std::vector<MenuStateMachine::StateAction>& actionList,
+                                     std::vector<std::optional<std::shared_ptr<State>>> newStateList)
 {
-    if (action == MenuStateMachine::StateAction::Pop) popState();
-
-    if (newState)
+    for (int index = 0; index < actionList.size(); ++index)
     {
-        auto callback =
-            [this](const MenuStateMachine::StateAction action, std::optional<std::unique_ptr<State>> newState)
-        { this->handleStateChange(action, std::move(newState)); };
+        const auto& action = actionList.at(index);
+        if (action == MenuStateMachine::StateAction::Pop)
+            popState();
 
-        newState.value()->m_stateChangeCallback = callback;
-        pushState(std::move(newState.value()));
+
+        auto callback =
+            [this](const std::vector<MenuStateMachine::StateAction>& actionList,
+                   const std::vector<std::optional<std::shared_ptr<State>>>& newStateList)
+        {
+            this->handleStateChange(actionList, newStateList);
+        };
+        if (newStateList[index])
+        {
+            newStateList[index].value()->m_stateChangeCallback = callback;
+            pushState(newStateList[index].value(), action);
+        }
     }
 }

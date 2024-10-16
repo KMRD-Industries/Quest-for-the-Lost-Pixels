@@ -1,8 +1,9 @@
+#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-#include <TextureSystem.h>
-#include <imgui-SFML.h>
+
+#include "BackgroundSystem.h"
 #include "Config.h"
 #include "Coordinator.h"
 #include "Game.h"
@@ -13,6 +14,7 @@
 #include "TextTagSystem.h"
 
 Coordinator gCoordinator;
+PublicConfigSingleton configSingleton;
 
 void handleInput(sf::RenderWindow& window)
 {
@@ -48,15 +50,15 @@ void handleInput(sf::RenderWindow& window)
             const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
-        if (event.type == sf::Event::Closed) window.close();
+        if (event.type == sf::Event::Closed)
+            window.close();
     }
 }
 
 int main() {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!");
-
-    window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
+    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!",
+                            sf::Style::Fullscreen);
 
     int _ = ImGui::SFML::Init(window);
     window.setFramerateLimit(config::frameCycle * (config::debugMode ? 100 : 1));
@@ -84,6 +86,7 @@ int main() {
 
         ImGui::SFML::Render(window);
         window.display();
+
         handleInput(window);
     }
 
