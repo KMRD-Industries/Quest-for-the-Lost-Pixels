@@ -1,6 +1,7 @@
 #include "TextureSystem.h"
 #include <iostream>
 
+#include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"

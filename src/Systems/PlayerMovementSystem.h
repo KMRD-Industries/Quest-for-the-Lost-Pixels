@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "InputHandler.h"
 #include "System.h"
 

@@ -1,7 +1,5 @@
 #include "SpawnerSystem.h"
-
 #include <regex>
-
 #include "AnimationComponent.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
@@ -13,7 +11,6 @@
 #include "SpawnerComponent.h"
 #include "TextTagComponent.h"
 #include "TextureSystem.h"
-#include "TileComponent.h"
 #include "TransformComponent.h"
 
 extern PublicConfigSingleton configSingleton;

@@ -1,13 +1,10 @@
 #include "TextTagSystem.h"
-
 #include <iostream>
-
 #include "AnimationSystem.h"
 #include "Config.h"
 #include "GameUtility.h"
 #include "Paths.h"
 #include "TextTagComponent.h"
-#include "TileComponent.h"
 #include "TransformComponent.h"
 
 extern PublicConfigSingleton configSingleton;

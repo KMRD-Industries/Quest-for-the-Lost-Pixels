@@ -29,7 +29,6 @@ class ChestSpawnerSystem : public System
 {
 public:
     void spawnChest() const;
-    void spawnWeapon(const TransformComponent& spawnerTransformComponent) const;
     ChestSpawnerSystem();
     void init();
 
@@ -38,7 +37,6 @@ private:
     void spawnItem(const TransformComponent& spawnerTransformComponent, GameType::itemLootType itemType) const;
     void processSpawn(const TransformComponent&) const;
     void handleChestCollision(Entity chest, const GameType::CollisionData&) const;
-    void spawnPotion(const TransformComponent&) const;
 
     std::vector<AnimationData> m_itemsToAnimate;
     std::vector<std::pair<int, GameType::WeaponType> > m_weaponsIDs;

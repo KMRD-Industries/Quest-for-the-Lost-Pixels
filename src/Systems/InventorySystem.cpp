@@ -2,13 +2,12 @@
 #include "AnimationSystem.h"
 #include "BodyArmourComponent.h"
 #include "ColliderComponent.h"
-#include "CreateBodyWithCollisionEvent.h"
+#include "CollisionSystem.h"
 #include "EquipmentComponent.h"
 #include "GameTypes.h"
 #include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
-#include "Physics.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
@@ -53,12 +52,7 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const Gam
 void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) const
 {
     if (gCoordinator.hasComponent<PotionComponent>(pickUpItemInfo.itemEntity)) return;
-
-    if (gCoordinator.hasComponent<ColliderComponent>(pickUpItemInfo.itemEntity))
-    {
-        auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(pickUpItemInfo.itemEntity);
-        if (colliderComponent.body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent.body);
-    }
+    gCoordinator.getRegisterSystem<CollisionSystem>()->deleteBody(pickUpItemInfo.itemEntity);
 
     if (gCoordinator.hasComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity))
         gCoordinator.removeComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity);

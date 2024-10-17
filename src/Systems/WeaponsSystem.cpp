@@ -5,11 +5,7 @@
 #include "ColliderComponent.h"
 #include "EquipmentComponent.h"
 #include "GameUtility.h"
-#include "InventoryComponent.h"
-#include "InventorySystem.h"
-#include "ItemComponent.h"
 #include "Physics.h"
-#include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 

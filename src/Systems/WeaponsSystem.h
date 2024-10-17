@@ -1,6 +1,5 @@
 #pragma once
 
-#include "RenderComponent.h"
 #include "System.h"
 #include "WeaponComponent.h"
 

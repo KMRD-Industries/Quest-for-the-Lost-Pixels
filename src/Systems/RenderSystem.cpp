@@ -145,7 +145,6 @@ void RenderSystem::setEquipment(const Entity entity)
         }
 
         if (!(itemPivot && itemPlacement)) return;
-
         if (reversed) reverseDisplay(*itemPivot, *itemPlacement);
 
         auto itemOrigin = getEquippedItemOrigin(*itemPlacement);

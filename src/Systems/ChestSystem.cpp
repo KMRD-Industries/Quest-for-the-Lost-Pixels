@@ -3,7 +3,6 @@
 #include "AnimationSystem.h"
 #include "ColliderComponent.h"
 #include "ItemComponent.h"
-#include "WeaponComponent.h"
 
 void ChestSystem::deleteItems() const
 {

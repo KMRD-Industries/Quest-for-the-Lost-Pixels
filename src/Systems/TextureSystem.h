@@ -1,11 +1,7 @@
-//
-// Created by dominiq on 5/11/24.
-//
 #pragma once
 
 #include <unordered_map>
 #include <vector>
-#include "AnimationComponent.h"
 #include "AnimationFrame.h"
 #include "AtlasComponents/Texture.h"
 #include "GameTypes.h"

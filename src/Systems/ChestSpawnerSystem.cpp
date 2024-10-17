@@ -1,5 +1,4 @@
 #include "ChestSpawnerSystem.h"
-
 #include "AnimationComponent.h"
 #include "BodyArmourComponent.h"
 #include "CharacterComponent.h"

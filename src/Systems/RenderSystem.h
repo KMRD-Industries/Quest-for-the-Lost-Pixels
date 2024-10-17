@@ -6,10 +6,6 @@
 #include "SFML/System/Vector2.hpp"
 #include "SFML/Window/Window.hpp"
 #include "System.h"
-#include "TransformComponent.h"
-#include "WeaponComponent.h"
-
-#include <functional>
 #include <vector>
 
 namespace sf
