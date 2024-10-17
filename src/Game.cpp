@@ -1,16 +1,11 @@
 #include "Game.h"
-
 #include <TextureSystem.h>
-
+#include "ButtonSystem.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
-#include "CreateBodyWithCollisionEvent.h"
-#include "FightActionEvent.h"
 #include "FightSystem.h"
-#include "ObjectCreatorSystem.h"
-#include "RenderComponent.h"
+#include "MainMenuState.h"
 #include "RenderSystem.h"
-#include "TransformComponent.h"
 
 extern Coordinator gCoordinator;
 

@@ -11,6 +11,7 @@
 #include "EnemySystem.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
+#include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -75,21 +76,20 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
         {
             if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
-            auto &playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
+            auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;
 
             playerCharacterComponent.hp -= enemyConfig.damage;
 
             const Entity tag = gCoordinator.createEntity();
             gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});
-            gCoordinator.addComponent(tag, TransformComponent{
-                                          gCoordinator.getComponent<TransformComponent>(collisionData.entityID)
-                                      });
+            gCoordinator.addComponent(
+                tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collisionData.entityID)});
 
             if (!config::applyKnockback) return;
 
-            auto &playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
-            auto &myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
+            auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
+            auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
 
             b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -
                                       myCollisionComponent.body->GetPosition()};
@@ -116,10 +116,12 @@ void SpawnerSystem::clearSpawners()
     }
 }
 
-void SpawnerSystem::spawnEnemies() {
-    for (const auto entity: m_entities) {
-        auto &spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto &spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+void SpawnerSystem::spawnEnemies()
+{
+    for (const auto entity : m_entities)
+    {
+        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
+        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
     cleanUpUnnecessarySpawners();

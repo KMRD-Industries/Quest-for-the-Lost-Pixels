@@ -1,24 +1,17 @@
 #include "PlayerMovementSystem.h"
-
 #include <EquipmentComponent.h>
-
-#include "AnimationComponent.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
-#include "EquipWeaponSystem.h"
 #include "FightActionEvent.h"
 #include "InputHandler.h"
 #include "InventorySystem.h"
 #include "ItemSystem.h"
 #include "Physics.h"
-#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextTagComponent.h"
-#include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
-#include "WeaponsSystem.h"
 #include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;

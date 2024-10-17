@@ -1,10 +1,4 @@
-#include <chrono>
-#include <format>
-
-#include <comm.pb.h>
-
 #include "Dungeon.h"
-
 #include <BodyArmourComponent.h>
 #include <CreateBodyWithCollisionEvent.h>
 #include <EquipmentComponent.h>
@@ -14,7 +8,9 @@
 #include <PassageComponent.h>
 #include <PotionComponent.h>
 #include <RenderSystem.h>
-
+#include <chrono>
+#include <comm.pb.h>
+#include <format>
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
 #include "CharacterComponent.h"
@@ -30,7 +26,6 @@
 #include "EndGameState.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
-#include "EquipWeaponSystem.h"
 #include "HealthBarSystem.h"
 #include "InputHandler.h"
 #include "InventoryComponent.h"
@@ -125,19 +120,13 @@ void Dungeon::render(sf::RenderWindow& window)
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponent(player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5});
-    gCoordinator.addComponent(player, RenderComponent{});
-    gCoordinator.addComponent(player, TransformComponent{GameUtility::startingPosition});
-    gCoordinator.addComponent(player, AnimationComponent{});
-    gCoordinator.addComponent(player, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
-    gCoordinator.addComponent(player, PlayerComponent{});
-    gCoordinator.addComponent(player, ColliderComponent{});
-    gCoordinator.addComponent(player, InventoryComponent{});
-    gCoordinator.addComponent(player, EquipmentComponent{});
-    gCoordinator.addComponent(player, FloorComponent{});
-    gCoordinator.addComponent(
-        player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
-    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
+    gCoordinator.addComponents(
+        player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
+        TransformComponent{GameUtility::startingPosition}, AnimationComponent{},
+        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP}, PlayerComponent{},
+        ColliderComponent{}, InventoryComponent{}, EquipmentComponent{}, FloorComponent{},
+        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }},
+        PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
 
 void Dungeon::createRemotePlayer(const uint32_t id)
@@ -262,10 +251,7 @@ void Dungeon::update(const float deltaTime)
     m_travellingSystem->update();
     m_passageSystem->update();
     m_characterSystem->update();
-    m_animationSystem->update(deltaTime);
-    m_textTagSystem->update();
-    m_roomListenerSystem->update(deltaTime);
-    m_itemSpawnerSystem->updateAnimation(deltaTime);
+    m_textTagSystem->update(deltaTime);
 
     if (m_multiplayerSystem->isConnected())
     {
