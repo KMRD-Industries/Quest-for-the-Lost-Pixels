@@ -120,11 +120,17 @@ void Dungeon::render(sf::RenderWindow& window)
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponents(
-        player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
-        TransformComponent{GameUtility::startingPosition}, AnimationComponent{},
-        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP}, PlayerComponent{},
-        ColliderComponent{}, InventoryComponent{}, EquipmentComponent{}, FloorComponent{},
+    gCoordinator.addComponents(player,
+        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5},
+        RenderComponent{},
+        TransformComponent{GameUtility::startingPosition},
+        AnimationComponent{},
+        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
+        PlayerComponent{},
+        ColliderComponent{},
+        InventoryComponent{},
+        EquipmentComponent{},
+        FloorComponent{},
         TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }},
         PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
@@ -134,18 +140,16 @@ void Dungeon::createRemotePlayer(const uint32_t id)
     const auto tag = std::format("Player {}", id);
     m_entities[id] = gCoordinator.createEntity();
 
-    gCoordinator.addComponent(
-        m_entities[id],
+    gCoordinator.addComponents(m_entities[id],
         TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, id),
                                         getSpawnOffset(configSingleton.GetConfig().startingPosition.y, id)),
-                           0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}));
-    gCoordinator.addComponent(m_entities[id],
-                              TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3});
-    gCoordinator.addComponent(m_entities[id], RenderComponent{});
-    gCoordinator.addComponent(m_entities[id], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
-    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
-    gCoordinator.addComponent(m_entities[id], ColliderComponent{});
+                           0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
+        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3},
+        RenderComponent{},
+        AnimationComponent{},
+        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
+        MultiplayerComponent{},
+        ColliderComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
         "Characters", configSingleton.GetConfig().playerAnimation);
