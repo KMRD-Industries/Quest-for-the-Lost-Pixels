@@ -2,7 +2,6 @@
 
 #include "ButtonSystem.h"
 #include "ColliderComponent.h"
-#include "CollisionSystem.h"
 #include "Coordinator.h"
 #include "MainMenuState.h"
 #include "RenderSystem.h"
@@ -20,7 +19,4 @@ void Game::draw(sf::RenderWindow& window)
     m_stateManager.render(window);
 }
 
-void Game::update(const float deltaTime)
-{
-    m_stateManager.update(deltaTime);
-}
+void Game::update(const float deltaTime) { m_stateManager.update(deltaTime); }

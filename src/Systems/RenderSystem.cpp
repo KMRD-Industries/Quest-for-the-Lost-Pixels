@@ -8,6 +8,7 @@
 #include "Coordinator.h"
 #include "EnemyComponent.h"
 #include "GameUtility.h"
+#include "ItemComponent.h"
 #include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
@@ -82,6 +83,9 @@ void RenderSystem::updateSprite(const Entity entity)
 
     displayDamageTaken(entity);
     displayPortal(entity);
+
+    if (gCoordinator.hasComponent<ItemComponent>(entity))
+        if (gCoordinator.getComponent<ItemComponent>(entity).equipped == false) renderComponent.layer = 4;
 
     if (tileComponent.tileSet == "SpecialBlocks" && configSingleton.GetConfig().debugMode)
         tiles[renderComponent.layer + 2].emplace_back(&renderComponent.sprite, &renderComponent.dirty);
@@ -444,13 +448,14 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
             window.draw(swordLine);
         }
 
-
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (colliderComponent.body == nullptr) continue;
 
         for (b2Fixture* fixture = colliderComponent.body->GetFixtureList(); fixture; fixture = fixture->GetNext())
         {
+            if (fixture->GetShape() == nullptr) return;
+
             b2Shape* shape = fixture->GetShape();
             if (shape->GetType() == b2Shape::e_polygon)
             {

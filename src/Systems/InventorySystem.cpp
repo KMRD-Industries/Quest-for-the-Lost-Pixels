@@ -54,8 +54,11 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
 {
     if (gCoordinator.hasComponent<PotionComponent>(pickUpItemInfo.itemEntity)) return;
 
-    if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(pickUpItemInfo.itemEntity))
-        if (colliderComponent->body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent->body);
+    if (gCoordinator.hasComponent<ColliderComponent>(pickUpItemInfo.itemEntity))
+    {
+        auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(pickUpItemInfo.itemEntity);
+        if (colliderComponent.body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent.body);
+    }
 
     if (gCoordinator.hasComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity))
         gCoordinator.removeComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity);
@@ -65,9 +68,7 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
     auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(pickUpItemInfo.characterEntity);
 
     if (const auto it = equipment.find(pickUpItemInfo.slot); it != equipment.end())
-    {
         dropItem(pickUpItemInfo.characterEntity, it->second, it->first);
-    }
 
     equipment.emplace(pickUpItemInfo.slot, pickUpItemInfo.itemEntity);
 }
