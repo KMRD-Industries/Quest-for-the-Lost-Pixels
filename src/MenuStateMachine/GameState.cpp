@@ -20,7 +20,7 @@ void GameState::handleCollision(const float deltaTime)
 {
     const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     constexpr auto timeStep = 1.f / 60.f;
-    collisionSystem->update();
+    collisionSystem->update(deltaTime);
     collisionSystem->updateSimulation(timeStep, 8, 3);
 }
 

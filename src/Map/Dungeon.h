@@ -22,6 +22,7 @@
 #include "HealthBarSystem.h"
 #include "InventorySystem.h"
 #include "ItemSpawnerSystem.h"
+#include "ItemSystem.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
 #include "PassageSystem.h"
@@ -46,6 +47,7 @@ public:
     void moveDownDungeon();
     void setupPlayerCollision(Entity player);
     void setupWeaponEntity(Entity player) const;
+    void setupHelmetEntity(Entity player) const;
     void update(float deltaTime);
     void makeStartFloor();
 
@@ -89,10 +91,10 @@ private:
     WeaponSystem* m_weaponSystem;
     TextTagSystem* m_textTagSystem;
     HealthBarSystem* m_healthBarSystem;
-    EquipWeaponSystem* m_equipWeaponSystem;
     InventorySystem* m_inventorySystem;
     CollisionSystem* m_collisionSystem;
     ChestSystem* m_chestSystem;
     RoomListenerSystem* m_roomListenerSystem;
     ItemSpawnerSystem* m_itemSpawnerSystem;
+    ItemSystem *m_itemSystem;
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "Config.h"
 
-struct InventoryComponent
+struct EquipmentComponent
 {
     std::unordered_map<GameType::slotType, Entity, GameType::slotTypeHash> slots{};
 };

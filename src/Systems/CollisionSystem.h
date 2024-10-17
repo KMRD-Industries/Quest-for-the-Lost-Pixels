@@ -21,9 +21,9 @@ class CollisionSystem : public System
 {
 public:
     void init();
-    void update() const;
-
+    void update(const float&);
     void createMapCollision();
+    void performFixedUpdate() const;
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations) const;
 
     CollisionSystem();
@@ -39,4 +39,5 @@ public:
 
 private:
     MyContactListener m_myContactListenerInstance;
+    float m_frameTime{};
 };

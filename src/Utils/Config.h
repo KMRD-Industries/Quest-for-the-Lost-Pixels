@@ -185,50 +185,43 @@ namespace config
 
     inline std::unordered_map<std::string, _entityCategory> categoriesLookup{
         {"Wall", BOUNDARY}, {"Bullet", BULLET}, {"Enemy", ENEMY}, {"Passage", PASSAGE},
-        {"Item", ITEM}, {"Player", PLAYER}, {"Door", DOOR}};
+        {"Item", ITEM},     {"Player", PLAYER}, {"Door", DOOR}};
 
     inline std::unordered_map<std::string, uint16> bitMaskLookup{
         {"Wall", BOUNDARY | PLAYER | ENEMY | BULLET | ITEM}, // Wall collides with everything
         {"Bullet", BOUNDARY | ENEMY}, // Bullet only collides with walls and enemies
         {"Enemy", BOUNDARY | PLAYER}, // Enemy collides with walls and players
         {"Passage", BOUNDARY | PLAYER}, // Passage collides with walls and players
-        {"Item", BOUNDARY | PLAYER}, // Item only collides with walls and players
+        {"Item", BOUNDARY}, // Item only collides with walls and players
         {"Player", BOUNDARY | ENEMY | ITEM}, // Player collides with walls, enemies, and items
         {"Door", BOUNDARY | PLAYER} // Door collides with walls and players
     };
 
     inline uint16 stringToCategoryBits(const std::string& str)
     {
-        if (categoriesLookup.contains(str))
-            return categoriesLookup[str];
+        if (categoriesLookup.contains(str)) return categoriesLookup[str];
 
-        if (std::regex_match(str, playerRegexTag))
-            return categoriesLookup["Player"];
+        if (std::regex_match(str, playerRegexTag)) return categoriesLookup["Player"];
 
-        if (str == "Chest")
-            return categoriesLookup["Item"];
+        if (str == "Chest" || str == "Potion") return categoriesLookup["Passage"];
 
         return 0x0000;
     }
 
     inline uint16 stringToMaskBits(const std::string& str)
     {
-        if (bitMaskLookup.contains(str))
-            return bitMaskLookup[str];
+        if (bitMaskLookup.contains(str)) return bitMaskLookup[str];
 
-        if (std::regex_match(str, playerRegexTag))
-            return bitMaskLookup["Player"];
+        if (std::regex_match(str, playerRegexTag)) return bitMaskLookup["Player"];
 
-        if (str == "Chest")
-            return bitMaskLookup["Item"];
+        if (str == "Chest" || str == "Potion") return bitMaskLookup["Passage"];
 
         return 0x0000;
     }
 
     inline uint16 stringToIndexGroup(const std::string& str)
     {
-        if (str == "Bullet")
-            return -8;
+        if (str == "Bullet") return -8;
         return 0;
     }
 } // namespace config
