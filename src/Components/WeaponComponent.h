@@ -1,24 +1,26 @@
 #pragma once
-#include "Config.h"
+#include "PublicConfigMenager.h"
+
+extern PublicConfigSingleton configSingleton;
 
 struct WeaponComponent
 {
     uint32_t id{};
-    int damageAmount{config::weaponComponentDefaultDamageAmount};
-    bool isAttacking{config::weaponComponentDefaultIsAttacking};
-    bool queuedAttack{config::weaponComponentDefaultQueuedAttack};
-    bool queuedAttackFlag{config::weaponComponentDefaultQueuedAttackFlag};
+    int damageAmount{configSingleton.GetConfig().weaponComponentDefaultDamageAmount};
+    bool isAttacking{configSingleton.GetConfig().weaponComponentDefaultIsAttacking};
+    bool queuedAttack{configSingleton.GetConfig().weaponComponentDefaultQueuedAttack};
+    bool queuedAttackFlag{configSingleton.GetConfig().weaponComponentDefaultQueuedAttackFlag};
 
-    bool isSwingingForward{config::weaponComponentDefaultIsSwingingForward};
-    bool isFacingRight{config::weaponComponentDefaultIsFacingRight};
+    bool isSwingingForward{configSingleton.GetConfig().weaponComponentDefaultIsSwingingForward};
+    bool isFacingRight{configSingleton.GetConfig().weaponComponentDefaultIsFacingRight};
 
-    float currentAngle{config::weaponComponentDefaultCurrentAngle};
-    float initialAngle{config::weaponComponentDefaultInitialAngle};
-    float rotationSpeed{config::weaponComponentDefaultRotationSpeed};
+    float currentAngle{configSingleton.GetConfig().weaponComponentDefaultCurrentAngle};
+    float initialAngle{configSingleton.GetConfig().weaponComponentDefaultInitialAngle};
+    float rotationSpeed{configSingleton.GetConfig().weaponComponentDefaultRotationSpeed};
 
-    float swingDistance{config::weaponComponentDefaultSwingDistance};
-    float remainingDistance{config::weaponComponentDefaultRemainingDistance};
-    float recoilAmount{config::weaponComponentDefaultRecoilAmount};
+    float swingDistance{configSingleton.GetConfig().weaponComponentDefaultSwingDistance};
+    float remainingDistance{configSingleton.GetConfig().weaponComponentDefaultRemainingDistance};
+    float recoilAmount{configSingleton.GetConfig().weaponComponentDefaultRecoilAmount};
 
     sf::Vector2f pivotPoint{};
     sf::Vector2f targetPoint{};

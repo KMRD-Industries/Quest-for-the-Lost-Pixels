@@ -63,7 +63,11 @@ void CollisionSystem::createMapCollision()
         const Entity newMapCollisionEntity = gCoordinator.createEntity();
 
         const auto newEvent = CreateBodyWithCollisionEvent(
-            entity, type, [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, isStatic,
+            entity, type, [](const GameType::CollisionData&)
+            {
+            }, [](const GameType::CollisionData&)
+            {
+            }, isStatic,
             useTexture);
 
         gCoordinator.addComponent(newMapCollisionEntity, newEvent);
@@ -77,9 +81,7 @@ void CollisionSystem::createMapCollision()
         if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
             gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
             gCoordinator.hasComponent<MultiplayerComponent>(entity))
-        {
             continue;
-        }
 
         if (tileComponent.tileSet == "SpecialBlocks")
         {
@@ -90,8 +92,7 @@ void CollisionSystem::createMapCollision()
                 createCollisionBody(entity, "Door", true, false);
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
-                if (const auto* passageComponent = gCoordinator.tryGetComponent<PassageComponent>(entity))
-                    if (passageComponent->activePassage) createCollisionBody(entity, "Passage", true, true);
+                createCollisionBody(entity, "Passage", true, true);
         }
         else
         {
@@ -109,15 +110,15 @@ void CollisionSystem::update() const
         auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-        if (!transformComponent.velocity.IsValid()) continue;
+        if (!transformComponent.velocity.IsValid())
+            continue;
 
         b2Body* body = colliderComponent.body;
-        if (body == nullptr) continue;
+        if (body == nullptr)
+            continue;
 
         if (colliderComponent.tag == "Item")
-        {
             body->ApplyForceToCenter({transformComponent.velocity.x, transformComponent.velocity.y}, true);
-        }
         else
         {
             body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
@@ -141,11 +142,12 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
         const b2Body* body = colliderComponent.body;
-        if (body == nullptr) continue;
+        if (body == nullptr)
+            continue;
         const auto position = body->GetPosition();
 
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
-        transformComponent.rotation = body->GetAngle() * 180.f / 3.131516;
+        transformComponent.rotation = body->GetAngle() * 180.f / M_PI;
         renderComponent.sprite.setPosition(position.x, position.y);
         renderComponent.dirty = true;
     }
@@ -155,7 +157,8 @@ void CollisionSystem::deleteBody(const Entity entity) const
 {
     if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
     {
-        if (colliderComponent->body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent->body);
+        if (colliderComponent->body != nullptr)
+            Physics::getWorld()->DestroyBody(colliderComponent->body);
         colliderComponent->body = nullptr;
         colliderComponent->collision = {};
     }
@@ -168,11 +171,13 @@ void CollisionSystem::deleteMarkedBodies() const
     for (const auto& entity : m_entities)
     {
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-        if (!colliderComponent.toDestroy) continue;
+        if (!colliderComponent.toDestroy)
+            continue;
         deleteBody(entity);
         entityToKill.insert(entity);
     }
 
-    for (auto& entity : entityToKill) gCoordinator.destroyEntity(entity);
+    for (auto& entity : entityToKill)
+        gCoordinator.destroyEntity(entity);
     entityToKill.clear();
 }
