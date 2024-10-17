@@ -1,8 +1,10 @@
 #include "InventorySystem.h"
 #include "AnimationSystem.h"
+#include "BodyArmourComponent.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "EquipmentComponent.h"
+#include "GameTypes.h"
 #include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
@@ -12,11 +14,9 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-extern PublicConfigSingleton configSingleton;
-
 void InventorySystem::dropItem(const Entity player, const Entity item, const GameType::slotType slot) const
 {
-    auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(player);
+    auto &equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
     const Entity newItemEntity = gCoordinator.createEntity();
 
     gCoordinator.addComponents(
@@ -31,34 +31,34 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const Gam
     {
     case GameType::slotType::WEAPON:
         {
-            gCoordinator.addComponent(newItemEntity, WeaponComponent{gCoordinator.getComponent<WeaponComponent>(item)});
+            gCoordinator.addComponent(newItemEntity, gCoordinator.getComponent<WeaponComponent>(item));
             break;
         }
     case GameType::slotType::HELMET:
         {
-            gCoordinator.addComponent(newItemEntity, HelmetComponent{gCoordinator.getComponent<HelmetComponent>(item)});
+            gCoordinator.addComponent(newItemEntity, gCoordinator.getComponent<HelmetComponent>(item));
             break;
         }
     case GameType::slotType::BODY_ARMOUR:
         {
-            gCoordinator.addComponent(newItemEntity,
-                                      BodyArmourComponent{gCoordinator.getComponent<BodyArmourComponent>(item)});
+            gCoordinator.addComponent(newItemEntity, gCoordinator.getComponent<BodyArmourComponent>(item));
             break;
         }
-    default:
-        break;
     }
 
-    gCoordinator.destroyEntity(equipment.at(slot));
-    equipment.erase(slot);
+    gCoordinator.destroyEntity(equipmentComponent.slots.at(slot));
+    equipmentComponent.slots.erase(slot);
 }
 
 void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) const
 {
     if (gCoordinator.hasComponent<PotionComponent>(pickUpItemInfo.itemEntity)) return;
 
-    if (const auto *colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(pickUpItemInfo.itemEntity))
-        if (colliderComponent->body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent->body);
+    if (gCoordinator.hasComponent<ColliderComponent>(pickUpItemInfo.itemEntity))
+    {
+        auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(pickUpItemInfo.itemEntity);
+        if (colliderComponent.body != nullptr) Physics::getWorld()->DestroyBody(colliderComponent.body);
+    }
 
     if (gCoordinator.hasComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity))
         gCoordinator.removeComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity);

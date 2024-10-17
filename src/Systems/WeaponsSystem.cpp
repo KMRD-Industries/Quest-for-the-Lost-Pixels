@@ -4,6 +4,10 @@
 #include "AnimationSystem.h"
 #include "ColliderComponent.h"
 #include "EquipmentComponent.h"
+#include "GameUtility.h"
+#include "InventoryComponent.h"
+#include "InventorySystem.h"
+#include "ItemComponent.h"
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
@@ -11,13 +15,11 @@
 
 extern PublicConfigSingleton configSingleton;
 
-void WeaponSystem::init()
-{
 void WeaponSystem::update(const float &deltaTime)
 {
-    if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs)
+    if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 1000)
     {
-        m_frameTime -= config::oneFrameTimeMs;
+        m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
         performFixedUpdate();
     }
 }
@@ -33,31 +35,17 @@ void WeaponSystem::performFixedUpdate()
 
 inline void WeaponSystem::updateWeaponAngle(const Entity entity)
 {
-    auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
+    const auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
     auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
 
     if (!weaponComponent.isAttacking) return;
     rotateWeapon(entity, weaponComponent.isSwingingForward);
 }
 
-void WeaponSystem::deleteItems() const
+
+inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward)
 {
-    std::deque<Entity> entityToRemove;
-
-    for (const auto entity : m_entities)
-    {
-        if (gCoordinator.hasComponent<ColliderComponent>(entity))
-            gCoordinator.getComponent<ColliderComponent>(entity).toDestroy = true;
-        else
-            entityToRemove.push_back(entity);
-    }
-
-    for (const auto entity : entityToRemove) gCoordinator.destroyEntity(entity);
-}
-
-inline void WeaponSystem::rotateWeapon(const Entity entity, const bool forward)
-{
-    auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
+    const auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
     auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
 
     weaponComponent.remainingDistance -= weaponComponent.rotationSpeed;
@@ -91,12 +79,12 @@ inline void WeaponSystem::rotateWeapon(const Entity entity, const bool forward)
 
 inline void WeaponSystem::setAngle(const Entity entity)
 {
-    auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
+    const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+    const auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
     auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
-    auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+    const auto center = sf::Vector2f{transformComponent.position + GameUtility::mapOffset};
 
     weaponComponent.remainingDistance = weaponComponent.swingDistance;
-    const auto center = sf::Vector2f{transformComponent.position + GameUtility::mapOffset};
 
     // Calculate the vector from the player position to the mouse position.
     const sf::Vector2f mouseOffset = weaponComponent.pivotPoint - center;
@@ -122,7 +110,7 @@ inline void WeaponSystem::setAngle(const Entity entity)
 
 inline void WeaponSystem::updateStartingAngle(const Entity entity)
 {
-    auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
+    const auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
     auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
 
     if (weaponComponent.queuedAttack && !weaponComponent.isAttacking)

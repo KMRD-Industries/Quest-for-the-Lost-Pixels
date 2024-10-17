@@ -3,14 +3,15 @@
 #include <SFML/Window/Event.hpp>
 #include <TextureSystem.h>
 #include <imgui-SFML.h>
-#include "Config.h"
+
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
-#include "RenderSystem.h"
+#include "Paths.h"
+#include "PublicConfigMenager.h"
+#include "ResourceManager.h"
 #include "SpawnerSystem.h"
-#include "TextTagSystem.h"
 
 Coordinator gCoordinator;
 PublicConfigSingleton configSingleton;
@@ -22,7 +23,7 @@ void handleInput(sf::RenderWindow& window)
 
     while (window.pollEvent(event))
     {
-        ImGui::SFML::ProcessEvent(window, event);
+        ImGui::SFML::ProcessEvent(event);
 
         if (event.type == sf::Event::KeyPressed)
         {
@@ -46,45 +47,46 @@ void handleInput(sf::RenderWindow& window)
         }
         else if (event.type == sf::Event::MouseMoved)
         {
-            InputHandler::getInstance()->updateMousePosition(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+            const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+            InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
-        if (event.type == sf::Event::Closed)
-            window.close();
+        if (event.type == sf::Event::Closed) window.close();
     }
 }
 
-int main() {
+int main()
+{
+    configSingleton.LoadConfig(ASSET_PATH + std::string("/config.json"));
+    const PublicConfig& config = configSingleton.GetConfig();
+
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!",
-                            sf::Style::Fullscreen);
+    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!", sf::Style::Fullscreen);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config::frameCycle * (config::debugMode ? 100 : 1));
+    window.setFramerateLimit(config.debugMode ? 144 : config.frameCycle);
+    ImGui::CreateContext();
 
     sf::Clock deltaClock;
     Game game;
     game.init();
 
-    RenderSystem* m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
-    TextTagSystem* m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
-    TextureSystem* m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
-    BackgroundSystem* m_backgroundSystem = gCoordinator.getRegisterSystem<BackgroundSystem>().get();
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 160);
+    resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 40);
 
     while (window.isOpen())
     {
         sf::Time deltaTime = deltaClock.restart();
-        window.clear(m_textureSystem->getBackgroundColor());
+        window.clear(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor());
+
         ImGui::SFML::Update(window, deltaTime);
 
-        game.update(deltaTime.asMilliseconds());
+        game.update(static_cast<float>(deltaTime.asMilliseconds()));
         game.draw(window);
-
-        m_renderSystem->draw(window);
-        gCoordinator.getRegisterSystem<BackgroundSystem>()->draw(window);
-        gCoordinator.getRegisterSystem<TextTagSystem>()->render(window);
 
         ImGui::SFML::Render(window);
         window.display();
+
         handleInput(window);
     }
 

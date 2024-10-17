@@ -12,6 +12,7 @@
 #include "InventorySystem.h"
 #include "ItemComponent.h"
 #include "Physics.h"
+#include "PotionComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerSystem.h"
 #include "TransformComponent.h"
@@ -90,6 +91,7 @@ void ItemSystem::update()
     for (const auto entity : m_entities)
     {
         if (const auto &item = gCoordinator.getComponent<ItemComponent>(entity); item.equipped == true) continue;
+        if (gCoordinator.hasComponent<PotionComponent>(entity)) continue;
 
         const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         const float distanceX = transformComponent.position.x - playerTransformComponent.position.x;

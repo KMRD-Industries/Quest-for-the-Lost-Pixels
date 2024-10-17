@@ -3,7 +3,6 @@
 #include <TextureSystem.h>
 
 #include "ColliderComponent.h"
-#include "CollisionSystem.h"
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "FightActionEvent.h"

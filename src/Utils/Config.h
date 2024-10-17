@@ -200,7 +200,7 @@ namespace config
         {"Bullet", BOUNDARY | ENEMY}, // Bullet only collides with walls and enemies
         {"Enemy", BOUNDARY | PLAYER}, // Enemy collides with walls and players
         {"Passage", BOUNDARY | PLAYER}, // Passage collides with walls and players
-        {"Item", BOUNDARY | PLAYER}, // Item only collides with walls and players
+        {"Item", BOUNDARY}, // Item only collides with walls and players
         {"Player", BOUNDARY | ENEMY | ITEM}, // Player collides with walls, enemies, and items
         {"Door", BOUNDARY | PLAYER} // Door collides with walls and players
     };

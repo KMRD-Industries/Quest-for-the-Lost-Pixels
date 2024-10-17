@@ -9,14 +9,11 @@ struct WeaponComponent {
     bool isAttacking{configSingleton.GetConfig().weaponComponentDefaultIsAttacking};
     bool queuedAttack{configSingleton.GetConfig().weaponComponentDefaultQueuedAttack};
     bool queuedAttackFlag{configSingleton.GetConfig().weaponComponentDefaultQueuedAttackFlag};
-
     bool isSwingingForward{configSingleton.GetConfig().weaponComponentDefaultIsSwingingForward};
     bool isFacingRight{configSingleton.GetConfig().weaponComponentDefaultIsFacingRight};
-
     float currentAngle{configSingleton.GetConfig().weaponComponentDefaultCurrentAngle};
     float initialAngle{configSingleton.GetConfig().weaponComponentDefaultInitialAngle};
     float rotationSpeed{configSingleton.GetConfig().weaponComponentDefaultRotationSpeed};
-
     float swingDistance{configSingleton.GetConfig().weaponComponentDefaultSwingDistance};
     float remainingDistance{configSingleton.GetConfig().weaponComponentDefaultRemainingDistance};
     float recoilAmount{configSingleton.GetConfig().weaponComponentDefaultRecoilAmount};

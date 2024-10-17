@@ -2,6 +2,7 @@
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "Physics.h"
+#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 
@@ -13,13 +14,10 @@ void ObjectCreatorSystem::update()
     {
         const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
 
-        if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity))
-            continue;
-        if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity))
-            continue;
-        if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity))
-            continue;
-        if (config::debugMode)
+        if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity)) continue;
+        if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity)) continue;
+        if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity)) continue;
+        if (configSingleton.GetConfig().debugMode)
             std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
 
         switch (eventInfo.type)
@@ -64,12 +62,12 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
         objectPosition.x = convertPixelsToMeters(
             transformComponent.position.x -
             (spriteBounds.width / 2.f - (colliderComponent.collision.x + colliderComponent.collision.width / 2.f)) *
-            config::gameScale);
+                configSingleton.GetConfig().gameScale);
 
         objectPosition.y = convertPixelsToMeters(
             transformComponent.position.y -
             (spriteBounds.height / 2 - (colliderComponent.collision.y + colliderComponent.collision.height / 2)) *
-            config::gameScale);
+                configSingleton.GetConfig().gameScale);
     }
 
     bodyDef.position.Set(objectPosition.x, objectPosition.y);
@@ -101,7 +99,7 @@ b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEve
 
     auto spriteBounds = renderComponent.sprite.getGlobalBounds();
     b2PolygonShape boxShape;
-    sf::Vector2f objectSize {};
+    sf::Vector2f objectSize{};
 
     spriteBounds.height = std::min(spriteBounds.height, 16.f);
     spriteBounds.width = std::min(spriteBounds.width, 16.f);
@@ -113,10 +111,10 @@ b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEve
     }
     else
     {
-        objectSize.x = convertPixelsToMeters(colliderComponent.collision.width * configSingleton.GetConfig().gameScale)
-            / 2;
-        objectSize.y = convertPixelsToMeters(colliderComponent.collision.height * configSingleton.GetConfig().gameScale)
-            / 2;
+        objectSize.x =
+            convertPixelsToMeters(colliderComponent.collision.width * configSingleton.GetConfig().gameScale) / 2;
+        objectSize.y =
+            convertPixelsToMeters(colliderComponent.collision.height * configSingleton.GetConfig().gameScale) / 2;
     }
 
     boxShape.SetAsBox(objectSize.x, objectSize.y);
@@ -153,10 +151,7 @@ void ObjectCreatorSystem::clear()
 {
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity : m_entities)
-    {
-        entityToRemove.push_back(entity);
-    }
+    for (const auto entity : m_entities) entityToRemove.push_back(entity);
 
     while (!entityToRemove.empty())
     {

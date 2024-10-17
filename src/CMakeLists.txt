@@ -49,7 +49,6 @@ set(COMPONENTS
         Components/EnemyComponent.h
         Components/WeaponComponent.h
         Components/InventoryComponent.h
-        Components/EquipmentComponent.h
         Components/TextTagComponent.h
         Components/PassageComponent.h
         Components/FloorComponent.h
@@ -58,6 +57,7 @@ set(COMPONENTS
         Components/HelmetComponent.h
         Components/PotionComponent.h
         Components/BodyArmourComponent.h
+        Components/EquipmentComponent.h
 )
 
 set(UI_COMPONENTS

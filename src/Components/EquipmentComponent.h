@@ -3,5 +3,5 @@
 
 struct EquipmentComponent
 {
-    std::unordered_map<GameType::slotType, Entity, config::slotTypeHash> slots{};
+    std::unordered_map<GameType::slotType, Entity, GameType::slotTypeHash> slots{};
 };

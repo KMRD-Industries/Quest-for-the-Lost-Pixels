@@ -13,9 +13,9 @@ public:
     void clear();
 
 private:
+    void handleMeleeAttack(Entity) const;
     void handleCollision(Entity bullet, const GameType::CollisionData& collisionData) const;
     float calculateAngle(const sf::Vector2f& pivotPoint, const sf::Vector2f& targetPoint) const;
     void handleWandAttack(Entity) const;
     void handleBowAttack(Entity);
-    void handleMeleeAttack(Entity eventEntity);
 };

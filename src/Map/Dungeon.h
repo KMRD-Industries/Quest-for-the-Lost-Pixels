@@ -18,6 +18,7 @@
 #include "CollisionSystem.h"
 #include "DoorSystem.h"
 #include "EnemySystem.h"
+#include "EquipWeaponSystem.h"
 #include "HealthBarSystem.h"
 #include "InventorySystem.h"
 #include "ItemSpawnerSystem.h"
@@ -36,30 +37,31 @@
 class Dungeon
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1){};
+    Dungeon() : m_entities(MAX_ENTITIES - 1)
+    {
+    };
 
+    void init();
+    void render(sf::RenderWindow& window);
+    void addPlayerComponents(Entity player);
+    void moveDownDungeon();
+    void setupPlayerCollision(Entity player);
     void setupWeaponEntity(Entity player) const;
     void setupHelmetEntity(Entity player) const;
-    void init();
-    void addPlayerComponents(Entity player);
-    void setupPlayerCollision(Entity player);
-    void createRemotePlayer(uint32_t);
-
-    void draw();
-    void update(float);
+    void update(float deltaTime);
+    void makeStartFloor();
 
     StateChangeCallback m_stateChangeCallback;
 
 private:
     void setECS();
     void makeSimpleFloor();
-    void moveInDungeon(const glm::ivec2 &dir);
-    void clearDungeon() const;
-    void makeStartFloor();
-    void moveDownDungeon();
-    void loadMap(const std::string &path) const;
-    float getSpawnOffset(float, int);
-    void changeRoom(const glm::ivec2 &dir);
+    void createRemotePlayer(uint32_t id);
+    void moveInDungeon(const glm::ivec2& dir);
+    void changeRoom(const glm::ivec2& dir);
+    void clearDungeon();
+    void loadMap(const std::string& path) const;
+    float getSpawnOffset(float position, int id);
 
     std::string m_asset_path{ASSET_PATH};
     FloorGenerator m_floorGenerator{};
@@ -75,24 +77,24 @@ private:
     int m_dungeonDepth{1};
     bool m_endGame{};
 
-    PlayerMovementSystem *m_playerMovementSystem;
-    MultiplayerSystem *m_multiplayerSystem;
-    CharacterSystem *m_characterSystem;
-    MapSystem *m_mapSystem;
-    DoorSystem *m_doorSystem;
-    PassageSystem *m_passageSystem;
-    TravellingSystem *m_travellingSystem;
-    TextureSystem *m_textureSystem;
-    AnimationSystem *m_animationSystem;
-    EnemySystem *m_enemySystem;
-    SpawnerSystem *m_spawnerSystem;
-    WeaponSystem *m_weaponSystem;
-    TextTagSystem *m_textTagSystem;
-    HealthBarSystem *m_healthBarSystem;
-    InventorySystem *m_inventorySystem;
-    CollisionSystem *m_collisionSystem;
-    ChestSystem *m_chestSystem;
-    RoomListenerSystem *m_roomListenerSystem;
-    ItemSpawnerSystem *m_itemSpawnerSystem;
+    PlayerMovementSystem* m_playerMovementSystem;
+    MultiplayerSystem* m_multiplayerSystem;
+    CharacterSystem* m_characterSystem;
+    MapSystem* m_mapSystem;
+    DoorSystem* m_doorSystem;
+    PassageSystem* m_passageSystem;
+    TravellingSystem* m_travellingSystem;
+    TextureSystem* m_textureSystem;
+    AnimationSystem* m_animationSystem;
+    EnemySystem* m_enemySystem;
+    SpawnerSystem* m_spawnerSystem;
+    WeaponSystem* m_weaponSystem;
+    TextTagSystem* m_textTagSystem;
+    HealthBarSystem* m_healthBarSystem;
+    InventorySystem* m_inventorySystem;
+    CollisionSystem* m_collisionSystem;
+    ChestSystem* m_chestSystem;
+    RoomListenerSystem* m_roomListenerSystem;
+    ItemSpawnerSystem* m_itemSpawnerSystem;
     ItemSystem *m_itemSystem;
 };

@@ -5,6 +5,7 @@
 #include "CollisionSystem.h"
 #include "Coordinator.h"
 #include "Paths.h"
+#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/Image.hpp"
 #include "TextureParser.h"
@@ -15,7 +16,6 @@
 
 extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
-
 
 void TextureSystem::init() { loadTexturesFromFiles(); }
 
@@ -71,9 +71,7 @@ long TextureSystem::initializeTileSet(const Tileset& parsedTileSet)
 
     // Load image from assets folder
     if (!image.loadFromFile(std::string(ASSET_PATH) + "/floorAtlas/" + parsedTileSet.image + ".png"))
-    {
         throw std::runtime_error("Cannot open image: " + parsedTileSet.image);
-    }
 
     // Store the starting ID (gid) of the loaded tile set.
     m_mapTextureIndexes.emplace(parsedTileSet.name, gid);
@@ -101,14 +99,10 @@ void TextureSystem::loadTilesIntoSystem(const Tileset& parsedTileSet, long& gid)
 
     // Load all tiles into the system
     for (int row = 0; row < numTilesVertically; ++row)
-    {
         for (int col = 0; col < numTilesHorizontally; ++col)
-        {
             m_mapTextureRects.emplace(gid++,
                                       sf::IntRect(col * parsedTileSet.tilewidth, row * parsedTileSet.tileheight,
                                                   parsedTileSet.tilewidth, parsedTileSet.tileheight));
-        }
-    }
 
     m_lNoTextures = static_cast<long>(m_mapTextureRects.size());
 }
@@ -121,43 +115,45 @@ void TextureSystem::loadTilesIntoSystem(const Tileset& parsedTileSet, long& gid)
  */
 void TextureSystem::loadAnimationsAndCollisionsIntoSystem(const Tileset& parsedTileSet, const long& firstGid)
 {
-    for (const auto& [id,properties, animation, objects] : parsedTileSet.tiles)
+    for (const auto& [id, properties, animation, objects] : parsedTileSet.tiles)
     {
         // Adjust tile with a tile set id.
         const long adjusted_id = firstGid + id;
 
-        if (!animation.empty())
-        {
-            m_mapAnimations.emplace(adjusted_id, animation);
-        }
+        if (!animation.empty()) m_mapAnimations.emplace(adjusted_id, animation);
 
         if (!objects.empty())
         {
             for (const auto& object : objects)
-            {
                 // If an object contains more than one property, it's a weapon placement object.
-                if (object.properties.size() >= 2) {
-                    for (auto &property: object.properties) {
-                        if (property.name == "helmetPlacement") {
+                if (object.properties.size() >= 2)
+                {
+                    for (auto& property : object.properties)
+                    {
+                        if (property.name == "helmetPlacement")
+                        {
                             m_mapHelmetPlacements.emplace(adjusted_id, object);
                             if (id <= 180) m_helmets.push_back(id);
                         }
 
-                        if (property.name == "weaponPlacement") {
+                        if (property.name == "weaponPlacement")
+                        {
                             m_mapWeaponPlacements.emplace(adjusted_id, object);
                             if (id <= 180)
                                 m_weaponsIDs.emplace_back(id, GameType::stringToWeaponType(properties[0].value));
                         }
 
-                        if (property.name == "bodyArmourPlacement") {
+                        if (property.name == "bodyArmourPlacement")
+                        {
                             m_mapBodyArmourPlacement.emplace(adjusted_id, object);
                             if (id <= 180) m_bodyArmours.push_back(id);
                         }
                     }
-                } else {
+                }
+                else
+                {
                     m_mapCollisions.emplace(adjusted_id, object);
                 }
-            }
         }
     }
 }
@@ -167,10 +163,7 @@ void TextureSystem::loadTexturesFromFiles()
     const auto prefix = std::string(ASSET_PATH) + "/tileSets/";
     const auto sufix = ".json";
 
-    for (const auto& texture : m_setTextureFiles)
-    {
-        loadFromFile(prefix + texture + sufix);
-    }
+    for (const auto& texture : m_setTextureFiles) loadFromFile(prefix + texture + sufix);
 }
 
 sf::Sprite TextureSystem::getTile(const std::string& tileSetName, const long id) const
@@ -181,10 +174,7 @@ sf::Sprite TextureSystem::getTile(const std::string& tileSetName, const long id)
     if (textureIter != m_mapTexturesWithColorSchemeApplied.end() && indexIter != m_mapTextureIndexes.end())
     {
         const auto rectIter = m_mapTextureRects.find(id + indexIter->second);
-        if (rectIter != m_mapTextureRects.end())
-        {
-            return {textureIter->second, rectIter->second};
-        }
+        if (rectIter != m_mapTextureRects.end()) return {textureIter->second, rectIter->second};
     }
 
     std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET SPRITE\n";
@@ -198,10 +188,7 @@ Collision TextureSystem::getCollision(const std::string& tileSetName, const long
     if (indexIter != m_mapTextureIndexes.end())
     {
         auto collisionIter = m_mapCollisions.find(id + indexIter->second);
-        if (collisionIter != m_mapCollisions.end())
-        {
-            return collisionIter->second;
-        }
+        if (collisionIter != m_mapCollisions.end()) return collisionIter->second;
     }
 
     // std::cout << "ERROR::TEXTURE_SYSTEM::GET_COLLISION::COULD NOT GET COLLISION\n";
@@ -215,10 +202,7 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
     if (indexIter != m_mapTextureIndexes.end())
     {
         auto animIter = m_mapAnimations.find(id + indexIter->second);
-        if (animIter != m_mapAnimations.end())
-        {
-            return animIter->second;
-        }
+        if (animIter != m_mapAnimations.end()) return animIter->second;
     }
 
     std::cout << "ERROR::TEXTURE_SYSTEM::GET_ANIMATIONS::COULD NOT GET ANIMATIONS\n";
@@ -236,17 +220,11 @@ void TextureSystem::loadTextures()
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
         if (tileComponent.id < 0 || tileComponent.id > m_lNoTextures) // Ignore invalid values
-        {
             continue;
-        }
 
-        if (!m_setTextureFiles.contains(tileComponent.tileSet))
-            continue;
-        }
+        if (!m_setTextureFiles.contains(tileComponent.tileSet)) continue;
 
-        if (renderComponent.dirty == false && !gCoordinator.hasComponent<PlayerComponent>(entity) &&
-            !gCoordinator.hasComponent<ItemComponent>(entity))
-            continue;
+        // if (renderComponent.dirty == false) continue;
 
         // Adjust tile index
         long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
@@ -271,9 +249,9 @@ void TextureSystem::loadTextures()
             if (!gCoordinator.hasComponent<ColliderComponent>(entity))
                 gCoordinator.addComponent(entity, ColliderComponent{});
 
-            auto &cc = m_mapCollisions.at(adjusted_id);
-            auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-            auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            auto& cc = m_mapCollisions.at(adjusted_id);
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
             if (colliderComponent.body != nullptr && colliderComponent.collision != cc)
             {
@@ -281,8 +259,8 @@ void TextureSystem::loadTextures()
                 {
                     b2Vec2 offset = {(cc.x - colliderComponent.collision.x), (cc.y - colliderComponent.collision.y)};
 
-                    offset.x = convertPixelsToMeters(offset.x * configSingleton.GetConfig().gameScale);
-                    offset.y = convertPixelsToMeters(-offset.y * configSingleton.GetConfig().gameScale);
+                    offset.x = convertPixelsToMeters(offset.x * config::gameScale);
+                    offset.y = convertPixelsToMeters(-offset.y * config::gameScale);
 
                     colliderComponent.body->SetTransform(colliderComponent.body->GetPosition() + offset, 0);
 
@@ -294,18 +272,21 @@ void TextureSystem::loadTextures()
             colliderComponent.collision = cc;
         }
 
-        if (helmetPlacementsIter != m_mapHelmetPlacements.end()) {
-            auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        if (helmetPlacementsIter != m_mapHelmetPlacements.end())
+        {
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.helmetPlacement = m_mapHelmetPlacements.at(adjusted_id);
         }
 
-        if (weaponPlacementsIter != m_mapWeaponPlacements.end()) {
-            auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        if (weaponPlacementsIter != m_mapWeaponPlacements.end())
+        {
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.weaponPlacement = m_mapWeaponPlacements.at(adjusted_id);
         }
 
-        if (bodyArmourPlacementsIter != m_mapBodyArmourPlacement.end()) {
-            auto &colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        if (bodyArmourPlacementsIter != m_mapBodyArmourPlacement.end())
+        {
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.bodyArmourPlacement = m_mapBodyArmourPlacement.at(adjusted_id);
         }
 
@@ -336,7 +317,6 @@ void TextureSystem::modifyColorScheme(const int playerFloor)
 
     // Apply semitone filter for each pixel
     for (unsigned int x = 0; x < size.x; ++x)
-    {
         for (unsigned int y = 0; y < size.y; ++y)
         {
             sf::Color pixel = image.getPixel(x, y);
@@ -351,7 +331,6 @@ void TextureSystem::modifyColorScheme(const int playerFloor)
 
             image.setPixel(x, y, pixel);
         }
-    }
 
     // Replace texture with applied filter
     m_mapTexturesWithColorSchemeApplied.at(tileSet).loadFromImage(image);
@@ -376,8 +355,8 @@ void TextureSystem::modifyColorScheme(const int playerFloor)
 
     std::stringstream stringHex;
     stringHex << "#" << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << red << std::setw(2)
-        << std::setfill('0') << std::hex << std::uppercase << green << std::setw(2) << std::setfill('0')
-        << std::hex << std::uppercase << blue;
+              << std::setfill('0') << std::hex << std::uppercase << green << std::setw(2) << std::setfill('0')
+              << std::hex << std::uppercase << blue;
 
     m_currentBackgroundColor = stringHex.str();
 }
