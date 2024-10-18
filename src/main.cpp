@@ -101,6 +101,7 @@ int main()
         ImGui::SFML::Update(window, deltaTime);
 
         game.update(deltaTime.asSeconds());
+
         game.draw(window);
 
         ImGui::SFML::Render(window);

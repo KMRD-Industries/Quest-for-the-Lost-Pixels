@@ -55,6 +55,7 @@ set(COMPONENTS
         Components/FloorComponent.h
         Components/CreateBodyWithCollisionEvent.h
         Components/FightActionEvent.h
+        Components/SoundComponent.h
 )
 
 set(UI_COMPONENTS
@@ -119,6 +120,8 @@ set(SYSTEMS
         Systems/TextTagSystem.h
         Systems/PassageSystem.cpp
         Systems/PassageSystem.h
+		Systems/SoundSystem.cpp
+		Systems/SoundSystem.h
 )
 
 set(EVENT_SYSTEMS
@@ -198,7 +201,7 @@ include_directories(./UiComponents ./UiSystems ./Ui ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(qlp ${SOURCES} ${CORE} ${EVENT_SYSTEMS} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS} ${MENU_STATE_MACHINE} ${UI_COMPONENTS} ${UI_SYSTEMS} ${UI})
 
-target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
+target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics sfml-audio ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
 
 if (WIN32)
     target_link_libraries(qlp PRIVATE ws2_32)
