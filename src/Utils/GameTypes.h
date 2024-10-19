@@ -9,6 +9,17 @@
 
 #define M_PI 3.1415927f
 
+namespace Sound
+{
+    enum class Type
+    {
+        PlayerShoot,
+        EnemyExplode,
+        BackgroundMusic,
+        PowerUp
+    };
+}
+
 namespace MenuStateMachine
 {
     enum class StateAction

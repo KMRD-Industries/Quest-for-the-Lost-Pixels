@@ -181,6 +181,11 @@ set(UI
         Ui/Text.cpp
 )
 
+set(Sounds
+        Sounds/SoundManager.h
+        Sounds/SoundPlayer.h
+)
+
 
 source_group("Core" FILES ${CORE})
 source_group("Components" FILES ${COMPONENTS})
@@ -193,13 +198,14 @@ source_group("MenuStateMachine" FILES ${MENU_STATE_MACHINE})
 source_group("UiComponents" FILES ${UI_COMPONENTS})
 source_group("UiSystems" FILES ${UI_SYSTEMS})
 source_group("Ui" FILES ${UI})
+source_group("Sounds" FILES ${Sounds})
 
 add_definitions(-D_ASSET_PATH=\"${ASSET_DIR}\")
 include_directories(./Core ./Components ./Systems ./Map ./Utils ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(./AtlasComponents ./Core ./Components ./Systems ./EventSystems ./MenuStateMachine ${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(./UiComponents ./UiSystems ./Ui ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(./UiComponents ./UiSystems ./Ui ./Sounds ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(qlp ${SOURCES} ${CORE} ${EVENT_SYSTEMS} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS} ${MENU_STATE_MACHINE} ${UI_COMPONENTS} ${UI_SYSTEMS} ${UI})
+add_executable(qlp ${SOURCES} ${CORE} ${EVENT_SYSTEMS} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS} ${MENU_STATE_MACHINE} ${UI_COMPONENTS} ${UI_SYSTEMS} ${UI} ${Sounds})
 
 target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics sfml-audio ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
 

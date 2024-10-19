@@ -15,7 +15,7 @@ void Game::init()
 {
     m_stateManager.handleStateChange({MenuStateMachine::StateAction::Push}, {std::make_unique<MainMenuState>()});
     auto backgroundMusic = gCoordinator.createEntity();
-    gCoordinator.addComponent(backgroundMusic, SoundComponent{ASSET_PATH + std::string("/sounds/backgroundSound.mp3")});
+    gCoordinator.addComponent(backgroundMusic, SoundComponent{.soundToPlay = Sound::Type::BackgroundMusic});
 }
 
 void Game::draw(sf::RenderWindow& window)
