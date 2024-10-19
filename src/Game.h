@@ -1,4 +1,10 @@
 #pragma once
+#include <RenderSystem.h>
+#include <TextureSystem.h>
+
+#include "CollisionSystem.h"
+#include "Coordinator.h"
+#include "Game.h"
 #include "StateMachine.h"
 
 class Game
@@ -10,4 +16,5 @@ public:
 
 private:
     StateManager m_stateManager;
+    CollisionSystem* m_collisionSystem{nullptr};
 };

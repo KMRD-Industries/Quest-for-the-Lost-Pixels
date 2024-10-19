@@ -18,10 +18,10 @@
 #include "CollisionSystem.h"
 #include "DoorSystem.h"
 #include "EnemySystem.h"
-#include "EquipWeaponSystem.h"
 #include "HealthBarSystem.h"
 #include "InventorySystem.h"
 #include "ItemSpawnerSystem.h"
+#include "ItemSystem.h"
 #include "MapSystem.h"
 #include "MultiplayerSystem.h"
 #include "PassageSystem.h"
@@ -36,9 +36,7 @@
 class Dungeon
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1)
-    {
-    };
+    Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
     void init();
     void render(sf::RenderWindow& window);
@@ -46,6 +44,7 @@ public:
     void moveDownDungeon();
     void setupPlayerCollision(Entity player);
     void setupWeaponEntity(Entity player) const;
+    void setupHelmetEntity(Entity player) const;
     void update(float deltaTime);
     void makeStartFloor();
 
@@ -89,10 +88,10 @@ private:
     WeaponSystem* m_weaponSystem;
     TextTagSystem* m_textTagSystem;
     HealthBarSystem* m_healthBarSystem;
-    EquipWeaponSystem* m_equipWeaponSystem;
     InventorySystem* m_inventorySystem;
     CollisionSystem* m_collisionSystem;
     ChestSystem* m_chestSystem;
     RoomListenerSystem* m_roomListenerSystem;
     ItemSpawnerSystem* m_itemSpawnerSystem;
+    ItemSystem* m_itemSystem;
 };

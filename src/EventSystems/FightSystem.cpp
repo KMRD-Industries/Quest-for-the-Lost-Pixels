@@ -1,9 +1,10 @@
 #include "FightSystem.h"
 
+#include <EquipmentComponent.h>
+
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
-#include "EquippedWeaponComponent.h"
 #include "FightActionEvent.h"
 #include "ObjectCreatorSystem.h"
 #include "Physics.h"
@@ -16,9 +17,7 @@ extern PublicConfigSingleton configSingleton;
 
 FightSystem::FightSystem() { init(); }
 
-void FightSystem::init()
-{
-}
+void FightSystem::init() {}
 
 void FightSystem::update()
 {
@@ -27,24 +26,25 @@ void FightSystem::update()
         const auto& [eventEntity] = gCoordinator.getComponent<FightActionEvent>(entity);
 
         // Start attack animation
-        const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);
-        auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
+        const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(eventEntity);
+        const auto& weaponComponent =
+            gCoordinator.getComponent<WeaponComponent>(equippedWeapon.slots.at(GameType::slotType::WEAPON));
 
         switch (weaponComponent.type)
         {
         case GameType::WeaponType::MELE:
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         case GameType::WeaponType::WAND:
             // TODO: Wand attack support
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         case GameType::WeaponType::BOW:
             // TODO: Bow attack support
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         default:
-            handleMeleAttack(eventEntity);
+            handleMeleeAttack(eventEntity);
             break;
         }
     }
@@ -52,20 +52,19 @@ void FightSystem::update()
     clear();
 }
 
-void FightSystem::handleBowAttack(Entity)
-{
-}
+void FightSystem::handleBowAttack(Entity) {}
 
-void FightSystem::handleMeleAttack(Entity eventEntity)
+void FightSystem::handleMeleeAttack(const Entity playerEntity) const
 {
-    auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventEntity);
-    const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(eventEntity);
-    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
+    const auto& playerRenderComponent = gCoordinator.getComponent<RenderComponent>(playerEntity);
+    const auto& [playerEquippedWeapon] = gCoordinator.getComponent<EquipmentComponent>(playerEntity);
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(playerEntity);
+    auto& weaponComponent =
+        gCoordinator.getComponent<WeaponComponent>(playerEquippedWeapon.at(GameType::slotType::WEAPON));
 
-    weaponComponent.isFacingRight = renderComponent.sprite.getScale().x > 0;
+    weaponComponent.isFacingRight = playerRenderComponent.sprite.getScale().x > 0;
     weaponComponent.queuedAttack = true;
 
-    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(eventEntity);
     const auto center = glm::vec2{transformComponent.position.x, transformComponent.position.y};
 
     // Calculate the direction vector using the angle in degrees
@@ -74,11 +73,10 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
         glm::sin(glm::radians(-weaponComponent.targetAngleDegrees)) // Sine of the angle
     };
 
-    const auto range = direction * (configSingleton.GetConfig().playerAttackRange *
-        std::abs(transformComponent.scale.x));
+    const auto range = direction * (config::playerAttackRange * std::abs(transformComponent.scale.x));
     const auto point2 = center + range;
 
-    const auto targetInBox = Physics::rayCast(center, point2, eventEntity);
+    const auto targetInBox = Physics::rayCast(center, point2, playerEntity);
 
     if (targetInBox.tag == "Enemy")
     {
@@ -93,7 +91,7 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
         characterComponent.attacked = true;
         characterComponent.hp -= configSingleton.GetConfig().playerAttackDamage;
 
-        const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(eventEntity).body->GetPosition();
+        const b2Vec2& attackerPos = gCoordinator.getComponent<ColliderComponent>(playerEntity).body->GetPosition();
         const b2Vec2& targetPos = colliderComponent.body->GetPosition();
 
         b2Vec2 recoilDirection = targetPos - attackerPos;
@@ -102,10 +100,10 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
         const float& recoilMagnitude = 20.0f;
         const b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
 
-        secondPlayertransformComponent.velocity.x += static_cast<float>(recoilVelocity.x * configSingleton.GetConfig().
-            meterToPixelRatio);
-        secondPlayertransformComponent.velocity.y += static_cast<float>(recoilVelocity.y * configSingleton.GetConfig().
-            meterToPixelRatio);
+        secondPlayertransformComponent.velocity.x +=
+            static_cast<float>(recoilVelocity.x * configSingleton.GetConfig().meterToPixelRatio);
+        secondPlayertransformComponent.velocity.y +=
+            static_cast<float>(recoilVelocity.y * configSingleton.GetConfig().meterToPixelRatio);
 
         b2Vec2 newPosition = colliderComponent.body->GetPosition() + 0.25 * recoilDirection;
         colliderComponent.body->SetTransform(newPosition, colliderComponent.body->GetAngle());
@@ -114,10 +112,8 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
 
 void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData& collisionData) const
 {
-    if (std::regex_match(collisionData.tag, config::playerRegexTag))
-        return;
-    if (collisionData.tag == "Bullet")
-        return;
+    if (std::regex_match(collisionData.tag, config::playerRegexTag)) return;
+    if (collisionData.tag == "Bullet") return;
 
     if (collisionData.tag == "Enemy")
     {
@@ -150,8 +146,7 @@ void FightSystem::clear()
 {
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity : m_entities)
-        entityToRemove.push_back(entity);
+    for (const auto entity : m_entities) entityToRemove.push_back(entity);
 
     while (!entityToRemove.empty())
     {

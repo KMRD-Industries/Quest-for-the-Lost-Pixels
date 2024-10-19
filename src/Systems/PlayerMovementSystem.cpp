@@ -1,22 +1,17 @@
 #include "PlayerMovementSystem.h"
-
-#include "AnimationComponent.h"
+#include <EquipmentComponent.h>
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
-#include "EquipWeaponSystem.h"
-#include "EquippedWeaponComponent.h"
 #include "FightActionEvent.h"
 #include "InputHandler.h"
 #include "InventorySystem.h"
+#include "ItemSystem.h"
 #include "Physics.h"
-#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextTagComponent.h"
-#include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
-#include "WeaponsSystem.h"
 #include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;
@@ -30,24 +25,30 @@ void PlayerMovementSystem::update(const float deltaTime)
 {
     handleAttack();
     handlePickUpAction();
+    handleSpecialKeys();
 
-    m_frameTime += deltaTime;
-    if (m_frameTime <= configSingleton.GetConfig().oneFrameTime)
-        return;
-    m_frameTime = 0;
+    if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 1000)
+    {
+        handleMovement();
+        m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
+    }
+}
 
-    handleMovement();
+void PlayerMovementSystem::handleSpecialKeys()
+{
+    // TODO: special keys
 }
 
 void PlayerMovementSystem::handlePickUpAction()
 {
     const auto inputHandler{InputHandler::getInstance()};
 
-    if (!inputHandler->isPressed(InputType::PickUpItem))
-        return;
+    if (!inputHandler->isPressed(InputType::PickUpItem)) return;
 
-    for (const auto entity : m_entities)
-        gCoordinator.getRegisterSystem<WeaponSystem>()->weaponInput(entity);
+    for (auto const entity : m_entities)
+    {
+        gCoordinator.getRegisterSystem<ItemSystem>()->input(entity);
+    }
 }
 
 void PlayerMovementSystem::handleMovement()
@@ -72,27 +73,32 @@ void PlayerMovementSystem::handleMovement()
     {
         // Handle Movement
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
-        const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(entity);
-
+        const auto& equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
         const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
-        const auto playerSpeed = glm::vec2{normalizedDir.x * configSingleton.GetConfig().playerAcc,
-                                           normalizedDir.y * configSingleton.GetConfig().playerAcc};
+        const auto playerSpeed = glm::vec2{normalizedDir.x * config::playerAcc, normalizedDir.y * config::playerAcc};
 
         transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
 
-        // Mirroring view if necessary
-        auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
-        auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(equippedWeapon.currentWeapon);
-        auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(equippedWeapon.currentWeapon);
-        if (!gCoordinator.hasComponent<EquippedWeaponComponent>(entity))
-            continue;
+        if (!gCoordinator.hasComponent<EquipmentComponent>(entity)) continue;
 
-        weaponComponent.pivotPoint = inputHandler->getMousePosition();
-        weaponRenderComponent.dirty = true;
-        transformComponent.scale = {weaponComponent.targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y};
-        weaponTransformComponent.scale = {weaponComponent.targetPoint.x <= 0 ? -1.f : 1.f,
-                                          weaponTransformComponent.scale.y};
+        if (equipment.slots.contains(GameType::slotType::WEAPON))
+        {
+            const Entity weaponEntity = equipment.slots.at(GameType::slotType::WEAPON);
+
+            if (auto* weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(weaponEntity))
+            {
+                auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
+                auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
+
+                weaponComponent->pivotPoint = inputHandler->getMousePosition();
+                weaponRenderComponent.dirty = true;
+
+                transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+                                            transformComponent.scale.y};
+                weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+                                                  weaponTransformComponent.scale.y};
+            }
+        }
     }
 }
 
@@ -100,10 +106,9 @@ void PlayerMovementSystem::handleAttack() const
 {
     const auto inputHandler{InputHandler::getInstance()};
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
     {
-        if (!inputHandler->isPressed(InputType::Attack))
-            continue;
+        if (!inputHandler->isPressed(InputType::Attack)) continue;
 
         const Entity fightAction = gCoordinator.createEntity();
         gCoordinator.addComponent(fightAction, FightActionEvent{.entity = entity});

@@ -1,7 +1,5 @@
 #include "GameState.h"
-
 #include <RenderSystem.h>
-
 #include "BackgroundSystem.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
@@ -20,11 +18,11 @@ void GameState::handleCollision(const float deltaTime)
 {
     const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     constexpr auto timeStep = 1.f / 60.f;
-    collisionSystem->update();
+    collisionSystem->update(deltaTime);
     collisionSystem->updateSimulation(timeStep, 8, 3);
 }
 
-void GameState::render(sf::RenderWindow& window)
+void GameState::render(sf::RenderWindow &window)
 {
     m_dungeon.render(window);
     gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);

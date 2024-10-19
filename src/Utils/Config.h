@@ -24,11 +24,16 @@ namespace config
     static constexpr double pixelToMeterRatio{1 / 30.f};
     static constexpr float tileHeight{16.f};
     static constexpr float oneFrameTime{1 / 60.f};
+    static constexpr float oneFrameTimeMs{1000.0f / 60.f};
+
     static constexpr int frameCycle{60};
     static constexpr int maximumNumberOfLayers{10};
     static constexpr float playerAttackRange{1000.f};
     static constexpr float playerAttackDamage{10.f};
     static constexpr float playerAttackAngle{0.785f};
+    constexpr auto defaultDensity{1.f};
+    constexpr auto defaultFriction{1.f};
+    constexpr auto defaultRestitution{0.05f};
 
     static constexpr int mapFirstEntity{1000};
     static constexpr int numberOfMapEntities{500};
@@ -59,6 +64,9 @@ namespace config
     static constexpr float textTagDefaultSpeed{1.0f};
     static constexpr float textTagDefaultAcceleration{10.0f};
     static constexpr int textTagDefaultFadeValue{20};
+
+    static constexpr int armourLayer{6};
+    static constexpr int weaponLayer{7};
 
     // Weapon component defaults
     static constexpr int weaponComponentDefaultDamageAmount{0};
@@ -185,50 +193,60 @@ namespace config
 
     inline std::unordered_map<std::string, _entityCategory> categoriesLookup{
         {"Wall", BOUNDARY}, {"Bullet", BULLET}, {"Enemy", ENEMY}, {"Passage", PASSAGE},
-        {"Item", ITEM}, {"Player", PLAYER}, {"Door", DOOR}};
+        {"Item", ITEM},     {"Player", PLAYER}, {"Door", DOOR}};
 
     inline std::unordered_map<std::string, uint16> bitMaskLookup{
         {"Wall", BOUNDARY | PLAYER | ENEMY | BULLET | ITEM}, // Wall collides with everything
         {"Bullet", BOUNDARY | ENEMY}, // Bullet only collides with walls and enemies
         {"Enemy", BOUNDARY | PLAYER}, // Enemy collides with walls and players
         {"Passage", BOUNDARY | PLAYER}, // Passage collides with walls and players
-        {"Item", BOUNDARY | PLAYER}, // Item only collides with walls and players
+        {"Item", BOUNDARY}, // Item only collides with walls and players
         {"Player", BOUNDARY | ENEMY | ITEM}, // Player collides with walls, enemies, and items
         {"Door", BOUNDARY | PLAYER} // Door collides with walls and players
     };
 
     inline uint16 stringToCategoryBits(const std::string& str)
     {
-        if (categoriesLookup.contains(str))
-            return categoriesLookup[str];
+        if (categoriesLookup.contains(str)) return categoriesLookup[str];
 
-        if (std::regex_match(str, playerRegexTag))
-            return categoriesLookup["Player"];
+        if (std::regex_match(str, playerRegexTag)) return categoriesLookup["Player"];
 
-        if (str == "Chest")
-            return categoriesLookup["Item"];
+        if (str == "Chest" || str == "Potion") return categoriesLookup["Passage"];
 
         return 0x0000;
     }
 
     inline uint16 stringToMaskBits(const std::string& str)
     {
-        if (bitMaskLookup.contains(str))
-            return bitMaskLookup[str];
+        if (bitMaskLookup.contains(str)) return bitMaskLookup[str];
 
-        if (std::regex_match(str, playerRegexTag))
-            return bitMaskLookup["Player"];
+        if (std::regex_match(str, playerRegexTag)) return bitMaskLookup["Player"];
 
-        if (str == "Chest")
-            return bitMaskLookup["Item"];
+        if (str == "Chest" || str == "Potion") return bitMaskLookup["Passage"];
 
         return 0x0000;
     }
 
     inline uint16 stringToIndexGroup(const std::string& str)
     {
-        if (str == "Bullet")
-            return -8;
+        if (str == "Bullet") return -8;
         return 0;
     }
+
+    enum itemLootType : int
+    {
+        WEAPON_LOOT = 1,
+        BODY_ARMOUR_LOOT = 2,
+        POTION_LOOT = 3,
+        HELMET_LOOT = 4
+    };
+
+    struct slotTypeHash
+    {
+        template <typename T>
+        std::size_t operator()(T t) const
+        {
+            return static_cast<std::size_t>(t);
+        }
+    };
 } // namespace config

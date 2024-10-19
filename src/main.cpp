@@ -1,7 +1,8 @@
-#include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <TextureSystem.h>
+#include <imgui-SFML.h>
 
 #include "Coordinator.h"
 #include "Game.h"
@@ -49,24 +50,8 @@ void handleInput(sf::RenderWindow& window)
             const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             InputHandler::getInstance()->updateMousePosition(mousePosition);
         }
-        if (event.type == sf::Event::Closed)
-            window.close();
+        if (event.type == sf::Event::Closed) window.close();
     }
-}
-
-sf::Color hexStringToSfmlColor(const std::string& hexColor)
-{
-    const std::string hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
-
-    std::istringstream iss(hex);
-    int rgbValue = 0;
-    iss >> std::hex >> rgbValue;
-
-    const uint8 red = rgbValue >> 16 & 0xFF;
-    const uint8 green = rgbValue >> 8 & 0xFF;
-    const uint8 blue = rgbValue & 0xFF;
-
-    return {red, green, blue};
 }
 
 int main()
@@ -75,18 +60,15 @@ int main()
     const PublicConfig& config = configSingleton.GetConfig();
 
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!",
-                            sf::Style::Fullscreen);
+    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!");
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config.frameCycle * (config.debugMode ? 100 : 1));
+    window.setFramerateLimit(config.debugMode ? 144 : config.frameCycle);
     ImGui::CreateContext();
 
     sf::Clock deltaClock;
     Game game;
     game.init();
-
-    sf::Color customColor = hexStringToSfmlColor(config.backgroundColor);
 
     ResourceManager& resourceManager = ResourceManager::getInstance();
     resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 160);
@@ -95,12 +77,11 @@ int main()
     while (window.isOpen())
     {
         sf::Time deltaTime = deltaClock.restart();
-
-        window.clear(customColor);
+        window.clear(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor());
 
         ImGui::SFML::Update(window, deltaTime);
 
-        game.update(deltaTime.asSeconds());
+        game.update(static_cast<float>(deltaTime.asMilliseconds()));
         game.draw(window);
 
         ImGui::SFML::Render(window);

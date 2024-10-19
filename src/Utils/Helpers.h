@@ -2,16 +2,16 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <cstdint>
 #include <functional>
+#include <glm/glm.hpp>
 #include <imgui.h>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <random>
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#include <glm/glm.hpp>
-#include <nlohmann/json.hpp>
-#include "Config.h"
 #include "GameTypes.h"
+#include "PublicConfig.h"
 #include "PublicConfigMenager.h"
 #include "glm/gtx/hash.hpp"
 
@@ -23,8 +23,7 @@ static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& e
 
     auto enemyConfig = configSingleton.GetConfig().enemyData.equal_range(enemyType);
     std::vector<config::EnemyConfig> enemiesConfig;
-    for (auto it = enemyConfig.first; it != enemyConfig.second; ++it)
-        enemiesConfig.push_back(it->second);
+    for (auto it = enemyConfig.first; it != enemyConfig.second; ++it) enemiesConfig.push_back(it->second);
 
     if (enemiesConfig.empty())
     {
@@ -62,9 +61,7 @@ static inline std::string base64_decode(const std::string& encoded_string)
         "0123456789+/";
 
     std::function<bool(unsigned char)> is_base64 = [](unsigned char c) -> bool
-    {
-        return (isalnum(c) || (c == '+') || (c == '/'));
-    };
+    { return (isalnum(c) || (c == '+') || (c == '/')); };
 
     auto in_len = encoded_string.size();
     int i = 0;
@@ -79,15 +76,13 @@ static inline std::string base64_decode(const std::string& encoded_string)
         in_++;
         if (i == 4)
         {
-            for (i = 0; i < 4; i++)
-                char_array_4[i] = static_cast<unsigned char>(base64_chars.find(char_array_4[i]));
+            for (i = 0; i < 4; i++) char_array_4[i] = static_cast<unsigned char>(base64_chars.find(char_array_4[i]));
 
             char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
             char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
             char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-            for (i = 0; (i < 3); i++)
-                ret += char_array_3[i];
+            for (i = 0; (i < 3); i++) ret += char_array_3[i];
 
             i = 0;
         }
@@ -95,19 +90,16 @@ static inline std::string base64_decode(const std::string& encoded_string)
 
     if (i)
     {
-        for (j = i; j < 4; j++)
-            char_array_4[j] = 0;
+        for (j = i; j < 4; j++) char_array_4[j] = 0;
 
 
-        for (j = 0; j < 4; j++)
-            char_array_4[j] = static_cast<unsigned char>(base64_chars.find(char_array_4[j]));
+        for (j = 0; j < 4; j++) char_array_4[j] = static_cast<unsigned char>(base64_chars.find(char_array_4[j]));
 
         char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
         char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
         char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
 
-        for (j = 0; (j < i - 1); j++)
-            ret += char_array_3[j];
+        for (j = 0; (j < i - 1); j++) ret += char_array_3[j];
     }
 
     return ret;
@@ -183,20 +175,18 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
         // Sprawdzamy, czy aktualny tileset zawiera "SpecialBlocks.json"
         if (tileset["source"].get<std::string>().find("SpecialBlocks.json") != std::string::npos)
             specialBlocksFirstGID = tileset["firstgid"];
-            // Znajdujemy pierwszy identyfikator GID nast�pnego tilesetu
+        // Znajdujemy pierwszy identyfikator GID nast�pnego tilesetu
         else if (tileset["firstgid"] > specialBlocksFirstGID && specialBlocksFirstGID != -1)
         {
             nextTilesetFirstGID = tileset["firstgid"];
             break;
         }
 
-    if (specialBlocksFirstGID == -1)
-        return result;
+    if (specialBlocksFirstGID == -1) return result;
 
     for (const auto& layer : json["layers"])
     {
-        if (layer["type"] != "tilelayer")
-            continue;
+        if (layer["type"] != "tilelayer") continue;
         static constexpr std::uint32_t mask = 0xf0000000;
 
         int x = 0;
@@ -210,8 +200,7 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
             if (tileID >= specialBlocksFirstGID && tileID < nextTilesetFirstGID)
             {
                 int localTileID = tileID - specialBlocksFirstGID;
-                if (localTileID >= 0)
-                    result.emplace(glm::ivec2{x, y}, localTileID);
+                if (localTileID >= 0) result.emplace(glm::ivec2{x, y}, localTileID);
             }
             ++x;
             if (x >= width)
@@ -224,6 +213,20 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
     return result;
 }
 
+inline sf::Color hexStringToSfmlColor(const std::string& hexColor)
+{
+    const std::string& hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
+
+    std::istringstream iss(hex);
+    int rgbValue = 0;
+    iss >> std::hex >> rgbValue;
+
+    const uint8 red = rgbValue >> 16 & 0xFF;
+    const uint8 green = rgbValue >> 8 & 0xFF;
+    const uint8 blue = rgbValue & 0xFF;
+
+    return {red, green, blue};
+}
 
 template <typename T>
 static T roundTo(T value, int places)
@@ -242,15 +245,35 @@ static GameType::MyVec2 roundTo(const GameType::MyVec2& vec, int places)
 template <typename T>
 static T convertMetersToPixel(const T meterValue)
 {
-    T result = meterValue * configSingleton.GetConfig().meterToPixelRatio;
+    T result = meterValue * config::meterToPixelRatio;
     return roundTo(result, 2);
 }
 
 template <typename T>
 static T convertPixelsToMeters(const T pixelValue)
 {
-    T result = pixelValue * configSingleton.GetConfig().pixelToMeterRatio;
+    T result = pixelValue * config::pixelToMeterRatio;
     return roundTo(result, 10);
+}
+
+template <typename, typename T, typename = void>
+struct has_member : std::false_type
+{
+};
+
+template <typename T, typename U>
+struct has_member<T, U, std::void_t<decltype(std::declval<U>())>> : std::true_type
+{
+};
+
+template <typename Struct, typename MemberType>
+void set(Struct& obj, MemberType Struct::*member, MemberType value)
+{
+    // Check if the member exists
+    if constexpr (has_member<Struct, decltype(obj.*member)>::value)
+    {
+        obj.*member = value; // Set the member to the new value
+    }
 }
 
 static sf::Vector2f convertPixelsToMeters(const sf::Vector2f& pixelValue)
