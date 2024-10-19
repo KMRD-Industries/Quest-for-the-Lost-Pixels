@@ -298,8 +298,11 @@ void Dungeon::update(const float deltaTime)
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
         m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});
-    if (m_endGame)
-        m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
+    else
+    {
+        if (m_endGame)
+            m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
+    }
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)

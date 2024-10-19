@@ -94,7 +94,10 @@ int main()
     resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 40);
 
     SoundManager& soundManager = SoundManager::getInstance();
-    soundManager.loadSound(Sound::Type::BackgroundMusic, ASSET_PATH + std::string("/sounds/backgroundSound.mp3"));
+    soundManager.loadSound(Sound::Type::MenuBackgroundMusic,
+                           ASSET_PATH + std::string("/sounds/menuBackgroundSound.mp3"));
+    soundManager.loadSound(Sound::Type::GameBackgroundMusic,
+                           ASSET_PATH + std::string("/sounds/gameBackgroundSound.mp3"));
 
     while (window.isOpen())
     {

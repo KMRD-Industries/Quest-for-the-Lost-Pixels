@@ -4,9 +4,7 @@
 #include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "MainMenuState.h"
-#include "Paths.h"
 #include "RenderSystem.h"
-#include "SoundComponent.h"
 #include "SoundSystem.h"
 
 extern Coordinator gCoordinator;
@@ -14,8 +12,6 @@ extern Coordinator gCoordinator;
 void Game::init()
 {
     m_stateManager.handleStateChange({MenuStateMachine::StateAction::Push}, {std::make_unique<MainMenuState>()});
-    auto backgroundMusic = gCoordinator.createEntity();
-    gCoordinator.addComponent(backgroundMusic, SoundComponent{.soundToPlay = Sound::Type::BackgroundMusic});
 }
 
 void Game::draw(sf::RenderWindow& window)

@@ -11,24 +11,21 @@ void SoundSystem::update(float deltaTime)
     if (m_entities.empty())
         return;
 
+    std::deque<Entity> entitiesToRemove;
+
     SoundManager& soundManager = SoundManager::getInstance();
     for (const auto entity : m_entities)
     {
         auto& soundComponent = gCoordinator.getComponent<SoundComponent>(entity);
-        if (soundComponent.proceeded)
-            continue;
         if (soundComponent.stopPlaying)
-        {
-            if (soundComponent.singleSound)
-                soundManager.stopSoundByID(soundComponent.id);
-            else
-                soundManager.stopSoundsByType(soundComponent.soundToPlay);
-        }
+            soundManager.stopSoundsByType(soundComponent.soundToPlay);
         else
-        {
-            soundComponent.id = soundManager.playSound(soundComponent.soundToPlay, soundComponent.volume,
-                                                       soundComponent.isLooping);
-        }
-        soundComponent.proceeded = true;
+            soundManager.playSound(soundComponent.soundToPlay, soundComponent.volume, soundComponent.isLooping);
+        entitiesToRemove.push_back(entity);
+    }
+    while (!entitiesToRemove.empty())
+    {
+        gCoordinator.destroyEntity(entitiesToRemove.front());
+        entitiesToRemove.pop_front();
     }
 }

@@ -13,10 +13,8 @@ namespace Sound
 {
     enum class Type
     {
-        PlayerShoot,
-        EnemyExplode,
-        BackgroundMusic,
-        PowerUp
+        MenuBackgroundMusic,
+        GameBackgroundMusic
     };
 }
 
