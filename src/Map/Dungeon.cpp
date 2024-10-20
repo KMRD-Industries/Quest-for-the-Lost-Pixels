@@ -96,8 +96,7 @@ void Dungeon::init()
     else
         std::cout << "Starting in single-player mode\n";
 
-    if (multiplayerSystem->isConnected())
-        multiplayerSystem->setRoom(m_currentPlayerPos);
+    if (multiplayerSystem->isConnected()) multiplayerSystem->setRoom(m_currentPlayerPos);
     const std::string tag = std::format("Player {}", m_id);
 
     makeStartFloor();
@@ -121,20 +120,13 @@ void Dungeon::render(sf::RenderWindow& window)
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponents(player,
-                               TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5},
-                               RenderComponent{},
-                               TransformComponent{GameUtility::startingPosition},
-                               AnimationComponent{},
-                               CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
-                               PlayerComponent{},
-                               ColliderComponent{},
-                               InventoryComponent{},
-                               EquipmentComponent{},
-                               FloorComponent{},
-                               TravellingDungeonComponent{
-                                   .moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }},
-                               PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
+    gCoordinator.addComponents(
+        player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
+        TransformComponent{GameUtility::startingPosition}, AnimationComponent{},
+        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP}, PlayerComponent{},
+        ColliderComponent{}, InventoryComponent{}, EquipmentComponent{}, FloorComponent{},
+        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }},
+        PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
 
 void Dungeon::createRemotePlayer(const uint32_t id)
@@ -142,19 +134,14 @@ void Dungeon::createRemotePlayer(const uint32_t id)
     const auto tag = std::format("Player {}", id);
     m_entities[id] = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(m_entities[id],
-                               TransformComponent(sf::Vector2f(
-                                                      getSpawnOffset(configSingleton.GetConfig().startingPosition.x,
-                                                                     id),
-                                                      getSpawnOffset(configSingleton.GetConfig().startingPosition.y,
-                                                                     id)),
-                                                  0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
-                               TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3},
-                               RenderComponent{},
-                               AnimationComponent{},
-                               CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
-                               MultiplayerComponent{},
-                               ColliderComponent{});
+    gCoordinator.addComponents(
+        m_entities[id],
+        TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, id),
+                                        getSpawnOffset(configSingleton.GetConfig().startingPosition.y, id)),
+                           0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
+        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3}, RenderComponent{},
+        AnimationComponent{}, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
+        MultiplayerComponent{}, ColliderComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
         "Characters", configSingleton.GetConfig().playerAnimation);
@@ -162,11 +149,7 @@ void Dungeon::createRemotePlayer(const uint32_t id)
 
     const Entity entity = gCoordinator.createEntity();
     const auto newEvent = CreateBodyWithCollisionEvent(
-        m_entities[id], tag, [&](const GameType::CollisionData&)
-        {
-        }, [&](const GameType::CollisionData&)
-        {
-        }, false,
+        m_entities[id], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false,
         false);
 
     gCoordinator.addComponent(entity, newEvent);
@@ -228,10 +211,7 @@ void Dungeon::setupWeaponEntity(const Entity player)
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
     auto weaponColliderComponent = ColliderComponent{true, "Weapon"};
-    weaponColliderComponent.onCollisionEnter = [](const GameType::CollisionData& data)
-    {
-        std::cout << data.tag << "\n";
-    };
+    weaponColliderComponent.onCollisionEnter = [](const GameType::CollisionData& data) {};
     gCoordinator.addComponent(weaponEntity, weaponColliderComponent);
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
     gCoordinator.addComponent(weaponEntity, ItemAnimationComponent{});
@@ -300,48 +280,37 @@ void Dungeon::update(const float deltaTime)
     if (m_weapon != -1)
     {
         const Entity entity = gCoordinator.createEntity();
-        const auto newEvent = CreateBodyWithCollisionEvent(m_weapon, "Weapon", [](const GameType::CollisionData& data)
-                                                           {
-                                                               auto& characterComponent = gCoordinator.getComponent<
-                                                                   CharacterComponent>(data.entityID);
-                                                               const auto& colliderComponent = gCoordinator.getComponent
-                                                                   <ColliderComponent>(data.entityID);
-                                                               auto& secondPlayertransformComponent = gCoordinator.
-                                                                   getComponent<TransformComponent>(
-                                                                       data.entityID);
+        const auto newEvent = CreateBodyWithCollisionEvent(
+            m_weapon, "Weapon",
+            [](const GameType::CollisionData& data)
+            {
+                auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(data.entityID);
+                const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(data.entityID);
+                auto& secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(data.entityID);
 
-                                                               const Entity tag = gCoordinator.createEntity();
-                                                               gCoordinator.addComponent(tag, TextTagComponent{});
-                                                               gCoordinator.addComponent(
-                                                                   tag, TransformComponent{
-                                                                       secondPlayertransformComponent});
+                const Entity tag = gCoordinator.createEntity();
+                gCoordinator.addComponent(tag, TextTagComponent{});
+                gCoordinator.addComponent(tag, TransformComponent{secondPlayertransformComponent});
 
-                                                               characterComponent.attacked = true;
-                                                               characterComponent.hp -= configSingleton.GetConfig().
-                                                                   playerAttackDamage;
+                characterComponent.attacked = true;
+                characterComponent.hp -= configSingleton.GetConfig().playerAttackDamage;
 
-                                                               const b2Vec2& attackerPos = gCoordinator.getComponent<
-                                                                       ColliderComponent>(config::playerEntity).body->
-                                                                   GetPosition();
-                                                               const b2Vec2& targetPos = colliderComponent.body->
-                                                                   GetPosition();
+                const b2Vec2& attackerPos =
+                    gCoordinator.getComponent<ColliderComponent>(config::playerEntity).body->GetPosition();
+                const b2Vec2& targetPos = colliderComponent.body->GetPosition();
 
-                                                               b2Vec2 recoilDirection = targetPos - attackerPos;
-                                                               recoilDirection.Normalize();
+                b2Vec2 recoilDirection = targetPos - attackerPos;
+                recoilDirection.Normalize();
 
-                                                               const float& recoilMagnitude = 20.0f;
-                                                               const b2Vec2 recoilVelocity = recoilMagnitude *
-                                                                   recoilDirection;
+                const float& recoilMagnitude = 20.0f;
+                const b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
 
-                                                               secondPlayertransformComponent.velocity.x +=
-                                                                   static_cast<float>(recoilVelocity.x * configSingleton
-                                                                       .GetConfig().meterToPixelRatio);
-                                                               secondPlayertransformComponent.velocity.y +=
-                                                                   static_cast<float>(recoilVelocity.y * configSingleton
-                                                                       .GetConfig().meterToPixelRatio);
-                                                           }, [](const GameType::CollisionData&)
-                                                           {
-                                                           }, false, false, true);
+                secondPlayertransformComponent.velocity.x +=
+                    static_cast<float>(recoilVelocity.x * configSingleton.GetConfig().meterToPixelRatio);
+                secondPlayertransformComponent.velocity.y +=
+                    static_cast<float>(recoilVelocity.y * configSingleton.GetConfig().meterToPixelRatio);
+            },
+            [](const GameType::CollisionData&) {}, false, false, true);
 
         gCoordinator.addComponent(entity, newEvent);
         m_weapon = -1;
@@ -350,8 +319,7 @@ void Dungeon::update(const float deltaTime)
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
         m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});
 
-    if (m_endGame)
-        m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
+    if (m_endGame) m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
@@ -436,8 +404,7 @@ inline void Dungeon::loadMap(const std::string& path) const
 
 void Dungeon::moveDownDungeon()
 {
-    if (m_dungeonDepth >= configSingleton.GetConfig().maxDungeonDepth)
-        m_endGame = true;
+    if (m_dungeonDepth >= configSingleton.GetConfig().maxDungeonDepth) m_endGame = true;
     ++m_dungeonDepth;
     makeSimpleFloor();
     const auto& pos = GameUtility::startingPosition;
@@ -490,15 +457,13 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
                 colliderComponent.body->GetAngle());
         }
 
-        if (m_multiplayerSystem->isConnected())
-            m_multiplayerSystem->roomChanged(m_currentPlayerPos);
+        if (m_multiplayerSystem->isConnected()) m_multiplayerSystem->roomChanged(m_currentPlayerPos);
     }
 }
 
 float Dungeon::getSpawnOffset(const float position, const int id)
 {
-    if (id % 2 == 0)
-        return position + id * configSingleton.GetConfig().spawnOffset;
+    if (id % 2 == 0) return position + id * configSingleton.GetConfig().spawnOffset;
     return position - id * configSingleton.GetConfig().spawnOffset;
 }
 
