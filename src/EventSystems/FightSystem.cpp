@@ -17,7 +17,9 @@ extern PublicConfigSingleton configSingleton;
 
 FightSystem::FightSystem() { init(); }
 
-void FightSystem::init() {}
+void FightSystem::init()
+{
+}
 
 void FightSystem::update()
 {
@@ -52,7 +54,9 @@ void FightSystem::update()
     clear();
 }
 
-void FightSystem::handleBowAttack(Entity) {}
+void FightSystem::handleBowAttack(Entity)
+{
+}
 
 void FightSystem::handleMeleeAttack(const Entity playerEntity) const
 {
@@ -76,6 +80,7 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
     const auto range = direction * (config::playerAttackRange * std::abs(transformComponent.scale.x));
     const auto point2 = center + range;
 
+    /*
     const auto targetInBox = Physics::rayCast(center, point2, playerEntity);
 
     if (targetInBox.tag == "Enemy")
@@ -107,13 +112,15 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
 
         b2Vec2 newPosition = colliderComponent.body->GetPosition() + 0.25 * recoilDirection;
         colliderComponent.body->SetTransform(newPosition, colliderComponent.body->GetAngle());
-    }
+    }*/
 }
 
 void FightSystem::handleCollision(const Entity bullet, const GameType::CollisionData& collisionData) const
 {
-    if (std::regex_match(collisionData.tag, config::playerRegexTag)) return;
-    if (collisionData.tag == "Bullet") return;
+    if (std::regex_match(collisionData.tag, config::playerRegexTag))
+        return;
+    if (collisionData.tag == "Bullet")
+        return;
 
     if (collisionData.tag == "Enemy")
     {
@@ -146,7 +153,8 @@ void FightSystem::clear()
 {
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity : m_entities) entityToRemove.push_back(entity);
+    for (const auto entity : m_entities)
+        entityToRemove.push_back(entity);
 
     while (!entityToRemove.empty())
     {

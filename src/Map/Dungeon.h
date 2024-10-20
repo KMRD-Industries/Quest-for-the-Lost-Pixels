@@ -36,14 +36,16 @@
 class Dungeon
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1){};
+    Dungeon() : m_entities(MAX_ENTITIES - 1)
+    {
+    };
 
     void init();
     void render(sf::RenderWindow& window);
     void addPlayerComponents(Entity player);
     void moveDownDungeon();
     void setupPlayerCollision(Entity player);
-    void setupWeaponEntity(Entity player) const;
+    void setupWeaponEntity(Entity player);
     void setupHelmetEntity(Entity player) const;
     void update(float deltaTime);
     void makeStartFloor();
@@ -73,6 +75,7 @@ private:
     bool m_passedBy;
     int m_dungeonDepth{1};
     bool m_endGame{};
+    Entity m_weapon{};
 
     PlayerMovementSystem* m_playerMovementSystem;
     MultiplayerSystem* m_multiplayerSystem;

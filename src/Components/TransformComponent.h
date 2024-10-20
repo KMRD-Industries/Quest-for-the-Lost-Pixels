@@ -9,6 +9,7 @@ struct TransformComponent
     sf::Vector2f position{0.f, 0.f};
     sf::Vector2f lastPosition{0.f, 0.f};
     sf::Vector2f scale{1.f, 1.f};
+    sf::Vector2f centerOfMass{};
     float rotation{0};
     b2Vec2 velocity{0.f, 0.f};
 
@@ -20,6 +21,11 @@ struct TransformComponent
     {
     }
 
-    explicit TransformComponent(const sf::Vector2f& position) : position{position} {}
-    explicit TransformComponent(const glm::vec2& position) : position{position.x, position.y} {}
+    explicit TransformComponent(const sf::Vector2f& position) : position{position}
+    {
+    }
+
+    explicit TransformComponent(const glm::vec2& position) : position{position.x, position.y}
+    {
+    }
 };

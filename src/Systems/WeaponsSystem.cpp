@@ -11,7 +11,7 @@
 
 extern PublicConfigSingleton configSingleton;
 
-void WeaponSystem::update(const float &deltaTime)
+void WeaponSystem::update(const float& deltaTime)
 {
     if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 1000)
     {
@@ -31,27 +31,26 @@ void WeaponSystem::performFixedUpdate()
 
 inline void WeaponSystem::updateWeaponAngle(const Entity entity)
 {
-    const auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
-    auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
+    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
 
-    if (!weaponComponent.isAttacking) return;
+    if (!weaponComponent.isAttacking)
+        return;
     rotateWeapon(entity, weaponComponent.isSwingingForward);
 }
 
 
 inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward)
 {
-    const auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
-    auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
+    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
 
     weaponComponent.remainingDistance -= weaponComponent.rotationSpeed;
     const float direction = weaponComponent.isFacingRight ? 1.f : -1.f;
     const float isMovingForward = forward ? 1.f : -1.f;
 
     if (weaponComponent.remainingDistance > 0)
-    {
         weaponComponent.currentAngle += weaponComponent.rotationSpeed * direction * isMovingForward;
-    }
     else
     {
         weaponComponent.currentAngle -= weaponComponent.remainingDistance * direction * isMovingForward;
@@ -71,13 +70,15 @@ inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward)
                 weaponComponent.isAttacking = false;
         }
     }
+    auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+    weaponTransformComponent.rotation = (weaponComponent.currentAngle + 60) * M_PI / 180;
 }
 
 inline void WeaponSystem::setAngle(const Entity entity)
 {
-    const auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-    const auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
-    auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
     const auto center = sf::Vector2f{transformComponent.position + GameUtility::mapOffset};
 
     weaponComponent.remainingDistance = weaponComponent.swingDistance;
@@ -106,8 +107,8 @@ inline void WeaponSystem::setAngle(const Entity entity)
 
 inline void WeaponSystem::updateStartingAngle(const Entity entity)
 {
-    const auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
-    auto &weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
+    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
 
     if (weaponComponent.queuedAttack && !weaponComponent.isAttacking)
     {
@@ -116,7 +117,8 @@ inline void WeaponSystem::updateStartingAngle(const Entity entity)
         return;
     }
 
-    if (weaponComponent.queuedAttack || weaponComponent.isAttacking) return;
+    if (weaponComponent.queuedAttack || weaponComponent.isAttacking)
+        return;
 
     setAngle(entity);
 }
