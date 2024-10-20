@@ -20,8 +20,13 @@ struct ColliderComponent
     Collision collision{};
     Collision specialCollision{};
     bool toDestroy{false};
+    bool trigger{false};
 
     ColliderComponent() = default;
+
+    explicit ColliderComponent(bool trigger) : trigger(trigger)
+    {
+    }
 
     explicit ColliderComponent(Collision collision) : collision(std::move(collision))
     {

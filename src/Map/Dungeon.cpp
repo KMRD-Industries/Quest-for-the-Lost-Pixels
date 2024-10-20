@@ -241,7 +241,7 @@ void Dungeon::setupPlayerCollision(const Entity player)
     gCoordinator.addComponent(entity, newEvent);
 }
 
-void Dungeon::setupWeaponEntity(const Entity player) const
+void Dungeon::setupWeaponEntity(const Entity player)
 {
     const Entity weaponEntity = gCoordinator.createEntity();
 
@@ -249,11 +249,13 @@ void Dungeon::setupWeaponEntity(const Entity player) const
     gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
-    gCoordinator.addComponent(weaponEntity, ColliderComponent{});
+    gCoordinator.addComponent(weaponEntity, ColliderComponent{true});
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
 
     m_inventorySystem->pickUpWeapon(player, weaponEntity);
     m_equipWeaponSystem->equipWeapon(player, weaponEntity);
+
+    m_weapon = weaponEntity;
 }
 
 void Dungeon::update(const float deltaTime)
@@ -294,7 +296,18 @@ void Dungeon::update(const float deltaTime)
 
         m_multiplayerSystem->update();
     }
+    if (m_weapon != -1)
+    {
+        const Entity entity = gCoordinator.createEntity();
+        const auto newEvent = CreateBodyWithCollisionEvent(m_weapon, "weapon", [](const GameType::CollisionData&)
+                                                           {
+                                                           }, [](const GameType::CollisionData&)
+                                                           {
+                                                           }, false, false);
 
+        gCoordinator.addComponent(entity, newEvent);
+        m_weapon = -1;
+    }
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
         m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});

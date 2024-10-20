@@ -1,5 +1,6 @@
 #pragma once
 #include "GameTypes.h"
+#include "GameUtility.h"
 #include "Helpers.h"
 #include "box2d/b2_circle_shape.h"
 #include "box2d/b2_distance.h"
@@ -48,8 +49,19 @@ public:
             const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
             if (m_ignoreYourself && bodyData->entityID == m_myEntity)
                 return true;
+            m_fixtures.push_back(fixture);
 
-            //TODO: HOW TO CHECK IF CIRCLE OVERLAP POLYGON ?????
+            if (fixture->GetShape()->GetType() == b2Shape::e_polygon)
+            {
+                b2PolygonShape* polygonShape = dynamic_cast<b2PolygonShape*>(fixture->GetShape());
+
+                b2Transform polygonTransform = fixture->GetBody()->GetTransform();
+                b2Transform circleTransform;
+                circleTransform.Set(m_circleCenter, 0.0f);
+
+                if (b2TestOverlap(polygonShape, 0, &m_circle, 0, polygonTransform, circleTransform))
+                    std::cout << "Kolizja\n";
+            }
         }
         return true;
     }
@@ -163,7 +175,8 @@ public:
     static std::vector<GameType::RaycastData> circleCast(const GameType::MyVec2& center, const float radius,
                                                          const int entity = -10)
     {
-        const b2Vec2 newCenter{convertPixelsToMeters(center.x), convertPixelsToMeters(center.y)};
+        const b2Vec2 newCenter{convertPixelsToMeters(center.x - GameUtility::mapOffset.x),
+                               convertPixelsToMeters(center.y - GameUtility::mapOffset.y)};
         const float newRadius = convertPixelsToMeters(radius);
 
         b2CircleShape circle;

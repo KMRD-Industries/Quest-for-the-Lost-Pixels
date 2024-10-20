@@ -120,7 +120,12 @@ void CollisionSystem::update() const
             body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
                                      convertPixelsToMeters(transformComponent.velocity.y)});
         }
-
+        if (colliderComponent.trigger)
+        {
+            body->SetTransform({convertPixelsToMeters(transformComponent.position.x),
+                                convertPixelsToMeters(transformComponent.position.y)},
+                               transformComponent.rotation);
+        }
         renderComponent.dirty = true;
         transformComponent.velocity = {};
     }
@@ -143,7 +148,7 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         const auto position = body->GetPosition();
 
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
-        transformComponent.rotation = body->GetAngle() * 180.f / M_PI;
+        //transformComponent.rotation = body->GetAngle() * 180.f / M_PI;
         renderComponent.sprite.setPosition(position.x, position.y);
         renderComponent.dirty = true;
     }

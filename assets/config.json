@@ -7,7 +7,7 @@
   "oneFrameTime": 0.016666667,
   "frameCycle": 60,
   "maximumNumberOfLayers": 10,
-  "playerAttackRange": 1000.0,
+  "playerAttackRange": 60.0,
   "playerAttackDamage": 10.0,
   "playerAttackAngle": 0.785,
   "mapFirstEntity": 1000,

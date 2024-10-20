@@ -138,7 +138,6 @@ void RenderSystem::setWeapon()
 
         // Update the weapon sprite's position and scale according to the transform component and game scale
         weaponTransformComponent.position = weaponPosition - weaponPlacement;
-        weaponTransformComponent.rotation = weaponComponent.currentAngle;
 
         weaponRenderComponent.sprite.setPosition(weaponTransformComponent.position);
         weaponRenderComponent.sprite.setRotation(weaponTransformComponent.rotation);
@@ -366,17 +365,37 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
     // const auto center = GameType::MyVec2{xPosCenter + m_mapOffset.x, yPosCenter + m_mapOffset.y};
     const auto center = GameType::MyVec2{transformComponent.position + GameUtility::mapOffset};
 
+    // Rysowanie centralnego punktu gracza
     sf::CircleShape centerPoint(5);
     centerPoint.setFillColor(sf::Color::Red);
     centerPoint.setPosition(center.x, center.y);
     window.draw(centerPoint);
 
-    const b2Vec2 newCenter{convertPixelsToMeters(center) + GameUtility::mapOffset};
-    const float newRadius = convertPixelsToMeters(configSingleton.GetConfig().playerAttackRange);
+    // Rysowanie okrêgu wokó³ gracza na podstawie promienia ataku
+    sf::CircleShape attackRangeCircle(configSingleton.GetConfig().playerAttackRange);
+    attackRangeCircle.setFillColor(sf::Color::Transparent);
+    attackRangeCircle.setOutlineColor(sf::Color::Blue);
+    attackRangeCircle.setOutlineThickness(1.f);
 
-    b2CircleShape circle;
-    circle.m_radius = newRadius;
-    circle.m_p = newCenter;
+    // Ustawienie pozycji okrêgu w pikselach wokó³ gracza
+    attackRangeCircle.setOrigin(attackRangeCircle.getRadius(), attackRangeCircle.getRadius());
+    attackRangeCircle.setPosition(center.x, center.y);
+
+    // Rysowanie okrêgu na oknie SFML
+    window.draw(attackRangeCircle);
+
+    const auto elements = Physics::circleCast(center, configSingleton.GetConfig().playerAttackRange,
+                                              config::playerEntity);
+
+    for (const auto& element : elements)
+    {
+        sf::CircleShape circle;
+        circle.setRadius(5);
+        circle.setFillColor(sf::Color::Red);
+        circle.setPosition(convertMetersToPixel(element.position.x), convertMetersToPixel(element.position.y));
+
+        window.draw(circle);
+    }
 
     for (const auto entity : gCoordinator.getRegisterSystem<CollisionSystem>()->m_entities)
     {

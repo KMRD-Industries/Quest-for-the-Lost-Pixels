@@ -196,6 +196,8 @@ inline void WeaponSystem::setAngle(const Entity entity)
         weaponComponent.currentAngle = adjustedAngle - weaponComponent.initialAngle;
     else
         weaponComponent.currentAngle = adjustedAngle + weaponComponent.initialAngle;
+    auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+    weaponTransformComponent.rotation = weaponComponent.currentAngle;
 }
 
 inline void WeaponSystem::updateStartingAngle(const Entity entity)
