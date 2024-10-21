@@ -9,13 +9,11 @@ extern Coordinator gCoordinator;
 class SpawnerSystem : public System
 {
 public:
-    void init();
+    SpawnerSystem() = default;
+
     void update(float);
     void clearSpawners();
-    void cleanUpUnnecessarySpawners();
     void spawnEnemies();
-
-    SpawnerSystem();
 
 private:
     float m_spawnTime{};
@@ -23,4 +21,5 @@ private:
     void processSpawner(SpawnerComponent &spawnerComponent, const TransformComponent &spawnerTransformComponent) const;
     bool isReadyToSpawn(int cooldown);
     void spawnEnemy(const TransformComponent &, Enemies::EnemyType) const;
+    void cleanUpUnnecessarySpawners();
 };

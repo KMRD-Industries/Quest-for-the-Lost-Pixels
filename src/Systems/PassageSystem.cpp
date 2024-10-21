@@ -6,8 +6,6 @@
 
 extern Coordinator gCoordinator;
 
-void PassageSystem::init() {}
-
 void PassageSystem::update()
 {
     for (const auto entity : m_entities)

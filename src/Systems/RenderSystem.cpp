@@ -8,6 +8,7 @@
 #include "Coordinator.h"
 #include "EnemyComponent.h"
 #include "GameUtility.h"
+#include "Helpers.h"
 #include "ItemComponent.h"
 #include "MultiplayerComponent.h"
 #include "PassageComponent.h"
@@ -26,9 +27,7 @@
 extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
 
-RenderSystem::RenderSystem() { init(); }
-
-void RenderSystem::init() { portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0); }
+RenderSystem::RenderSystem() { portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0); }
 
 void RenderSystem::draw(sf::RenderWindow& window)
 {

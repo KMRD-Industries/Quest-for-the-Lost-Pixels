@@ -5,6 +5,6 @@
 class TravellingSystem : public System
 {
 public:
-    void init();
+    TravellingSystem() = default;
     void update();
 };

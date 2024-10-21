@@ -18,10 +18,6 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-void ItemSystem::init() {}
-
-void ItemSystem::markClosest() {}
-
 void ItemSystem::displayWeaponStats(const Entity entity)
 {
     const auto &weapon = gCoordinator.getComponent<WeaponComponent>(entity);
