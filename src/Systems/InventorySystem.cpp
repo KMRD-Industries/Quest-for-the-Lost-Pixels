@@ -58,6 +58,7 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
         gCoordinator.removeComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity);
 
     gCoordinator.getComponent<ItemComponent>(pickUpItemInfo.itemEntity).equipped = true;
+    gCoordinator.getComponent<RenderComponent>(pickUpItemInfo.itemEntity).color = sf::Color::White;
 
     auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(pickUpItemInfo.characterEntity);
 

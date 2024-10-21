@@ -6,9 +6,7 @@
 class GameState : public State
 {
 public:
-    GameState()
-    {
-    };
+    GameState(){};
 
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;
@@ -17,4 +15,6 @@ public:
 private:
     Dungeon m_dungeon{};
     void handleCollision(float deltaTime);
+    CollisionSystem* m_collisionSystem = nullptr;
+    float m_oneFrameTime;
 };

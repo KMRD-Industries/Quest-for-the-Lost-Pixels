@@ -2,13 +2,22 @@
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
+#include "PublicConfigMenager.h"
 
 extern Coordinator gCoordinator;
+extern PublicConfigSingleton configSingleton;
 
-void CharacterSystem::update() const
+void CharacterSystem::update(const float& deltaTime)
 {
-    cleanUpDeadEntities();
+    if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 1000)
+    {
+        m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
+        performFixedUpdate();
+    }
 }
+
+void CharacterSystem::performFixedUpdate() { cleanUpDeadEntities(); }
+
 
 void CharacterSystem::cleanUpDeadEntities() const
 {
@@ -22,7 +31,7 @@ void CharacterSystem::cleanUpDeadEntities() const
 
         if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
         {
-           colliderComponent->toDestroy = true;
+            colliderComponent->toDestroy = true;
         }
         else
         {

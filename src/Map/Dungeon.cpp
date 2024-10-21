@@ -120,17 +120,11 @@ void Dungeon::render(sf::RenderWindow& window)
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponents(player,
-        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5},
-        RenderComponent{},
-        TransformComponent{GameUtility::startingPosition},
-        AnimationComponent{},
-        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
-        PlayerComponent{},
-        ColliderComponent{},
-        InventoryComponent{},
-        EquipmentComponent{},
-        FloorComponent{},
+    gCoordinator.addComponents(
+        player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
+        TransformComponent{GameUtility::startingPosition}, AnimationComponent{},
+        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP}, PlayerComponent{},
+        ColliderComponent{}, InventoryComponent{}, EquipmentComponent{}, FloorComponent{},
         TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }},
         PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
@@ -140,16 +134,14 @@ void Dungeon::createRemotePlayer(const uint32_t id)
     const auto tag = std::format("Player {}", id);
     m_entities[id] = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(m_entities[id],
+    gCoordinator.addComponents(
+        m_entities[id],
         TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, id),
                                         getSpawnOffset(configSingleton.GetConfig().startingPosition.y, id)),
                            0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
-        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3},
-        RenderComponent{},
-        AnimationComponent{},
-        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
-        MultiplayerComponent{},
-        ColliderComponent{});
+        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3}, RenderComponent{},
+        AnimationComponent{}, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
+        MultiplayerComponent{}, ColliderComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
         "Characters", configSingleton.GetConfig().playerAnimation);
@@ -245,17 +237,17 @@ void Dungeon::setupHelmetEntity(const Entity player) const
 
 void Dungeon::update(const float deltaTime)
 {
-    m_itemSystem->update();
+    m_itemSystem->update(deltaTime);
     m_playerMovementSystem->update(deltaTime);
     m_weaponSystem->update(deltaTime);
     m_animationSystem->update(deltaTime);
     m_roomListenerSystem->update(deltaTime);
     m_itemSpawnerSystem->updateAnimation(deltaTime);
-    m_enemySystem->update();
+    m_enemySystem->update(deltaTime);
+    m_textTagSystem->update(deltaTime);
+    m_characterSystem->update(deltaTime);
     m_travellingSystem->update();
     m_passageSystem->update();
-    m_characterSystem->update();
-    m_textTagSystem->update(deltaTime);
 
     if (m_multiplayerSystem->isConnected())
     {

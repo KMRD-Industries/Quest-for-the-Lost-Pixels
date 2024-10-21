@@ -8,7 +8,7 @@ class ItemSystem : public System
 {
 public:
     void init();
-    void update();
+    void update(const float& deltaTime);
     void markClosest();
     void displayWeaponStats(Entity entity);
     void displayHelmetStats(Entity entity);
@@ -18,5 +18,7 @@ public:
 
 private:
     float m_frameTime{};
+    double minDistance = std::numeric_limits<int>::max();
     GameType::PickUpInfo closestItem{};
+    void performFixedUpdate();
 };

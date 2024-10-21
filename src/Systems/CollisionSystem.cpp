@@ -98,12 +98,13 @@ void CollisionSystem::createMapCollision()
     }
 }
 
-void CollisionSystem::update(const float& deltaTime)
+void CollisionSystem::update(const float& deltaTime, float timeStep, int32 velocityIterations, int32 positionIterations)
 {
     if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 1000)
     {
         m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
         performFixedUpdate();
+        updateSimulation(timeStep, velocityIterations, positionIterations);
     }
 }
 

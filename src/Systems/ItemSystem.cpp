@@ -81,11 +81,10 @@ void ItemSystem::displayBodyArmourStats(const Entity entity)
     ImGui::PopStyleColor();
 }
 
-
-void ItemSystem::update()
+void ItemSystem::performFixedUpdate()
 {
     const auto &playerTransformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
-    double minDistance = std::numeric_limits<int>::max();
+    minDistance = std::numeric_limits<int>::max();
     closestItem = {};
 
     for (const auto entity : m_entities)
@@ -122,13 +121,25 @@ void ItemSystem::update()
     }
 
     if (closestItem.itemEntity == 0 || gCoordinator.hasComponent<ChestComponent>(closestItem.itemEntity))
-    {
         closestItem = {};
-        return;
+}
+
+void ItemSystem::update(const float &deltaTime)
+{
+    if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 1000)
+    {
+        m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
+        performFixedUpdate();
     }
 
     if (minDistance <= config::weaponInteractionDistance)
     {
+        if (closestItem.itemEntity == 0 || gCoordinator.hasComponent<ChestComponent>(closestItem.itemEntity))
+        {
+            closestItem = {};
+            return;
+        }
+
         gCoordinator.getComponent<RenderComponent>(closestItem.itemEntity).color = sf::Color(255, 102, 102);
 
         switch (closestItem.slot)
@@ -143,7 +154,7 @@ void ItemSystem::update()
             displayBodyArmourStats(closestItem.itemEntity);
             break;
         default:
-            return;
+            break;
         }
     }
     else

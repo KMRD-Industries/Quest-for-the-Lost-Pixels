@@ -1,12 +1,12 @@
 #pragma once
 
+#include <vector>
 #include "Config.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "SFML/Window/Window.hpp"
 #include "System.h"
-#include <vector>
 
 namespace sf
 {
@@ -54,4 +54,5 @@ private:
     std::vector<Entity> players;
     sf::Vector2u windowSize{};
     sf::Vector2f newMapOffset{};
+    float m_frameTime{};
 };

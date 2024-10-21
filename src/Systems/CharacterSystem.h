@@ -5,8 +5,10 @@ class CharacterSystem : public System
 {
 public:
     explicit CharacterSystem() = default;
-    void update() const;
+    void update(const float&);
 
 private:
     void cleanUpDeadEntities() const;
+    void performFixedUpdate();
+    float m_frameTime{};
 };

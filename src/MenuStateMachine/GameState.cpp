@@ -7,20 +7,17 @@
 #include "ObjectCreatorSystem.h"
 
 extern Coordinator gCoordinator;
+extern PublicConfigSingleton configSingleton;
 
 void GameState::init()
 {
     m_dungeon.m_stateChangeCallback = m_stateChangeCallback;
+    m_collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>().get();
+    m_oneFrameTime = configSingleton.GetConfig().oneFrameTime;
     m_dungeon.init();
 }
 
-void GameState::handleCollision(const float deltaTime)
-{
-    const auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
-    constexpr auto timeStep = 1.f / 60.f;
-    collisionSystem->update(deltaTime);
-    collisionSystem->updateSimulation(timeStep, 8, 3);
-}
+void GameState::handleCollision(const float deltaTime) { m_collisionSystem->update(deltaTime, m_oneFrameTime, 8, 3); }
 
 void GameState::render(sf::RenderWindow &window)
 {

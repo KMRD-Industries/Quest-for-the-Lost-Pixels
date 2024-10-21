@@ -17,7 +17,7 @@ void EnemySystem::init()
     dis = std::uniform_real_distribution<float>(-1, 1); // Range between -1 and 1
 }
 
-void EnemySystem::update()
+void EnemySystem::performFixedUpdate()
 {
     for (const auto entity : m_entities)
         if (gCoordinator.hasComponent<TransformComponent>(entity))
@@ -32,6 +32,15 @@ void EnemySystem::update()
         }
 }
 
+void EnemySystem::update(const float& deltaTime)
+{
+    if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 1000)
+    {
+        m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
+        performFixedUpdate();
+    }
+}
+
 void EnemySystem::deleteEnemies() const
 {
     std::vector<Entity> entitiesToKill;
@@ -43,6 +52,5 @@ void EnemySystem::deleteEnemies() const
         else
             entitiesToKill.push_back(entity);
 
-    for (const auto entity : entitiesToKill)
-        gCoordinator.destroyEntity(entity);
+    for (const auto entity : entitiesToKill) gCoordinator.destroyEntity(entity);
 }

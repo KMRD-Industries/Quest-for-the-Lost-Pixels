@@ -21,7 +21,7 @@ class CollisionSystem : public System
 {
 public:
     void init();
-    void update(const float&);
+    void update(const float&, float, int, int);
     void createMapCollision();
     void performFixedUpdate() const;
     void updateSimulation(float timeStep, int32 velocityIterations, int32 positionIterations) const;
