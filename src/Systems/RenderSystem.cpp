@@ -249,6 +249,8 @@ void RenderSystem::displayPortal(const Entity entity)
 
     if (gCoordinator.hasComponent<PassageComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity))
     {
+        if (!gCoordinator.getComponent<PassageComponent>(entity).activePassage) return;
+
         sf::Vector2f portalPosition = {};
         portalPosition.x = renderComponent.sprite.getPosition().x - renderComponent.sprite.getLocalBounds().width -
             9 * configSingleton.GetConfig().gameScale;

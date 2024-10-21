@@ -109,6 +109,7 @@ void Dungeon::init()
     addPlayerComponents(m_entities[m_id]);
     setupPlayerCollision(m_entities[m_id]);
     setupWeaponEntity(m_entities[m_id]);
+    m_passageSystem->setPassages(true);
 }
 
 void Dungeon::render(sf::RenderWindow& window)
@@ -120,17 +121,11 @@ void Dungeon::render(sf::RenderWindow& window)
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponents(player,
-        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5},
-        RenderComponent{},
-        TransformComponent{GameUtility::startingPosition},
-        AnimationComponent{},
-        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
-        PlayerComponent{},
-        ColliderComponent{},
-        InventoryComponent{},
-        EquipmentComponent{},
-        FloorComponent{},
+    gCoordinator.addComponents(
+        player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
+        TransformComponent{GameUtility::startingPosition}, AnimationComponent{},
+        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP}, PlayerComponent{},
+        ColliderComponent{}, InventoryComponent{}, EquipmentComponent{}, FloorComponent{},
         TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }},
         PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
 }
@@ -140,16 +135,14 @@ void Dungeon::createRemotePlayer(const uint32_t id)
     const auto tag = std::format("Player {}", id);
     m_entities[id] = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(m_entities[id],
+    gCoordinator.addComponents(
+        m_entities[id],
         TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, id),
                                         getSpawnOffset(configSingleton.GetConfig().startingPosition.y, id)),
                            0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
-        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3},
-        RenderComponent{},
-        AnimationComponent{},
-        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
-        MultiplayerComponent{},
-        ColliderComponent{});
+        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3}, RenderComponent{},
+        AnimationComponent{}, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
+        MultiplayerComponent{}, ColliderComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
         "Characters", configSingleton.GetConfig().playerAnimation);
@@ -188,6 +181,8 @@ void Dungeon::setupPlayerCollision(const Entity player)
         if (entityT.tag == "Passage")
         {
             auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
+
+            if (!passageComponent.activePassage) return;
 
             gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
             passageComponent.moveInDungeon.emplace_back(true);
