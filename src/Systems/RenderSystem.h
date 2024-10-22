@@ -1,12 +1,13 @@
 #pragma once
 
+#include <vector>
 #include "Config.h"
+#include "PlayerStatsGUI.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "SFML/Window/Window.hpp"
 #include "System.h"
-#include <vector>
 
 namespace sf
 {
@@ -48,6 +49,8 @@ private:
     void displayDamageTaken(Entity);
     void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);
     void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity) const;
+
+    PlayerStatsGUI* m_playerStatsGui = nullptr;
 
     std::vector<std::vector<std::pair<sf::Sprite*, bool*>>> tiles;
     sf::Sprite portalSprite;

@@ -179,6 +179,8 @@ set(UI
         Ui/TextDTO.h
         Ui/Text.h
         Ui/Text.cpp
+        Ui/PlayerStatsGUI.cpp
+        Ui/PlayerStatsGUI.h
 )
 
 

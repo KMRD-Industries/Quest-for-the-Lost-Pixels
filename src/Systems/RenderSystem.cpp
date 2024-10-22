@@ -12,6 +12,7 @@
 #include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
+#include "PlayerStatsGUI.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
 #include "SFML/Graphics/ConvexShape.hpp"
@@ -28,7 +29,11 @@ extern PublicConfigSingleton configSingleton;
 
 RenderSystem::RenderSystem() { init(); }
 
-void RenderSystem::init() { portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0); }
+void RenderSystem::init()
+{
+    portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0);
+    m_playerStatsGui = std::make_unique<PlayerStatsGUI>().get();
+}
 
 void RenderSystem::draw(sf::RenderWindow& window)
 {
@@ -287,89 +292,11 @@ void RenderSystem::displayDamageTaken(const Entity entity)
     }
 }
 
-void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const Entity entity) const
-{
-    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 370), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(270, 0), ImGuiCond_Always); // Set the width to 250, height is auto
-    ImGui::Begin("Player Stats", nullptr,
-                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysUseWindowPadding);
-
-    const auto pos = gCoordinator.getComponent<TransformComponent>(entity);
-    const auto& tile = gCoordinator.getComponent<TileComponent>(entity);
-    const auto& render = gCoordinator.getComponent<RenderComponent>(entity);
-
-    ImGui::Separator();
-    ImGui::Text("Player Movement");
-    ImGui::Separator();
-
-    ImGui::Text("Position: (X: %.2f, Y: %.2f)", pos.position.x, pos.position.y);
-    ImGui::Text("Velocity: (X: %.2f, Y: %.2f)", pos.velocity.x, pos.velocity.y);
-
-    ImGui::Separator();
-    ImGui::Text("Sprite Information");
-    ImGui::Separator();
-
-    ImGui::Text("Sprite Position: (X: %.0f, Y: %.0f)", render.sprite.getGlobalBounds().left,
-                render.sprite.getGlobalBounds().top);
-    ImGui::Text("Sprite Size: Width: %.0f, Height: %.0f", render.sprite.getGlobalBounds().width,
-                render.sprite.getGlobalBounds().height);
-    ImGui::Text("Tile ID: %.0f", tile.id);
-    ImGui::End();
-}
-
-void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const Entity entity)
-{
-    const auto& equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
-    if (!equipment.slots.contains(GameType::slotType::WEAPON)) return;
-
-    const auto& weapon = gCoordinator.getComponent<WeaponComponent>(equipment.slots.at(GameType::slotType::WEAPON));
-
-    // Display the Weapon Stats table in the top-right corner
-    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 10));
-    ImGui::SetNextWindowSize(ImVec2(270, 0));
-    ImGui::Begin("Weapon Stats", nullptr,
-                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysUseWindowPadding);
-
-    ImGui::Separator();
-    ImGui::Text("Weapon Details");
-    ImGui::Separator();
-
-    ImGui::Text("ID: %d", weapon.id);
-    ImGui::Text("Damage: %d", weapon.damageAmount);
-
-    ImGui::Separator();
-    ImGui::Text("Status Flags");
-    ImGui::Separator();
-
-    ImGui::Text("Is Attacking: %s", weapon.isAttacking ? "Yes" : "No");
-    ImGui::Text("Attack Queued: %s", weapon.queuedAttack ? "Yes" : "No");
-    ImGui::Text("Swinging Forward: %s", weapon.isSwingingForward ? "Yes" : "No");
-    ImGui::Text("Facing Right: %s", weapon.isFacingRight ? "Yes" : "No");
-
-    ImGui::Separator();
-    ImGui::Text("Angles and Rotation");
-    ImGui::Separator();
-
-    ImGui::Text("Current Angle: %.2f degrees", weapon.currentAngle);
-    ImGui::Text("Starting Angle: %.2f degrees", weapon.initialAngle);
-    ImGui::Text("Rotation Speed: %.2f degrees/sec", weapon.rotationSpeed);
-    ImGui::Text("Recoil Amount: %.2f", weapon.recoilAmount);
-
-    ImGui::Separator();
-    ImGui::Text("Movement and Position");
-    ImGui::Separator();
-
-    ImGui::Text("Distance to Travel: %.2f units", weapon.remainingDistance);
-    ImGui::Text("Pivot Point: (%d, %d)", weapon.pivotPoint.x, weapon.pivotPoint.y);
-    ImGui::Text("Target Point: (%d, %d)", weapon.targetPoint.x, weapon.targetPoint.y);
-    ImGui::Text("Target Angle: %.2f degrees", weapon.targetAngleDegrees);
-
-    ImGui::End();
-}
-
 void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
 {
     if (!gCoordinator.hasComponent<RenderComponent>(config::playerEntity)) return;
+
+    m_playerStatsGui->displayEntityExplorator(window);
 
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
@@ -429,8 +356,8 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
 
         if (gCoordinator.hasComponent<EquipmentComponent>(entity))
         {
-            displayWeaponStatsTable(window, entity);
-            displayPlayerStatsTable(window, entity);
+            m_playerStatsGui->displayPlayerStatsTable(window, entity);
+            m_playerStatsGui->displayWeaponStatsTable(window, entity);
         }
 
         if (gCoordinator.hasComponent<PlayerComponent>(entity) && gCoordinator.hasComponent<EquipmentComponent>(entity))
