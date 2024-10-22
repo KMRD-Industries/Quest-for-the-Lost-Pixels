@@ -58,6 +58,9 @@ private:
     float getSpawnOffset(float, int);
     void changeRoom(const glm::ivec2& dir);
     void updateEnemyPositions(const comm::EnemyPositionsUpdate& enemyPositionsUpdate);
+    void sendRoomDimensions();
+    void updateMap();
+    void mapServerIdToGameId(uint32 serverEntity, float x, float y);
 
     std::string m_asset_path;
     FloorGenerator m_floorGenerator;

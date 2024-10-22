@@ -39,9 +39,10 @@ public:
     void roomChanged(const glm::ivec2& room);
     void init();
     void update();
-    void updateMap(const std::map<Entity, sf::Vector2<float>>& enemies, const std::map<Entity, ObstacleData>& obstacles, const std::map<Entity, sf::Vector2<int>>& players);
+    void updateMap(const std::map<Entity, sf::Vector2<float>>& enemies, const std::map<Entity, ObstacleData>& obstacles,
+                   const std::map<Entity, sf::Vector2<int>>& players);
     void setMapDimensions(const std::map<Entity, ObstacleData>& obstacles);
-    void setEnemyPositions();
+    void askForEnemyId(Entity enemyId, sf::Vector2<float> position);
     void disconnect();
 
     bool isConnected() const noexcept;

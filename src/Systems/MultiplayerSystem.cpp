@@ -47,6 +47,7 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port) no
 
         auto r2 = new comm::Room();
         m_position.set_allocated_curr_room(r2);
+        //TODO wyślij tutaj info o wymiarach pierwszej mapy i potem spradź jak działa wysłanie mapy razem z updatem pokoju
     }
     catch (boost::system::system_error)
     {
@@ -111,7 +112,7 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
         std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
 
         state.ParseFromArray(m_buf.data(), int(received));
-        std::cout << state.ShortDebugString() << '\n';
+        // std::cout << state.ShortDebugString() << '\n';
 
         if (state.variant() == comm::ROOM_CHANGED)
         {
@@ -227,14 +228,19 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
                                   const std::map<Entity, sf::Vector2<int>>& players)
 {
     comm::MapPositionsUpdate mapUpdate;
-    std::cout << "another update!!!!\n";
+    // std::cout << "another update!!!!\n";
     for (const auto& enemy : enemies)
     {
-        std::cout << "enemy's position: x: " << enemy.second.x << " y: " << enemy.second.y << "\n";
+        if (gCoordinator.getServerEntity(enemy.first) == 0)
+        {
+            //TODO imo powinno być return
+            continue;
+        }
+        // std::cout << "enemy's position: x: " << enemy.second.x << " y: " << enemy.second.y << "\n";
         comm::Enemy* enemy_position = mapUpdate.add_enemies();
         enemy_position->set_x(enemy.second.x);
         enemy_position->set_y(enemy.second.y);
-        enemy_position->set_id(enemy.first);
+        enemy_position->set_id(gCoordinator.getServerEntity(enemy.first));
     }
 
     for (const auto& player : players)
@@ -250,7 +256,7 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
     *message.mutable_mappositionsupdate() = mapUpdate;
 
     auto serializedMessage = message.SerializeAsString();
-    std::cout << "Sending map updated message, size: " << serializedMessage.size() << "\n";
+    // std::cout << "Sending map updated message, size: " << serializedMessage.size() << "\n";
 
     m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
@@ -271,14 +277,23 @@ void MultiplayerSystem::setMapDimensions(const std::map<Entity, ObstacleData>& o
     *message.mutable_mapdimensionsupdate() = mapDimensionsUpdate;
 
     auto serializedMessage = message.SerializeAsString();
-    std::cout << "Sending map dimension update message, size: " << serializedMessage.size() << "\n";
+    // std::cout << "Sending map dimension update message, size: " << serializedMessage.size() << "\n";
 
     m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
 
+void MultiplayerSystem::askForEnemyId(const Entity enemyId, const sf::Vector2<float> position)
+{
+    const auto spawnRequest = new comm::Enemy;
+    spawnRequest->set_id(enemyId);
+    spawnRequest->set_x(position.x);
+    spawnRequest->set_y(position.y);
 
-void MultiplayerSystem::setEnemyPositions() {
-    std::size_t received = m_tcp_socket.receive(boost::asio::buffer(m_buf));
+    comm::StateUpdate message;
+    message.set_variant(comm::StateVariant::SPAWN_ENEMY_REQUEST);
+    *message.mutable_spawnenemyrequest() = *spawnRequest;
 
+    auto serializedMessage = message.SerializeAsString();
+    m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
 

@@ -14,6 +14,8 @@ public:
     void clearSpawners();
     void cleanUpUnnecessarySpawners();
     void spawnEnemies();
+    int getSpawners();
+    void getSpawnerPositions();
 
     SpawnerSystem();
 

@@ -23,10 +23,10 @@ void EnemySystem::update(std::unordered_map<Entity, sf::Vector2<float>> &enemies
         {
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(enemy.first);
 
-            transformComponent.velocity.x = enemy.second.x * 250;
-            transformComponent.velocity.y = -enemy.second.y * 250;
+            transformComponent.velocity.x = enemy.second.x * 60;
+            transformComponent.velocity.y = -enemy.second.y * 60;
 
-            printf("[Adding new positions] x: %f, y: %f\n", enemy.second.x, enemy.second.y);
+            // printf("[Adding new positions] x: %f, y: %f\n", enemy.second.x, enemy.second.y);
         }
     }
     enemies.clear();

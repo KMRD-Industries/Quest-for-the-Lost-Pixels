@@ -7,13 +7,20 @@
 
 #include <memory>
 
+#include "ServerEntityManager.h"
+
 class Coordinator
 {
 public:
     Coordinator();
     void init();
     Entity createEntity() const;
+    Entity createServerEntity() const;
     void destroyEntity(Entity entity) const;
+    void destroyServerEntity(Entity entity) const;
+    void mapEntity(Entity serverEntity, Entity gameEntity) const;
+    Entity getServerEntity(Entity gameEntity) const;
+    Entity getGameEntity(Entity serverEntity) const;
 
     template <typename T>
     void registerComponent() const
@@ -91,4 +98,5 @@ private:
     std::unique_ptr<ComponentManager> m_componentManager;
     std::unique_ptr<EntityManager> m_entityManager;
     std::unique_ptr<SystemManager> m_systemManager;
+    std::unique_ptr<ServerEntityManager> m_serverEntityManager;
 };

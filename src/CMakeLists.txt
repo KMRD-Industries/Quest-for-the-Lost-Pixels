@@ -136,6 +136,8 @@ set(UTILS
         Utils/Timer.h
         Utils/TextTag.h
         Utils/GameUtility.h
+        Core/ServerEntityManager.cpp
+        Core/ServerEntityManager.h
 )
 
 source_group("Core" FILES ${CORE})

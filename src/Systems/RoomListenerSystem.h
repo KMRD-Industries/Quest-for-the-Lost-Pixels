@@ -24,4 +24,5 @@ private:
     bool m_isCurrentRoomClear{};
     bool m_toLoot{};
     glm::ivec2 m_currentRoom{};
+
 };

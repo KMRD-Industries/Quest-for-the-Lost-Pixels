@@ -9,6 +9,7 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
+#include "MultiplayerSystem.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
 #include "TextureSystem.h"
@@ -23,7 +24,6 @@ void SpawnerSystem::init() {}
 
 void SpawnerSystem::update(const float timeStamp)
 {
-
     for (const auto entity : m_entities)
     {
         auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
@@ -32,6 +32,7 @@ void SpawnerSystem::update(const float timeStamp)
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
 
+    // TODO przenieś do stałej
     m_spawnTime += timeStamp * 1000.f;
 
     if (m_spawnTime >= SPAWN_RATE) m_spawnTime -= SPAWN_RATE;
@@ -65,6 +66,10 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     gCoordinator.addComponents(newMonsterEntity, enemyConfig.textureData, transformComponent, RenderComponent{},
                                AnimationComponent{}, EnemyComponent{}, ColliderComponent{enemyConfig.collisionData},
                                CharacterComponent{.hp = enemyConfig.hp});
+
+    sf::Vector2f spawnPosition = transformComponent.position;
+    std::shared_ptr<MultiplayerSystem> multiplayer_system = gCoordinator.getRegisterSystem<MultiplayerSystem>();
+    multiplayer_system->askForEnemyId(newMonsterEntity, spawnPosition);
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
@@ -135,4 +140,19 @@ void SpawnerSystem::cleanUpUnnecessarySpawners()
     }
     for (const auto entity : entityToKill) gCoordinator.destroyEntity(entity);
     entityToKill.clear();
+}
+
+int SpawnerSystem::getSpawners()
+{
+    printf("SpawnerSystem::getSpawners, there is %lu spawners.\n", m_entities.size());
+    return static_cast<int>(m_entities.size());
+}
+
+void SpawnerSystem::getSpawnerPositions()
+{
+    for (const auto entity : m_entities)
+    {
+        sf::Vector2f position = gCoordinator.getComponent<TransformComponent>(entity).position;
+
+    }
 }
