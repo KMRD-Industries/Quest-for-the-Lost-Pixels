@@ -157,7 +157,10 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
         AnimationComponent{},
         CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
         MultiplayerComponent{},
-        ColliderComponent{});
+        ColliderComponent{},
+        InventoryComponent{},
+        EquipmentComponent{}
+    );
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", configSingleton.GetConfig().playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[playerID]).collision = cc;
@@ -627,7 +630,7 @@ void Dungeon::setECS()
     const auto weaponSystem = gCoordinator.getRegisterSystem<WeaponSystem>();
     {
         Signature signature;
-        signature.set(gCoordinator.getComponentType<PlayerComponent>());
+        signature.set(gCoordinator.getComponentType<EquipmentComponent>());
         gCoordinator.setSystemSignature<WeaponSystem>(signature);
     }
 

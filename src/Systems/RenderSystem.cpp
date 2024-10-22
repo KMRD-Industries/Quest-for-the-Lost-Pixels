@@ -37,7 +37,9 @@ void RenderSystem::draw(sf::RenderWindow& window)
 
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.hasComponent<PlayerComponent>(entity)) players.push_back(entity);
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
+            gCoordinator.hasComponent<MultiplayerComponent>(entity))
+            players.push_back(entity);
 
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
@@ -106,10 +108,10 @@ void RenderSystem::updatePlayerSprite(const Entity entity) { setEquipment(entity
 
 void RenderSystem::setEquipment(const Entity entity)
 {
-    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(config::playerEntity);
+    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
 
     auto& playerRenderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-    auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(config::playerEntity);
+    auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
     for (const auto it : equipment)
     {
@@ -440,7 +442,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
             sf::VertexArray swordLine(sf::Lines, 2);
-            swordLine[0].position = center;
+            swordLine[0].position = transformComponent.position + GameUtility::mapOffset;
             swordLine[0].color = sf::Color::Red;
             swordLine[1].position =
                 gCoordinator.getComponent<WeaponComponent>(weaponComponent.slots.at(GameType::slotType::WEAPON))

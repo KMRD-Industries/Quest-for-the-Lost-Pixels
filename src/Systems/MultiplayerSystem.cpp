@@ -14,6 +14,7 @@
 #include "Helpers.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
+#include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "Types.h"
 
@@ -172,16 +173,16 @@ void MultiplayerSystem::update()
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
 
-            if (const auto equippedWeapon = gCoordinator.tryGetComponent<EquipmentComponent>(target)) {
+            const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(target);
+            const Entity& weaponEntity = equippedWeapon.slots.at(GameType::slotType::WEAPON);
+            auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
 
-                auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon->slots.at(GameType::slotType::WEAPON));
-                const auto& windowSize = InputHandler::getInstance()->getWindowSize();
+            const auto& windowSize = InputHandler::getInstance()->getWindowSize();
 
-                weaponComponent.pivotPoint.x = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
-                weaponComponent.pivotPoint.y = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
+            weaponComponent.pivotPoint.x = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
+            weaponComponent.pivotPoint.y = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
 
-                weaponComponent.isAttacking = m_incomming_movement.attack();
-            }
+            weaponComponent.isAttacking = m_incomming_movement.attack();
 
             float x = m_incomming_movement.position_x();
             float y = m_incomming_movement.position_y();
