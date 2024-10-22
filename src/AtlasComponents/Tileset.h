@@ -4,15 +4,13 @@
 #include <vector>
 #include "AnimationFrame.h"
 
-struct ObjectProperty
-{
+struct ObjectProperty {
     std::string name;
     std::string type;
     std::string value;
 };
 
-struct Collision
-{
+struct Collision {
     int id{};
     float x{};
     float y{};
@@ -20,23 +18,19 @@ struct Collision
     float height{16};
     std::vector<ObjectProperty> properties;
 
-    // Equality operator
-    bool operator==(const Collision& other) const
-    {
+    bool operator==(const Collision &other) const {
         return x == other.x && y == other.y && width == other.width && height == other.height;
     }
 };
 
-struct Tile
-{
+struct Tile {
     int id;
     std::vector<ObjectProperty> properties;
     std::vector<AnimationFrame> animation;
     std::vector<Collision> objects;
 };
 
-struct Tileset
-{
+struct Tileset {
     int columns;
     std::string image;
     int imageheight;

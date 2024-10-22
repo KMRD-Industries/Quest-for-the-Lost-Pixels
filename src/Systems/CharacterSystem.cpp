@@ -1,5 +1,4 @@
 #include "CharacterSystem.h"
-
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"

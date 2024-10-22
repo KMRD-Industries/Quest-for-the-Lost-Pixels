@@ -7,12 +7,10 @@
 #include <cassert>
 #include <unordered_map>
 
-template <typename T>
-class ComponentArray final : public IComponentArray
-{
+template<typename T>
+class ComponentArray final : public IComponentArray {
 public:
-    void insertData(const Entity entity, const T& component)
-    {
+    void insertData(const Entity entity, const T &component) {
         assert(!m_entityToIndex.contains(entity) && "Component added to same entity more than once.");
         const size_t newIndex{m_size};
         m_entityToIndex[entity] = newIndex;
@@ -21,8 +19,7 @@ public:
         ++m_size;
     }
 
-    void removeData(const Entity entity)
-    {
+    void removeData(const Entity entity) {
         assert(m_entityToIndex.contains(entity) && "Removing non-existent component.");
 
         const size_t indexOfRemovedEntity{m_entityToIndex[entity]};
@@ -39,27 +36,20 @@ public:
         --m_size;
     }
 
-    bool hasComponent(const Entity entity) const
-    {
-        return m_entityToIndex.contains(entity);
-    }
+    bool hasComponent(const Entity entity) const { return m_entityToIndex.contains(entity); }
 
-    T* tryGetData(const Entity entity)
-    {
-        if(!m_entityToIndex.contains(entity)) return nullptr;
+    T *tryGetData(const Entity entity) {
+        if (!m_entityToIndex.contains(entity)) return nullptr;
         return &m_componentArray[m_entityToIndex[entity]];
     }
 
-    T& getData(const Entity entity)
-    {
+    T &getData(const Entity entity) {
         assert(m_entityToIndex.contains(entity) && "Retrieving non-existent component.");
         return m_componentArray[m_entityToIndex[entity]];
     }
 
-    void entityDestroyed(const Entity entity) override
-    {
-        if (m_entityToIndex.contains(entity))
-        {
+    void entityDestroyed(const Entity entity) override {
+        if (m_entityToIndex.contains(entity)) {
             removeData(entity);
         }
     }

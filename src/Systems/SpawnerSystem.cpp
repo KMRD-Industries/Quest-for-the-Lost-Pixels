@@ -1,7 +1,5 @@
 #include "SpawnerSystem.h"
-
 #include <regex>
-
 #include "AnimationComponent.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
@@ -9,11 +7,10 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
-#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
+#include "TextTagComponent.h"
 #include "TextureSystem.h"
-#include "TileComponent.h"
 #include "TransformComponent.h"
 
 extern PublicConfigSingleton configSingleton;
@@ -22,9 +19,7 @@ constexpr float SPAWN_RATE = 3600.f;
 
 SpawnerSystem::SpawnerSystem() { init(); }
 
-void SpawnerSystem::init()
-{
-}
+void SpawnerSystem::init() {}
 
 void SpawnerSystem::update(const float timeStamp)
 {
@@ -38,8 +33,7 @@ void SpawnerSystem::update(const float timeStamp)
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
 
-    if (m_spawnTime >= SPAWN_RATE)
-        m_spawnTime -= SPAWN_RATE;
+    if (m_spawnTime >= SPAWN_RATE) m_spawnTime -= SPAWN_RATE;
 
     cleanUpUnnecessarySpawners();
 }
@@ -48,8 +42,7 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
                                    const TransformComponent& spawnerTransformComponent) const
 {
     // Check if the spawner is ready to spawn the enemy.
-    if (m_spawnTime < SPAWN_RATE)
-        return;
+    if (m_spawnTime < SPAWN_RATE) return;
 
     // Spawn the enemy and increment the spawn count.
     spawnerComponent.noSpawns++;
@@ -78,30 +71,31 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
         newMonsterEntity, "Enemy",
         [&, newMonsterEntity, enemyConfig](const GameType::CollisionData& collisionData)
         {
-            if (!std::regex_match(collisionData.tag, config::playerRegexTag))
-                return;
+            if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;
 
             playerCharacterComponent.hp -= enemyConfig.damage;
 
-            if (!configSingleton.GetConfig().applyKnockback)
-                return;
+            const Entity tag = gCoordinator.createEntity();
+            gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});
+            gCoordinator.addComponent(
+                tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collisionData.entityID)});
+
+            if (!config::applyKnockback) return;
 
             auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
             auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
 
             b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -
-                myCollisionComponent.body->GetPosition()};
+                                      myCollisionComponent.body->GetPosition()};
             knockbackDirection.Normalize();
 
             const auto knockbackForce{configSingleton.GetConfig().defaultEnemyKnockbackForce * knockbackDirection};
             playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
         },
-        [&](const GameType::CollisionData&)
-        {
-        }, false, false);
+        [&](const GameType::CollisionData&) {}, false, false);
 
     gCoordinator.addComponent(newEventEntity, newEvent);
 }
@@ -110,8 +104,7 @@ void SpawnerSystem::clearSpawners()
 {
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity : m_entities)
-        entityToRemove.push_back(entity);
+    for (const auto entity : m_entities) entityToRemove.push_back(entity);
 
     while (!entityToRemove.empty())
     {
@@ -137,10 +130,13 @@ void SpawnerSystem::cleanUpUnnecessarySpawners()
     std::unordered_set<Entity> entityToKill{};
 
     for (const auto entity : m_entities)
+    {
         if (const auto& spawner = gCoordinator.getComponent<SpawnerComponent>(entity);
             !spawner.loopSpawn && spawner.noSpawns >= 1)
+        {
             entityToKill.insert(entity);
-    for (const auto entity : entityToKill)
-        gCoordinator.destroyEntity(entity);
+        }
+    }
+    for (const auto entity : entityToKill) gCoordinator.destroyEntity(entity);
     entityToKill.clear();
 }

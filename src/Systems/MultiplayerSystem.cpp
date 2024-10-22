@@ -9,7 +9,8 @@
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
-#include "EquippedWeaponComponent.h"
+#include "EquipmentComponent.h"
+#include "GameTypes.h"
 #include "Helpers.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
@@ -171,9 +172,9 @@ void MultiplayerSystem::update()
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
 
-            if (const auto equippedWeapon = gCoordinator.tryGetComponent<EquippedWeaponComponent>(target))
-            {
-                auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon->currentWeapon);
+            if (const auto equippedWeapon = gCoordinator.tryGetComponent<EquipmentComponent>(target)) {
+
+                auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon->slots.at(GameType::slotType::WEAPON));
                 const auto& windowSize = InputHandler::getInstance()->getWindowSize();
 
                 weaponComponent.pivotPoint.x = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
@@ -199,8 +200,8 @@ void MultiplayerSystem::update()
     m_last_tick = tick;
 
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
-    const auto& equippedWeapon = gCoordinator.getComponent<EquippedWeaponComponent>(m_player_entity);
-    const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.currentWeapon);
+    const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(m_player_entity);
+    const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.slots.at(GameType::slotType::WEAPON));
 
     const auto& windowSize = InputHandler::getInstance()->getWindowSize();
     float scaledPivotX = weaponComponent.pivotPoint.x / static_cast<float>(windowSize.x);

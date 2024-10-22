@@ -1,7 +1,6 @@
 #pragma once
 
 #include <unordered_map>
-#include "nlohmann/json.hpp"
 
 struct Property
 {

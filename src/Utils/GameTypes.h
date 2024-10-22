@@ -45,7 +45,7 @@ namespace Items
         {"Heal", Behaviours::HEAL},
         {"DmgUp", Behaviours::DMGUP},
     };
-}
+} // namespace Items
 
 namespace Enemies
 {
@@ -75,25 +75,17 @@ namespace GameType
         float x, y;
 
         // Constructors
-        MyVec2(const float x, const float y) : x{x}, y{y}
-        {
-        }
+        MyVec2(const float x, const float y) : x{x}, y{y} {}
 
-        MyVec2(const glm::vec2& vec) : x(vec.x), y(vec.y)
-        {
-        }
+        MyVec2(const glm::vec2& vec) : x(vec.x), y(vec.y) {}
 
         operator glm::vec2() const { return {x, y}; }
 
-        MyVec2(const sf::Vector2f& vec) : x(vec.x), y(vec.y)
-        {
-        }
+        MyVec2(const sf::Vector2f& vec) : x(vec.x), y(vec.y) {}
 
         operator sf::Vector2f() const { return {x, y}; }
 
-        MyVec2(const b2Vec2& vec) : x(vec.x), y(vec.y)
-        {
-        }
+        MyVec2(const b2Vec2& vec) : x(vec.x), y(vec.y) {}
 
         operator b2Vec2() const { return {x, y}; }
 
@@ -253,6 +245,37 @@ namespace GameType
         Entity entityID;
         std::string tag;
         MyVec2 position;
+    };
+
+    enum slotType : int
+    {
+        WEAPON = 1,
+        HELMET = 2,
+        BODY_ARMOUR = 3
+    };
+
+    struct PickUpInfo
+    {
+        Entity characterEntity;
+        Entity itemEntity;
+        slotType slot;
+    };
+
+    enum itemLootType : int
+    {
+        WEAPON_LOOT = 1,
+        BODY_ARMOUR_LOOT = 2,
+        POTION_LOOT = 3,
+        HELMET_LOOT = 4
+    };
+
+    struct slotTypeHash
+    {
+        template <typename T>
+        std::size_t operator()(T t) const
+        {
+            return static_cast<std::size_t>(t);
+        }
     };
 } // namespace GameType
 

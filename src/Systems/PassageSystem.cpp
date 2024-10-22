@@ -1,5 +1,4 @@
 #include "PassageSystem.h"
-
 #include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "PassageComponent.h"

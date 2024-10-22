@@ -1,7 +1,6 @@
 #pragma once
 
 #include <random>
-#include <stdint.h>
 #include "Coordinator.h"
 
 extern Coordinator gCoordinator;
