@@ -87,11 +87,11 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/..\/..\/..\/..\/CLionProjects\/Quest-for-the-Lost-Pixels\/assets\/tileSets\/CosmicLilac.json"
+         "source":"..\/..\/tileSets\/CosmicLilac.json"
         }, 
         {
          "firstgid":105,
-         "source":"..\/..\/..\/..\/..\/..\/CLionProjects\/Quest-for-the-Lost-Pixels\/assets\/tileSets\/SpecialBlocks.json"
+         "source":"..\/..\/tileSets\/SpecialBlocks.json"
         }, 
         {
          "firstgid":217,
