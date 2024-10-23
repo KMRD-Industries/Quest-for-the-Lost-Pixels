@@ -31,14 +31,13 @@
 #include "State.h"
 #include "TextTagSystem.h"
 #include "TravellingSystem.h"
+#include "WeaponBindSystem.h"
 #include "WeaponsSystem.h"
 
 class Dungeon
 {
 public:
-    Dungeon() : m_entities(MAX_ENTITIES - 1)
-    {
-    };
+    Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
     void init();
     void render(sf::RenderWindow& window);
@@ -97,4 +96,5 @@ private:
     RoomListenerSystem* m_roomListenerSystem;
     ItemSpawnerSystem* m_itemSpawnerSystem;
     ItemSystem* m_itemSystem;
+    WeaponBindSystem* m_weaponBindSystem;
 };

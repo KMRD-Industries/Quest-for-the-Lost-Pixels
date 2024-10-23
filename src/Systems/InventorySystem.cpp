@@ -1,5 +1,6 @@
 #include "InventorySystem.h"
 #include "AnimationSystem.h"
+#include "BindSwingWeaponEvent.h"
 #include "BodyArmourComponent.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
@@ -15,6 +16,7 @@
 #include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
+#include "WeaponSwingComponent.h"
 
 void InventorySystem::dropItem(const Entity player, const Entity item, const GameType::slotType slot) const
 {
@@ -57,48 +59,6 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
     if (gCoordinator.hasComponent<PotionComponent>(pickUpItemInfo.itemEntity)) return;
     gCoordinator.getRegisterSystem<CollisionSystem>()->deleteBody(pickUpItemInfo.itemEntity);
 
-    auto weaponColliderComponent = ColliderComponent{true, "Weapon"};
-    weaponColliderComponent.onCollisionEnter = [](const GameType::CollisionData& data) {};
-
-    gCoordinator.removeComponent<ColliderComponent>(pickUpItemInfo.itemEntity);
-    gCoordinator.addComponent(pickUpItemInfo.itemEntity, weaponColliderComponent);
-
-    const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(
-        pickUpItemInfo.itemEntity, "Weapon",
-        [](const GameType::CollisionData& data)
-        {
-            auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(data.entityID);
-            const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(data.entityID);
-            auto& secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(data.entityID);
-
-            const Entity tag = gCoordinator.createEntity();
-            gCoordinator.addComponent(tag, TextTagComponent{});
-            gCoordinator.addComponent(tag, TransformComponent{secondPlayertransformComponent});
-
-            characterComponent.attacked = true;
-            characterComponent.hp -= configSingleton.GetConfig().playerAttackDamage;
-
-            const b2Vec2& attackerPos =
-                gCoordinator.getComponent<ColliderComponent>(config::playerEntity).body->GetPosition();
-            const b2Vec2& targetPos = colliderComponent.body->GetPosition();
-
-            b2Vec2 recoilDirection = targetPos - attackerPos;
-            recoilDirection.Normalize();
-
-            const float& recoilMagnitude = 20.0f;
-            const b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
-
-            secondPlayertransformComponent.velocity.x +=
-                static_cast<float>(recoilVelocity.x * configSingleton.GetConfig().meterToPixelRatio);
-            secondPlayertransformComponent.velocity.y +=
-                static_cast<float>(recoilVelocity.y * configSingleton.GetConfig().meterToPixelRatio);
-        },
-        [](const GameType::CollisionData&) {}, false, false, true);
-
-    gCoordinator.addComponent(entity, newEvent);
-
-
     if (gCoordinator.hasComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity))
         gCoordinator.removeComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity);
 
@@ -110,4 +70,6 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
         dropItem(pickUpItemInfo.characterEntity, it->second, it->first);
 
     equipment.emplace(pickUpItemInfo.slot, pickUpItemInfo.itemEntity);
+
+    gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
 }

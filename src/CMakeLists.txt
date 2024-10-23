@@ -58,6 +58,8 @@ set(COMPONENTS
         Components/PotionComponent.h
         Components/BodyArmourComponent.h
         Components/EquipmentComponent.h
+        Components/WeaponSwingComponent.h
+        Components/BindSwingWeaponEvent.h
 )
 
 set(UI_COMPONENTS
@@ -122,6 +124,10 @@ set(SYSTEMS
         Systems/PassageSystem.h
         Systems/ItemSystem.cpp
         Systems/ItemSystem.h
+        Systems/WeaponBindSystem.cpp
+        Systems/WeaponBindSystem.h        
+        Systems/DealDMGToEnemySystem.cpp
+        Systems/DealDMGToEnemySystem.h
 )
 
 set(EVENT_SYSTEMS

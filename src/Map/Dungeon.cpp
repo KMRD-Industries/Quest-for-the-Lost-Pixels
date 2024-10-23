@@ -13,6 +13,7 @@
 #include <format>
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
+#include "BindSwingWeaponEvent.h"
 #include "CharacterComponent.h"
 #include "CharacterSystem.h"
 #include "ChestComponent.h"
@@ -54,9 +55,10 @@
 #include "TravellingDungeonComponent.h"
 #include "TravellingSystem.h"
 #include "WeaponComponent.h"
+#include "WeaponSwingComponent.h"
 #include "WeaponsSystem.h"
 
-extern Coordinator Coordinator;
+extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
 
 void Dungeon::init()
@@ -210,16 +212,13 @@ void Dungeon::setupWeaponEntity(const Entity player)
     gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
-    auto weaponColliderComponent = ColliderComponent{true, "Weapon"};
-    weaponColliderComponent.onCollisionEnter = [](const GameType::CollisionData& data) {};
-    gCoordinator.addComponent(weaponEntity, weaponColliderComponent);
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
     gCoordinator.addComponent(weaponEntity, ItemAnimationComponent{});
     gCoordinator.addComponent(weaponEntity, CharacterComponent{});
     gCoordinator.addComponent(weaponEntity, ItemComponent{.equipped = true});
+    gCoordinator.addComponent(weaponEntity, WeaponSwingComponent{});
 
     m_inventorySystem->pickUpItem(GameType::PickUpInfo{player, weaponEntity, GameType::slotType::WEAPON});
-    m_weapon = weaponEntity;
 }
 
 void Dungeon::setupHelmetEntity(const Entity player) const
@@ -251,6 +250,7 @@ void Dungeon::update(const float deltaTime)
     m_passageSystem->update();
     m_characterSystem->update();
     m_textTagSystem->update(deltaTime);
+    m_weaponBindSystem->update();
 
     if (m_multiplayerSystem->isConnected())
     {
@@ -276,44 +276,6 @@ void Dungeon::update(const float deltaTime)
         }
 
         m_multiplayerSystem->update();
-    }
-    if (m_weapon != -1)
-    {
-        const Entity entity = gCoordinator.createEntity();
-        const auto newEvent = CreateBodyWithCollisionEvent(
-            m_weapon, "Weapon",
-            [](const GameType::CollisionData& data)
-            {
-                auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(data.entityID);
-                const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(data.entityID);
-                auto& secondPlayertransformComponent = gCoordinator.getComponent<TransformComponent>(data.entityID);
-
-                const Entity tag = gCoordinator.createEntity();
-                gCoordinator.addComponent(tag, TextTagComponent{});
-                gCoordinator.addComponent(tag, TransformComponent{secondPlayertransformComponent});
-
-                characterComponent.attacked = true;
-                characterComponent.hp -= configSingleton.GetConfig().playerAttackDamage;
-
-                const b2Vec2& attackerPos =
-                    gCoordinator.getComponent<ColliderComponent>(config::playerEntity).body->GetPosition();
-                const b2Vec2& targetPos = colliderComponent.body->GetPosition();
-
-                b2Vec2 recoilDirection = targetPos - attackerPos;
-                recoilDirection.Normalize();
-
-                const float& recoilMagnitude = 20.0f;
-                const b2Vec2 recoilVelocity = recoilMagnitude * recoilDirection;
-
-                secondPlayertransformComponent.velocity.x +=
-                    static_cast<float>(recoilVelocity.x * configSingleton.GetConfig().meterToPixelRatio);
-                secondPlayertransformComponent.velocity.y +=
-                    static_cast<float>(recoilVelocity.y * configSingleton.GetConfig().meterToPixelRatio);
-            },
-            [](const GameType::CollisionData&) {}, false, false, true);
-
-        gCoordinator.addComponent(entity, newEvent);
-        m_weapon = -1;
     }
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
@@ -492,6 +454,8 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<HelmetComponent>();
     gCoordinator.registerComponent<PotionComponent>();
     gCoordinator.registerComponent<BodyArmourComponent>();
+    gCoordinator.registerComponent<WeaponSwingComponent>();
+    gCoordinator.registerComponent<BindSwingWeaponEvent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -646,6 +610,14 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<ItemSystem>(signature);
     }
 
+    const auto weaponBindSystem = gCoordinator.getRegisterSystem<WeaponBindSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<BindSwingWeaponEvent>());
+        gCoordinator.setSystemSignature<WeaponBindSystem>(signature);
+    }
+
+    m_weaponBindSystem = gCoordinator.getRegisterSystem<WeaponBindSystem>().get();
     m_playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>().get();
     m_multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>().get();
     m_characterSystem = gCoordinator.getRegisterSystem<CharacterSystem>().get();
