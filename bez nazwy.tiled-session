@@ -1,13 +1,13 @@
 {
-    "activeFile": "assets/tileSets/Armour.json",
+    "activeFile": "assets/maps/floor_01/map_17.json",
     "expandedProjectPaths": [
-        "assets/tileSets",
         "assets/maps",
+        "assets/maps/floor_01",
+        "assets/tileSets",
         "assets",
         "build",
         ".",
-        "assets/maps/floor_00",
-        "assets/maps/floor_01"
+        "assets/maps/floor_00"
     ],
     "file.lastUsedOpenFilter": "Wszystkie pliki (*)",
     "fileStates": {
@@ -76,22 +76,30 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "y": 119.80174651876327
             }
         },
         "assets/maps/floor_01/map_16.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
+                "x": 120.08496577767289,
                 "y": 120.08496577767288
+            }
+        },
+        "assets/maps/floor_01/map_17.json": {
+            "scale": 2,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 140.5,
+                "y": 194
             }
         },
         "assets/maps/floor_01/map_3.json": {
             "scale": 3.0726562499999996,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 159.95931858632088,
+                "x": 159.79659293160438,
                 "y": 40.03051106025933
             }
         },
@@ -99,7 +107,7 @@
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
+                "x": 120.08496577767289,
                 "y": 120.08496577767288
             }
         },
@@ -116,7 +124,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 208.1586575133486,
-                "y": 119.94508009153319
+                "y": 119.73353674040172
             }
         },
         "assets/maps/floor_01/map_7.json": {
@@ -452,7 +460,7 @@
         },
         "assets/tileSets/Weapons.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 1.5
+            "scaleInEditor": 1
         }
     },
     "last.imagePath": "C:/Users/domin/CLionProjects/Quest-for-the-Lost-Pixels/assets/floorAtlas",
@@ -462,22 +470,27 @@
         "assets/tileSets/Items.json",
         "assets/tileSets/Characters.json",
         "assets/tileSets/SpecialBlocks.json",
-        "assets/maps/floor_01/map_110.json"
+        "assets/maps/floor_01/map_16.json",
+        "assets/maps/floor_01/map_3.json",
+        "assets/maps/floor_01/map_6.json",
+        "assets/maps/floor_01/map_4.json",
+        "assets/maps/floor_01/map_15.json",
+        "assets/maps/floor_01/map_17.json"
     ],
     "project": "bez nazwy.tiled-project",
     "recentFiles": [
         "assets/tileSets/Weapons.json",
-        "assets/maps/floor_01/map_110.json",
-        "assets/tileSets/SpecialBlocks.json",
-        "assets/tileSets/Characters.json",
-        "assets/tileSets/Items.json",
         "assets/tileSets/Armour.json",
-        "assets/maps/floor_01/map_12.json",
-        "C:/Users/domin/Desktop/xp.tsx",
+        "assets/tileSets/Items.json",
+        "assets/tileSets/Characters.json",
+        "assets/tileSets/SpecialBlocks.json",
+        "assets/maps/floor_01/map_16.json",
+        "assets/maps/floor_01/map_3.json",
+        "assets/maps/floor_01/map_6.json",
+        "assets/maps/floor_01/map_4.json",
         "assets/maps/floor_01/map_15.json",
-        "assets/maps/floor_01/map_9.json",
-        "assets/maps/floor_01/map_s1.json",
-        "assets/maps/floor_01/map_s10.json"
+        "assets/maps/floor_01/map_17.json",
+        "assets/maps/floor_01/map_110.json"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {
