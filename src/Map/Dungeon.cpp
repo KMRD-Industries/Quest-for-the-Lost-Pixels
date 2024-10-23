@@ -22,6 +22,7 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Config.h"
+#include "DealDMGToEnemyEvent.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
 #include "EndGameState.h"
@@ -251,6 +252,7 @@ void Dungeon::update(const float deltaTime)
     m_characterSystem->update();
     m_textTagSystem->update(deltaTime);
     m_weaponBindSystem->update();
+    m_dealDMGSystem->update();
 
     if (m_multiplayerSystem->isConnected())
     {
@@ -456,6 +458,7 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<BodyArmourComponent>();
     gCoordinator.registerComponent<WeaponSwingComponent>();
     gCoordinator.registerComponent<BindSwingWeaponEvent>();
+    gCoordinator.registerComponent<DealDMGToEnemyEvent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -617,6 +620,14 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<WeaponBindSystem>(signature);
     }
 
+    const auto dealDMGToEnemySystem = gCoordinator.getRegisterSystem<DealDMGToEnemySystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<DealDMGToEnemyEvent>());
+        gCoordinator.setSystemSignature<DealDMGToEnemySystem>(signature);
+    }
+
+    m_dealDMGSystem = gCoordinator.getRegisterSystem<DealDMGToEnemySystem>().get();
     m_weaponBindSystem = gCoordinator.getRegisterSystem<WeaponBindSystem>().get();
     m_playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>().get();
     m_multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>().get();

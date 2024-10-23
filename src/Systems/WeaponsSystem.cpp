@@ -3,11 +3,13 @@
 #include <cmath>
 #include "AnimationSystem.h"
 #include "ColliderComponent.h"
+#include "DealDMGToEnemyEvent.h"
 #include "EquipmentComponent.h"
 #include "GameUtility.h"
 #include "Physics.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
+#include "WeaponSwingComponent.h"
 
 extern PublicConfigSingleton configSingleton;
 
@@ -32,15 +34,15 @@ void WeaponSystem::performFixedUpdate()
 inline void WeaponSystem::updateWeaponAngle(const Entity entity)
 {
     const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
-    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
+    const auto weaponEntity = equipment.at(GameType::slotType::WEAPON);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
 
-    if (!weaponComponent.isAttacking)
-        return;
-    rotateWeapon(entity, weaponComponent.isSwingingForward);
+    if (!weaponComponent.isAttacking) return;
+    rotateWeapon(entity, weaponComponent.isSwingingForward, weaponEntity);
 }
 
 
-inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward)
+inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward, const Entity weaponEntity)
 {
     const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
     auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
@@ -67,7 +69,17 @@ inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward)
                 setAngle(entity);
             }
             else
+            {
                 weaponComponent.isAttacking = false;
+                auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(weaponEntity);
+                for (const Entity enemy : swingComponent.enemyColided)
+                {
+                    if (swingComponent.enemyHited.contains(enemy)) continue;
+                    gCoordinator.addComponent(entity, DealDMGToEnemyEvent{});
+                }
+                swingComponent.enemyColided.clear();
+                swingComponent.enemyHited.clear();
+            }
         }
     }
     auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
@@ -117,8 +129,7 @@ inline void WeaponSystem::updateStartingAngle(const Entity entity)
         return;
     }
 
-    if (weaponComponent.queuedAttack || weaponComponent.isAttacking)
-        return;
+    if (weaponComponent.queuedAttack || weaponComponent.isAttacking) return;
 
     setAngle(entity);
 }

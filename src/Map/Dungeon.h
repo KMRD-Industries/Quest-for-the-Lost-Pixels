@@ -16,6 +16,7 @@
 #include "CharacterSystem.h"
 #include "ChestSystem.h"
 #include "CollisionSystem.h"
+#include "DealDMGToEnemySystem.h"
 #include "DoorSystem.h"
 #include "EnemySystem.h"
 #include "HealthBarSystem.h"
@@ -97,4 +98,5 @@ private:
     ItemSpawnerSystem* m_itemSpawnerSystem;
     ItemSystem* m_itemSystem;
     WeaponBindSystem* m_weaponBindSystem;
+    DealDMGToEnemySystem* m_dealDMGSystem;
 };

@@ -60,6 +60,7 @@ set(COMPONENTS
         Components/EquipmentComponent.h
         Components/WeaponSwingComponent.h
         Components/BindSwingWeaponEvent.h
+        Components/DealDMGToEnemyEvent.h
 )
 
 set(UI_COMPONENTS
