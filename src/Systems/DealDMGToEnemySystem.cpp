@@ -49,8 +49,4 @@ void DealDMGToEnemySystem::applyKnockback(const Entity entityID) const
         static_cast<float>(recoilVelocity.x * configSingleton.GetConfig().meterToPixelRatio);
     enemyTransformComponent.velocity.y +=
         static_cast<float>(recoilVelocity.y * configSingleton.GetConfig().meterToPixelRatio);
-    //
-    // auto newPosition = targetPos + 0.25;
-    // newPosition = {newPosition.x * newRecoilDirection.x, newPosition.y * newRecoilDirection.y};
-    // targetPos = newPosition;
 }
