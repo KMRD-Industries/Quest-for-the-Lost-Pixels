@@ -218,6 +218,7 @@ void Dungeon::setupWeaponEntity(const Entity player)
     gCoordinator.addComponent(weaponEntity, CharacterComponent{});
     gCoordinator.addComponent(weaponEntity, ItemComponent{.equipped = true});
     gCoordinator.addComponent(weaponEntity, WeaponSwingComponent{});
+    gCoordinator.addComponent(weaponEntity, BindSwingWeaponEvent{});
 
     m_inventorySystem->pickUpItem(GameType::PickUpInfo{player, weaponEntity, GameType::slotType::WEAPON});
 }
