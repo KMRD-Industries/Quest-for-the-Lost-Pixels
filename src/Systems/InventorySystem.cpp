@@ -71,5 +71,6 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
 
     equipment.emplace(pickUpItemInfo.slot, pickUpItemInfo.itemEntity);
 
-    gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
+    if (pickUpItemInfo.slot == GameType::WEAPON)
+        gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
 }

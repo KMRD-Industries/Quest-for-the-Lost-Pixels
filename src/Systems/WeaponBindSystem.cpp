@@ -1,13 +1,10 @@
 #include "WeaponBindSystem.h"
 
 #include "BindSwingWeaponEvent.h"
-#include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "DealDMGToEnemyEvent.h"
-#include "TextTagComponent.h"
-#include "TransformComponent.h"
 #include "WeaponComponent.h"
 #include "WeaponSwingComponent.h"
 

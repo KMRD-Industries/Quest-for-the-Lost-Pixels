@@ -63,6 +63,7 @@ inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward, const 
         {
             if (weaponComponent.queuedAttack == true)
             {
+                dealDMGToCollidedEnemies(weaponEntity, true);
                 weaponComponent.isAttacking = true;
                 weaponComponent.queuedAttack = false;
 
@@ -70,15 +71,8 @@ inline void WeaponSystem::rotateWeapon(const Entity entity, bool forward, const 
             }
             else
             {
+                dealDMGToCollidedEnemies(weaponEntity, true);
                 weaponComponent.isAttacking = false;
-                auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(weaponEntity);
-                for (const Entity enemy : swingComponent.enemyColided)
-                {
-                    if (swingComponent.enemyHited.contains(enemy)) continue;
-                    gCoordinator.addComponent(entity, DealDMGToEnemyEvent{});
-                }
-                swingComponent.enemyColided.clear();
-                swingComponent.enemyHited.clear();
             }
         }
     }
@@ -120,10 +114,12 @@ inline void WeaponSystem::setAngle(const Entity entity)
 inline void WeaponSystem::updateStartingAngle(const Entity entity)
 {
     const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
-    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equipment.at(GameType::slotType::WEAPON));
+    const auto weaponEntity = equipment.at(GameType::slotType::WEAPON);
+    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
 
     if (weaponComponent.queuedAttack && !weaponComponent.isAttacking)
     {
+        dealDMGToCollidedEnemies(weaponEntity);
         weaponComponent.isAttacking = true;
         weaponComponent.queuedAttack = false;
         return;
@@ -132,4 +128,19 @@ inline void WeaponSystem::updateStartingAngle(const Entity entity)
     if (weaponComponent.queuedAttack || weaponComponent.isAttacking) return;
 
     setAngle(entity);
+}
+
+void WeaponSystem::dealDMGToCollidedEnemies(const Entity weaponEntity, const bool clear)
+{
+    auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(weaponEntity);
+    for (const Entity enemy : swingComponent.enemyColided)
+    {
+        if (swingComponent.enemyHited.contains(enemy)) continue;
+        gCoordinator.addComponent(enemy, DealDMGToEnemyEvent{});
+        swingComponent.enemyHited.insert(enemy);
+    }
+    if (clear)
+    {
+        swingComponent.enemyHited.clear();
+    }
 }
