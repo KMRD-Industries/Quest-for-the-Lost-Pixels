@@ -1,6 +1,7 @@
 #pragma once
+#include "Config.h"
 
 struct InventoryComponent
 {
-    std::vector<Entity> weapons;
+    std::unordered_map<GameType::slotType, Entity, GameType::slotTypeHash> slots{};
 };

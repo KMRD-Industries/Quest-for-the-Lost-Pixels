@@ -1,8 +1,9 @@
 #include "Game.h"
-
+#include <TextureSystem.h>
 #include "ButtonSystem.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
+#include "FightSystem.h"
 #include "MainMenuState.h"
 #include "RenderSystem.h"
 #include "SoundSystem.h"

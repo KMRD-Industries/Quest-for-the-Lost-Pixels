@@ -1,7 +1,5 @@
 #include "MapSystem.h"
-#include <fstream>
 #include <nlohmann/json.hpp>
-#include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Config.h"
@@ -25,13 +23,9 @@
 extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
 
-void MapSystem::init()
-{
-}
+void MapSystem::init() {}
 
-void MapSystem::update()
-{
-}
+void MapSystem::update() {}
 
 /**
  * @brief Load room layout from given path of Tiled Json map format
@@ -63,7 +57,9 @@ void MapSystem::loadMap(const std::string& path)
             y_position = index / layer.width;
 
             if (m_tileID > 0)
+            {
                 processTile(m_tileID, m_flipFlags, layer.id, x_position, y_position, parsedMap);
+            }
 
             index++;
         }
@@ -150,10 +146,10 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
     gCoordinator.addComponents(mapEntity,
-                               RenderComponent{},
-                               MapComponent{},
-                               transformComponent,
-                               tileComponent);
+        RenderComponent{},
+        MapComponent{},
+        transformComponent,
+        tileComponent);
 
     if (tileComponent.tileSet == "SpecialBlocks") // Handle special Tiles
     {
@@ -231,22 +227,28 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
 
 void MapSystem::resetMap() const
 {
-    std::deque<Entity> entityToRemove;
+    std::unordered_set<Entity> entityToKill{};
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
+    {
         if (!gCoordinator.hasComponent<PlayerComponent>(entity) &&
             !gCoordinator.hasComponent<MultiplayerComponent>(entity))
-            entityToRemove.push_back(entity);
-
-
-    while (!entityToRemove.empty())
-    {
-        gCoordinator.getRegisterSystem<CollisionSystem>()->deleteBody(entityToRemove.front());
-        gCoordinator.destroyEntity(entityToRemove.front());
-        entityToRemove.pop_front();
+        {
+            if (auto* collisionComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+            {
+                collisionComponent->toDestroy = true;
+            }
+            else
+            {
+                entityToKill.insert(entity);
+            }
+        }
     }
 
-    entityToRemove.clear();
+    gCoordinator.getRegisterSystem<CollisionSystem>()->deleteMarkedBodies();
+
+    for (auto& entity : entityToKill) gCoordinator.destroyEntity(entity);
+    entityToKill.clear();
 }
 
 sf::Vector2f MapSystem::getPosition(const int x_axis, const int y_axis, const int map_tile_width) const

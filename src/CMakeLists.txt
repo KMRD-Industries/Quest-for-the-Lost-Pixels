@@ -49,12 +49,15 @@ set(COMPONENTS
         Components/EnemyComponent.h
         Components/WeaponComponent.h
         Components/InventoryComponent.h
-        Components/EquippedWeaponComponent.h
         Components/TextTagComponent.h
         Components/PassageComponent.h
         Components/FloorComponent.h
         Components/CreateBodyWithCollisionEvent.h
         Components/FightActionEvent.h
+        Components/HelmetComponent.h
+        Components/PotionComponent.h
+        Components/BodyArmourComponent.h
+        Components/EquipmentComponent.h
         Components/SoundComponent.h
 )
 
@@ -114,12 +117,12 @@ set(SYSTEMS
         Systems/WeaponsSystem.h
         Systems/InventorySystem.cpp
         Systems/InventorySystem.h
-        Systems/EquipWeaponSystem.cpp
-        Systems/EquipWeaponSystem.h
         Systems/TextTagSystem.cpp
         Systems/TextTagSystem.h
         Systems/PassageSystem.cpp
         Systems/PassageSystem.h
+        Systems/ItemSystem.cpp
+        Systems/ItemSystem.h
 		Systems/SoundSystem.cpp
 		Systems/SoundSystem.h
 )

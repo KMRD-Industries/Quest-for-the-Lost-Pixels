@@ -11,3 +11,4 @@ out
 
 imgui.ini
 compile_commands.json
+/cmake-build-relwithdebinfo/

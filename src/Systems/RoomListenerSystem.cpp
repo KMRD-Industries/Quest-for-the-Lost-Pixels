@@ -1,8 +1,6 @@
 #include "RoomListenerSystem.h"
-
 #include <SpawnerSystem.h>
 #include <iostream>
-
 #include "ChestSpawnerSystem.h"
 #include "PassageSystem.h"
 
