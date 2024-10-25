@@ -24,6 +24,8 @@ void MyContactListener::BeginContact(b2Contact* contact)
 
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
         colliderComponentA.onCollisionEnter({bodyBData->entityID, bodyBData->tag});
@@ -41,6 +43,9 @@ void MyContactListener::EndContact(b2Contact* contact)
 
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
+        // TODO: Fix weapon collision in other task
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
         colliderComponentA.onCollisionOut({bodyBData->entityID, bodyBData->tag});
