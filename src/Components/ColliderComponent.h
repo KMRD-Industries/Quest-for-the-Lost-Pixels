@@ -9,7 +9,8 @@
 
 class b2Body;
 
-struct ColliderComponent {
+struct ColliderComponent
+{
     b2Body *body{nullptr};
     std::string tag{};
     std::function<void(GameType::CollisionData)> onCollisionEnter;
@@ -20,9 +21,9 @@ struct ColliderComponent {
     Collision bodyArmourPlacement{};
 
     bool toDestroy{false};
+    bool toRemoveCollider{false};
 
     ColliderComponent() = default;
 
-    explicit ColliderComponent(Collision collision) : collision(std::move(collision)) {
-    }
+    explicit ColliderComponent(Collision collision) : collision(std::move(collision)) {}
 };

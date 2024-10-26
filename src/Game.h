@@ -11,7 +11,7 @@ class Game
 {
 public:
     void init();
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderTexture& window);
     void update(float deltaTime);
 
 private:

@@ -1,17 +1,18 @@
 #pragma once
 
+#include <vector>
 #include "Config.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "SFML/Window/Window.hpp"
 #include "System.h"
-#include <vector>
 
 namespace sf
 {
+    class RenderTexture;
     class RenderWindow;
-}
+} // namespace sf
 
 class RenderSystem : public System
 {
@@ -20,7 +21,7 @@ public:
     void init();
     void update();
     void displayPortal(Entity entity);
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderTexture& window);
     void updatePlayerSprite(Entity entity);
     void setHelmet() const;
     void setBodyArmour();
@@ -34,8 +35,8 @@ public:
     void setWeaponOrigin();
 
 private:
-    void displayEnemiesTable(const sf::RenderWindow& window);
-    void debugBoundingBoxes(sf::RenderWindow& window);
+    void displayEnemiesTable(const sf::RenderTexture& window);
+    void debugBoundingBoxes(sf::RenderTexture& window);
     void drawEquipment(Entity);
     void setOrigin(Entity);
     void setSpritePosition(Entity);
@@ -44,10 +45,10 @@ private:
     float getRotation(Entity entity);
     sf::Vector2f getOrigin(Entity);
     void updateSprite(Entity);
-    void clear(const sf::Window& window);
+    void clear(const sf::RenderTexture& window);
     void displayDamageTaken(Entity);
-    void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);
-    void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity) const;
+    void displayWeaponStatsTable(const sf::RenderTexture&, Entity entity);
+    void displayPlayerStatsTable(const sf::RenderTexture&, Entity entity) const;
 
     std::vector<std::vector<std::pair<sf::Sprite*, bool*>>> tiles;
     sf::Sprite portalSprite;

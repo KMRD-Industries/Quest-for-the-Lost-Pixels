@@ -15,7 +15,7 @@ void Game::init()
     m_stateManager.handleStateChange({MenuStateMachine::StateAction::Push}, {std::make_unique<MainMenuState>()});
 }
 
-void Game::draw(sf::RenderWindow& window)
+void Game::draw(sf::RenderTexture& window)
 {
     gCoordinator.getRegisterSystem<ButtonSystem>()->render();
     m_stateManager.render(window);

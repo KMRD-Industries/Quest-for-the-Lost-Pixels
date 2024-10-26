@@ -39,7 +39,7 @@ public:
     Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
     void init();
-    void render(sf::RenderWindow& window);
+    void render(sf::RenderTexture& window);
     void addPlayerComponents(Entity player);
     void moveDownDungeon();
     void setupPlayerCollision(Entity player);
