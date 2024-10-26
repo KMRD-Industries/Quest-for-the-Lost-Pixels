@@ -159,6 +159,8 @@ set(UTILS
 set(MENU_STATE_MACHINE
         MenuStateMachine/EndGameState.cpp
         MenuStateMachine/EndGameState.h
+		MenuStateMachine/LooseGameState.cpp
+        MenuStateMachine/LooseGameState.h
         MenuStateMachine/MainMenuState.cpp
         MenuStateMachine/MainMenuState.h
         MenuStateMachine/GameState.cpp

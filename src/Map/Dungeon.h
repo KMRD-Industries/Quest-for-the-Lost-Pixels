@@ -59,6 +59,7 @@ private:
     void clearDungeon();
     void loadMap(const std::string& path) const;
     float getSpawnOffset(float position, int id);
+    void checkForEndOfTheGame();
 
     std::string m_asset_path{ASSET_PATH};
     FloorGenerator m_floorGenerator{};
