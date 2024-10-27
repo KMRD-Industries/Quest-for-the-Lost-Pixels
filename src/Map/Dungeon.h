@@ -44,7 +44,7 @@ public:
     void moveDownDungeon();
     void setupPlayerCollision(Entity player);
     void setupWeaponEntity(const comm::Player& player) const;
-    void setupHelmetEntity(Entity player) const;
+    void setupHelmetEntity(const comm::Player& player) const;
     void update(float deltaTime);
     void makeStartFloor();
 

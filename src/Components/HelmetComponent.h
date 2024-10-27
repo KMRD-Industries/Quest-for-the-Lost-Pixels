@@ -1,6 +1,7 @@
 #pragma once
+#include <cstdint>
 
 struct HelmetComponent
 {
-    int id{};
+    uint32_t id{};
 };

@@ -1,5 +1,6 @@
 #pragma once
+#include <cstdint>
 
 struct BodyArmourComponent {
-    int id{};
+    uint32_t id{};
 };

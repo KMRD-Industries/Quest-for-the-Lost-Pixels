@@ -47,7 +47,7 @@ public:
     void modifyColorScheme(int);
     sf::Color getBackgroundColor();
 
-    std::vector<std::pair<int, GameType::WeaponType>> m_weaponsIDs;
-    std::vector<int> m_helmets;
-    std::vector<int> m_bodyArmours;
+    std::vector<std::pair<uint32_t, GameType::WeaponType>> m_weaponsIDs;
+    std::vector<uint32_t> m_helmets;
+    std::vector<uint32_t> m_bodyArmours;
 };

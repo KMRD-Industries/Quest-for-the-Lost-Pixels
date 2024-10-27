@@ -39,9 +39,9 @@ private:
     void handleChestCollision(Entity chest, const GameType::CollisionData&) const;
 
     std::vector<AnimationData> m_itemsToAnimate;
-    std::vector<std::pair<int, GameType::WeaponType> > m_weaponsIDs;
-    std::vector<int> m_helmetsIDs;
-    std::vector<int> m_bodyArmoursIDs;
+    std::vector<std::pair<uint32_t, GameType::WeaponType>> m_weaponsIDs;
+    std::vector<uint32_t> m_helmetsIDs;
+    std::vector<uint32_t> m_bodyArmoursIDs;
     Collision m_chestCollision;
     Collision m_potionCollision;
     TileComponent m_chestTile;

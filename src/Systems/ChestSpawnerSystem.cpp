@@ -52,7 +52,7 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
             const auto &helmetDesc = getRandomElement(m_helmetsIDs);
             gCoordinator.addComponents(
                 newItemEntity, HelmetComponent{.id = helmetDesc},
-                TileComponent{static_cast<uint32_t>(helmetDesc), "Armour", 6},
+                TileComponent{helmetDesc, "Armour", 6},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;
@@ -61,8 +61,8 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
         {
             const auto weaponDesc = getRandomElement(m_weaponsIDs);
             gCoordinator.addComponents(
-                newItemEntity, WeaponComponent{.id = static_cast<uint32_t>(weaponDesc.first), .type = weaponDesc.second},
-                TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", 7},
+                newItemEntity, WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second},
+                TileComponent{weaponDesc.first, "Weapons", 7},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y - 75});
             break;
@@ -72,7 +72,7 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
             const auto &bodyArmourDesc = getRandomElement(m_bodyArmoursIDs);
             gCoordinator.addComponents(
                 newItemEntity, BodyArmourComponent{.id = bodyArmourDesc},
-                TileComponent{static_cast<uint32_t>(bodyArmourDesc), "Armour", 6},
+                TileComponent{bodyArmourDesc, "Armour", 6},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;
@@ -108,7 +108,7 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransform
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dist(1, 4);
 
-        switch (dist(gen))
+        switch (2)
         {
         case 1:
             spawnItem(spawnerTransformComponent, GameType::itemLootType::POTION_LOOT);

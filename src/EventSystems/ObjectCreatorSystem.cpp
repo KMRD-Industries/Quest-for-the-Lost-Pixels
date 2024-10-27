@@ -1,7 +1,6 @@
 #include "ObjectCreatorSystem.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
-#include "MultiplayerComponent.h"
 #include "Physics.h"
 #include "PublicConfigMenager.h"
 #include "RenderComponent.h"
@@ -139,8 +138,6 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
     b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
 
     if (collisionData->tag != "Item") body->SetFixedRotation(true);
-
-    if (gCoordinator.hasComponent<MultiplayerComponent>(eventInfo.entity)) body->SetType(b2BodyType::b2_staticBody);
 
     body->CreateFixture(&fixtureDef);
     colliderComponent.body = body;

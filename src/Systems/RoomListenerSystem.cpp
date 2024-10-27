@@ -43,6 +43,7 @@ void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)
 
 void RoomListenerSystem::spawnLoot()
 {
+    if (m_isCurrentRoomLooted) return;
     gCoordinator.getRegisterSystem<ChestSpawnerSystem>()->spawnChest();
     gCoordinator.getRegisterSystem<PassageSystem>()->setPassages(true);
     std::cout << "[INFO] Spawning room content (chests, portals)\n";

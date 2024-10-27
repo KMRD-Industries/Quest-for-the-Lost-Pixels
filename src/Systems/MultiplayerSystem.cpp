@@ -94,6 +94,14 @@ void MultiplayerSystem::roomChanged(const glm::ivec2& room)
     m_tcp_socket.send(boost::asio::buffer(serialized));
 }
 
+void MultiplayerSystem::roomCleared()
+{
+    m_state.set_variant(comm::ROOM_CLEARED);
+    auto serialized = m_state.SerializeAsString();
+
+    m_tcp_socket.send(boost::asio::buffer(serialized));
+}
+
 bool MultiplayerSystem::isInsideInitialRoom(const bool change) noexcept
 {
     bool ret = m_inside_initial_room;
@@ -188,9 +196,10 @@ void MultiplayerSystem::update()
             float y = m_incomming_movement.position_y();
             float r = m_incomming_movement.direction();
 
-            transformComponent.position.x = x;
-            transformComponent.position.y = y;
+            transformComponent.velocity.x = x - transformComponent.position.x;
+            transformComponent.velocity.y = y - transformComponent.position.y;
             transformComponent.scale.x = r;
+
             colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
                                                  colliderComponent.body->GetAngle());
         }

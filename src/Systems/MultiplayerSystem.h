@@ -27,6 +27,9 @@ private:
     glm::ivec2 m_current_room{};
     std::unordered_map<uint32_t, Entity> m_entity_map{};
 
+    bool m_generator_ready = false;
+    std::pair<uint32_t, uint32_t> m_item_generator{};
+
     int m_prefix_size{};
     std::vector<char> m_prefix_buf{};
     comm::BytePrefix m_prefix{};
@@ -41,6 +44,7 @@ public:
     void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
     void entityDisconnected(const std::uint32_t id) noexcept;
     void roomChanged(const glm::ivec2& room);
+    void roomCleared();
     void update();
     void disconnect();
 

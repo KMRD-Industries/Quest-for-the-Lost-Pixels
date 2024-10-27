@@ -1,5 +1,6 @@
 #include <chrono>
 #include <format>
+#include <iostream>
 #include <vector>
 
 #include <comm.pb.h>
@@ -116,6 +117,7 @@ void Dungeon::init()
     addPlayerComponents(m_entities[m_id]);
     setupPlayerCollision(m_entities[m_id]);
     setupWeaponEntity(player);
+    setupHelmetEntity(player);
 }
 
 void Dungeon::render(sf::RenderWindow& window)
@@ -173,6 +175,7 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
     gCoordinator.addComponent(entity, newEvent);
 
     setupWeaponEntity(player);
+    setupHelmetEntity(player);
 
     m_multiplayerSystem->entityConnected(playerID, m_entities[playerID]);
 }
@@ -225,13 +228,16 @@ void Dungeon::setupPlayerCollision(const Entity player)
 
 void Dungeon::setupWeaponEntity(const comm::Player& player) const
 {
-    const auto& weapon = player.weapon();
+    const auto& weapon = player.items(0);
+    const auto& availableWeapons = gCoordinator.getRegisterSystem<TextureSystem>()->m_weaponsIDs;
+
+    const auto& weaponDesc = availableWeapons[weapon.gen() % availableWeapons.size()];
 
     const Entity weaponEntity = gCoordinator.createEntity();
     const Entity playerEntity = m_entities[player.id()];
 
-    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = weapon.id()});
-    gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second});
+    gCoordinator.addComponent(weaponEntity, TileComponent{weaponDesc.first, "Weapons", 7});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
     gCoordinator.addComponent(weaponEntity, ColliderComponent{});
@@ -243,12 +249,18 @@ void Dungeon::setupWeaponEntity(const comm::Player& player) const
     m_inventorySystem->pickUpItem(GameType::PickUpInfo{playerEntity, weaponEntity, GameType::slotType::WEAPON});
 }
 
-void Dungeon::setupHelmetEntity(const Entity player) const
+void Dungeon::setupHelmetEntity(const comm::Player& player) const
 {
-    const Entity helmetEntity = gCoordinator.createEntity();
+    const auto& helmet = player.items(1);
+    const auto& availableHelmets = gCoordinator.getRegisterSystem<TextureSystem>()->m_helmets;
 
-    gCoordinator.addComponent(helmetEntity, HelmetComponent{.id = 0});
-    gCoordinator.addComponent(helmetEntity, TileComponent{0, "Armour", 6});
+    const uint32_t helmetID = availableHelmets[helmet.gen() % availableHelmets.size()];
+
+    const Entity helmetEntity = gCoordinator.createEntity();
+    const Entity playerEntity = m_entities[player.id()];
+
+    gCoordinator.addComponent(helmetEntity, HelmetComponent{.id = helmetID});
+    gCoordinator.addComponent(helmetEntity, TileComponent{helmetID, "Armour", 6});
     gCoordinator.addComponent(helmetEntity, TransformComponent{});
     gCoordinator.addComponent(helmetEntity, RenderComponent{});
     gCoordinator.addComponent(helmetEntity, ColliderComponent{});
@@ -256,7 +268,7 @@ void Dungeon::setupHelmetEntity(const Entity player) const
     gCoordinator.addComponent(helmetEntity, ItemAnimationComponent{});
     gCoordinator.addComponent(helmetEntity, ItemComponent{.equipped = true});
 
-    m_inventorySystem->pickUpItem(GameType::PickUpInfo{player, helmetEntity, GameType::slotType::HELMET});
+    m_inventorySystem->pickUpItem(GameType::PickUpInfo{playerEntity, helmetEntity, GameType::slotType::HELMET});
 }
 
 void Dungeon::update(const float deltaTime)
@@ -285,6 +297,13 @@ void Dungeon::update(const float deltaTime)
             m_multiplayerSystem->entityDisconnected(playerID);
             m_players.erase(playerID);
             gCoordinator.getComponent<ColliderComponent>(m_entities[playerID]).toDestroy = true;
+            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entities[playerID]).slots)
+            {
+                if (slot.second != 0)
+                {
+                    gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
+                }
+            }
             break;
         case comm::CONNECTED:
             createRemotePlayer(player);
@@ -292,6 +311,9 @@ void Dungeon::update(const float deltaTime)
             break;
         case comm::ROOM_CHANGED:
             changeRoom(m_multiplayerSystem->getRoom());
+            break;
+        case comm::ROOM_CLEARED:
+            m_roomListenerSystem->spawnLoot();
             break;
         default:
             break;
