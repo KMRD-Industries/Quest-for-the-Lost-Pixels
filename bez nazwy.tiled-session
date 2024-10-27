@@ -19,24 +19,24 @@
             "scale": 2.36,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 207.83898305084747,
-                "y": 120.33898305084746
+                "x": 139.83050847457628,
+                "y": 120.12711864406782
             }
         },
         "assets/maps/floor_01/map_10.json": {
             "scale": 3.0726562499999996,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 159.95931858632088,
-                "y": 111.95525044495295
+                "x": 159.79659293160438,
+                "y": 111.79252479023647
             }
         },
         "assets/maps/floor_01/map_11.json": {
             "scale": 2.648125,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 159.92447486429077,
-                "y": 160.11328770356386
+                "x": 160.11328770356386,
+                "y": 159.92447486429077
             }
         },
         "assets/maps/floor_01/map_110.json": {
@@ -52,23 +52,23 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 120.08496577767289,
-                "y": 119.94335614821807
+                "y": 119.9433561482181
             }
         },
         "assets/maps/floor_01/map_13.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 120.08496577767288
+                "x": 120.08496577767289,
+                "y": 119.9433561482181
             }
         },
         "assets/maps/floor_01/map_14.json": {
             "scale": 3.5308333333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.94335614821809,
-                "y": 120.08496577767288
+                "x": 120.08496577767289,
+                "y": 119.9433561482181
             }
         },
         "assets/maps/floor_01/map_15.json": {
@@ -466,6 +466,7 @@
     ],
     "project": "bez nazwy.tiled-project",
     "recentFiles": [
+        "assets/maps/floor_01/map_1.json",
         "assets/tileSets/Weapons.json",
         "assets/maps/floor_01/map_110.json",
         "assets/tileSets/SpecialBlocks.json",
@@ -476,8 +477,7 @@
         "C:/Users/domin/Desktop/xp.tsx",
         "assets/maps/floor_01/map_15.json",
         "assets/maps/floor_01/map_9.json",
-        "assets/maps/floor_01/map_s1.json",
-        "assets/maps/floor_01/map_s10.json"
+        "assets/maps/floor_01/map_s1.json"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {

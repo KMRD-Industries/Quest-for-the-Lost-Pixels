@@ -86,9 +86,6 @@ void CollisionSystem::createMapCollision()
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER))
                 createCollisionBody(entity, "Door", true, false);
-
-            else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
-                createCollisionBody(entity, "Passage", true, true);
         }
         else
         {

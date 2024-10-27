@@ -1,8 +1,10 @@
 #include "PassageSystem.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
+#include "CreateBodyWithCollisionEvent.h"
 #include "PassageComponent.h"
 #include "Physics.h"
+#include "PlayerComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -26,6 +28,17 @@ void PassageSystem::setPassages(const bool val) const
     for (const auto entity : m_entities)
     {
         gCoordinator.getComponent<PassageComponent>(entity).activePassage = val;
+
+        if (val == true && !gCoordinator.hasComponent<PlayerComponent>(entity))
+        {
+            const Entity newMapCollisionEntity = gCoordinator.createEntity();
+
+            const auto newEvent = CreateBodyWithCollisionEvent(
+                entity, "Passage", [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, true,
+                true);
+
+            gCoordinator.addComponent(newMapCollisionEntity, newEvent);
+        }
     }
 }
 
