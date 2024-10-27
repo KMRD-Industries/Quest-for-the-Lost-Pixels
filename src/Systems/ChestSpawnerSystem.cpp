@@ -47,7 +47,17 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
     gCoordinator.addComponents(newItemEntity, TransformComponent{spawnerTransformComponent}, RenderComponent{},
                                ColliderComponent{}, AnimationComponent{}, ItemComponent{});
 
-    const auto& itemGenerator = gCoordinator.getRegisterSystem<MultiplayerSystem>()->getItemGenerator();
+    // for single player compatibility
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist1(1, 4);
+    std::uniform_int_distribution<> dist2(0, 100);
+    std::pair<uint32_t, uint32_t> itemGenerator{dist2(gen), dist1(gen)};
+
+    const auto& multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
+    if (multiplayerSystem->isConnected())
+        itemGenerator = multiplayerSystem->getItemGenerator();
+
     switch (itemGenerator.second)
     {
         case comm::HELMET:
