@@ -7,6 +7,7 @@
 #include "CollisionSystem.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "HelmetComponent.h"
+#include "Helpers.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "PotionComponent.h"
@@ -18,9 +19,7 @@
 
 extern PublicConfigSingleton configSingleton;
 
-ChestSpawnerSystem::ChestSpawnerSystem() { init(); }
-
-void ChestSpawnerSystem::init()
+ChestSpawnerSystem::ChestSpawnerSystem()
 {
     m_chestCollision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Items", 819);
     m_potionCollision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Items", 693);

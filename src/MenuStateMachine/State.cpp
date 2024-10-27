@@ -14,6 +14,7 @@
 #include "FightActionEvent.h"
 #include "FightSystem.h"
 #include "ObjectCreatorSystem.h"
+#include "Physics.h"
 #include "RenderComponent.h"
 #include "SoundComponent.h"
 #include "SoundSystem.h"
@@ -24,8 +25,7 @@ extern Coordinator gCoordinator;
 
 void State::beforeInit()
 {
-    if (!m_resetECS)
-        return;
+    if (!m_resetECS) return;
 
     Physics::getInstance()->resetWorld();
     gCoordinator.init();

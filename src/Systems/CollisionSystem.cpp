@@ -5,6 +5,7 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "HelmetComponent.h"
 #include "MultiplayerSystem.h"
+#include "Physics.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
@@ -48,9 +49,7 @@ void MyContactListener::EndContact(b2Contact* contact)
     }
 }
 
-CollisionSystem::CollisionSystem() { init(); }
-
-void CollisionSystem::init() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
+CollisionSystem::CollisionSystem() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
 
 void CollisionSystem::createMapCollision()
 {
