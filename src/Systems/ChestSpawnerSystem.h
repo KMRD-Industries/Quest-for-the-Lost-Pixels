@@ -34,7 +34,7 @@ public:
 
 private:
     void clearSpawners() const;
-    void spawnItem(const TransformComponent& spawnerTransformComponent, GameType::itemLootType itemType) const;
+    void spawnItem(const TransformComponent& spawnerTransformComponent) const;
     void processSpawn(const TransformComponent&) const;
     void handleChestCollision(Entity chest, const GameType::CollisionData&) const;
 

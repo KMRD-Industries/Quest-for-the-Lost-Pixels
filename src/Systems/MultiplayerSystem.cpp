@@ -82,7 +82,20 @@ void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
     m_outgoing_movement.set_allocated_curr_room(r2);
 }
 
-glm::ivec2& MultiplayerSystem::getRoom() noexcept { return m_current_room; }
+const glm::ivec2& MultiplayerSystem::getRoom() const noexcept { return m_current_room; }
+
+const std::pair<uint32_t, uint32_t>& MultiplayerSystem::getItemGenerator()
+{
+    m_generator_ready = false;
+
+    m_state.set_variant(comm::REQUEST_ITEM_GENERATOR);
+    m_state.mutable_player()->set_id(m_player_id);
+
+    const auto serialized = m_state.SerializeAsString();
+
+    m_tcp_socket.send(boost::asio::buffer(serialized));
+    return m_item_generator;
+}
 
 void MultiplayerSystem::roomChanged(const glm::ivec2& room)
 {
@@ -97,7 +110,7 @@ void MultiplayerSystem::roomChanged(const glm::ivec2& room)
 void MultiplayerSystem::roomCleared()
 {
     m_state.set_variant(comm::ROOM_CLEARED);
-    auto serialized = m_state.SerializeAsString();
+    const auto serialized = m_state.SerializeAsString();
 
     m_tcp_socket.send(boost::asio::buffer(serialized));
 }
@@ -124,10 +137,14 @@ comm::InitialInfo MultiplayerSystem::registerPlayer(const Entity playerEntity)
     m_player_entity = playerEntity;
     m_player_id = id;
 
+    const auto& nextItem = initialInfo.next_item();
+    m_item_generator = {nextItem.gen(), nextItem.type()};
+    m_generator_ready = true;
+
     return initialInfo;
 }
 
-comm::StateUpdate MultiplayerSystem::pollStateUpdates()
+const comm::StateUpdate& MultiplayerSystem::pollStateUpdates()
 {
     size_t available = m_tcp_socket.available();
     if (available >= m_prefix_size)
@@ -147,10 +164,20 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
         m_state.ParseFromArray(m_buf.data(), static_cast<int>(received));
         std::cout << m_state.ShortDebugString() << '\n';
 
-        if (m_state.variant() == comm::ROOM_CHANGED)
-        {
-            auto r = m_state.room();
-            setRoom({r.x(), r.y()});
+        switch (m_state.variant()) {
+        case comm::ROOM_CHANGED:
+            {
+                auto r = m_state.room();
+                setRoom({r.x(), r.y()});
+                break;
+            }
+        case comm::REQUEST_ITEM_GENERATOR:
+            {
+                const auto& nextItem = m_state.item();
+                m_generator_ready = true;
+                m_item_generator = {nextItem.gen(), nextItem.type()};
+            }
+        default:
         }
     }
     else

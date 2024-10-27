@@ -51,7 +51,8 @@ public:
     bool isConnected() const noexcept;
     bool isInsideInitialRoom(const bool change) noexcept;
     uint32_t playerID() const noexcept;
-    glm::ivec2& getRoom() noexcept;
+    const glm::ivec2& getRoom() const noexcept;
+    const std::pair<uint32_t, uint32_t>& getItemGenerator();
     comm::InitialInfo registerPlayer(const Entity player);
-    comm::StateUpdate pollStateUpdates();
+    const comm::StateUpdate& pollStateUpdates();
 };

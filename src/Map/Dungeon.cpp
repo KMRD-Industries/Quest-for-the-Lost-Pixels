@@ -228,7 +228,11 @@ void Dungeon::setupPlayerCollision(const Entity player)
 
 void Dungeon::setupWeaponEntity(const comm::Player& player) const
 {
-    const auto& weapon = player.items(0);
+    // temporary for single-player
+    comm::Item weapon;
+    if (m_multiplayerSystem->isConnected())
+        weapon = player.items(0);
+
     const auto& availableWeapons = gCoordinator.getRegisterSystem<TextureSystem>()->m_weaponsIDs;
 
     const auto& weaponDesc = availableWeapons[weapon.gen() % availableWeapons.size()];
@@ -251,7 +255,11 @@ void Dungeon::setupWeaponEntity(const comm::Player& player) const
 
 void Dungeon::setupHelmetEntity(const comm::Player& player) const
 {
-    const auto& helmet = player.items(1);
+    // temporary for single-player
+    comm::Item helmet;
+    if (m_multiplayerSystem->isConnected())
+        helmet = player.items(1);
+
     const auto& availableHelmets = gCoordinator.getRegisterSystem<TextureSystem>()->m_helmets;
 
     const uint32_t helmetID = availableHelmets[helmet.gen() % availableHelmets.size()];
@@ -285,8 +293,17 @@ void Dungeon::update(const float deltaTime)
     m_characterSystem->update();
     m_textTagSystem->update(deltaTime);
 
+    bool a = false;
+    if (InputHandler::getInstance()->isPressed(InputType::Test))
+    {
+        m_roomListenerSystem->spawnLoot();
+        a = true;
+    }
+
     if (m_multiplayerSystem->isConnected())
     {
+        if (a)
+            m_multiplayerSystem->roomCleared();
         const auto& stateUpdate = m_multiplayerSystem->pollStateUpdates();
         const auto& player = stateUpdate.player();
         const uint32_t playerID = player.id();
