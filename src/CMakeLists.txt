@@ -219,38 +219,58 @@ endif ()
 target_compile_features(qlp PRIVATE cxx_std_23)
 
 if (WIN32)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(ARCH_DIR "x64")
+    else ()
+        set(ARCH_DIR "x86")
+    endif ()
+
     set(BOX2D_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/box2d-build/bin")
-    set(ADDITIONAL_DLL_DIR "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
+    set(ADDITIONAL_DLL_DIR "${CMAKE_BINARY_DIR}/bin")
+    set(OPENAL_DLL_PATH "${SFML_SOURCE_DIR}/extlibs/bin/${ARCH_DIR}/openal32.dll")
 
     if (EXISTS ${BOX2D_SOURCE_DIR})
+        message(STATUS "Box2d source dir found: ${BOX2D_SOURCE_DIR}. Copying Box2d dll.")
         add_custom_command(
                 TARGET qlp
-                COMMENT "Copy box2d BLLS"
+                COMMENT "Copy box2d dll"
                 PRE_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_directory ${BOX2D_SOURCE_DIR} $<TARGET_FILE_DIR:qlp>
                 VERBATIM
         )
+    else ()
+        message(WARNING "Directory does not exist: ${BOX2D_SOURCE_DIR}")
     endif ()
 
-    if (EXISTS ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>)
+    if (EXISTS ${OPENAL_DLL_PATH})
+        message(STATUS "OpenAL source dir found: ${OPENAL_DLL_PATH}. Copying OpenAL dll.")
         add_custom_command(
                 TARGET qlp
-                COMMENT "Copy box2d BLLS"
+                COMMENT "Copy openAL dll"
                 PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:qlp>
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${OPENAL_DLL_PATH}"
+                "$<TARGET_FILE_DIR:qlp>/openal32.dll"
+                COMMENT "Copy OpenAL32.dll"
                 VERBATIM
         )
+    else ()
+        message(WARNING "Directory does not exist: ${OPENAL_DLL_PATH}")
     endif ()
 
-    if (EXISTS ${ADDITIONAL_DLL_DIR})
+    if (EXISTS "${ADDITIONAL_DLL_DIR}")
+        message(STATUS "Additional Dll dir found: ${ADDITIONAL_DLL_DIR}. Copying libabsl dlls.")
         add_custom_command(
                 TARGET qlp
-                COMMENT "Copy abseil_dll DLLs"
+                COMMENT "Copy libabsl dlls"
                 PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/abseil_dll.dll $<TARGET_FILE_DIR:qlp>
+                COMMAND ${CMAKE_COMMAND} -E copy_directory ${ADDITIONAL_DLL_DIR} $<TARGET_FILE_DIR:qlp>
                 VERBATIM
         )
+    else ()
+        message(WARNING "Directory does not exist: ${ADDITIONAL_DLL_DIR}")
     endif ()
+
 
     # Dodanie komendy do kopiowania libprotobufd.dll, jeśli istnieje
     if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobufd.dll)
