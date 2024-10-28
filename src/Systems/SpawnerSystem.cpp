@@ -32,6 +32,7 @@ void SpawnerSystem::update(const float timeStamp)
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
 
+    prepareEnemies();
     // TODO przenieś do stałej
     m_spawnTime += timeStamp * 1000.f;
 
@@ -66,10 +67,6 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     gCoordinator.addComponents(newMonsterEntity, enemyConfig.textureData, transformComponent, RenderComponent{},
                                AnimationComponent{}, EnemyComponent{}, ColliderComponent{enemyConfig.collisionData},
                                CharacterComponent{.hp = enemyConfig.hp});
-
-    sf::Vector2f spawnPosition = transformComponent.position;
-    std::shared_ptr<MultiplayerSystem> multiplayer_system = gCoordinator.getRegisterSystem<MultiplayerSystem>();
-    multiplayer_system->askForEnemyId(newMonsterEntity, spawnPosition);
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
@@ -122,9 +119,9 @@ void SpawnerSystem::spawnEnemies()
         const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         processSpawner(spawnerComponent, spawnerTransformComponent);
     }
+    prepareEnemies();
     cleanUpUnnecessarySpawners();
 }
-
 
 void SpawnerSystem::cleanUpUnnecessarySpawners()
 {
@@ -142,17 +139,23 @@ void SpawnerSystem::cleanUpUnnecessarySpawners()
     entityToKill.clear();
 }
 
-int SpawnerSystem::getSpawners()
+std::vector<std::pair<Entity, sf::Vector2<float>>> SpawnerSystem::getSortedSpawnedEnemies()
 {
-    printf("SpawnerSystem::getSpawners, there is %lu spawners.\n", m_entities.size());
-    return static_cast<int>(m_entities.size());
+    return m_spawnedEnemies;
 }
 
-void SpawnerSystem::getSpawnerPositions()
-{
-    for (const auto entity : m_entities)
+void SpawnerSystem::prepareEnemies() {
+    for (auto enemyEntity : gCoordinator.getRegisterSystem<EnemySystem>()->m_entities)
     {
-        sf::Vector2f position = gCoordinator.getComponent<TransformComponent>(entity).position;
-
+        m_spawnedEnemies.push_back(std::make_pair(enemyEntity, gCoordinator.getComponent<TransformComponent>(enemyEntity).position));
     }
+
+    std::sort(m_spawnedEnemies.begin(), m_spawnedEnemies.end(),
+              [](const std::pair<Entity, sf::Vector2<float>>& a, const std::pair<Entity, sf::Vector2<float>>& b) {
+                  return a.second.x > b.second.x;
+              });
+
+    std::shared_ptr<MultiplayerSystem> multiplayer_system = gCoordinator.getRegisterSystem<MultiplayerSystem>();
+    multiplayer_system->askForEnemyIds(m_spawnedEnemies);
 }
+

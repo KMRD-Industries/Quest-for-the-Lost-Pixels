@@ -60,7 +60,7 @@ private:
     void updateEnemyPositions(const comm::EnemyPositionsUpdate& enemyPositionsUpdate);
     void sendRoomDimensions();
     void updateMap();
-    void mapServerIdToGameId(uint32 serverEntity, float x, float y);
+    void mapServerIdToGameId(comm::SpawningEnemiesResponse& ids) const;
 
     std::string m_asset_path;
     FloorGenerator m_floorGenerator;
@@ -79,6 +79,7 @@ private:
     Timer* m_timer;
     float elapsedTime = 0.0f;
     std::unordered_map<Entity, sf::Vector2<float>> m_enemyPositionsUpdate;
+    std::queue<comm::Enemy> m_enemyQueue;
 
     PlayerMovementSystem* m_playerMovementSystem;
     MultiplayerSystem* m_multiplayerSystem;

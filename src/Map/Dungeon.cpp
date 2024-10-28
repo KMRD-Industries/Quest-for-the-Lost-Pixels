@@ -1,3 +1,4 @@
+#include "Dungeon.h"
 #include <comm.pb.h>
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
@@ -11,7 +12,6 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
-#include "Dungeon.h"
 
 #include <map>
 
@@ -223,6 +223,7 @@ void Dungeon::update(const float deltaTime)
     m_characterSystem->update();
     m_animationSystem->update(deltaTime);
     m_textTagSystem->update();
+    // TODO posortuj spawnery i przypisz po koleji id
     m_roomListenerSystem->update(deltaTime);
     m_itemSpawnerSystem->updateAnimation(deltaTime);
 
@@ -231,7 +232,6 @@ void Dungeon::update(const float deltaTime)
         const auto stateUpdate = m_multiplayerSystem->pollStateUpdates();
         const uint32_t id = stateUpdate.id();
 
-        // TODO dodaj locka
         switch (stateUpdate.variant())
         {
         case comm::DISCONNECTED:
@@ -252,12 +252,12 @@ void Dungeon::update(const float deltaTime)
             updateEnemyPositions(stateUpdate.enemypositionsupdate());
             break;
         case comm::SPAWN_ENEMY_REQUEST:
-            const comm::Enemy& enemy = stateUpdate.spawnenemyrequest();
-            printf("RECEIVED spawned enemy with id: %d, and position: %f %f\n", enemy.id(), enemy.x(), enemy.y());
-            mapServerIdToGameId(enemy.id(), enemy.x(), enemy.y());
+            comm::SpawningEnemiesResponse response = stateUpdate.spawningenemiesresponse();
+            // printf("RECEIVED spawned enemy with id: %d, and position: %f %f\n", enemy.id(), enemy.x(), enemy.y());
+            mapServerIdToGameId(response);
             break;
-        // default:
-        //     break;
+            // default:
+            //     break;
         }
 
         m_multiplayerSystem->update();
@@ -282,15 +282,14 @@ void Dungeon::update(const float deltaTime)
     m_roomMap.at(m_currentPlayerPos).update();
 }
 
-void Dungeon::mapServerIdToGameId(const uint32 serverEntity, const float x, const float y)
+void Dungeon::mapServerIdToGameId(comm::SpawningEnemiesResponse& ids)const
 {
-    for (const auto entity : gCoordinator.getRegisterSystem<EnemySystem>()->m_entities)
+    auto const test = m_spawnerSystem->getSortedSpawnedEnemies();
+    int i = 0;
+    for (const auto enemy: m_spawnerSystem->getSortedSpawnedEnemies())
     {
-        if (const auto entityPosition = gCoordinator.getComponent<TransformComponent>(entity).position;
-            entityPosition.x == x && entityPosition.y == y)
-        {
-            gCoordinator.mapEntity(serverEntity, entity);
-        }
+        gCoordinator.mapEntity(ids.enemyid().Get(i), enemy.first);
+        i++;
     }
 }
 
@@ -396,7 +395,7 @@ void Dungeon::makeSimpleFloor()
     m_roomMap = m_floorGenerator.getFloor(true);
     m_currentPlayerPos = m_floorGenerator.getStartingRoom();
     m_passageSystem->setPassages(m_floorGenerator.getEndingRoom() == m_currentPlayerPos);
-    //TODO gdzieś tutaj chyba powinno być wysyłanie wymiarów mapy
+    // TODO gdzieś tutaj chyba powinno być wysyłanie wymiarów mapy
     m_roomListenerSystem->changeRoom(m_currentPlayerPos);
 }
 

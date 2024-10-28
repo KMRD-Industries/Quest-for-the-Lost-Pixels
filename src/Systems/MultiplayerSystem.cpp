@@ -261,7 +261,8 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
     m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
 
-void MultiplayerSystem::setMapDimensions(const std::map<Entity, ObstacleData>& obstacles){
+void MultiplayerSystem::setMapDimensions(const std::map<Entity, ObstacleData>& obstacles)
+{
     comm::MapDimensionsUpdate mapDimensionsUpdate;
     for (const auto& obstacle : obstacles)
     {
@@ -282,16 +283,22 @@ void MultiplayerSystem::setMapDimensions(const std::map<Entity, ObstacleData>& o
     m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
 
-void MultiplayerSystem::askForEnemyId(const Entity enemyId, const sf::Vector2<float> position)
+void MultiplayerSystem::askForEnemyIds(std::vector<std::pair<Entity, sf::Vector2<float>>> sortedEnemies)
 {
-    const auto spawnRequest = new comm::Enemy;
-    spawnRequest->set_id(enemyId);
-    spawnRequest->set_x(position.x);
-    spawnRequest->set_y(position.y);
+    //TODO chuj wi czy działą
+    comm::EnemyPositionsUpdate spawnEnemyRequest;
+
+    for (const auto& enemy : sortedEnemies)
+    {
+        comm::Enemy* enemy_position = spawnEnemyRequest.add_enemypositions();
+        enemy_position->set_x(enemy.second.x);
+        enemy_position->set_y(enemy.second.y);
+        enemy_position->set_id(enemy.first);
+    }
 
     comm::StateUpdate message;
+    *message.mutable_enemypositionsupdate() = spawnEnemyRequest;
     message.set_variant(comm::StateVariant::SPAWN_ENEMY_REQUEST);
-    *message.mutable_spawnenemyrequest() = *spawnRequest;
 
     auto serializedMessage = message.SerializeAsString();
     m_tcp_socket.send(boost::asio::buffer(serializedMessage));
