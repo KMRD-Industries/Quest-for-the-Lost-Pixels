@@ -16,8 +16,9 @@ void WeaponBindSystem::update()
     {
         if (gCoordinator.hasComponent<ColliderComponent>(entity))
         {
-            gCoordinator.getComponent<ColliderComponent>(entity).trigger = true;
-            gCoordinator.getComponent<ColliderComponent>(entity).tag = "Weapon";
+            auto& weaponColliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            weaponColliderComponent.trigger = true;
+            weaponColliderComponent.tag = "Weapon";
         }
         else
         {
