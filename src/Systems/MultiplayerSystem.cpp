@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <iostream>
@@ -84,7 +85,7 @@ void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
 
 const glm::ivec2& MultiplayerSystem::getRoom() const noexcept { return m_current_room; }
 
-const std::pair<uint32_t, uint32_t>& MultiplayerSystem::getItemGenerator()
+const ItemGenerator& MultiplayerSystem::getItemGenerator()
 {
     m_generator_ready = false;
 
@@ -138,7 +139,9 @@ comm::InitialInfo MultiplayerSystem::registerPlayer(const Entity playerEntity)
     m_player_id = id;
 
     const auto& nextItem = initialInfo.next_item();
-    m_item_generator = {nextItem.gen(), nextItem.type()};
+    m_item_generator.id = nextItem.id();
+    m_item_generator.gen = nextItem.gen();
+    m_item_generator.type = nextItem.type();
     m_generator_ready = true;
 
     return initialInfo;
@@ -164,7 +167,8 @@ const comm::StateUpdate& MultiplayerSystem::pollStateUpdates()
         m_state.ParseFromArray(m_buf.data(), static_cast<int>(received));
         std::cout << m_state.ShortDebugString() << '\n';
 
-        switch (m_state.variant()) {
+        switch (m_state.variant())
+        {
         case comm::ROOM_CHANGED:
             {
                 auto r = m_state.room();
@@ -175,7 +179,9 @@ const comm::StateUpdate& MultiplayerSystem::pollStateUpdates()
             {
                 const auto& nextItem = m_state.item();
                 m_generator_ready = true;
-                m_item_generator = {nextItem.gen(), nextItem.type()};
+                m_item_generator.id = nextItem.id();
+                m_item_generator.gen = nextItem.gen();
+                m_item_generator.type = nextItem.type();
             }
         default:
         }
@@ -187,8 +193,49 @@ const comm::StateUpdate& MultiplayerSystem::pollStateUpdates()
     return m_state;
 }
 
-void MultiplayerSystem::entityConnected(const uint32_t id, const Entity entity) noexcept { m_entity_map[id] = entity; }
-void MultiplayerSystem::entityDisconnected(const uint32_t id) noexcept { m_entity_map.erase(id); }
+void MultiplayerSystem::playerConnected(const uint32_t id, const Entity entity) noexcept { m_entity_map[id] = entity; }
+void MultiplayerSystem::playerDisconnected(const uint32_t id) noexcept
+{
+    m_entity_map.erase(id);
+
+    gCoordinator.getComponent<ColliderComponent>(m_entity_map[id]).toDestroy = true;
+    for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[id]).slots)
+    {
+        if (slot.second != 0)
+        {
+            m_registered_items.erase(slot.second);
+            gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
+        }
+    }
+}
+
+void MultiplayerSystem::registerItem(const uint32_t id, const Entity entity)
+{
+    m_registered_items[id] = entity;
+    for (auto &[i, e]: m_registered_items) {
+        std::cout << i << ' ' << e << '\n';
+    }
+}
+Entity MultiplayerSystem::getItemEntity(const uint32_t id)
+{
+    if (m_registered_items.contains(id)) return m_registered_items[id];
+    return 0;
+}
+void MultiplayerSystem::itemEquipped(const Entity entity)
+{
+    std::cout << "entity: " << entity << '\n';
+    for (const auto& p : m_registered_items)
+    {
+        if (p.second != entity) continue;
+
+        m_state.set_variant(comm::ITEM_EQUIPPED);
+        m_state.mutable_item()->set_id(p.first);
+        const auto serialized = m_state.SerializeAsString();
+
+        m_tcp_socket.send(boost::asio::buffer(serialized));
+        return;
+    }
+}
 
 void MultiplayerSystem::update()
 {
@@ -238,7 +285,8 @@ void MultiplayerSystem::update()
 
     const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
     const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(m_player_entity);
-    const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(equippedWeapon.slots.at(GameType::slotType::WEAPON));
+    const auto& weaponComponent =
+        gCoordinator.getComponent<WeaponComponent>(equippedWeapon.slots.at(GameType::slotType::WEAPON));
 
     const auto& windowSize = InputHandler::getInstance()->getWindowSize();
     float scaledPivotX = weaponComponent.pivotPoint.x / static_cast<float>(windowSize.x);

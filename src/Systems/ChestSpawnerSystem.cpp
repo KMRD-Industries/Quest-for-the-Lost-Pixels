@@ -52,29 +52,37 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist1(1, 4);
     std::uniform_int_distribution<> dist2(0, 100);
-    std::pair<uint32_t, uint32_t> itemGenerator{dist2(gen), dist1(gen)};
+    ItemGenerator itemGenerator{0, static_cast<uint32_t>(dist2(gen)), static_cast<comm::ItemType>(dist1(gen))};
+    uint32_t id = 0;
 
     const auto& multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     if (multiplayerSystem->isConnected())
+    {
         itemGenerator = multiplayerSystem->getItemGenerator();
+        multiplayerSystem->registerItem(itemGenerator.id, newItemEntity);
+    }
 
-    switch (itemGenerator.second)
+    switch (itemGenerator.type)
     {
         case comm::HELMET:
         {
-            const uint32_t helmetID = m_helmetsIDs[itemGenerator.first % m_helmetsIDs.size()];
+            const uint32_t tileID = m_helmetsIDs[itemGenerator.gen % m_helmetsIDs.size()];
+            if (id == 0) id = tileID;
+
             gCoordinator.addComponents(
-                newItemEntity, HelmetComponent{.id = helmetID},
-                TileComponent{helmetID, "Armour", 6},
+                newItemEntity, HelmetComponent{.id = id},
+                TileComponent{tileID, "Armour", 6},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;
         }
         case comm::WEAPON:
         {
-            const auto& weaponDesc = m_weaponsIDs[itemGenerator.first % m_weaponsIDs.size()];
+            const auto& weaponDesc = m_weaponsIDs[itemGenerator.gen % m_weaponsIDs.size()];
+            if (id == 0) id = weaponDesc.first;
+
             gCoordinator.addComponents(
-                newItemEntity, WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second},
+                newItemEntity, WeaponComponent{.id = id, .type = weaponDesc.second},
                 TileComponent{weaponDesc.first, "Weapons", 7},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y - 75});
@@ -82,10 +90,12 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
         }
         case comm::ARMOUR:
         {
-            const uint32_t armourID = m_bodyArmoursIDs[itemGenerator.first % m_bodyArmoursIDs.size()];
+            const uint32_t tileID = m_bodyArmoursIDs[itemGenerator.gen % m_bodyArmoursIDs.size()];
+            if (id == 0) id = tileID;
+
             gCoordinator.addComponents(
-                newItemEntity, BodyArmourComponent{.id = armourID},
-                TileComponent{armourID, "Armour", 6},
+                newItemEntity, BodyArmourComponent{.id = id},
+                TileComponent{tileID, "Armour", 6},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;

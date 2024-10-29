@@ -8,6 +8,13 @@
 #include "System.h"
 #include "Types.h"
 
+struct ItemGenerator
+{
+    uint32_t id;
+    uint32_t gen;
+    comm::ItemType type;
+};
+
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
 class MultiplayerSystem : public System
@@ -28,7 +35,8 @@ private:
     std::unordered_map<uint32_t, Entity> m_entity_map{};
 
     bool m_generator_ready = false;
-    std::pair<uint32_t, uint32_t> m_item_generator{};
+    ItemGenerator m_item_generator{};
+    std::unordered_map<uint32_t, Entity> m_registered_items{};
 
     int m_prefix_size{};
     std::vector<char> m_prefix_buf{};
@@ -41,8 +49,10 @@ public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
     void setup(const std::string_view& ip, const std::string_view& port) noexcept;
     void setRoom(const glm::ivec2& room) noexcept;
-    void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
-    void entityDisconnected(const std::uint32_t id) noexcept;
+    void playerConnected(const uint32_t id, const Entity entity) noexcept;
+    void playerDisconnected(const uint32_t id) noexcept;
+    void registerItem(const uint32_t id, const Entity entity);
+    void itemEquipped(const Entity entity);
     void roomChanged(const glm::ivec2& room);
     void roomCleared();
     void update();
@@ -52,7 +62,8 @@ public:
     bool isInsideInitialRoom(const bool change) noexcept;
     uint32_t playerID() const noexcept;
     const glm::ivec2& getRoom() const noexcept;
-    const std::pair<uint32_t, uint32_t>& getItemGenerator();
+    const ItemGenerator& getItemGenerator();
+    Entity getItemEntity(const uint32_t id);
     comm::InitialInfo registerPlayer(const Entity player);
     const comm::StateUpdate& pollStateUpdates();
 };

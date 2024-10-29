@@ -177,7 +177,7 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
     setupWeaponEntity(player);
     setupHelmetEntity(player);
 
-    m_multiplayerSystem->entityConnected(playerID, m_entities[playerID]);
+    m_multiplayerSystem->playerConnected(playerID, m_entities[playerID]);
 }
 
 void Dungeon::setupPlayerCollision(const Entity player)
@@ -251,6 +251,8 @@ void Dungeon::setupWeaponEntity(const comm::Player& player) const
     gCoordinator.addComponent(weaponEntity, ItemComponent{.equipped = true});
 
     m_inventorySystem->pickUpItem(GameType::PickUpInfo{playerEntity, weaponEntity, GameType::slotType::WEAPON});
+    if (m_multiplayerSystem->isConnected())
+        m_multiplayerSystem->registerItem(weapon.id(), weaponEntity);
 }
 
 void Dungeon::setupHelmetEntity(const comm::Player& player) const
@@ -306,21 +308,14 @@ void Dungeon::update(const float deltaTime)
             m_multiplayerSystem->roomCleared();
         const auto& stateUpdate = m_multiplayerSystem->pollStateUpdates();
         const auto& player = stateUpdate.player();
+        const auto& item = stateUpdate.item();
         const uint32_t playerID = player.id();
 
         switch (stateUpdate.variant())
         {
         case comm::DISCONNECTED:
-            m_multiplayerSystem->entityDisconnected(playerID);
+            m_multiplayerSystem->playerDisconnected(playerID);
             m_players.erase(playerID);
-            gCoordinator.getComponent<ColliderComponent>(m_entities[playerID]).toDestroy = true;
-            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entities[playerID]).slots)
-            {
-                if (slot.second != 0)
-                {
-                    gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
-                }
-            }
             break;
         case comm::CONNECTED:
             createRemotePlayer(player);
@@ -332,6 +327,10 @@ void Dungeon::update(const float deltaTime)
         case comm::ROOM_CLEARED:
             m_roomListenerSystem->spawnLoot();
             break;
+        case comm::ITEM_EQUIPPED:
+            std::cout << "incomming id: " << item.id() << '\n';
+            m_inventorySystem->pickUpItem(GameType::PickUpInfo{
+                m_entities[playerID], m_multiplayerSystem->getItemEntity(item.id()), GameType::slotType::WEAPON});
         default:
             break;
         }

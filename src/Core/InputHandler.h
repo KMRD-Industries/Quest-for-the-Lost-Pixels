@@ -17,7 +17,8 @@ enum class InputType
     Attack,
     PickUpItem,
     DebugMode,
-    ReturnInMenu
+    ReturnInMenu,
+    Test
 };
 
 class InputHandler
@@ -48,6 +49,7 @@ class InputHandler
         {sf::Keyboard::Key::D, InputType::MoveRight},
         {sf::Keyboard::Key::Space, InputType::Attack},
         {sf::Keyboard::Key::E, InputType::PickUpItem},
+        {sf::Keyboard::Key::X, InputType::Test},
         {sf::Keyboard::F1, InputType::DebugMode}, // Handling for the right mouse button
         {sf::Keyboard::Key::Escape, InputType::ReturnInMenu},
         {sf::Mouse::Left, InputType::Attack}};
