@@ -7,6 +7,7 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
+#include "Helpers.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
 #include "TextTagComponent.h"
@@ -16,10 +17,6 @@
 extern PublicConfigSingleton configSingleton;
 
 constexpr float SPAWN_RATE = 3600.f;
-
-SpawnerSystem::SpawnerSystem() { init(); }
-
-void SpawnerSystem::init() {}
 
 void SpawnerSystem::update(const float timeStamp)
 {

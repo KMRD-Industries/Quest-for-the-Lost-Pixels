@@ -9,9 +9,7 @@
 
 extern PublicConfigSingleton configSingleton;
 
-EnemySystem::EnemySystem() { init(); }
-
-void EnemySystem::init()
+EnemySystem::EnemySystem()
 {
     gen.seed(rd()); // Seed the generator
     dis = std::uniform_real_distribution<float>(-1, 1); // Range between -1 and 1
@@ -43,6 +41,5 @@ void EnemySystem::deleteEnemies() const
         else
             entitiesToKill.push_back(entity);
 
-    for (const auto entity : entitiesToKill)
-        gCoordinator.destroyEntity(entity);
+    for (const auto entity : entitiesToKill) gCoordinator.destroyEntity(entity);
 }

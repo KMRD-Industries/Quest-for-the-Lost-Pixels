@@ -9,16 +9,14 @@
 
 extern PublicConfigSingleton configSingleton;
 
-TextTagSystem::TextTagSystem() { init(); }
+TextTagSystem::TextTagSystem() { this->loadFont(std::string(ASSET_PATH) + "/fonts/PixellettersFull.ttf"); }
 
-void TextTagSystem::init() {
-    this->loadFont(std::string(ASSET_PATH) + "/fonts/PixellettersFull.ttf");
-}
-
-void TextTagSystem::performFixedUpdate() const {
-    for (const auto &entity: m_entities) {
-        auto &textTagComponent = gCoordinator.getComponent<TextTagComponent>(entity);
-        auto &transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+void TextTagSystem::performFixedUpdate() const
+{
+    for (const auto& entity : m_entities)
+    {
+        auto& textTagComponent = gCoordinator.getComponent<TextTagComponent>(entity);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
         textTagComponent.text.setFont(this->font);
         textTagComponent.text.setOutlineColor(sf::Color(0, 0, 0, 128));
@@ -28,8 +26,10 @@ void TextTagSystem::performFixedUpdate() const {
     }
 }
 
-void TextTagSystem::update(const float &deltaTime) {
-    if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs) {
+void TextTagSystem::update(const float& deltaTime)
+{
+    if (m_frameTime += deltaTime; m_frameTime >= config::oneFrameTimeMs)
+    {
         m_frameTime -= config::oneFrameTimeMs;
         performFixedUpdate();
         deleteTags();
@@ -41,8 +41,6 @@ void TextTagSystem::loadFont(const std::string& path)
     if (!this->font.loadFromFile(path))
         std::cout << "ERROR::TEXT_TAG_SYSTEM::CONSTRUCTOR::Failed to load font " << path << "\n";
 }
-
-void TextTagSystem::initPresets() {}
 
 void TextTagSystem::render(sf::RenderTarget& window)
 {

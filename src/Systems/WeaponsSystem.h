@@ -8,7 +8,6 @@ class WeaponSystem : public System
 public:
     void update(const float &deltaTime);
     void performFixedUpdate();
-    void deleteItems() const;
 
 private:
     void updateWeaponAngle(Entity);

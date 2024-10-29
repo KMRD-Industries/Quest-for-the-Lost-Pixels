@@ -112,6 +112,7 @@ void Dungeon::init()
     addPlayerComponents(m_entities[m_id]);
     setupPlayerCollision(m_entities[m_id]);
     setupWeaponEntity(m_entities[m_id]);
+    m_passageSystem->setPassages(true);
 }
 
 void Dungeon::render(sf::RenderWindow& window)
@@ -183,6 +184,8 @@ void Dungeon::setupPlayerCollision(const Entity player)
         if (entityT.tag == "Passage")
         {
             auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
+
+            if (!passageComponent.activePassage) return;
 
             gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
             passageComponent.moveInDungeon.emplace_back(true);
@@ -281,8 +284,11 @@ void Dungeon::update(const float deltaTime)
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
         m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});
-
-    if (m_endGame) m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
+    else
+    {
+        if (m_endGame)
+            m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
+    }
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
