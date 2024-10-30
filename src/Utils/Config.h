@@ -5,6 +5,7 @@
 // Remember that in the game we use units in pixels, and the collision and physics system takes meters
 
 #include <imgui.h>
+#include <iostream>
 #include <regex>
 #include <string>
 #include <unordered_map>
@@ -189,47 +190,61 @@ namespace config
         PASSAGE = 0x0005,
         BULLET = 0x0006,
         ITEM = 0x0007,
+        WEAPON = 0x008
     };
 
     inline std::unordered_map<std::string, _entityCategory> categoriesLookup{
         {"Wall", BOUNDARY}, {"Bullet", BULLET}, {"Enemy", ENEMY}, {"Passage", PASSAGE},
-        {"Item", ITEM},     {"Player", PLAYER}, {"Door", DOOR}};
+        {"Item", ITEM}, {"Player", PLAYER}, {"Door", DOOR}, {"Weapon", WEAPON}};
 
     inline std::unordered_map<std::string, uint16> bitMaskLookup{
         {"Wall", BOUNDARY | PLAYER | ENEMY | BULLET | ITEM}, // Wall collides with everything
         {"Bullet", BOUNDARY | ENEMY}, // Bullet only collides with walls and enemies
-        {"Enemy", BOUNDARY | PLAYER}, // Enemy collides with walls and players
+        {"Enemy", BOUNDARY | PLAYER | WEAPON}, // Enemy collides with walls and players
         {"Passage", BOUNDARY | PLAYER}, // Passage collides with walls and players
         {"Item", BOUNDARY}, // Item only collides with walls and players
         {"Player", BOUNDARY | ENEMY | ITEM}, // Player collides with walls, enemies, and items
-        {"Door", BOUNDARY | PLAYER} // Door collides with walls and players
+        {"Door", BOUNDARY | PLAYER}, // Door collides with walls and players
+        {"Weapon", ENEMY} // Weapon collides with enemies
     };
 
     inline uint16 stringToCategoryBits(const std::string& str)
     {
-        if (categoriesLookup.contains(str)) return categoriesLookup[str];
+        if (categoriesLookup.contains(str))
+            return categoriesLookup[str];
 
-        if (std::regex_match(str, playerRegexTag)) return categoriesLookup["Player"];
+        if (std::regex_match(str, playerRegexTag))
+            return categoriesLookup["Player"];
 
-        if (str == "Chest" || str == "Potion") return categoriesLookup["Passage"];
+        if (str == "Chest" || str == "Potion")
+            return categoriesLookup["Passage"];
 
+        if (str == "Weapon")
+            return categoriesLookup["Weapon"];
         return 0x0000;
     }
 
     inline uint16 stringToMaskBits(const std::string& str)
     {
-        if (bitMaskLookup.contains(str)) return bitMaskLookup[str];
+        if (bitMaskLookup.contains(str))
+            return bitMaskLookup[str];
 
-        if (std::regex_match(str, playerRegexTag)) return bitMaskLookup["Player"];
+        if (std::regex_match(str, playerRegexTag))
+            return bitMaskLookup["Player"];
 
-        if (str == "Chest" || str == "Potion") return bitMaskLookup["Passage"];
+        if (str == "Chest" || str == "Potion")
+            return bitMaskLookup["Passage"];
+
+        if (str == "Weapon")
+            return bitMaskLookup["Weapon"];
 
         return 0x0000;
     }
 
     inline uint16 stringToIndexGroup(const std::string& str)
     {
-        if (str == "Bullet") return -8;
+        if (str == "Bullet")
+            return -8;
         return 0;
     }
 

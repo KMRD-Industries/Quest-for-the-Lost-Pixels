@@ -7,12 +7,10 @@
 class ItemSpawnerSystem : public System
 {
 public:
-    ItemSpawnerSystem();
-    void init();
+    ItemSpawnerSystem() = default;
     void updateAnimation(float deltaTime);
     void deleteItems();
 
 private:
-    void handlePotionCollision(Entity potion, const GameType::CollisionData& collisionData, Items::Behaviours behaviour,
-                               float value);
+    void handlePotionCollision(Entity potion, const GameType::CollisionData&, Items::Behaviours, float value);
 };

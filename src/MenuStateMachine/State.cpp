@@ -13,6 +13,7 @@
 #include "Coordinator.h"
 #include "FightSystem.h"
 #include "ObjectCreatorSystem.h"
+#include "Physics.h"
 #include "RenderComponent.h"
 #include "SoundComponent.h"
 #include "SoundSystem.h"

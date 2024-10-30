@@ -18,10 +18,11 @@ class RenderSystem : public System
 {
 public:
     RenderSystem();
-    void init();
     void update();
-    void displayPortal(Entity entity);
     void draw(sf::RenderTexture& window);
+
+private:
+    void displayPortal(Entity entity);
     void updatePlayerSprite(Entity entity);
     void setHelmet() const;
     void setBodyArmour();
