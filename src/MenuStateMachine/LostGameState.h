@@ -5,10 +5,10 @@
 #include "State.h"
 #include "Text.h"
 
-class LooseGameState : public State
+class LostGameState : public State
 {
 public:
-    LooseGameState(const bool resetECS = false) : State(resetECS) {}
+    LostGameState(const bool resetECS = false) : State(resetECS) {}
 
     void update(float deltaTime) override;
     void render(sf::RenderTexture& window) override;

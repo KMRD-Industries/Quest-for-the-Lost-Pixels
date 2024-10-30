@@ -1,4 +1,4 @@
-#include "LooseGameState.h"
+#include "LostGameState.h"
 
 #include "ButtonDTO.h"
 #include "GameState.h"
@@ -6,7 +6,7 @@
 #include "ResourceManager.h"
 #include "TextDTO.h"
 
-void LooseGameState::init()
+void LostGameState::init()
 {
     m_menuButton.init(ButtonDTO{std::string(ASSET_PATH) + "/ui/uiHigh.png",
                                 ASSET_PATH + std::string("/ui/uiFont.ttf"),
@@ -53,7 +53,7 @@ void LooseGameState::init()
         TextDTO{ASSET_PATH + std::string("/ui/uiFont.ttf"), "You lost!!", 160, 2.f, {0.f, 0.f, 0.f, 1.f}, {680, 200}});
 }
 
-void LooseGameState::render(sf::RenderTexture& window)
+void LostGameState::render(sf::RenderTexture& window)
 {
     m_backgroundGraphics.render(window);
     m_tomb.render(window);
@@ -63,7 +63,7 @@ void LooseGameState::render(sf::RenderTexture& window)
     m_winText.render();
 }
 
-void LooseGameState::update(const float deltaTime)
+void LostGameState::update(const float deltaTime)
 {
     if (m_returnToMenu)
     {

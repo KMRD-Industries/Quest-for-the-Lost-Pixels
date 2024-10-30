@@ -33,8 +33,8 @@
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
 #include "ItemSpawnerSystem.h"
-#include "LooseGameState.h"
 #include "LootComponent.h"
+#include "LostGameState.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerComponent.h"
@@ -441,7 +441,7 @@ void Dungeon::checkForEndOfTheGame()
     {
         if (gCoordinator.hasComponent<PlayerComponent>(m_entities[player])) return;
     }
-    m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<LooseGameState>()});
+    m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<LostGameState>()});
 }
 
 void Dungeon::setECS()
