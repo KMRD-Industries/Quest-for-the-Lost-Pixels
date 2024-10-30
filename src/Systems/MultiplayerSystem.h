@@ -1,8 +1,8 @@
 #pragma once
-#include <unordered_map>
 #include <SFML/System/Vector3.hpp>
 #include <boost/asio.hpp>
 #include <comm.pb.h>
+#include <unordered_map>
 #include "System.h"
 #include "Types.h"
 #include "glm/ext/vector_int2.hpp"

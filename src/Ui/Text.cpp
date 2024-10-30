@@ -6,10 +6,10 @@
 
 void Text::render()
 {
-    ImGui::Begin("ButtonWindow", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-                 ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
-                 ImGuiWindowFlags_NoSavedSettings);
+    ImGui::Begin("ButtonWindow", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
+                     ImGuiWindowFlags_NoSavedSettings);
     ImGui::SetCursorPos(m_position);
 
     ImGui::PushStyleColor(ImGuiCol_Text, m_color);

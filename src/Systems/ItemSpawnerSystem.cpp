@@ -29,7 +29,8 @@ void ItemSpawnerSystem::updateAnimation(const float deltaTime)
             const std::string itemTag = gCoordinator.hasComponent<PotionComponent>(entity) ? "Potion" : "Item";
 
             const auto newEvent = CreateBodyWithCollisionEvent(
-                entity, itemTag, [this, entity, itemBehaviour, itemValue](const GameType::CollisionData &collisionData)
+                entity, itemTag,
+                [this, entity, itemBehaviour, itemValue](const GameType::CollisionData &collisionData)
                 { handlePotionCollision(entity, collisionData, itemBehaviour, itemValue); },
                 [&](const GameType::CollisionData &) {}, false, false);
 

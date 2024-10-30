@@ -6,8 +6,7 @@
 
 void RoomListenerSystem::update(const float deltaTime)
 {
-    if (m_isCurrentRoomLooted)
-        return;
+    if (m_isCurrentRoomLooted) return;
     if (!m_entities.empty())
         m_toLoot = true;
     else if (m_entities.empty() && m_toLoot)

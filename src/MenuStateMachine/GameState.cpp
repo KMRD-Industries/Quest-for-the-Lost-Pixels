@@ -17,8 +17,7 @@ void GameState::init()
     gCoordinator.addComponent(menuBackgroundMusic,
                               SoundComponent{.soundToPlay = Sound::Type::MenuBackgroundMusic, .stopPlaying = true});
     auto gameBackgroundMusic = gCoordinator.createEntity();
-    gCoordinator.addComponent(gameBackgroundMusic,
-                              SoundComponent{.soundToPlay = Sound::Type::GameBackgroundMusic});
+    gCoordinator.addComponent(gameBackgroundMusic, SoundComponent{.soundToPlay = Sound::Type::GameBackgroundMusic});
 }
 
 void GameState::handleCollision(const float deltaTime)

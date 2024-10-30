@@ -8,9 +8,7 @@
 class EndGameState : public State
 {
 public:
-    EndGameState(const bool resetECS = false) : State(resetECS)
-    {
-    }
+    EndGameState(const bool resetECS = false) : State(resetECS) {}
 
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;

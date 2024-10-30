@@ -3,7 +3,8 @@
 
 extern PublicConfigSingleton configSingleton;
 
-struct WeaponComponent {
+struct WeaponComponent
+{
     int id{};
     int damageAmount{configSingleton.GetConfig().weaponComponentDefaultDamageAmount};
     bool isAttacking{configSingleton.GetConfig().weaponComponentDefaultIsAttacking};

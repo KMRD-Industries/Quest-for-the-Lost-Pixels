@@ -2,8 +2,8 @@
 #include <imgui.h>
 #include <unordered_map>
 
-#include "System.h"
 #include "SFML/Graphics/Texture.hpp"
+#include "System.h"
 
 class ButtonSystem : public System
 {

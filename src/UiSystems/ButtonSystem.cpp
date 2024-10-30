@@ -12,16 +12,15 @@ void ButtonSystem::render()
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
-    ImGui::Begin("ButtonWindow", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-                 ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
-                 ImGuiWindowFlags_NoSavedSettings);
+    ImGui::Begin("ButtonWindow", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
+                     ImGuiWindowFlags_NoSavedSettings);
 
 
     for (const auto entity : m_entities)
     {
-        if (m_entities.empty())
-            return;
+        if (m_entities.empty()) return;
         auto& buttonComponent = gCoordinator.getComponent<ButtonComponent>(entity);
 
         ImGui::SetCursorPos(buttonComponent.position);
@@ -34,8 +33,9 @@ void ButtonSystem::render()
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
         if (ImGui::ImageButton(
-            atlasID, ImVec2(buttonTexture.width * buttonComponent.scale, buttonTexture.height * buttonComponent.scale),
-            buttonComponent.m_uv0, buttonComponent.m_uv1))
+                atlasID,
+                ImVec2(buttonTexture.width * buttonComponent.scale, buttonTexture.height * buttonComponent.scale),
+                buttonComponent.m_uv0, buttonComponent.m_uv1))
         {
         }
 
@@ -50,23 +50,20 @@ void ButtonSystem::render()
                 const auto& clickedRect = buttonComponent.clickedTexture;
                 buttonComponent.m_uv0 = ImVec2(static_cast<float>(clickedRect.left) / buttonAtlasX,
                                                static_cast<float>(clickedRect.top) / buttonAtlasY);
-                buttonComponent.m_uv1 = ImVec2(
-                    static_cast<float>(clickedRect.left + clickedRect.width) / buttonAtlasX,
-                    static_cast<float>(clickedRect.top + clickedRect.height) / buttonAtlasY);
+                buttonComponent.m_uv1 = ImVec2(static_cast<float>(clickedRect.left + clickedRect.width) / buttonAtlasX,
+                                               static_cast<float>(clickedRect.top + clickedRect.height) / buttonAtlasY);
             }
             else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
             {
-                if (buttonComponent.m_onClickedFunction)
-                    buttonComponent.m_onClickedFunction();
+                if (buttonComponent.m_onClickedFunction) buttonComponent.m_onClickedFunction();
             }
             else
             {
                 const auto& hoverRect = buttonComponent.hooveredTexture;
                 buttonComponent.m_uv0 = ImVec2(static_cast<float>(hoverRect.left) / buttonAtlasX,
                                                static_cast<float>(hoverRect.top) / buttonAtlasY);
-                buttonComponent.m_uv1 = ImVec2(
-                    static_cast<float>(hoverRect.left + hoverRect.width) / buttonAtlasX,
-                    static_cast<float>(hoverRect.top + hoverRect.height) / buttonAtlasY);
+                buttonComponent.m_uv1 = ImVec2(static_cast<float>(hoverRect.left + hoverRect.width) / buttonAtlasX,
+                                               static_cast<float>(hoverRect.top + hoverRect.height) / buttonAtlasY);
             }
         }
         else
@@ -80,14 +77,12 @@ void ButtonSystem::render()
         auto buttonFont = m_loadedFonts[buttonComponent.fontPath + std::to_string(buttonComponent.textSize)];
         ImGui::PushFont(buttonFont);
 
-        ImVec2 buttonSize = ImVec2(buttonTexture.width * buttonComponent.scale,
-                                   buttonTexture.height * buttonComponent.scale);
+        ImVec2 buttonSize =
+            ImVec2(buttonTexture.width * buttonComponent.scale, buttonTexture.height * buttonComponent.scale);
         ImVec2 textSize = ImGui::CalcTextSize(buttonComponent.text.data());
 
-        ImVec2 textPos = ImVec2(
-            buttonComponent.position.x + (buttonSize.x - textSize.x) * 0.5f,
-            buttonComponent.position.y + (buttonSize.y - textSize.y) * 0.5f
-            );
+        ImVec2 textPos = ImVec2(buttonComponent.position.x + (buttonSize.x - textSize.x) * 0.5f,
+                                buttonComponent.position.y + (buttonSize.y - textSize.y) * 0.5f);
 
         ImGui::SetCursorScreenPos(textPos);
         ImGui::Text(buttonComponent.text.data());
@@ -99,8 +94,7 @@ void ButtonSystem::render()
 
 void ButtonSystem::loadData(const std::string& atlasPath, const std::string& fontPath, const float fontSize)
 {
-    if (!m_loadedTextures.contains(atlasPath))
-        m_loadedTextures[atlasPath].loadFromFile(atlasPath);
+    if (!m_loadedTextures.contains(atlasPath)) m_loadedTextures[atlasPath].loadFromFile(atlasPath);
     if (!m_loadedFonts.contains(fontPath + std::to_string(fontSize)))
     {
         ImGuiIO& io = ImGui::GetIO();

@@ -8,7 +8,7 @@ namespace sf
 {
     class RenderWindow;
     class Sprite;
-}
+} // namespace sf
 
 struct Graphics
 {

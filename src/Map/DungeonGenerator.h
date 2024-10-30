@@ -9,7 +9,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-class DungeonGenerator {
+class DungeonGenerator
+{
     using DirectedGraph = std::unordered_map<glm::ivec2, std::unordered_set<glm::ivec2> >;
     using UnDirectedGraph = std::unordered_map<glm::ivec2, std::unordered_set<glm::ivec2> >;
     using PathsNodes = std::unordered_map<std::string, std::unordered_set<glm::ivec2> >;
@@ -20,13 +21,15 @@ class DungeonGenerator {
     using PathNames = std::unordered_set<std::string>;
 
 public:
-    struct PathConfig {
+    struct PathConfig
+    {
         glm::ivec2 start{};
         std::string pathName{};
         int pathLength{};
     };
 
-    struct sidePathConfig {
+    struct sidePathConfig
+    {
         std::string pathName{};
         std::string startingPathName{};
         std::string endPathName{};
@@ -36,9 +39,8 @@ public:
 
     DungeonGenerator() = default;
 
-    DungeonGenerator(const int height, const int width, const int64_t seed) : m_height(height), m_width(width),
-                                                                              gen(seed) {
-    };
+    DungeonGenerator(const int height, const int width, const int64_t seed) :
+        m_height(height), m_width(width), gen(seed){};
 
     void generateMainPath(int pathLength);
 
@@ -64,10 +66,14 @@ public:
 
     [[nodiscard]] bool isConnected(const glm::ivec2 &firstNode, const glm::ivec2 &secondNode) const;
 
-    int getOutEdgesCount(int i, int j) const {
-        try {
+    int getOutEdgesCount(int i, int j) const
+    {
+        try
+        {
             return m_nodeOutEdgesCount.at({i, j});
-        } catch (const std::out_of_range &e) {
+        }
+        catch (const std::out_of_range &e)
+        {
             return {};
         }
     };

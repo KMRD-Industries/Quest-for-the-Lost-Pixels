@@ -1,11 +1,11 @@
 #pragma once
 
+#include <SFML/Graphics.hpp>
 #include <imgui-SFML.h>
 #include <imgui.h>
 #include <iostream>
 #include <string>
 #include <unordered_map>
-#include <SFML/Graphics.hpp>
 
 class ResourceManager
 {
@@ -48,15 +48,9 @@ public:
         return m_loadedFonts[fontKey];
     }
 
-    void setIP(const std::string& serverIp)
-    {
-        m_serverIp = serverIp;
-    }
+    void setIP(const std::string& serverIp) { m_serverIp = serverIp; }
 
-    std::string getIP()
-    {
-        return m_serverIp;
-    }
+    std::string getIP() { return m_serverIp; }
 
 private:
     ResourceManager() = default;

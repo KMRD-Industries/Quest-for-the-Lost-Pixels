@@ -8,9 +8,7 @@
 class MainMenuState : public State
 {
 public:
-    MainMenuState()
-    {
-    };
+    MainMenuState(){};
 
     void update(float deltaTime) override;
     void render(sf::RenderWindow& window) override;

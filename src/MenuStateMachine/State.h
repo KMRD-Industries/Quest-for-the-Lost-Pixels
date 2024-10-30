@@ -17,9 +17,7 @@ using StateChangeCallback = std::function<void(const std::vector<MenuStateMachin
 class State
 {
 public:
-    State(const bool resetECS = true) : m_resetECS{resetECS}
-    {
-    }
+    State(const bool resetECS = true) : m_resetECS{resetECS} {}
 
     virtual ~State() = default;
     void beforeInit();

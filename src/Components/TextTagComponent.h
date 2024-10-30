@@ -1,7 +1,7 @@
 #pragma once
 
-#include "PublicConfigMenager.h"
 #include "AtlasComponents/Texture.h"
+#include "PublicConfigMenager.h"
 
 extern PublicConfigSingleton configSingleton;
 

@@ -8,10 +8,10 @@ void InputText::render()
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
-    ImGui::Begin("ButtonWindow", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-                 ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
-                 ImGuiWindowFlags_NoSavedSettings);
+    ImGui::Begin("ButtonWindow", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
+                     ImGuiWindowFlags_NoSavedSettings);
 
     ImGui::SetCursorPos(m_position);
 
@@ -26,14 +26,11 @@ void InputText::render()
 
     ImGui::PushFont(m_loadedFonts);
 
-    ImVec2 buttonSize = ImVec2(m_texture.width * m_scale,
-                               m_texture.height * m_scale);
+    ImVec2 buttonSize = ImVec2(m_texture.width * m_scale, m_texture.height * m_scale);
     ImVec2 textSize = ImGui::CalcTextSize(m_text.data());
 
-    ImVec2 textPos = ImVec2(
-        m_position.x + m_leftOffset,
-        m_position.y + (buttonSize.y - textSize.y) * 0.5f - m_topOffset
-        );
+    ImVec2 textPos =
+        ImVec2(m_position.x + m_leftOffset, m_position.y + (buttonSize.y - textSize.y) * 0.5f - m_topOffset);
 
     ImGui::SetCursorScreenPos(textPos);
 
@@ -73,13 +70,9 @@ void InputText::init(const InputTextDTO& config)
     const float buttonAtlasX = static_cast<float>(m_loadedTextures.getSize().x);
     const float buttonAtlasY = static_cast<float>(m_loadedTextures.getSize().y);
 
-    m_uv0 = ImVec2(static_cast<float>(m_texture.left) / buttonAtlasX,
-                   static_cast<float>(m_texture.top) / buttonAtlasY);
+    m_uv0 = ImVec2(static_cast<float>(m_texture.left) / buttonAtlasX, static_cast<float>(m_texture.top) / buttonAtlasY);
     m_uv1 = ImVec2(static_cast<float>(m_texture.left + m_texture.width) / buttonAtlasX,
                    static_cast<float>(m_texture.top + m_texture.height) / buttonAtlasY);
 }
 
-std::string InputText::getString() const
-{
-    return m_text;
-}
+std::string InputText::getString() const { return m_text; }

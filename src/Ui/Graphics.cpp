@@ -4,16 +4,12 @@
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Texture.hpp"
 
-void Graphics::render(sf::RenderWindow& window)
-{
-    window.draw(*m_sprite);
-}
+void Graphics::render(sf::RenderWindow& window) { window.draw(*m_sprite); }
 
 void Graphics::init(const std::string& spritePath)
 {
     sf::Texture* backgroundTexture = new sf::Texture();
-    if (!backgroundTexture->loadFromFile(spritePath))
-        return;
+    if (!backgroundTexture->loadFromFile(spritePath)) return;
     m_sprite = new sf::Sprite();
     m_sprite->setTexture(*backgroundTexture);
     m_sprite->setPosition(m_position);

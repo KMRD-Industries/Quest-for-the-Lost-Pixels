@@ -128,8 +128,10 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransform
 
     // Create new object with special eventComponent
     const auto newEventComponent = CreateBodyWithCollisionEvent(
-        newChestEntity, "Chest", [this, newChestEntity](const GameType::CollisionData &collisionData)
-        { handleChestCollision(newChestEntity, collisionData); }, spawnFunction, true, true);
+        newChestEntity, "Chest",
+        [this, newChestEntity](const GameType::CollisionData &collisionData)
+        { handleChestCollision(newChestEntity, collisionData); },
+        spawnFunction, true, true);
 
     gCoordinator.addComponent(newItemEntity, newEventComponent);
 }
