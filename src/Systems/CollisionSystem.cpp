@@ -25,6 +25,8 @@ void MyContactListener::BeginContact(b2Contact* contact)
 
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
         colliderComponentA.onCollisionEnter({bodyBData->entityID, bodyBData->tag});
@@ -42,6 +44,9 @@ void MyContactListener::EndContact(b2Contact* contact)
 
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
+        // TODO: Fix weapon collision in other task
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
         colliderComponentA.onCollisionOut({bodyBData->entityID, bodyBData->tag});
@@ -74,9 +79,7 @@ void CollisionSystem::createMapCollision()
             gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
             gCoordinator.hasComponent<HelmetComponent>(entity) ||
             gCoordinator.hasComponent<BodyArmourComponent>(entity))
-        {
             continue;
-        }
 
         if (tileComponent.tileSet == "SpecialBlocks")
         {
@@ -123,7 +126,15 @@ void CollisionSystem::performFixedUpdate() const
             body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
                                      convertPixelsToMeters(transformComponent.velocity.y)});
         }
+        if (colliderComponent.trigger)
+        {
+            // TODO: Normal space
+            const auto center = glm::vec2{transformComponent.position.x + colliderComponent.weaponPlacement.x,
+                                          transformComponent.position.y + colliderComponent.weaponPlacement.y};
 
+            body->SetTransform({convertPixelsToMeters(center.x), convertPixelsToMeters(center.y)},
+                               transformComponent.rotation * M_PI / 180);
+        }
         renderComponent.dirty = true;
         transformComponent.velocity = {};
     }

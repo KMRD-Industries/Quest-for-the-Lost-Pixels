@@ -1,8 +1,11 @@
 #include "InventorySystem.h"
 #include "AnimationSystem.h"
+#include "BindSwingWeaponEvent.h"
 #include "BodyArmourComponent.h"
+#include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "CreateBodyWithCollisionEvent.h"
 #include "EquipmentComponent.h"
 #include "GameTypes.h"
 #include "HelmetComponent.h"
@@ -10,12 +13,14 @@
 #include "ItemComponent.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
+#include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
+#include "WeaponSwingComponent.h"
 
 void InventorySystem::dropItem(const Entity player, const Entity item, const GameType::slotType slot) const
 {
-    auto &equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
+    auto& equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
     const Entity newItemEntity = gCoordinator.createEntity();
 
     gCoordinator.addComponents(
@@ -59,10 +64,16 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
 
     gCoordinator.getComponent<ItemComponent>(pickUpItemInfo.itemEntity).equipped = true;
 
-    auto &[equipment] = gCoordinator.getComponent<EquipmentComponent>(pickUpItemInfo.characterEntity);
+    auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(pickUpItemInfo.characterEntity);
 
     if (const auto it = equipment.find(pickUpItemInfo.slot); it != equipment.end())
         dropItem(pickUpItemInfo.characterEntity, it->second, it->first);
 
     equipment.emplace(pickUpItemInfo.slot, pickUpItemInfo.itemEntity);
+
+    if (pickUpItemInfo.slot == GameType::WEAPON)
+    {
+        gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
+        gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
+    }
 }

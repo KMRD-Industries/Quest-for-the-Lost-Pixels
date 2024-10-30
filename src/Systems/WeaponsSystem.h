@@ -13,6 +13,7 @@ private:
     void updateWeaponAngle(Entity);
     void updateStartingAngle(Entity);
     void setAngle(Entity);
-    void rotateWeapon(Entity, bool);
+    void dealDMGToCollidedEnemies(const Entity weaponEntity, const bool clear = false);
+    void rotateWeapon(Entity, bool, const Entity weaponEntity);
     float m_frameTime{};
 };

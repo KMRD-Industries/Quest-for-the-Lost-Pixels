@@ -59,6 +59,9 @@ set(COMPONENTS
         Components/BodyArmourComponent.h
         Components/EquipmentComponent.h
         Components/SoundComponent.h
+        Components/WeaponSwingComponent.h
+        Components/BindSwingWeaponEvent.h
+        Components/DealDMGToEnemyEvent.h
 )
 
 set(UI_COMPONENTS
@@ -125,6 +128,10 @@ set(SYSTEMS
         Systems/ItemSystem.h
 		Systems/SoundSystem.cpp
 		Systems/SoundSystem.h
+        Systems/WeaponBindSystem.cpp
+        Systems/WeaponBindSystem.h        
+        Systems/DealDMGToEnemySystem.cpp
+        Systems/DealDMGToEnemySystem.h
 )
 
 set(EVENT_SYSTEMS
