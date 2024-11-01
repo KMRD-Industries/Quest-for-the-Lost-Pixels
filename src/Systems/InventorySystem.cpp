@@ -8,6 +8,7 @@
 #include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
+#include "MultiplayerSystem.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
 #include "TransformComponent.h"
@@ -17,6 +18,8 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const Gam
 {
     auto &equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
     const Entity newItemEntity = gCoordinator.createEntity();
+
+    gCoordinator.getRegisterSystem<MultiplayerSystem>()->updateItemEntity(item, newItemEntity);
 
     gCoordinator.addComponents(
         newItemEntity, TileComponent{gCoordinator.getComponent<TileComponent>(item)},

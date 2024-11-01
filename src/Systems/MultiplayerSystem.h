@@ -52,6 +52,7 @@ public:
     void playerConnected(const uint32_t id, const Entity entity) noexcept;
     void playerDisconnected(const uint32_t id) noexcept;
     void registerItem(const uint32_t id, const Entity entity);
+    void updateItemEntity(const Entity oldEntity, const Entity newEntity);
     void itemEquipped(const Entity entity);
     void roomChanged(const glm::ivec2& room);
     void roomCleared();

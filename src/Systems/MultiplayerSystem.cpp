@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <iostream>
@@ -15,7 +14,6 @@
 #include "Helpers.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
-#include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "Types.h"
 
@@ -212,13 +210,29 @@ void MultiplayerSystem::playerDisconnected(const uint32_t id) noexcept
 void MultiplayerSystem::registerItem(const uint32_t id, const Entity entity)
 {
     m_registered_items[id] = entity;
-    for (auto &[i, e]: m_registered_items) {
-        std::cout << i << ' ' << e << '\n';
+    std::cout << "registering item " << id << ": " << entity << '\n';
+}
+
+void MultiplayerSystem::updateItemEntity(const Entity oldEntity, const Entity newEntity)
+{
+    for (const auto& p : m_registered_items)
+    {
+        if (p.second != oldEntity) continue;
+
+        std::cout << "found id for " << oldEntity << ' ' << p.first << " replacing with " << newEntity << '\n';
+        m_registered_items[p.first] = newEntity;
+        return;
     }
 }
+
 Entity MultiplayerSystem::getItemEntity(const uint32_t id)
 {
-    if (m_registered_items.contains(id)) return m_registered_items[id];
+    if (m_registered_items.contains(id)) 
+    {
+        std::cout << "found entity with id " << id << ' ' << m_registered_items[id] << '\n';
+        return m_registered_items[id];
+    }
+    std::cout << "entity with id " << id << " not found\n";
     return 0;
 }
 void MultiplayerSystem::itemEquipped(const Entity entity)
@@ -227,14 +241,17 @@ void MultiplayerSystem::itemEquipped(const Entity entity)
     for (const auto& p : m_registered_items)
     {
         if (p.second != entity) continue;
+        std::cout << "equipping weapon with id " << p.first << ": " << entity << '\n';
 
         m_state.set_variant(comm::ITEM_EQUIPPED);
+        m_state.mutable_player()->set_id(m_player_id);
         m_state.mutable_item()->set_id(p.first);
         const auto serialized = m_state.SerializeAsString();
 
         m_tcp_socket.send(boost::asio::buffer(serialized));
         return;
     }
+    std::cout << "weapon with entity " << entity << " not found!\n";
 }
 
 void MultiplayerSystem::update()
