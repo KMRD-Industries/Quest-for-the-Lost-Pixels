@@ -328,7 +328,6 @@ void Dungeon::update(const float deltaTime)
             m_roomListenerSystem->spawnLoot();
             break;
         case comm::ITEM_EQUIPPED:
-            std::cout << "incomming id: " << item.id() << '\n';
             m_inventorySystem->pickUpItem(GameType::PickUpInfo{
                 m_entities[playerID], m_multiplayerSystem->getItemEntity(item.id()), GameType::slotType::WEAPON});
         default:
