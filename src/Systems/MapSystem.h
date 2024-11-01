@@ -8,8 +8,6 @@
 class MapSystem : public System
 {
 public:
-    void init();
-    void update();
     void loadMap(const std::string&);
 
 private:

@@ -14,9 +14,12 @@ void ObjectCreatorSystem::update()
     {
         const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
 
-        if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity)) continue;
-        if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity)) continue;
-        if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity)) continue;
+        if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity))
+            continue;
+        if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity))
+            continue;
+        if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity))
+            continue;
         if (configSingleton.GetConfig().debugMode)
             std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
 
@@ -62,12 +65,12 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
         objectPosition.x = convertPixelsToMeters(
             transformComponent.position.x -
             (spriteBounds.width / 2.f - (colliderComponent.collision.x + colliderComponent.collision.width / 2.f)) *
-                configSingleton.GetConfig().gameScale);
+            configSingleton.GetConfig().gameScale);
 
         objectPosition.y = convertPixelsToMeters(
             transformComponent.position.y -
             (spriteBounds.height / 2 - (colliderComponent.collision.y + colliderComponent.collision.height / 2)) *
-                configSingleton.GetConfig().gameScale);
+            configSingleton.GetConfig().gameScale);
     }
 
     bodyDef.position.Set(objectPosition.x, objectPosition.y);
@@ -88,7 +91,7 @@ b2FixtureDef ObjectCreatorSystem::defineFixture(const CreateBodyWithCollisionEve
     fixtureDef.filter.maskBits = config::stringToMaskBits(eventInfo.tag);
     fixtureDef.filter.groupIndex = config::stringToIndexGroup(eventInfo.tag);
     fixtureDef.restitution = {0.05f};
-
+    fixtureDef.isSensor = eventInfo.trigger;
     return fixtureDef;
 }
 
@@ -117,7 +120,11 @@ b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEve
             convertPixelsToMeters(colliderComponent.collision.height * configSingleton.GetConfig().gameScale) / 2;
     }
 
-    boxShape.SetAsBox(objectSize.x, objectSize.y);
+    if (eventInfo.tag == "Weapon")
+        boxShape.SetAsBox(objectSize.x, objectSize.y, b2Vec2(0, -objectSize.y), 0);
+    else
+        boxShape.SetAsBox(objectSize.x, objectSize.y);
+
     return boxShape;
 }
 
@@ -137,7 +144,8 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
 
     b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
 
-    if (collisionData->tag != "Item") body->SetFixedRotation(true);
+    if (collisionData->tag != "Item")
+        body->SetFixedRotation(true);
 
     body->CreateFixture(&fixtureDef);
     colliderComponent.body = body;
@@ -151,7 +159,8 @@ void ObjectCreatorSystem::clear()
 {
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity : m_entities) entityToRemove.push_back(entity);
+    for (const auto entity : m_entities)
+        entityToRemove.push_back(entity);
 
     while (!entityToRemove.empty())
     {

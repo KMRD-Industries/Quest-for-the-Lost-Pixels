@@ -6,6 +6,7 @@
 #include "HelmetComponent.h"
 #include "MultiplayerSystem.h"
 #include "MultiplayerComponent.h"
+#include "Physics.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
@@ -25,6 +26,8 @@ void MyContactListener::BeginContact(b2Contact* contact)
 
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
         colliderComponentA.onCollisionEnter({bodyBData->entityID, bodyBData->tag});
@@ -42,6 +45,9 @@ void MyContactListener::EndContact(b2Contact* contact)
 
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
+        // TODO: Fix weapon collision in other task
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
         colliderComponentA.onCollisionOut({bodyBData->entityID, bodyBData->tag});
@@ -49,9 +55,7 @@ void MyContactListener::EndContact(b2Contact* contact)
     }
 }
 
-CollisionSystem::CollisionSystem() { init(); }
-
-void CollisionSystem::init() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
+CollisionSystem::CollisionSystem() { Physics::getWorld()->SetContactListener(&m_myContactListenerInstance); }
 
 void CollisionSystem::createMapCollision()
 {
@@ -77,9 +81,7 @@ void CollisionSystem::createMapCollision()
             gCoordinator.hasComponent<MultiplayerComponent>(entity) ||
             gCoordinator.hasComponent<HelmetComponent>(entity) ||
             gCoordinator.hasComponent<BodyArmourComponent>(entity))
-        {
             continue;
-        }
 
         if (tileComponent.tileSet == "SpecialBlocks")
         {
@@ -88,9 +90,6 @@ void CollisionSystem::createMapCollision()
 
             else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOORSCOLLIDER))
                 createCollisionBody(entity, "Door", true, false);
-
-            else if (tileComponent.id == static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR))
-                createCollisionBody(entity, "Passage", true, true);
         }
         else
         {
@@ -129,7 +128,15 @@ void CollisionSystem::performFixedUpdate() const
             body->SetLinearVelocity({convertPixelsToMeters(transformComponent.velocity.x),
                                      convertPixelsToMeters(transformComponent.velocity.y)});
         }
+        if (colliderComponent.trigger)
+        {
+            // TODO: Normal space
+            const auto center = glm::vec2{transformComponent.position.x + colliderComponent.weaponPlacement.x,
+                                          transformComponent.position.y + colliderComponent.weaponPlacement.y};
 
+            body->SetTransform({convertPixelsToMeters(center.x), convertPixelsToMeters(center.y)},
+                               transformComponent.rotation * M_PI / 180);
+        }
         renderComponent.dirty = true;
         transformComponent.velocity = {};
     }

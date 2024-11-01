@@ -18,7 +18,7 @@
 extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
 
-void TextureSystem::init() { loadTexturesFromFiles(); }
+TextureSystem::TextureSystem() { loadTexturesFromFiles(); }
 
 void TextureSystem::update() {}
 

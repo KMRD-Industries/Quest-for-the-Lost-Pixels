@@ -16,6 +16,7 @@
 #include "CharacterSystem.h"
 #include "ChestSystem.h"
 #include "CollisionSystem.h"
+#include "DealDMGToEnemySystem.h"
 #include "DoorSystem.h"
 #include "EnemySystem.h"
 #include "HealthBarSystem.h"
@@ -31,6 +32,7 @@
 #include "State.h"
 #include "TextTagSystem.h"
 #include "TravellingSystem.h"
+#include "WeaponBindSystem.h"
 #include "WeaponsSystem.h"
 
 class Dungeon
@@ -73,6 +75,7 @@ private:
     bool m_passedBy;
     int m_dungeonDepth{1};
     bool m_endGame{};
+    Entity m_weapon{};
 
     PlayerMovementSystem* m_playerMovementSystem;
     MultiplayerSystem* m_multiplayerSystem;
@@ -94,4 +97,6 @@ private:
     RoomListenerSystem* m_roomListenerSystem;
     ItemSpawnerSystem* m_itemSpawnerSystem;
     ItemSystem* m_itemSystem;
+    WeaponBindSystem* m_weaponBindSystem;
+    DealDMGToEnemySystem* m_dealDMGSystem;
 };

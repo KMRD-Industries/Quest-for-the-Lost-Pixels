@@ -9,13 +9,13 @@ class AnimationSystem : public System
 {
 public:
     AnimationSystem() = default;
-
     void update(const float &deltaTime) const;
-    void updateEntityAnimation(AnimationComponent &, TileComponent &, float) const;
-    void advanceFrame(AnimationComponent &animationComponent) const;
-    void updateTileComponent(TileComponent &tileComponent, const AnimationComponent &animationComponent) const;
 
 private:
+    void updateEntityAnimation(AnimationComponent &, TileComponent &, float) const;
+    void advanceFrame(AnimationComponent &) const;
+    void updateTileComponent(TileComponent &, const AnimationComponent &) const;
+
     float m_animationFrameTime{};
     float m_frameTime{};
 };

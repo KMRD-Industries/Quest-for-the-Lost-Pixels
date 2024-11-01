@@ -5,6 +5,7 @@
 #include "Coordinator.h"
 #include "FightSystem.h"
 #include "ObjectCreatorSystem.h"
+#include "SoundComponent.h"
 
 extern Coordinator gCoordinator;
 
@@ -12,6 +13,12 @@ void GameState::init()
 {
     m_dungeon.m_stateChangeCallback = m_stateChangeCallback;
     m_dungeon.init();
+    auto menuBackgroundMusic = gCoordinator.createEntity();
+    gCoordinator.addComponent(menuBackgroundMusic,
+                              SoundComponent{.soundToPlay = Sound::Type::MenuBackgroundMusic, .stopPlaying = true});
+    auto gameBackgroundMusic = gCoordinator.createEntity();
+    gCoordinator.addComponent(gameBackgroundMusic,
+                              SoundComponent{.soundToPlay = Sound::Type::GameBackgroundMusic});
 }
 
 void GameState::handleCollision(const float deltaTime)

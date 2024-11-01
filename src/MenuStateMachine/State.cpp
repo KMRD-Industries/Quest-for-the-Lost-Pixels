@@ -14,7 +14,10 @@
 #include "FightActionEvent.h"
 #include "FightSystem.h"
 #include "ObjectCreatorSystem.h"
+#include "Physics.h"
 #include "RenderComponent.h"
+#include "SoundComponent.h"
+#include "SoundSystem.h"
 #include "TransformComponent.h"
 #include "UiComponent.h"
 
@@ -22,8 +25,7 @@ extern Coordinator gCoordinator;
 
 void State::beforeInit()
 {
-    if (!m_resetECS)
-        return;
+    if (!m_resetECS) return;
 
     Physics::getInstance()->resetWorld();
     gCoordinator.init();
@@ -35,6 +37,14 @@ void State::beforeInit()
     gCoordinator.registerComponent<CreateBodyWithCollisionEvent>();
     gCoordinator.registerComponent<UiComponent>();
     gCoordinator.registerComponent<FightActionEvent>();
+    gCoordinator.registerComponent<SoundComponent>();
+
+    auto soundSystem = gCoordinator.getRegisterSystem<SoundSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<SoundComponent>());
+        gCoordinator.setSystemSignature<SoundSystem>(signature);
+    }
 
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     {
