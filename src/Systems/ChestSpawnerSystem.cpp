@@ -58,7 +58,9 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
     if (multiplayerSystem->isConnected())
     {
         itemGenerator = multiplayerSystem->getItemGenerator();
-        multiplayerSystem->registerItem(itemGenerator.id, newItemEntity);
+
+        if (itemGenerator.type != comm::POTION)
+            multiplayerSystem->registerItem(itemGenerator.id, newItemEntity);
     }
 
     switch (itemGenerator.type)

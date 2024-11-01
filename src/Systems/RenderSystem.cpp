@@ -10,7 +10,6 @@
 #include "GameUtility.h"
 #include "Helpers.h"
 #include "ItemComponent.h"
-#include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
@@ -36,8 +35,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
 
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
-            gCoordinator.hasComponent<MultiplayerComponent>(entity))
+        if (gCoordinator.hasComponent<PlayerComponent>(entity))
             players.push_back(entity);
 
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
@@ -438,9 +436,8 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
             !gCoordinator.hasComponent<RenderComponent>(entity))
             continue;
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
-            gCoordinator.hasComponent<MultiplayerComponent>(entity) ||
-            gCoordinator.hasComponent<EnemyComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<EnemyComponent>(entity) ||
+            gCoordinator.hasComponent<WeaponComponent>(entity))
             drawSprite(entity);
 
         if (gCoordinator.hasComponent<EquipmentComponent>(entity))
@@ -449,8 +446,7 @@ void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
             displayPlayerStatsTable(window, entity);
         }
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
-             gCoordinator.hasComponent<MultiplayerComponent>(entity))
+        if (gCoordinator.hasComponent<PlayerComponent>(entity))
         {
             const auto& weaponComponent = gCoordinator.getComponent<EquipmentComponent>(entity);
             const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);

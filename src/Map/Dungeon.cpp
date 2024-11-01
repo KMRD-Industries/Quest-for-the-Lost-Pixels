@@ -156,6 +156,7 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
         RenderComponent{},
         AnimationComponent{},
         CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
+        PlayerComponent{},
         MultiplayerComponent{},
         ColliderComponent{},
         InventoryComponent{},
@@ -278,6 +279,8 @@ void Dungeon::setupHelmetEntity(const comm::Player& player) const
     gCoordinator.addComponent(helmetEntity, ItemComponent{.equipped = true});
 
     m_inventorySystem->pickUpItem(GameType::PickUpInfo{playerEntity, helmetEntity, GameType::slotType::HELMET});
+    if (m_multiplayerSystem->isConnected())
+        m_multiplayerSystem->registerItem(helmet.id(), helmetEntity);
 }
 
 void Dungeon::update(const float deltaTime)
@@ -296,17 +299,8 @@ void Dungeon::update(const float deltaTime)
     m_weaponBindSystem->update();
     m_dealDMGSystem->update();
 
-    bool a = false;
-    if (InputHandler::getInstance()->isPressed(InputType::Test))
-    {
-        m_roomListenerSystem->spawnLoot();
-        a = true;
-    }
-
     if (m_multiplayerSystem->isConnected())
     {
-        if (a)
-            m_multiplayerSystem->roomCleared();
         const auto& stateUpdate = m_multiplayerSystem->pollStateUpdates();
         const auto& player = stateUpdate.player();
         const auto& item = stateUpdate.item();
@@ -329,8 +323,24 @@ void Dungeon::update(const float deltaTime)
             m_roomListenerSystem->spawnLoot();
             break;
         case comm::ITEM_EQUIPPED:
-            m_inventorySystem->pickUpItem(GameType::PickUpInfo{
-                m_entities[playerID], m_multiplayerSystem->getItemEntity(item.id()), GameType::slotType::WEAPON});
+            switch (item.type())
+            {
+            case comm::WEAPON:
+                m_inventorySystem->pickUpItem(GameType::PickUpInfo{
+                    m_entities[playerID], m_multiplayerSystem->getItemEntity(item.id()), GameType::slotType::WEAPON});
+                break;
+            case comm::HELMET:
+                m_inventorySystem->pickUpItem(GameType::PickUpInfo{
+                    m_entities[playerID], m_multiplayerSystem->getItemEntity(item.id()), GameType::slotType::HELMET});
+                break;
+            case comm::ARMOUR:
+                m_inventorySystem->pickUpItem(GameType::PickUpInfo{m_entities[playerID],
+                                                                   m_multiplayerSystem->getItemEntity(item.id()),
+                                                                   GameType::slotType::BODY_ARMOUR});
+                break;
+            default:
+                break;
+            }
         default:
             break;
         }
@@ -673,7 +683,7 @@ void Dungeon::setECS()
     const auto weaponSystem = gCoordinator.getRegisterSystem<WeaponSystem>();
     {
         Signature signature;
-        signature.set(gCoordinator.getComponentType<EquipmentComponent>());
+        signature.set(gCoordinator.getComponentType<PlayerComponent>());
         gCoordinator.setSystemSignature<WeaponSystem>(signature);
     }
 

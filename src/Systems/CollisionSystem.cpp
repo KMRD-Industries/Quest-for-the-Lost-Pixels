@@ -5,7 +5,6 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "HelmetComponent.h"
 #include "MultiplayerSystem.h"
-#include "MultiplayerComponent.h"
 #include "Physics.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
@@ -78,7 +77,6 @@ void CollisionSystem::createMapCollision()
 
         if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
             gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
-            gCoordinator.hasComponent<MultiplayerComponent>(entity) ||
             gCoordinator.hasComponent<HelmetComponent>(entity) ||
             gCoordinator.hasComponent<BodyArmourComponent>(entity))
             continue;

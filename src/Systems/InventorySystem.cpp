@@ -14,6 +14,7 @@
 #include "MultiplayerSystem.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
+#include "SpawnerSystem.h"
 #include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
@@ -76,7 +77,10 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
 
     if (pickUpItemInfo.slot == GameType::WEAPON)
     {
-        gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
-        gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
+        if (!gCoordinator.hasComponent<BindSwingWeaponEvent>(pickUpItemInfo.itemEntity))
+            gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
+
+        if (!gCoordinator.hasComponent<WeaponSwingComponent>(pickUpItemInfo.itemEntity))
+            gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
     }
 }

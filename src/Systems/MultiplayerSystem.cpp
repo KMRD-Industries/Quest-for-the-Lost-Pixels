@@ -224,15 +224,32 @@ Entity MultiplayerSystem::getItemEntity(const uint32_t id)
     if (m_registered_items.contains(id)) return m_registered_items[id];
     return 0;
 }
-void MultiplayerSystem::itemEquipped(const Entity entity)
+void MultiplayerSystem::itemEquipped(const GameType::PickUpInfo& pickUpInfo)
 {
     for (const auto& p : m_registered_items)
     {
-        if (p.second != entity) continue;
+        if (p.second != pickUpInfo.itemEntity) continue;
 
         m_state.set_variant(comm::ITEM_EQUIPPED);
         m_state.mutable_player()->set_id(m_player_id);
-        m_state.mutable_item()->set_id(p.first);
+        auto item = m_state.mutable_item();
+        item->set_id(p.first);
+
+        switch (pickUpInfo.slot)
+        {
+        case GameType::slotType::WEAPON:
+            item->set_type(comm::WEAPON);
+            break;
+        case GameType::slotType::HELMET:
+            item->set_type(comm::HELMET);
+            break;
+        case GameType::slotType::BODY_ARMOUR:
+            item->set_type(comm::ARMOUR);
+            break;
+        default:
+            break;
+        }
+
         const auto serialized = m_state.SerializeAsString();
 
         m_tcp_socket.send(boost::asio::buffer(serialized));

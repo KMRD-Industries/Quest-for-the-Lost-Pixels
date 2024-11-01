@@ -154,7 +154,7 @@ void ItemSystem::input(const Entity player)
     if (closestItem.itemEntity == 0 || closestItem.slot == GameType::slotType{}) return;
     closestItem.characterEntity = player;
     
-    gCoordinator.getRegisterSystem<MultiplayerSystem>()->itemEquipped(closestItem.itemEntity);
+    gCoordinator.getRegisterSystem<MultiplayerSystem>()->itemEquipped(closestItem);
     gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(closestItem);
 }
 
