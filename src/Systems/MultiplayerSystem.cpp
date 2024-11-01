@@ -194,8 +194,6 @@ const comm::StateUpdate& MultiplayerSystem::pollStateUpdates()
 void MultiplayerSystem::playerConnected(const uint32_t id, const Entity entity) noexcept { m_entity_map[id] = entity; }
 void MultiplayerSystem::playerDisconnected(const uint32_t id) noexcept
 {
-    m_entity_map.erase(id);
-
     gCoordinator.getComponent<ColliderComponent>(m_entity_map[id]).toDestroy = true;
     for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[id]).slots)
     {
@@ -205,6 +203,7 @@ void MultiplayerSystem::playerDisconnected(const uint32_t id) noexcept
             gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
         }
     }
+    m_entity_map.erase(id);
 }
 
 void MultiplayerSystem::registerItem(const uint32_t id, const Entity entity) { m_registered_items[id] = entity; }
