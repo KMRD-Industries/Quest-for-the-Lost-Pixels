@@ -61,7 +61,7 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale;
 
     gCoordinator.addComponent(newMonsterEntity, TileComponent{enemyConfig.textureData});
-    gCoordinator.addComponent(newMonsterEntity, TransformComponent{spawnerTransformComponent});
+    gCoordinator.addComponent(newMonsterEntity, TransformComponent{transformComponent});
     gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
     gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
