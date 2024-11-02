@@ -2,6 +2,7 @@
 #include "State.h"
 
 #include <CreateBodyWithCollisionEvent.h>
+#include <DirtyFlagComponent.h>
 #include <FightActionEvent.h>
 #include <RenderSystem.h>
 
@@ -38,6 +39,7 @@ void State::beforeInit()
     gCoordinator.registerComponent<UiComponent>();
     gCoordinator.registerComponent<FightActionEvent>();
     gCoordinator.registerComponent<SoundComponent>();
+    gCoordinator.registerComponent<DirtyFlagComponent>();
 
     auto soundSystem = gCoordinator.getRegisterSystem<SoundSystem>();
     {
@@ -60,6 +62,7 @@ void State::beforeInit()
         Signature signature;
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<DirtyFlagComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 

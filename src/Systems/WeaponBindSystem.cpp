@@ -22,38 +22,45 @@ void WeaponBindSystem::update()
         }
         else
         {
-            auto weaponColliderComponent = ColliderComponent{true, "Weapon"};
+            auto weaponColliderComponent = ColliderComponent{.tag = "Weapon", .trigger = true};
             gCoordinator.addComponent(entity, weaponColliderComponent);
         }
 
         const Entity eventEntity = gCoordinator.createEntity();
-        const auto newEvent = CreateBodyWithCollisionEvent(
-            entity, "Weapon",
-            [this, entity](const GameType::CollisionData& data)
-            {
-                auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
-                swingComponent.enemyColided.insert(data.entityID);
-                const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
-                if (!weaponComponent.isAttacking) return;
-                if (swingComponent.enemyHited.contains(data.entityID)) return;
 
-                swingComponent.enemyHited.insert(data.entityID);
-                gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
-            },
-            [entity](const GameType::CollisionData& data)
-            {
-                auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
-                swingComponent.enemyColided.erase(data.entityID);
-                const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
-                if (!weaponComponent.isAttacking) return;
-                if (swingComponent.enemyHited.contains(data.entityID)) return;
+        const auto onCollisionEnterFunction = [this, entity](const GameType::CollisionData& data)
+        {
+            auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
+            swingComponent.enemyColided.insert(data.entityID);
+            const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
+            if (!weaponComponent.isAttacking) return;
+            if (swingComponent.enemyHited.contains(data.entityID)) return;
 
-                swingComponent.enemyHited.insert(data.entityID);
-                gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
-            },
-            false, false, true);
+            swingComponent.enemyHited.insert(data.entityID);
+            gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
+        };
 
-        gCoordinator.addComponent(eventEntity, newEvent);
+        const auto onCollisionOutFunction = [entity](const GameType::CollisionData& data)
+        {
+            auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
+            swingComponent.enemyColided.erase(data.entityID);
+            const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
+            if (!weaponComponent.isAttacking) return;
+            if (swingComponent.enemyHited.contains(data.entityID)) return;
+
+            swingComponent.enemyHited.insert(data.entityID);
+            gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
+        };
+
+        const auto createNewCollisionEvent = CreateBodyWithCollisionEvent{.entity = entity,
+                                                                          .tag = "Weapon",
+                                                                          .onCollisionEnter = onCollisionEnterFunction,
+                                                                          .onCollisionOut = onCollisionOutFunction,
+                                                                          .isStatic = false,
+                                                                          .useTextureSize = false,
+                                                                          .trigger = true};
+
+        gCoordinator.addComponent(eventEntity, createNewCollisionEvent);
         m_entityToRemove.push(entity);
     }
     while (!m_entityToRemove.empty())
