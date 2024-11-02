@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-
 #include "Camera.h"
 #include "Config.h"
 #include "RenderComponent.h"
@@ -11,7 +10,6 @@
 #include "SFML/Window/Window.hpp"
 #include "System.h"
 #include "TransformComponent.h"
-
 #include <set>
 
 namespace sf
@@ -23,10 +21,11 @@ class RenderSystem : public System
 {
 public:
     RenderSystem();
-    void init();
     void update();
-    void displayPortal(Entity entity);
     void draw(sf::RenderWindow& window);
+
+private:
+    void displayPortal(Entity entity);
     void renderMap(sf::RenderWindow& window, const std::vector<sf::Sprite*>& tiles, const Camera& camera);
     void renderMap(sf::RenderWindow& window, const std::unordered_map<sf::Texture*, sf::VertexArray>& tiles,
                    const Camera& camera);
@@ -44,22 +43,20 @@ public:
     void reverseDisplay(Collision& itemPivot, Collision& itemPlacement);
     void setWeapon();
     void setWeaponOrigin();
-
-private:
     void displayEnemiesTable(const sf::RenderWindow& window);
     void debugBoundingBoxes(sf::RenderWindow& window);
-    void drawEquipment(Entity);
-    void setOrigin(Entity);
-    void setSpritePosition(Entity);
-    sf::Vector2f getPosition(Entity);
+    void drawEquipment(Entity entity);
+    void setOrigin(Entity entity);
+    void setSpritePosition(Entity entity);
+    sf::Vector2f getPosition(Entity entity);
     sf::Vector2f getScale(Entity entity);
     float getRotation(Entity entity);
-    sf::Vector2f getOrigin(Entity);
-    void updateSprite(Entity);
+    sf::Vector2f getOrigin(Entity entity);
+    void updateSprite(Entity entity);
     void clearSpriteArray();
-    void displayDamageTaken(Entity);
-    void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);
-    void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity) const;
+    void displayDamageTaken(Entity entity);
+    void displayWeaponStatsTable(const sf::RenderWindow& window, Entity entity);
+    void displayPlayerStatsTable(const sf::RenderWindow& window, Entity entity) const;
 
     std::vector<std::vector<sf::Sprite*>> m_vecSpriteArray;
     std::vector<unsigned long> m_entityToVertexArrayIndex;

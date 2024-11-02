@@ -12,10 +12,6 @@
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-ItemSpawnerSystem::ItemSpawnerSystem() { init(); }
-
-void ItemSpawnerSystem::init() {}
-
 void ItemSpawnerSystem::updateAnimation(const float deltaTime)
 {
     for (const auto entity : m_entities)

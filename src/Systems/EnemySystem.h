@@ -9,7 +9,6 @@ class EnemySystem : public System
 {
 public:
     EnemySystem();
-    void init();
     void update();
     void deleteEnemies() const;
 

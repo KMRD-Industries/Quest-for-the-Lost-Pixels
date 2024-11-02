@@ -28,9 +28,8 @@ struct AnimationData
 class ChestSpawnerSystem : public System
 {
 public:
-    void spawnChest() const;
     ChestSpawnerSystem();
-    void init();
+    void spawnChest() const;
 
 private:
     void clearSpawners() const;

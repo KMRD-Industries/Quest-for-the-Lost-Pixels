@@ -4,7 +4,7 @@
 class CharacterSystem : public System
 {
 public:
-    explicit CharacterSystem() = default;
+    CharacterSystem() = default;
     void update() const;
 
 private:

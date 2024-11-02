@@ -10,6 +10,7 @@
 #include "Paths.h"
 #include "PublicConfigMenager.h"
 #include "ResourceManager.h"
+#include "SoundManager.h"
 #include "SpawnerSystem.h"
 
 Coordinator gCoordinator;
@@ -72,6 +73,12 @@ int main()
     ResourceManager& resourceManager = ResourceManager::getInstance();
     resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 160);
     resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 40);
+
+    SoundManager& soundManager = SoundManager::getInstance();
+    soundManager.loadSound(Sound::Type::MenuBackgroundMusic,
+                           ASSET_PATH + std::string("/sounds/menuBackgroundSound.mp3"));
+    soundManager.loadSound(Sound::Type::GameBackgroundMusic,
+                           ASSET_PATH + std::string("/sounds/gameBackgroundSound.mp3"));
 
     while (window.isOpen())
     {

@@ -6,6 +6,7 @@
 #include "FightSystem.h"
 #include "MainMenuState.h"
 #include "RenderSystem.h"
+#include "SoundSystem.h"
 
 extern Coordinator gCoordinator;
 
@@ -20,4 +21,8 @@ void Game::draw(sf::RenderWindow& window)
     m_stateManager.render(window);
 }
 
-void Game::update(const float deltaTime) { m_stateManager.update(deltaTime); }
+void Game::update(const float deltaTime)
+{
+    gCoordinator.getRegisterSystem<SoundSystem>()->update(deltaTime);
+    m_stateManager.update(deltaTime);
+}

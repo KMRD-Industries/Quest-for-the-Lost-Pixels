@@ -5,10 +5,15 @@
 #include "InputTextDTO.h"
 #include "Paths.h"
 #include "ResourceManager.h"
-#include "SFML/Graphics/Sprite.hpp"
+#include "SoundComponent.h"
 
 void MainMenuState::init()
 {
+    auto backgroundMusic = gCoordinator.createEntity();
+    gCoordinator.addComponent(backgroundMusic, SoundComponent{.soundToPlay = Sound::Type::MenuBackgroundMusic});
+    auto stopGameMusic = gCoordinator.createEntity();
+    gCoordinator.addComponent(stopGameMusic,
+                              SoundComponent{.soundToPlay = Sound::Type::GameBackgroundMusic, .stopPlaying = true});
     m_playButton.init(ButtonDTO{std::string(ASSET_PATH) + "/ui/uiHigh.png",
                                 ASSET_PATH + std::string("/ui/uiFont.ttf"),
                                 "Start",

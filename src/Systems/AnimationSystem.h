@@ -9,7 +9,6 @@ class AnimationSystem : public System
 {
 public:
     AnimationSystem() = default;
-
     void update(const float &deltaTime) const;
     void updateEntityAnimation(Entity entity, float deltaTime) const;
 

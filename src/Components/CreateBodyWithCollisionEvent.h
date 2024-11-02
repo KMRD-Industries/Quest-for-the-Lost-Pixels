@@ -12,5 +12,6 @@ struct CreateBodyWithCollisionEvent
     std::optional<std::function<void(GameType::CollisionData)>> onCollisionOut = std::nullopt;
     bool isStatic{true};
     bool useTextureSize{true};
+    bool trigger{false};
     GameType::ObjectType type{GameType::ObjectType::NORMAL};
 };

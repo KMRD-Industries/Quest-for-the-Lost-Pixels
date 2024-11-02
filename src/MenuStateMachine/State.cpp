@@ -15,7 +15,10 @@
 #include "FightActionEvent.h"
 #include "FightSystem.h"
 #include "ObjectCreatorSystem.h"
+#include "Physics.h"
 #include "RenderComponent.h"
+#include "SoundComponent.h"
+#include "SoundSystem.h"
 #include "TransformComponent.h"
 #include "UiComponent.h"
 
@@ -35,7 +38,15 @@ void State::beforeInit()
     gCoordinator.registerComponent<CreateBodyWithCollisionEvent>();
     gCoordinator.registerComponent<UiComponent>();
     gCoordinator.registerComponent<FightActionEvent>();
+    gCoordinator.registerComponent<SoundComponent>();
     gCoordinator.registerComponent<DirtyFlagComponent>();
+
+    auto soundSystem = gCoordinator.getRegisterSystem<SoundSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<SoundComponent>());
+        gCoordinator.setSystemSignature<SoundSystem>(signature);
+    }
 
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     {

@@ -14,6 +14,7 @@
 #include <format>
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
+#include "BindSwingWeaponEvent.h"
 #include "CharacterComponent.h"
 #include "CharacterSystem.h"
 #include "ChestComponent.h"
@@ -22,6 +23,7 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Config.h"
+#include "DealDMGToEnemyEvent.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
 #include "EndGameState.h"
@@ -55,9 +57,10 @@
 #include "TravellingDungeonComponent.h"
 #include "TravellingSystem.h"
 #include "WeaponComponent.h"
+#include "WeaponSwingComponent.h"
 #include "WeaponsSystem.h"
 
-extern Coordinator Coordinator;
+extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
 
 void Dungeon::init()
@@ -110,6 +113,7 @@ void Dungeon::init()
     addPlayerComponents(m_entities[m_id]);
     setupPlayerCollision(m_entities[m_id]);
     setupWeaponEntity(m_entities[m_id]);
+    m_passageSystem->setPassages(true);
 }
 
 void Dungeon::render(sf::RenderWindow& window)
@@ -200,6 +204,8 @@ void Dungeon::setupPlayerCollision(const Entity player)
         {
             auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
 
+            if (!passageComponent.activePassage) return;
+
             gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
             passageComponent.moveInDungeon.emplace_back(true);
             passageComponent.activePassage = false;
@@ -227,7 +233,7 @@ void Dungeon::setupPlayerCollision(const Entity player)
     gCoordinator.addComponent(entity, newEventComponent);
 }
 
-void Dungeon::setupWeaponEntity(const Entity player) const
+void Dungeon::setupWeaponEntity(const Entity player)
 {
     const Entity weaponEntity = gCoordinator.createEntity();
 
@@ -275,6 +281,8 @@ void Dungeon::update(const float deltaTime)
     m_passageSystem->update();
     m_characterSystem->update();
     m_textTagSystem->update(deltaTime);
+    m_weaponBindSystem->update();
+    m_dealDMGSystem->update();
 
     if (m_multiplayerSystem->isConnected())
     {
@@ -301,12 +309,14 @@ void Dungeon::update(const float deltaTime)
 
         m_multiplayerSystem->update();
     }
-
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
         m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});
-
-    if (m_endGame) m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
+    else
+    {
+        if (m_endGame)
+            m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
+    }
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
@@ -480,6 +490,9 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<HelmetComponent>();
     gCoordinator.registerComponent<PotionComponent>();
     gCoordinator.registerComponent<BodyArmourComponent>();
+    gCoordinator.registerComponent<WeaponSwingComponent>();
+    gCoordinator.registerComponent<BindSwingWeaponEvent>();
+    gCoordinator.registerComponent<DealDMGToEnemyEvent>();
 
     auto playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>();
     {
@@ -634,6 +647,22 @@ void Dungeon::setECS()
         gCoordinator.setSystemSignature<ItemSystem>(signature);
     }
 
+    const auto weaponBindSystem = gCoordinator.getRegisterSystem<WeaponBindSystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<BindSwingWeaponEvent>());
+        gCoordinator.setSystemSignature<WeaponBindSystem>(signature);
+    }
+
+    const auto dealDMGToEnemySystem = gCoordinator.getRegisterSystem<DealDMGToEnemySystem>();
+    {
+        Signature signature;
+        signature.set(gCoordinator.getComponentType<DealDMGToEnemyEvent>());
+        gCoordinator.setSystemSignature<DealDMGToEnemySystem>(signature);
+    }
+
+    m_dealDMGSystem = gCoordinator.getRegisterSystem<DealDMGToEnemySystem>().get();
+    m_weaponBindSystem = gCoordinator.getRegisterSystem<WeaponBindSystem>().get();
     m_playerMovementSystem = gCoordinator.getRegisterSystem<PlayerMovementSystem>().get();
     m_multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>().get();
     m_characterSystem = gCoordinator.getRegisterSystem<CharacterSystem>().get();

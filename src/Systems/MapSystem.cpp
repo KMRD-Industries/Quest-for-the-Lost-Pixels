@@ -1,5 +1,4 @@
 #include "MapSystem.h"
-
 #include <DirtyFlagComponent.h>
 #include <nlohmann/json.hpp>
 #include "ColliderComponent.h"
@@ -24,10 +23,6 @@
 
 extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
-
-void MapSystem::init() {}
-
-void MapSystem::update() {}
 
 /**
  * @brief Load room layout from given path of Tiled Json map format
