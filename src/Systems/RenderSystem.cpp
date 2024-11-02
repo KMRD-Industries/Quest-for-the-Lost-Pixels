@@ -36,7 +36,7 @@ RenderSystem::RenderSystem()
     // Initialize vector of map layers
     m_layeredTextureVertexArrays = std::vector<LayerVertexArray>(configSingleton.GetConfig().maximumNumberOfLayers);
     m_vecSpriteArray = std::vector(configSingleton.GetConfig().maximumNumberOfLayers, std::vector<sf::Sprite*>{});
-    m_entityToVertexArrayIndex = std::vector<unsigned long>(MAX_ENTITIES);
+    m_entityToVertexArrayIndex = std::vector<unsigned long>(MAX_ENTITIES, -1);
 
     // Load spacial sprites
     portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getSprite("portal", 0);
@@ -147,8 +147,16 @@ void RenderSystem::updateCamera(Camera& camera, const sf::Vector2f targetPos, co
  * */
 void RenderSystem::clearMap()
 {
-    for (auto& layer : m_layeredTextureVertexArrays) layer.clear();
     for (auto& layer : m_vecSpriteArray) layer.clear();
+
+    for (auto& layer : m_layeredTextureVertexArrays)
+    {
+        for (auto& pair : layer) pair.second.clear(); // Clear each VertexArray
+        layer.clear();
+    }
+
+    // Fill with known invalid state
+    for (auto& value : m_entityToVertexArrayIndex) value = -1;
 
     camera.setSize({});
     camera.setPosition({});
@@ -186,10 +194,10 @@ void RenderSystem::updateQuad(const Entity entity)
 
     // To speed up computation, render system contains mapping [Entity, vertexArrayIndex].
     // This helps with getting verticals related to each Entity.
-    unsigned long vertexArrayIndex;
+    unsigned long vertexArrayIndex{};
 
-    // Check if Entity already contains vertexes
-    if (m_entityToVertexArrayIndex[entity] == 0)
+    // Check if entity already contains valid vertexes
+    if (m_entityToVertexArrayIndex[entity] <= 0 || m_entityToVertexArrayIndex[entity] >= MAX_ENTITIES)
     {
         // Add new mapping and resize VertexArray to make place for new Tile Vertexes
         const size_t currentCount = vertexArray->getVertexCount();
@@ -213,6 +221,9 @@ void RenderSystem::updateQuad(const Entity entity)
     // The map size is described by the bottom-right element's position.
     GameUtility::mapWidth = std::max(GameUtility::mapWidth, position.x);
     GameUtility::mapHeight = std::max(GameUtility::mapHeight, position.y);
+
+    // Ensure vertexArray not null
+    if (vertexArray == nullptr) return;
 
     // Rotation in Vertex Arrays is handled by flipping texture coordinates.
     // For example, a base `sprite` is represented by 4 coordinates in a given texture:
