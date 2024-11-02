@@ -42,7 +42,8 @@ public:
     void updateMap(const std::map<Entity, sf::Vector2<float>>& enemies, const std::map<Entity, ObstacleData>& obstacles,
                    const std::map<Entity, sf::Vector2<int>>& players);
     void setMapDimensions(const std::map<Entity, ObstacleData>& obstacles);
-    void askForEnemyIds(std::vector<std::pair<Entity, sf::Vector2<float>>> sortedEnemies);
+    void sendSpawnerPosition(std::vector<std::pair<Entity, sf::Vector2<float>>> spawners);
+    void updateEnemyHp(Entity id, float hp, sf::Vector2<float> position);
     void disconnect();
 
     bool isConnected() const noexcept;

@@ -3,6 +3,7 @@
 #include "SpawnerComponent.h"
 #include "System.h"
 #include "TransformComponent.h"
+#include "comm.pb.h"
 
 extern Coordinator gCoordinator;
 
@@ -15,6 +16,7 @@ public:
     void cleanUpUnnecessarySpawners();
     void spawnEnemies();
     std::vector<std::pair<Entity, sf::Vector2<float>>> getSortedSpawnedEnemies();
+    void spawnOnDemand(const comm::EnemyPositionsUpdate &enemiesToSpawn) const;
 
     SpawnerSystem();
 
@@ -24,6 +26,6 @@ private:
     void incrementSpawnTimer();
     void processSpawner(SpawnerComponent &spawnerComponent, const TransformComponent &spawnerTransformComponent) const;
     bool isReadyToSpawn(int cooldown);
-    void spawnEnemy(const TransformComponent &, Enemies::EnemyType) const;
+    Entity spawnEnemy(const comm::Enemy &enemyToSpawn) const;
     void prepareEnemies();
 };

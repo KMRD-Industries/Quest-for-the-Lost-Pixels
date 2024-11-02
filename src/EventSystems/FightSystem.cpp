@@ -5,6 +5,7 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "EquippedWeaponComponent.h"
 #include "FightActionEvent.h"
+#include "MultiplayerSystem.h"
 #include "ObjectCreatorSystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"
@@ -99,6 +100,11 @@ void FightSystem::handleMeleAttack(Entity eventEntity)
 
         b2Vec2 newPosition = colliderComponent.body->GetPosition() + 0.25 * recoilDirection;
         colliderComponent.body->SetTransform(newPosition, colliderComponent.body->GetAngle());
+
+        //TODO tutaj przesyłamy cios
+
+        // std::shared_ptr<MultiplayerSystem> multiplayer_system = gCoordinator.getRegisterSystem<MultiplayerSystem>();
+        // multiplayer_system->askForEnemyIds(m_spawnedEnemies);
     }
 }
 

@@ -10,6 +10,8 @@
 #include "Coordinator.h"
 #include "Helpers.h"
 #include "MultiplayerSystem.h"
+
+#include "CharacterComponent.h"
 #include "SFML/System/Vector3.hpp"
 #include "TransformComponent.h"
 #include "Types.h"
@@ -283,17 +285,18 @@ void MultiplayerSystem::setMapDimensions(const std::map<Entity, ObstacleData>& o
     m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
 
-void MultiplayerSystem::askForEnemyIds(std::vector<std::pair<Entity, sf::Vector2<float>>> sortedEnemies)
+// TODO w przyszłości będzie też zapytanie o stworznie spawnerów
+void MultiplayerSystem::sendSpawnerPosition(std::vector<std::pair<Entity, sf::Vector2<float>>> spawners)
 {
-    //TODO chuj wi czy działą
+    //TODO to jest kurwa spawner
     comm::EnemyPositionsUpdate spawnEnemyRequest;
 
-    for (const auto& enemy : sortedEnemies)
+    for (const auto& spawner : spawners)
     {
-        comm::Enemy* enemy_position = spawnEnemyRequest.add_enemypositions();
-        enemy_position->set_x(enemy.second.x);
-        enemy_position->set_y(enemy.second.y);
-        enemy_position->set_id(enemy.first);
+        comm::Enemy* spawnerPosition = spawnEnemyRequest.add_enemypositions();
+        spawnerPosition->set_x(spawner.second.x);
+        spawnerPosition->set_y(spawner.second.y);
+        spawnerPosition->set_id(spawner.first);
     }
 
     comm::StateUpdate message;
@@ -304,3 +307,7 @@ void MultiplayerSystem::askForEnemyIds(std::vector<std::pair<Entity, sf::Vector2
     m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
 
+void MultiplayerSystem::updateEnemyHp(Entity id, float hp, sf::Vector2<float> position)
+{
+
+}

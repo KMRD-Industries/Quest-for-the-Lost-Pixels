@@ -223,7 +223,6 @@ void Dungeon::update(const float deltaTime)
     m_characterSystem->update();
     m_animationSystem->update(deltaTime);
     m_textTagSystem->update();
-    // TODO posortuj spawnery i przypisz po koleji id
     m_roomListenerSystem->update(deltaTime);
     m_itemSpawnerSystem->updateAnimation(deltaTime);
 
@@ -252,12 +251,11 @@ void Dungeon::update(const float deltaTime)
             updateEnemyPositions(stateUpdate.enemypositionsupdate());
             break;
         case comm::SPAWN_ENEMY_REQUEST:
-            comm::SpawningEnemiesResponse response = stateUpdate.spawningenemiesresponse();
-            // printf("RECEIVED spawned enemy with id: %d, and position: %f %f\n", enemy.id(), enemy.x(), enemy.y());
-            mapServerIdToGameId(response);
+            printf("RECEIVED spawned enemy\n");
+            m_spawnerSystem->spawnOnDemand(stateUpdate.enemypositionsupdate());
             break;
-            // default:
-            //     break;
+        default:
+            break;
         }
 
         m_multiplayerSystem->update();
@@ -282,11 +280,11 @@ void Dungeon::update(const float deltaTime)
     m_roomMap.at(m_currentPlayerPos).update();
 }
 
-void Dungeon::mapServerIdToGameId(comm::SpawningEnemiesResponse& ids)const
+void Dungeon::mapServerIdToGameId(const comm::SpawningEnemiesResponse& ids) const
 {
     auto const test = m_spawnerSystem->getSortedSpawnedEnemies();
     int i = 0;
-    for (const auto enemy: m_spawnerSystem->getSortedSpawnedEnemies())
+    for (const auto enemy : m_spawnerSystem->getSortedSpawnedEnemies())
     {
         gCoordinator.mapEntity(ids.enemyid().Get(i), enemy.first);
         i++;

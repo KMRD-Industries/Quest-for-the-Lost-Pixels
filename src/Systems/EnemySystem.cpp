@@ -23,8 +23,9 @@ void EnemySystem::update(std::unordered_map<Entity, sf::Vector2<float>> &enemies
         {
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(enemy.first);
 
-            transformComponent.velocity.x = enemy.second.x * 60;
-            transformComponent.velocity.y = -enemy.second.y * 60;
+            //TODO przsyłam pozycje serwera i odejmuję aktualną pozycję na kliencie
+            transformComponent.velocity.x = enemy.second.x * 20;
+            transformComponent.velocity.y = -enemy.second.y * 20;
 
             // printf("[Adding new positions] x: %f, y: %f\n", enemy.second.x, enemy.second.y);
         }

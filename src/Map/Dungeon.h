@@ -60,7 +60,7 @@ private:
     void updateEnemyPositions(const comm::EnemyPositionsUpdate& enemyPositionsUpdate);
     void sendRoomDimensions();
     void updateMap();
-    void mapServerIdToGameId(comm::SpawningEnemiesResponse& ids) const;
+    void mapServerIdToGameId(const comm::SpawningEnemiesResponse& ids) const;
 
     std::string m_asset_path;
     FloorGenerator m_floorGenerator;
