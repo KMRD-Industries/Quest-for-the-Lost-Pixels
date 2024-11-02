@@ -20,4 +20,5 @@ struct ColliderComponent
     Collision helmetPlacement{};
     Collision bodyArmourPlacement{};
     bool toDestroy{false};
+    bool trigger{false};
 };

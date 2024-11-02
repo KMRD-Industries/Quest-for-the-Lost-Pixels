@@ -6,6 +6,7 @@
 #include "HelmetComponent.h"
 #include "ItemComponent.h"
 #include "MultiplayerSystem.h"
+#include "Physics.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"

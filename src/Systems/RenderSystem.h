@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <vector>
 #include "Camera.h"
 #include "Config.h"
@@ -10,7 +11,6 @@
 #include "SFML/Window/Window.hpp"
 #include "System.h"
 #include "TransformComponent.h"
-#include <set>
 
 namespace sf
 {
@@ -23,6 +23,7 @@ public:
     RenderSystem();
     void update();
     void draw(sf::RenderWindow& window);
+    void clearMap();
 
 private:
     void displayPortal(Entity entity);
@@ -30,7 +31,6 @@ private:
     void renderMap(sf::RenderWindow& window, const std::unordered_map<sf::Texture*, sf::VertexArray>& tiles,
                    const Camera& camera);
     void updateCamera(Camera& camera, sf::Vector2f targetPos, const sf::RenderWindow& window);
-    void clearMap();
     void updateQuad(Entity entity);
     void updatePlayerSprite(Entity entity);
     void setHelmet() const;

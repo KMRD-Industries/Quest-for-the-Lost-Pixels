@@ -30,12 +30,10 @@ void PassageSystem::setPassages(const bool val) const
         if (val == true && !gCoordinator.hasComponent<PlayerComponent>(entity))
         {
             const Entity newMapCollisionEntity = gCoordinator.createEntity();
+            const auto createNewCollisionEvent = CreateBodyWithCollisionEvent{
+                .entity = entity, .tag = "Passage", .isStatic = true, .useTextureSize = true};
 
-            const auto newEvent = CreateBodyWithCollisionEvent(
-                entity, "Passage", [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, true,
-                true);
-
-            gCoordinator.addComponent(newMapCollisionEntity, newEvent);
+            gCoordinator.addComponent(newMapCollisionEntity, createNewCollisionEvent);
         }
     }
 }
