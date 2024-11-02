@@ -62,7 +62,7 @@ void FightSystem::handleMeleeAttack(const Entity playerEntity) const
     auto& weaponComponent =
         gCoordinator.getComponent<WeaponComponent>(playerEquippedWeapon.at(GameType::slotType::WEAPON));
 
-    weaponComponent.isFacingRight = playerRenderComponent.sprite.getScale().x > 0;
+    weaponComponent.isFacingRight = true;
     weaponComponent.queuedAttack = true;
 
     const auto center = glm::vec2{transformComponent.position.x, transformComponent.position.y};

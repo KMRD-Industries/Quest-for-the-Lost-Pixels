@@ -1,8 +1,8 @@
 #include "BackgroundSystem.h"
 #include "Coordinator.h"
+#include "SFML/Graphics/RenderWindow.hpp"
 #include "TransformComponent.h"
 #include "UiComponent.h"
-#include "SFML/Graphics/RenderWindow.hpp"
 
 extern Coordinator gCoordinator;
 

@@ -2,6 +2,7 @@
 #include "State.h"
 
 #include <CreateBodyWithCollisionEvent.h>
+#include <DirtyFlagComponent.h>
 #include <FightActionEvent.h>
 #include <RenderSystem.h>
 
@@ -22,8 +23,7 @@ extern Coordinator gCoordinator;
 
 void State::beforeInit()
 {
-    if (!m_resetECS)
-        return;
+    if (!m_resetECS) return;
 
     Physics::getInstance()->resetWorld();
     gCoordinator.init();
@@ -35,6 +35,7 @@ void State::beforeInit()
     gCoordinator.registerComponent<CreateBodyWithCollisionEvent>();
     gCoordinator.registerComponent<UiComponent>();
     gCoordinator.registerComponent<FightActionEvent>();
+    gCoordinator.registerComponent<DirtyFlagComponent>();
 
     auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
     {
@@ -50,6 +51,7 @@ void State::beforeInit()
         Signature signature;
         signature.set(gCoordinator.getComponentType<RenderComponent>());
         signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<DirtyFlagComponent>());
         gCoordinator.setSystemSignature<RenderSystem>(signature);
     }
 

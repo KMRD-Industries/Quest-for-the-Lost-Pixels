@@ -11,9 +11,7 @@ public:
     AnimationSystem() = default;
 
     void update(const float &deltaTime) const;
-    void updateEntityAnimation(AnimationComponent &, TileComponent &, float) const;
-    void advanceFrame(AnimationComponent &animationComponent) const;
-    void updateTileComponent(TileComponent &tileComponent, const AnimationComponent &animationComponent) const;
+    void updateEntityAnimation(Entity entity, float deltaTime) const;
 
 private:
     float m_animationFrameTime{};

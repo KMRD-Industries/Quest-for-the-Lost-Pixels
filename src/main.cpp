@@ -3,7 +3,6 @@
 #include <SFML/Window/Event.hpp>
 #include <TextureSystem.h>
 #include <imgui-SFML.h>
-
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
@@ -47,8 +46,8 @@ void handleInput(sf::RenderWindow& window)
         }
         else if (event.type == sf::Event::MouseMoved)
         {
-            const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
-            InputHandler::getInstance()->updateMousePosition(mousePosition);
+            const auto mousePosition = sf::Mouse::getPosition(window);
+            InputHandler::getInstance()->updateMousePosition(window.mapPixelToCoords(mousePosition));
         }
         if (event.type == sf::Event::Closed) window.close();
     }
@@ -78,7 +77,6 @@ int main()
     {
         sf::Time deltaTime = deltaClock.restart();
         window.clear(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor());
-
         ImGui::SFML::Update(window, deltaTime);
 
         game.update(static_cast<float>(deltaTime.asMilliseconds()));

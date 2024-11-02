@@ -151,6 +151,7 @@ set(UTILS
         Utils/TextureParser.h
         Utils/TextTag.h
         Utils/GameUtility.h
+        Utils/Camera.h
 )
 
 set(MENU_STATE_MACHINE

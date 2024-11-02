@@ -1,6 +1,7 @@
 #include "Dungeon.h"
 #include <BodyArmourComponent.h>
 #include <CreateBodyWithCollisionEvent.h>
+#include <DirtyFlagComponent.h>
 #include <EquipmentComponent.h>
 #include <FloorComponent.h>
 #include <HelmetComponent.h>
@@ -120,13 +121,20 @@ void Dungeon::render(sf::RenderWindow& window)
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponents(
-        player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
-        TransformComponent{GameUtility::startingPosition}, AnimationComponent{},
-        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP}, PlayerComponent{},
-        ColliderComponent{}, InventoryComponent{}, EquipmentComponent{}, FloorComponent{},
-        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }},
-        PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
+    gCoordinator.addComponent(player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 6});
+    gCoordinator.addComponent(player, RenderComponent{});
+    gCoordinator.addComponent(player, DirtyFlagComponent{});
+    gCoordinator.addComponent(player, TransformComponent{.position = GameUtility::startingPosition});
+    gCoordinator.addComponent(player, AnimationComponent{});
+    gCoordinator.addComponent(player, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
+    gCoordinator.addComponent(player, PlayerComponent{});
+    gCoordinator.addComponent(player, ColliderComponent{});
+    gCoordinator.addComponent(player, InventoryComponent{});
+    gCoordinator.addComponent(player, EquipmentComponent{});
+    gCoordinator.addComponent(player, FloorComponent{});
+    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
+    gCoordinator.addComponent(
+        player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
 }
 
 void Dungeon::createRemotePlayer(const uint32_t id)
@@ -134,25 +142,36 @@ void Dungeon::createRemotePlayer(const uint32_t id)
     const auto tag = std::format("Player {}", id);
     m_entities[id] = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(
-        m_entities[id],
-        TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, id),
-                                        getSpawnOffset(configSingleton.GetConfig().startingPosition.y, id)),
-                           0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
-        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3}, RenderComponent{},
-        AnimationComponent{}, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
-        MultiplayerComponent{}, ColliderComponent{});
+    const auto startingPosition = sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, id),
+                                               getSpawnOffset(configSingleton.GetConfig().startingPosition.y, id));
+
+    gCoordinator.addComponent(m_entities[id],
+                              TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3});
+    gCoordinator.addComponent(m_entities[id], TransformComponent(startingPosition));
+    gCoordinator.addComponent(m_entities[id], RenderComponent{});
+    gCoordinator.addComponent(m_entities[id], TransformComponent{GameUtility::startingPosition});
+    gCoordinator.addComponent(m_entities[id], AnimationComponent{});
+    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
+    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
+    gCoordinator.addComponent(m_entities[id], ColliderComponent{});
+    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
         "Characters", configSingleton.GetConfig().playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
 
+    // Create Collider of new Player
     const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(
-        m_entities[id], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false,
-        false);
 
-    gCoordinator.addComponent(entity, newEvent);
+    const auto createBodyEvent = CreateBodyWithCollisionEvent{
+        .entity = m_entities[id], // player ID
+        .tag = tag, // special player tag for collision handling
+        .isStatic = false, // player needs to have dynamic body to make his position updatable
+        .useTextureSize = false // do not use texture size since it will have its own collision
+    };
+
+    gCoordinator.addComponent(entity, createBodyEvent);
+
     m_multiplayerSystem->entityConnected(id, m_entities[id]);
 }
 
@@ -197,9 +216,15 @@ void Dungeon::setupPlayerCollision(const Entity player)
     };
 
     const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(player, tag, onCollisionIn, onCollisionOut, false, false);
 
-    gCoordinator.addComponent(entity, newEvent);
+    const auto newEventComponent = CreateBodyWithCollisionEvent{.entity = player,
+                                                                .tag = tag,
+                                                                .onCollisionEnter = onCollisionIn,
+                                                                .onCollisionOut = onCollisionOut,
+                                                                .isStatic = false,
+                                                                .useTextureSize = false};
+
+    gCoordinator.addComponent(entity, newEventComponent);
 }
 
 void Dungeon::setupWeaponEntity(const Entity player) const
@@ -207,9 +232,10 @@ void Dungeon::setupWeaponEntity(const Entity player) const
     const Entity weaponEntity = gCoordinator.createEntity();
 
     gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19});
-    gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 7});
+    gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 8});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
+    gCoordinator.addComponent(weaponEntity, DirtyFlagComponent{});
     gCoordinator.addComponent(weaponEntity, ColliderComponent{});
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
     gCoordinator.addComponent(weaponEntity, ItemAnimationComponent{});
@@ -224,11 +250,12 @@ void Dungeon::setupHelmetEntity(const Entity player) const
     const Entity helmetEntity = gCoordinator.createEntity();
 
     gCoordinator.addComponent(helmetEntity, HelmetComponent{.id = 0});
-    gCoordinator.addComponent(helmetEntity, TileComponent{0, "Armour", 6});
+    gCoordinator.addComponent(helmetEntity, TileComponent{0, "Armour", 7});
     gCoordinator.addComponent(helmetEntity, TransformComponent{});
     gCoordinator.addComponent(helmetEntity, RenderComponent{});
     gCoordinator.addComponent(helmetEntity, ColliderComponent{});
     gCoordinator.addComponent(helmetEntity, AnimationComponent{});
+    gCoordinator.addComponent(helmetEntity, DirtyFlagComponent{});
     gCoordinator.addComponent(helmetEntity, ItemAnimationComponent{});
     gCoordinator.addComponent(helmetEntity, ItemComponent{.equipped = true});
 
@@ -309,7 +336,7 @@ void Dungeon::changeRoom(const glm::ivec2& room)
 
 void Dungeon::makeStartFloor()
 {
-    Room room{"17", 1};
+    Room room{"0", 0};
     m_roomMap.clear();
     m_roomMap.emplace(glm::ivec2{0, 0}, room);
     m_currentPlayerPos = {0.f, 0.f};
@@ -353,6 +380,7 @@ void Dungeon::clearDungeon()
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
     m_collisionSystem->deleteMarkedBodies();
+    gCoordinator.getRegisterSystem<RenderSystem>()->clearMap();
 }
 
 inline void Dungeon::loadMap(const std::string& path) const

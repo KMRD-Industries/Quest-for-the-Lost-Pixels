@@ -1,4 +1,6 @@
 #include "TextureSystem.h"
+
+#include <DirtyFlagComponent.h>
 #include <iostream>
 
 #include "AnimationComponent.h"
@@ -79,8 +81,8 @@ long TextureSystem::initializeTileSet(const Tileset& parsedTileSet)
 
     // Load the image to Texture, and store it in a map.
     tex.loadFromImage(image);
-    m_mapTextures.emplace(parsedTileSet.name, tex);
-    m_mapTexturesWithColorSchemeApplied.emplace(parsedTileSet.name, tex);
+    m_mapTextures.emplace(parsedTileSet.name, sf::Texture(tex));
+    m_mapTexturesWithColorSchemeApplied.emplace(parsedTileSet.name, sf::Texture(tex));
 
     return gid;
 }
@@ -100,10 +102,31 @@ void TextureSystem::loadTilesIntoSystem(const Tileset& parsedTileSet, long& gid)
 
     // Load all tiles into the system
     for (int row = 0; row < numTilesVertically; ++row)
+    {
         for (int col = 0; col < numTilesHorizontally; ++col)
-            m_mapTextureRects.emplace(gid++,
-                                      sf::IntRect(col * parsedTileSet.tilewidth, row * parsedTileSet.tileheight,
-                                                  parsedTileSet.tilewidth, parsedTileSet.tileheight));
+        {
+            sf::VertexArray vertexArray(sf::PrimitiveType::Quads);
+
+            // Calculate texture coordinates for VertexArray
+            const auto texLeft = static_cast<float>(col * parsedTileSet.tilewidth);
+            const auto texTop = static_cast<float>((row + 1) * parsedTileSet.tileheight);
+            const auto texRight = static_cast<float>((col + 1) * parsedTileSet.tilewidth);
+            const auto texBottom = static_cast<float>(row * parsedTileSet.tileheight);
+
+            vertexArray.append(sf::Vertex({}, sf::Color::White, sf::Vector2f(texLeft, texTop))); // Top-left
+            vertexArray.append(sf::Vertex({}, sf::Color::White, sf::Vector2f(texRight, texTop))); // Top-right
+            vertexArray.append(sf::Vertex({}, sf::Color::White, sf::Vector2f(texRight, texBottom))); // Bottom-right
+            vertexArray.append(sf::Vertex({}, sf::Color::White, sf::Vector2f(texLeft, texBottom))); // Bottom-left
+
+            m_mapTextureRects.emplace(gid, vertexArray);
+
+            // Do the same for sf::Sprite
+            sf::IntRect spriteRectangle = {static_cast<int>(texLeft), static_cast<int>(texBottom),
+                                           parsedTileSet.tilewidth, parsedTileSet.tileheight};
+
+            m_mapTextureIntRects.emplace(gid++, spriteRectangle);
+        }
+    }
 
     m_lNoTextures = static_cast<long>(m_mapTextureRects.size());
 }
@@ -167,18 +190,35 @@ void TextureSystem::loadTexturesFromFiles()
     for (const auto& texture : m_setTextureFiles) loadFromFile(prefix + texture + sufix);
 }
 
-sf::Sprite TextureSystem::getTile(const std::string& tileSetName, const long id) const
+sf::Sprite TextureSystem::getSprite(const std::string& tileSetName, const long id) const
 {
     const auto textureIter = m_mapTexturesWithColorSchemeApplied.find(tileSetName);
     const auto indexIter = m_mapTextureIndexes.find(tileSetName);
 
     if (textureIter != m_mapTexturesWithColorSchemeApplied.end() && indexIter != m_mapTextureIndexes.end())
     {
-        const auto rectIter = m_mapTextureRects.find(id + indexIter->second);
-        if (rectIter != m_mapTextureRects.end()) return {textureIter->second, rectIter->second};
+        const auto rectIter = m_mapTextureIntRects.find(id + indexIter->second);
+        if (rectIter != m_mapTextureIntRects.end()) return {textureIter->second, rectIter->second};
+
+        std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET SPRITE\n";
+        return {};
+    }
+}
+
+sf::VertexArray TextureSystem::getTile(const std::string& tileSetName, const long id) const
+{
+    const auto textureIter = m_mapTexturesWithColorSchemeApplied.find(tileSetName);
+    const auto indexIter = m_mapTextureIndexes.find(tileSetName);
+
+    if (textureIter != m_mapTexturesWithColorSchemeApplied.end() && indexIter != m_mapTextureIndexes.end())
+    {
+        if (const auto rectIter = m_mapTextureRects.find(id + indexIter->second); rectIter != m_mapTextureRects.end())
+        {
+            return rectIter->second;
+        }
     }
 
-    std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET SPRITE\n";
+    std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET VERTEX\n";
     return {};
 }
 
@@ -220,23 +260,17 @@ void TextureSystem::loadTextures()
         auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
-        if (tileComponent.id < 0 || tileComponent.id > m_lNoTextures) // Ignore invalid values
+        if (!gCoordinator.hasComponent<DirtyFlagComponent>(entity)) continue;
+
+        if (auto it = m_mapTexturesWithColorSchemeApplied.find(tileComponent.tileSet); it != nullptr)
+            renderComponent.texture = &it->second;
+        else
             continue;
 
-        if (!m_setTextureFiles.contains(tileComponent.tileSet)) continue;
-
-        // if (renderComponent.dirty == false) continue;
-
-        // Adjust tile index
         long adjusted_id = tileComponent.id + m_mapTextureIndexes.at(tileComponent.tileSet);
-        auto animationsIter = m_mapAnimations.find(adjusted_id);
-        auto collisionsIter = m_mapCollisions.find(adjusted_id);
-        auto weaponPlacementsIter = m_mapWeaponPlacements.find(adjusted_id);
-        auto helmetPlacementsIter = m_mapHelmetPlacements.find(adjusted_id);
-        auto bodyArmourPlacementsIter = m_mapBodyArmourPlacement.find(adjusted_id);
 
-        // Load animations from a system if tile is animated
-        if (animationsIter != m_mapAnimations.end())
+        // Load Animation with new ID
+        if (auto animationsIter = m_mapAnimations.find(adjusted_id); animationsIter != m_mapAnimations.end())
         {
             if (!gCoordinator.hasComponent<AnimationComponent>(entity))
                 gCoordinator.addComponent(entity, AnimationComponent{});
@@ -245,13 +279,14 @@ void TextureSystem::loadTextures()
             animation_component.frames = getAnimations(tileComponent.tileSet, tileComponent.id);
         }
 
-        if (collisionsIter != m_mapCollisions.end())
+        // Load Collisions with new ID && adjust id by new margin
+        if (auto collisionsIter = m_mapCollisions.find(adjusted_id); collisionsIter != m_mapCollisions.end())
         {
             if (!gCoordinator.hasComponent<ColliderComponent>(entity))
                 gCoordinator.addComponent(entity, ColliderComponent{});
 
             auto& cc = m_mapCollisions.at(adjusted_id);
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            // auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
             if (colliderComponent.body != nullptr && colliderComponent.collision != cc)
@@ -263,38 +298,42 @@ void TextureSystem::loadTextures()
                     offset.x = convertPixelsToMeters(offset.x * config::gameScale);
                     offset.y = convertPixelsToMeters(-offset.y * config::gameScale);
 
-                    colliderComponent.body->SetTransform(colliderComponent.body->GetPosition() + offset, 0);
+                    // colliderComponent.body->SetTransform(colliderComponent.body->GetPosition() + offset, 0);
 
-                    transformComponent.position.x += convertMetersToPixel(offset.x);
-                    transformComponent.position.y += convertMetersToPixel(offset.y);
+                    // transformComponent.position.x += convertMetersToPixel(offset.x);
+                    // transformComponent.position.y += convertMetersToPixel(offset.y);
                 }
             }
 
             colliderComponent.collision = cc;
         }
 
-        if (helmetPlacementsIter != m_mapHelmetPlacements.end())
+        // Load Helmet Placement Collision
+        if (auto helmetPlacementsIter = m_mapHelmetPlacements.find(adjusted_id);
+            helmetPlacementsIter != m_mapHelmetPlacements.end())
         {
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.helmetPlacement = m_mapHelmetPlacements.at(adjusted_id);
         }
 
-        if (weaponPlacementsIter != m_mapWeaponPlacements.end())
+        // Load Weapon Placement Collision
+        if (auto weaponPlacementsIter = m_mapWeaponPlacements.find(adjusted_id);
+            weaponPlacementsIter != m_mapWeaponPlacements.end())
         {
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.weaponPlacement = m_mapWeaponPlacements.at(adjusted_id);
         }
 
-        if (bodyArmourPlacementsIter != m_mapBodyArmourPlacement.end())
+        // Load Body Armour Placement
+        if (auto bodyArmourPlacementsIter = m_mapBodyArmourPlacement.find(adjusted_id);
+            bodyArmourPlacementsIter != m_mapBodyArmourPlacement.end())
         {
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
             colliderComponent.bodyArmourPlacement = m_mapBodyArmourPlacement.at(adjusted_id);
         }
 
-        // Load texture of tile with that id to render component
-        renderComponent.sprite = getTile(tileComponent.tileSet, tileComponent.id);
-        renderComponent.layer = tileComponent.layer;
-        renderComponent.dirty = true;
+        renderComponent.sprite = getSprite(tileComponent.tileSet, tileComponent.id);
+        renderComponent.vertexArray = getTile(tileComponent.tileSet, tileComponent.id);
     }
 }
 

@@ -1,12 +1,18 @@
 #pragma once
 
+#include <vector>
+
+#include "Camera.h"
 #include "Config.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/Sprite.hpp"
+#include "SFML/Graphics/VertexArray.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "SFML/Window/Window.hpp"
 #include "System.h"
-#include <vector>
+#include "TransformComponent.h"
+
+#include <set>
 
 namespace sf
 {
@@ -21,6 +27,12 @@ public:
     void update();
     void displayPortal(Entity entity);
     void draw(sf::RenderWindow& window);
+    void renderMap(sf::RenderWindow& window, const std::vector<sf::Sprite*>& tiles, const Camera& camera);
+    void renderMap(sf::RenderWindow& window, const std::unordered_map<sf::Texture*, sf::VertexArray>& tiles,
+                   const Camera& camera);
+    void updateCamera(Camera& camera, sf::Vector2f targetPos, const sf::RenderWindow& window);
+    void clearMap();
+    void updateQuad(Entity entity);
     void updatePlayerSprite(Entity entity);
     void setHelmet() const;
     void setBodyArmour();
@@ -44,14 +56,18 @@ private:
     float getRotation(Entity entity);
     sf::Vector2f getOrigin(Entity);
     void updateSprite(Entity);
-    void clear(const sf::Window& window);
+    void clearSpriteArray();
     void displayDamageTaken(Entity);
     void displayWeaponStatsTable(const sf::RenderWindow&, Entity entity);
     void displayPlayerStatsTable(const sf::RenderWindow&, Entity entity) const;
 
-    std::vector<std::vector<std::pair<sf::Sprite*, bool*>>> tiles;
-    sf::Sprite portalSprite;
-    std::vector<Entity> players;
+    std::vector<std::vector<sf::Sprite*>> m_vecSpriteArray;
+    std::vector<unsigned long> m_entityToVertexArrayIndex;
+    std::vector<std::unordered_map<sf::Texture*, sf::VertexArray>> m_layeredTextureVertexArrays;
+    std::set<Entity> players;
+    std::set<Entity> specialObjects;
     sf::Vector2u windowSize{};
     sf::Vector2f newMapOffset{};
+    sf::Sprite portalSprite;
+    Camera camera{};
 };

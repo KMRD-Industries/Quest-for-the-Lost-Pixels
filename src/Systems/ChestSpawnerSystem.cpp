@@ -1,4 +1,7 @@
 #include "ChestSpawnerSystem.h"
+
+#include <DirtyFlagComponent.h>
+
 #include "AnimationComponent.h"
 #include "BodyArmourComponent.h"
 #include "CharacterComponent.h"
@@ -42,8 +45,12 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
 {
     const Entity newItemEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(newItemEntity, TransformComponent{spawnerTransformComponent}, RenderComponent{},
-                               ColliderComponent{}, AnimationComponent{}, ItemComponent{});
+    gCoordinator.addComponents(newItemEntity, TransformComponent{spawnerTransformComponent});
+    gCoordinator.addComponents(newItemEntity, RenderComponent{});
+    gCoordinator.addComponents(newItemEntity, ColliderComponent{});
+    gCoordinator.addComponents(newItemEntity, AnimationComponent{});
+    gCoordinator.addComponents(newItemEntity, ItemComponent{});
+    gCoordinator.addComponents(newItemEntity, DirtyFlagComponent{});
 
     switch (itemType)
     {
@@ -95,9 +102,15 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransform
     // Create new entity for chest and add all necessary components
     const Entity newChestEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(newChestEntity, m_chestTile, TransformComponent{spawnerTransformComponent},
-                               ColliderComponent{m_chestCollision}, RenderComponent{}, AnimationComponent{},
-                               CharacterComponent{}, ItemComponent{}, ChestComponent{});
+    gCoordinator.addComponent(newChestEntity, m_chestTile);
+    gCoordinator.addComponent(newChestEntity, TransformComponent{.position = spawnerTransformComponent.position});
+    gCoordinator.addComponent(newChestEntity, ColliderComponent{.collision = m_chestCollision});
+    gCoordinator.addComponent(newChestEntity, RenderComponent{});
+    gCoordinator.addComponent(newChestEntity, AnimationComponent{});
+    gCoordinator.addComponent(newChestEntity, CharacterComponent{});
+    gCoordinator.addComponent(newChestEntity, ItemComponent{});
+    gCoordinator.addComponent(newChestEntity, ChestComponent{});
+    gCoordinator.addComponent(newChestEntity, DirtyFlagComponent{});
 
     const Entity newItemEntity = gCoordinator.createEntity();
 
@@ -128,9 +141,14 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransform
     };
 
     // Create new object with special eventComponent
-    const auto newEventComponent = CreateBodyWithCollisionEvent(
-        newChestEntity, "Chest", [this, newChestEntity](const GameType::CollisionData &collisionData)
-        { handleChestCollision(newChestEntity, collisionData); }, spawnFunction, true, true);
+    const auto newEventComponent = CreateBodyWithCollisionEvent{
+        .entity = newChestEntity,
+        .tag = "Chest",
+        .onCollisionEnter = [this, newChestEntity](const GameType::CollisionData &collisionData)
+        { handleChestCollision(newChestEntity, collisionData); },
+        .onCollisionOut = spawnFunction,
+        .isStatic = true,
+        .useTextureSize = true};
 
     gCoordinator.addComponent(newItemEntity, newEventComponent);
 }

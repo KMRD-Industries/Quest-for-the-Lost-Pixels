@@ -3,7 +3,8 @@
 
 extern PublicConfigSingleton configSingleton;
 
-struct WeaponComponent {
+struct WeaponComponent
+{
     int id{};
     int damageAmount{configSingleton.GetConfig().weaponComponentDefaultDamageAmount};
     bool isAttacking{configSingleton.GetConfig().weaponComponentDefaultIsAttacking};
@@ -17,7 +18,6 @@ struct WeaponComponent {
     float swingDistance{configSingleton.GetConfig().weaponComponentDefaultSwingDistance};
     float remainingDistance{configSingleton.GetConfig().weaponComponentDefaultRemainingDistance};
     float recoilAmount{configSingleton.GetConfig().weaponComponentDefaultRecoilAmount};
-
     sf::Vector2f pivotPoint{};
     sf::Vector2f targetPoint{};
     float targetAngleDegrees{};
