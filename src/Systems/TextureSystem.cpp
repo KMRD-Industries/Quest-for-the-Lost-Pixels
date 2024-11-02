@@ -1,6 +1,7 @@
 #include "TextureSystem.h"
 
 #include <DirtyFlagComponent.h>
+#include <iomanip>
 #include <iostream>
 
 #include "AnimationComponent.h"
@@ -262,7 +263,8 @@ void TextureSystem::loadTextures()
 
         if (!gCoordinator.hasComponent<DirtyFlagComponent>(entity)) continue;
 
-        if (auto it = m_mapTexturesWithColorSchemeApplied.find(tileComponent.tileSet); it != nullptr)
+        if (auto it = m_mapTexturesWithColorSchemeApplied.find(tileComponent.tileSet);
+            it != m_mapTexturesWithColorSchemeApplied.end())
             renderComponent.texture = &it->second;
         else
             continue;
