@@ -37,24 +37,38 @@ void MultiplayerSystem::setup(const std::string_view& ip, const std::string_view
 {
     try
     {
+        boost::asio::steady_timer timer(m_io_context);
+
+        timer.expires_after(std::chrono::seconds(5));
         udp::resolver udp_resolver(m_io_context);
         udp::resolver::results_type udp_endpoints = udp_resolver.resolve(ip, port);
 
         tcp::resolver tcp_resolver(m_io_context);
         tcp::resolver::results_type tcp_endpoints = tcp_resolver.resolve(ip, port);
 
-        boost::asio::connect(m_udp_socket, udp_endpoints);
-        boost::asio::connect(m_tcp_socket, tcp_endpoints);
+        m_udp_socket.connect(*udp_endpoints.begin());
+        m_tcp_socket.async_connect(*tcp_endpoints.begin(),
+                                   [&](const boost::system::error_code& ec)
+                                   {
+                                       timer.cancel();
+                                       if (!ec) m_connected = true;
+                                   });
 
-        m_udp_socket.wait(udp::socket::wait_write);
-        m_tcp_socket.wait(tcp::socket::wait_write);
+        timer.async_wait(
+            [&](const boost::system::error_code& ec)
+            {
+                if (!m_connected && !ec) m_tcp_socket.cancel();
+            });
+
+        m_io_context.run();
     }
     catch (boost::system::system_error)
     {
         return;
     }
 
-    m_connected = true;
+    if (!m_connected) return;
+
     m_last_tick = sysClock::now();
 
     m_state.set_allocated_room(new comm::Room());
