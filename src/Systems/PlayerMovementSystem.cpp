@@ -7,6 +7,7 @@
 #include "InputHandler.h"
 #include "InventorySystem.h"
 #include "ItemSystem.h"
+#include "MultiplayerSystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "TextTagComponent.h"
@@ -102,6 +103,7 @@ void PlayerMovementSystem::handleAttack() const
 
     if (!inputHandler->isPressed(InputType::Attack)) return;
 
+    gCoordinator.getRegisterSystem<MultiplayerSystem>()->onAttack();
     const Entity fightAction = gCoordinator.createEntity();
     gCoordinator.addComponent(fightAction, FightActionEvent{.entity = config::playerEntity});
 }

@@ -10,6 +10,7 @@
 #include "Config.h"
 #include "Coordinator.h"
 #include "EquipmentComponent.h"
+#include "FightActionEvent.h"
 #include "GameTypes.h"
 #include "Helpers.h"
 #include "InputHandler.h"
@@ -113,6 +114,8 @@ void MultiplayerSystem::roomCleared()
 
     m_tcp_socket.send(boost::asio::buffer(serialized));
 }
+
+void MultiplayerSystem::onAttack() { m_outgoing_movement.set_attack(true); }
 
 bool MultiplayerSystem::isInsideInitialRoom(const bool change) noexcept
 {
@@ -284,7 +287,11 @@ void MultiplayerSystem::update()
             weaponComponent.pivotPoint.x = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
             weaponComponent.pivotPoint.y = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
 
-            weaponComponent.isAttacking = m_incomming_movement.attack();
+            if (m_incomming_movement.attack())
+            {
+                const Entity fightAction = gCoordinator.createEntity();
+                gCoordinator.addComponent(fightAction, FightActionEvent{target});
+            }
 
             float x = m_incomming_movement.position_x();
             float y = m_incomming_movement.position_y();
@@ -318,10 +325,11 @@ void MultiplayerSystem::update()
     m_outgoing_movement.set_weapon_pivot_x(scaledPivotX);
     m_outgoing_movement.set_weapon_pivot_y(scaledPivotY);
     m_outgoing_movement.set_direction(transformComponent.scale.x);
-    m_outgoing_movement.set_attack(weaponComponent.isAttacking);
 
     auto serialized = m_outgoing_movement.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
+
+    m_outgoing_movement.set_attack(false);
 }
 
 void MultiplayerSystem::disconnect()

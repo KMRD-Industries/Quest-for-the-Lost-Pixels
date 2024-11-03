@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+
 #include <SFML/System/Vector3.hpp>
 #include <boost/asio.hpp>
 #include <comm.pb.h>
@@ -57,6 +58,7 @@ public:
     void itemEquipped(const GameType::PickUpInfo& entity);
     void roomChanged(const glm::ivec2& room);
     void roomCleared();
+    void onAttack();
     void update();
     void disconnect();
 
