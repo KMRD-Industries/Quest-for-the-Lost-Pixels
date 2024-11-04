@@ -7,8 +7,9 @@
 
 namespace sf
 {
+    class RenderTexture;
     class RenderWindow;
-}
+} // namespace sf
 
 class State;
 using StateChangeCallback = std::function<void(const std::vector<MenuStateMachine::StateAction>& actionList,
@@ -17,15 +18,13 @@ using StateChangeCallback = std::function<void(const std::vector<MenuStateMachin
 class State
 {
 public:
-    State(const bool resetECS = true) : m_resetECS{resetECS}
-    {
-    }
+    State(const bool resetECS = true) : m_resetECS{resetECS} {}
 
     virtual ~State() = default;
     void beforeInit();
     virtual void init() = 0;
     virtual void update(float deltaTime) = 0;
-    virtual void render(sf::RenderWindow& window) = 0;
+    virtual void render(sf::RenderTexture& window) = 0;
 
     StateChangeCallback m_stateChangeCallback;
     bool m_resetECS{};

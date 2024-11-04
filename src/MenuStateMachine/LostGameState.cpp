@@ -1,11 +1,12 @@
-#include "EndGameState.h"
+#include "LostGameState.h"
 
 #include "ButtonDTO.h"
 #include "GameState.h"
 #include "Paths.h"
+#include "ResourceManager.h"
 #include "TextDTO.h"
 
-void EndGameState::init()
+void LostGameState::init()
 {
     m_menuButton.init(ButtonDTO{std::string(ASSET_PATH) + "/ui/uiHigh.png",
                                 ASSET_PATH + std::string("/ui/uiFont.ttf"),
@@ -47,30 +48,32 @@ void EndGameState::init()
                                 []() { std::exit(1); }});
 
     m_backgroundGraphics.init(std::string(ASSET_PATH) + "/ui/Pngs/SettingsBackground.png");
-    m_crown.init(std::string(ASSET_PATH) + "/ui/crown.png");
+    m_tomb.init(std::string(ASSET_PATH) + "/ui/tomb.png");
     m_winText.init(
-        TextDTO{ASSET_PATH + std::string("/ui/uiFont.ttf"), "You won!!", 160, 2.f, {0.f, 0.f, 0.f, 1.f}, {680, 200}});
+        TextDTO{ASSET_PATH + std::string("/ui/uiFont.ttf"), "You lost!!", 160, 2.f, {0.f, 0.f, 0.f, 1.f}, {680, 200}});
 }
 
-void EndGameState::render(sf::RenderTexture& window)
+void LostGameState::render(sf::RenderTexture& window)
 {
     m_backgroundGraphics.render(window);
-    m_crown.render(window);
+    m_tomb.render(window);
     m_menuButton.render();
     m_restartButton.render();
     m_quitButton.render();
     m_winText.render();
 }
 
-void EndGameState::update(const float deltaTime)
+void LostGameState::update(const float deltaTime)
 {
     if (m_returnToMenu)
     {
+        ResourceManager::getInstance().setCurrentShader(video::FragmentShader::NONE);
         m_stateChangeCallback({MenuStateMachine::StateAction::Pop, MenuStateMachine::StateAction::Pop},
                               {std::nullopt, std::nullopt});
     }
-    if (m_restartGame)
+    else if (m_restartGame)
     {
+        ResourceManager::getInstance().setCurrentShader(video::FragmentShader::NONE);
         m_stateChangeCallback({MenuStateMachine::StateAction::Pop, MenuStateMachine::StateAction::Pop},
                               {std::nullopt, std::make_unique<GameState>()});
     }

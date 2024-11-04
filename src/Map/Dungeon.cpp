@@ -36,6 +36,7 @@
 #include "ItemComponent.h"
 #include "ItemSpawnerSystem.h"
 #include "LootComponent.h"
+#include "LostGameState.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerComponent.h"
@@ -115,7 +116,7 @@ void Dungeon::init()
     m_passageSystem->setPassages(true);
 }
 
-void Dungeon::render(sf::RenderWindow& window)
+void Dungeon::render(sf::RenderTexture& window)
 {
     gCoordinator.getRegisterSystem<TextureSystem>().get()->loadTextures();
     gCoordinator.getRegisterSystem<HealthBarSystem>().get()->drawHealthBar();
@@ -283,12 +284,16 @@ void Dungeon::update(const float deltaTime)
     }
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
-        m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});
-    else
     {
-        if (m_endGame)
-            m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
+        m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});
+        return;
     }
+    if (m_endGame)
+    {
+        m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
+        return;
+    }
+    checkForEndOfTheGame();
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
@@ -434,6 +439,15 @@ float Dungeon::getSpawnOffset(const float position, const int id)
 {
     if (id % 2 == 0) return position + id * configSingleton.GetConfig().spawnOffset;
     return position - id * configSingleton.GetConfig().spawnOffset;
+}
+
+void Dungeon::checkForEndOfTheGame()
+{
+    for (const Entity player : m_players)
+    {
+        if (gCoordinator.hasComponent<PlayerComponent>(m_entities[player])) return;
+    }
+    m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<LostGameState>()});
 }
 
 void Dungeon::setECS()

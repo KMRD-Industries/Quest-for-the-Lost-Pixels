@@ -8,11 +8,14 @@
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "Helpers.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
+#include "ResourceManager.h"
 #include "SpawnerComponent.h"
 #include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TransformComponent.h"
+#include "WeaponComponent.h"
 
 extern PublicConfigSingleton configSingleton;
 
@@ -70,10 +73,19 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
         {
             if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
+            if (!gCoordinator.hasComponent<CharacterComponent>(collisionData.entityID)) return;
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;
 
             playerCharacterComponent.hp -= enemyConfig.damage;
+            if (playerCharacterComponent.hp <= 0)
+            {
+                ResourceManager::getInstance().setCurrentShader(video::FragmentShader::DEATH);
+                gCoordinator.removeComponent<CharacterComponent>(collisionData.entityID);
+                gCoordinator.removeComponent<RenderComponent>(collisionData.entityID);
+                gCoordinator.removeComponent<PlayerComponent>(collisionData.entityID);
+                gCoordinator.getComponent<ColliderComponent>(collisionData.entityID).toRemoveCollider = true;
+            }
 
             const Entity tag = gCoordinator.createEntity();
             gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});

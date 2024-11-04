@@ -41,7 +41,7 @@ public:
     Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
     void init();
-    void render(sf::RenderWindow& window);
+    void render(sf::RenderTexture& window);
     void addPlayerComponents(Entity player);
     void moveDownDungeon();
     void setupPlayerCollision(Entity player);
@@ -61,6 +61,7 @@ private:
     void clearDungeon();
     void loadMap(const std::string& path) const;
     float getSpawnOffset(float position, int id);
+    void checkForEndOfTheGame();
 
     std::string m_asset_path{ASSET_PATH};
     FloorGenerator m_floorGenerator{};

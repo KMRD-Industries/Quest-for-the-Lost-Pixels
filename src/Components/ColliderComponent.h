@@ -22,6 +22,7 @@ struct ColliderComponent
 
     bool toDestroy{false};
     bool trigger{false};
+    bool toRemoveCollider{false};
 
     ColliderComponent() = default;
 
