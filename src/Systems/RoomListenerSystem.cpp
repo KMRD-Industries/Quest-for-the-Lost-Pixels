@@ -13,8 +13,11 @@ void RoomListenerSystem::update(const float deltaTime)
         m_toLoot = true;
     else if (m_entities.empty() && m_toLoot)
         spawnLoot();
-    else
+    if (!m_areEnemiesSpawned)
+    {
+        m_areEnemiesSpawned = true;
         gCoordinator.getRegisterSystem<SpawnerSystem>()->update(deltaTime);
+    }
 }
 
 void RoomListenerSystem::reset()
