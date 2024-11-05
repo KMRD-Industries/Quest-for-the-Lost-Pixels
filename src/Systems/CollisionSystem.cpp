@@ -179,9 +179,15 @@ void CollisionSystem::deleteMarkedBodies() const
     for (const auto& entity : m_entities)
     {
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-        if (!colliderComponent.toDestroy) continue;
-        deleteBody(entity);
-        entityToKill.insert(entity);
+        if (colliderComponent.toDestroy)
+        {
+            deleteBody(entity);
+            entityToKill.insert(entity);
+        }
+        if (colliderComponent.toRemoveCollider)
+        {
+            deleteBody(entity);
+        }
     }
 
     for (auto& entity : entityToKill) gCoordinator.destroyEntity(entity);

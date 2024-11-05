@@ -5,13 +5,18 @@
 
 #include "State.h"
 
+namespace sf
+{
+    class RenderTexture;
+}
+
 class StateManager
 {
 public:
     void handleStateChange(const std::vector<MenuStateMachine::StateAction>& actionList,
                            std::vector<std::optional<std::shared_ptr<State>>> newStateList);
     void update(float deltaTime);
-    void render(sf::RenderWindow& window);
+    void render(sf::RenderTexture& window);
 
 private:
     void pushState(const std::shared_ptr<State>& newState, MenuStateMachine::StateAction action);

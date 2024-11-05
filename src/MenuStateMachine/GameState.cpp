@@ -17,8 +17,7 @@ void GameState::init()
     gCoordinator.addComponent(menuBackgroundMusic,
                               SoundComponent{.soundToPlay = Sound::Type::MenuBackgroundMusic, .stopPlaying = true});
     auto gameBackgroundMusic = gCoordinator.createEntity();
-    gCoordinator.addComponent(gameBackgroundMusic,
-                              SoundComponent{.soundToPlay = Sound::Type::GameBackgroundMusic});
+    gCoordinator.addComponent(gameBackgroundMusic, SoundComponent{.soundToPlay = Sound::Type::GameBackgroundMusic});
 }
 
 void GameState::handleCollision(const float deltaTime)
@@ -29,7 +28,7 @@ void GameState::handleCollision(const float deltaTime)
     collisionSystem->updateSimulation(timeStep, 8, 3);
 }
 
-void GameState::render(sf::RenderWindow &window)
+void GameState::render(sf::RenderTexture& window)
 {
     m_dungeon.render(window);
     gCoordinator.getRegisterSystem<RenderSystem>()->draw(window);

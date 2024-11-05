@@ -1,5 +1,5 @@
 {
-  "debugMode": true,
+  "debugMode": false,
   "gameScale": 3.0,
   "meterToPixelRatio": 30.0,
   "pixelToMeterRatio": 0.033333333,

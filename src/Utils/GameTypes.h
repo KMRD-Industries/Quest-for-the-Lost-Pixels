@@ -9,6 +9,15 @@
 
 #define M_PI 3.1415927f
 
+namespace video
+{
+    enum class FragmentShader
+    {
+        NONE,
+        DEATH
+    };
+};
+
 namespace Sound
 {
     enum class Type

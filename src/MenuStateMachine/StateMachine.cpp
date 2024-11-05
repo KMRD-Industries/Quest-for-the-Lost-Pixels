@@ -1,5 +1,6 @@
 #include "StateMachine.h"
 
+#include "SFML/Graphics/RenderTexture.hpp"
 #include "State.h"
 
 void StateManager::pushState(const std::shared_ptr<State>& newState, const MenuStateMachine::StateAction action)
@@ -26,8 +27,7 @@ void StateManager::popState()
         return;
     }
 
-    if (!m_states.empty())
-        m_states.pop();
+    if (!m_states.empty()) m_states.pop();
     if (!m_states.empty())
     {
         m_states.top()->beforeInit();
@@ -42,16 +42,13 @@ void StateManager::update(const float deltaTime)
         m_statesToRenderOnTop.back()->update(deltaTime);
         return;
     }
-    if (!m_states.empty())
-        m_states.top()->update(deltaTime);
+    if (!m_states.empty()) m_states.top()->update(deltaTime);
 }
 
-void StateManager::render(sf::RenderWindow& window)
+void StateManager::render(sf::RenderTexture& window)
 {
-    if (!m_states.empty())
-        m_states.top()->render(window);
-    for (auto& state : m_statesToRenderOnTop)
-        state->render(window);
+    if (!m_states.empty()) m_states.top()->render(window);
+    for (auto& state : m_statesToRenderOnTop) state->render(window);
 }
 
 void StateManager::handleStateChange(const std::vector<MenuStateMachine::StateAction>& actionList,
@@ -60,16 +57,12 @@ void StateManager::handleStateChange(const std::vector<MenuStateMachine::StateAc
     for (int index = 0; index < actionList.size(); ++index)
     {
         const auto& action = actionList.at(index);
-        if (action == MenuStateMachine::StateAction::Pop)
-            popState();
+        if (action == MenuStateMachine::StateAction::Pop) popState();
 
 
-        auto callback =
-            [this](const std::vector<MenuStateMachine::StateAction>& actionList,
-                   const std::vector<std::optional<std::shared_ptr<State>>>& newStateList)
-        {
-            this->handleStateChange(actionList, newStateList);
-        };
+        auto callback = [this](const std::vector<MenuStateMachine::StateAction>& actionList,
+                               const std::vector<std::optional<std::shared_ptr<State>>>& newStateList)
+        { this->handleStateChange(actionList, newStateList); };
         if (newStateList[index])
         {
             newStateList[index].value()->m_stateChangeCallback = callback;

@@ -295,6 +295,7 @@ void MultiplayerSystem::update()
             const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(target);
             const Entity& weaponEntity = equippedWeapon.slots.at(GameType::slotType::WEAPON);
             auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
+            auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
 
             const auto& windowSize = InputHandler::getInstance()->getWindowSize();
 
@@ -314,6 +315,7 @@ void MultiplayerSystem::update()
             transformComponent.velocity.x = x - transformComponent.position.x;
             transformComponent.velocity.y = y - transformComponent.position.y;
             transformComponent.scale.x = r;
+            weaponTransformComponent.scale.x = r;
 
             colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
                                                  colliderComponent.body->GetAngle());

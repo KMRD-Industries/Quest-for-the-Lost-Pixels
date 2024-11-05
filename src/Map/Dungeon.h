@@ -41,7 +41,7 @@ public:
     Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
     void init();
-    void render(sf::RenderWindow& window);
+    void render(sf::RenderTexture& window);
     void addPlayerComponents(Entity player);
     void moveDownDungeon();
     void setupPlayerCollision(Entity player);
@@ -60,6 +60,7 @@ private:
     void changeRoom(const glm::ivec2& dir);
     void clearDungeon();
     void loadMap(const std::string& path) const;
+    void checkForEndOfTheGame();
     float getSpawnOffset(const float position, const uint32_t id);
 
     std::string m_asset_path{ASSET_PATH};

@@ -5,10 +5,10 @@
 #include "State.h"
 #include "Text.h"
 
-class EndGameState : public State
+class LostGameState : public State
 {
 public:
-    EndGameState(const bool resetECS = false) : State(resetECS) {}
+    LostGameState(const bool resetECS = false) : State(resetECS) {}
 
     void update(float deltaTime) override;
     void render(sf::RenderTexture& window) override;
@@ -23,5 +23,5 @@ private:
     Button m_menuButton{};
     Button m_quitButton{};
     Graphics m_backgroundGraphics{.m_position = {520, 130}};
-    Graphics m_crown{.m_position = {850, 430}};
+    Graphics m_tomb{.m_position = {830, 400}};
 };

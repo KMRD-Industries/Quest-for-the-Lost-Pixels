@@ -11,7 +11,6 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
-#include "FightActionEvent.h"
 #include "FightSystem.h"
 #include "ObjectCreatorSystem.h"
 #include "Physics.h"

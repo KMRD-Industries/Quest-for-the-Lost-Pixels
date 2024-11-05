@@ -10,15 +10,16 @@
 
 namespace sf
 {
+    class RenderTexture;
     class RenderWindow;
-}
+} // namespace sf
 
 class RenderSystem : public System
 {
 public:
     RenderSystem();
     void update();
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderTexture& window);
 
 private:
     void displayPortal(Entity entity);
@@ -33,20 +34,22 @@ private:
     void reverseDisplay(Collision& itemPivot, Collision& itemPlacement);
     void setWeapon();
     void setWeaponOrigin();
-    void displayEnemiesTable(const sf::RenderWindow& window);
-    void debugBoundingBoxes(sf::RenderWindow& window);
-    void drawEquipment(Entity entity);
-    void setOrigin(Entity entity);
-    void setSpritePosition(Entity entity);
-    sf::Vector2f getPosition(Entity entity);
+
+private:
+    void displayEnemiesTable(const sf::RenderTexture& window);
+    void debugBoundingBoxes(sf::RenderTexture& window);
+    void drawEquipment(Entity);
+    void setOrigin(Entity);
+    void setSpritePosition(Entity);
+    sf::Vector2f getPosition(Entity);
     sf::Vector2f getScale(Entity entity);
     float getRotation(Entity entity);
-    sf::Vector2f getOrigin(Entity entity);
-    void updateSprite(Entity entity);
-    void clear(const sf::Window& window);
-    void displayDamageTaken(Entity entity);
-    void displayWeaponStatsTable(const sf::RenderWindow& window, Entity entity);
-    void displayPlayerStatsTable(const sf::RenderWindow& window, Entity entity) const;
+    sf::Vector2f getOrigin(Entity);
+    void updateSprite(Entity);
+    void clear(const sf::RenderTexture& window);
+    void displayDamageTaken(Entity);
+    void displayWeaponStatsTable(const sf::RenderTexture&, Entity entity);
+    void displayPlayerStatsTable(const sf::RenderTexture&, Entity entity) const;
 
     std::vector<std::vector<std::pair<sf::Sprite*, bool*>>> tiles;
     sf::Sprite portalSprite;

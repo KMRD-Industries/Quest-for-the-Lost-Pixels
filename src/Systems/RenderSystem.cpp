@@ -28,7 +28,7 @@ extern PublicConfigSingleton configSingleton;
 
 RenderSystem::RenderSystem() { portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0); }
 
-void RenderSystem::draw(sf::RenderWindow& window)
+void RenderSystem::draw(sf::RenderTexture& window)
 {
     clear(window);
     const sf::Vector2f oldMapOffset = {GameUtility::mapOffset};
@@ -96,7 +96,7 @@ void RenderSystem::updateSprite(const Entity entity)
         tiles[renderComponent.layer].emplace_back(&renderComponent.sprite, &renderComponent.dirty);
 }
 
-void RenderSystem::clear(const sf::Window& window)
+void RenderSystem::clear(const sf::RenderTexture& window)
 {
     if (tiles.empty())
         tiles.resize(configSingleton.GetConfig().maximumNumberOfLayers);
@@ -299,7 +299,7 @@ void RenderSystem::displayDamageTaken(const Entity entity)
     }
 }
 
-void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const Entity entity) const
+void RenderSystem::displayPlayerStatsTable(const sf::RenderTexture& window, const Entity entity) const
 {
     ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 370), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(270, 0), ImGuiCond_Always); // Set the width to 250, height is auto
@@ -329,7 +329,7 @@ void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const
     ImGui::End();
 }
 
-void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const Entity entity)
+void RenderSystem::displayWeaponStatsTable(const sf::RenderTexture& window, const Entity entity)
 {
     const auto& equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
     if (!equipment.slots.contains(GameType::slotType::WEAPON))
@@ -380,7 +380,7 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const
     ImGui::End();
 }
 
-void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
+void RenderSystem::debugBoundingBoxes(sf::RenderTexture& window)
 {
     if (!gCoordinator.hasComponent<RenderComponent>(config::playerEntity))
         return;
