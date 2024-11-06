@@ -3,17 +3,20 @@
 #include <SFML/Window/Event.hpp>
 #include <TextureSystem.h>
 #include <imgui-SFML.h>
-#include "Config.h"
+
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
-#include "RenderSystem.h"
+#include "Paths.h"
+#include "PublicConfigMenager.h"
+#include "ResourceManager.h"
+#include "SoundManager.h"
 #include "SpawnerSystem.h"
-#include "TextTagSystem.h"
 #include "Timer.h"
 
 Coordinator gCoordinator;
+PublicConfigSingleton configSingleton;
 
 void handleInput(sf::RenderWindow& window)
 {
@@ -22,7 +25,7 @@ void handleInput(sf::RenderWindow& window)
 
     while (window.pollEvent(event))
     {
-        ImGui::SFML::ProcessEvent(window, event);
+        ImGui::SFML::ProcessEvent(event);
 
         if (event.type == sf::Event::KeyPressed)
         {
@@ -53,56 +56,63 @@ void handleInput(sf::RenderWindow& window)
     }
 }
 
-sf::Color hexStringToSfmlColor(const std::string& hexColor)
-{
-    const std::string& hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
-
-    std::istringstream iss(hex);
-    int rgbValue = 0;
-    iss >> std::hex >> rgbValue;
-
-    const uint8 red = rgbValue >> 16 & 0xFF;
-    const uint8 green = rgbValue >> 8 & 0xFF;
-    const uint8 blue = rgbValue & 0xFF;
-
-    return {red, green, blue};
-}
-
 int main()
 {
+    configSingleton.LoadConfig(ASSET_PATH + std::string("/config.json"));
+    const PublicConfig& config = configSingleton.GetConfig();
+
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(sf::VideoMode(config::initWidth, config::initHeight), "Quest for the lost pixels!");
+    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!");
     Timer* timer = Timer::Instance();
 
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
     int _ = ImGui::SFML::Init(window);
-    window.setFramerateLimit(config::frameCycle * (config::debugMode ? 100 : 1));
+    window.setFramerateLimit(config.debugMode ? 144 : config.frameCycle);
+    ImGui::CreateContext();
 
     sf::Clock deltaClock;
     Game game;
     game.init();
 
-    RenderSystem* m_renderSystem = gCoordinator.getRegisterSystem<RenderSystem>().get();
-    TextTagSystem* m_textTagSystem = gCoordinator.getRegisterSystem<TextTagSystem>().get();
-    TextureSystem* m_textureSystem = gCoordinator.getRegisterSystem<TextureSystem>().get();
+    ResourceManager& resourceManager = ResourceManager::getInstance();
+    resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 160);
+    resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 40);
+    resourceManager.loadShader(ASSET_PATH + std::string("/shaders/grayscale.frag"), video::FragmentShader::DEATH);
 
+    SoundManager& soundManager = SoundManager::getInstance();
+    soundManager.loadSound(Sound::Type::MenuBackgroundMusic,
+                           ASSET_PATH + std::string("/sounds/menuBackgroundSound.mp3"));
+    soundManager.loadSound(Sound::Type::GameBackgroundMusic,
+                           ASSET_PATH + std::string("/sounds/gameBackgroundSound.mp3"));
+
+    sf::RenderTexture renderTexture;
+    if (!renderTexture.create(window.getSize().x, window.getSize().y))
+    {
+    }
     while (window.isOpen())
     {
         sf::Time deltaTime = deltaClock.restart();
-        window.clear(hexStringToSfmlColor(m_textureSystem->getBackgroundColor()));
+        renderTexture.clear(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor());
+
         ImGui::SFML::Update(window, deltaTime);
         timer->Tick();
         timer->Reset();
 
-        game.update(deltaTime.asSeconds());
-        game.handleCollision();
-        game.draw();
+        game.update(static_cast<float>(deltaTime.asMilliseconds()));
+        game.draw(renderTexture);
 
-        m_renderSystem->draw(window);
-        m_textTagSystem->render(window);
+        ImGui::SFML::Render(renderTexture);
+        renderTexture.display();
 
-        ImGui::SFML::Render(window);
+        window.clear();
+        sf::Sprite sprite(renderTexture.getTexture());
+        if (resourceManager.getCurretShaderType() == video::FragmentShader::NONE)
+            window.draw(sprite);
+        else
+            window.draw(sprite, resourceManager.getCurrentShader().get());
+
+
         window.display();
         handleInput(window);
     }

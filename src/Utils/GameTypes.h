@@ -9,6 +9,34 @@
 
 #define M_PI 3.1415927f
 
+namespace video
+{
+    enum class FragmentShader
+    {
+        NONE,
+        DEATH
+    };
+};
+
+namespace Sound
+{
+    enum class Type
+    {
+        MenuBackgroundMusic,
+        GameBackgroundMusic
+    };
+}
+
+namespace MenuStateMachine
+{
+    enum class StateAction
+    {
+        Push,
+        Pop,
+        PutOnTop
+    };
+}
+
 namespace SpecialBlocks
 {
     enum class Blocks : int
@@ -30,7 +58,12 @@ namespace Items
         HEAL = 0,
         DMGUP = 1
     };
-}
+
+    const std::unordered_map<std::string, Behaviours> behaviourMap = {
+        {"Heal", Behaviours::HEAL},
+        {"DmgUp", Behaviours::DMGUP},
+    };
+} // namespace Items
 
 namespace Enemies
 {
@@ -38,6 +71,11 @@ namespace Enemies
     {
         MELEE = 0,
         BOSS = 1
+    };
+
+    const std::unordered_map<std::string, EnemyType> enemyTypeMap = {
+        {"Melee", EnemyType::MELEE},
+        {"Boss", EnemyType::BOSS},
     };
 } // namespace Enemies
 
@@ -225,6 +263,37 @@ namespace GameType
         Entity entityID;
         std::string tag;
         MyVec2 position;
+    };
+
+    enum slotType : int
+    {
+        WEAPON = 1,
+        HELMET = 2,
+        BODY_ARMOUR = 3
+    };
+
+    struct PickUpInfo
+    {
+        Entity characterEntity;
+        Entity itemEntity;
+        slotType slot;
+    };
+
+    enum itemLootType : int
+    {
+        WEAPON_LOOT = 1,
+        BODY_ARMOUR_LOOT = 2,
+        POTION_LOOT = 3,
+        HELMET_LOOT = 4
+    };
+
+    struct slotTypeHash
+    {
+        template <typename T>
+        std::size_t operator()(T t) const
+        {
+            return static_cast<std::size_t>(t);
+        }
     };
 } // namespace GameType
 

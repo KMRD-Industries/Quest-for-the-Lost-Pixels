@@ -1,7 +1,5 @@
 #include "SpawnerSystem.h"
-
 #include <regex>
-
 #include "AnimationComponent.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
@@ -9,18 +7,20 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
+#include "Helpers.h"
+#include "PlayerComponent.h"
 #include "MultiplayerSystem.h"
 #include "RenderComponent.h"
+#include "ResourceManager.h"
 #include "SpawnerComponent.h"
+#include "TextTagComponent.h"
 #include "TextureSystem.h"
-#include "TileComponent.h"
 #include "TransformComponent.h"
+#include "WeaponComponent.h"
+
+extern PublicConfigSingleton configSingleton;
 
 constexpr float SPAWN_RATE = 3600.f;
-
-SpawnerSystem::SpawnerSystem() { init(); }
-
-void SpawnerSystem::init() {}
 
 void SpawnerSystem::update(const float timeStamp)
 {
@@ -45,7 +45,8 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
                                    const TransformComponent& spawnerTransformComponent) const
 {
     // Check if the spawner is ready to spawn the enemy.
-    if (m_spawnTime != 0) return;
+    //TODO idk czy to nie psuje
+    if (m_spawnTime < SPAWN_RATE) return;
 
     // Spawn the enemy and increment the spawn count.
     spawnerComponent.noSpawns++;
@@ -65,8 +66,8 @@ Entity SpawnerSystem::spawnEnemy(const comm::Enemy& enemyToSpawn) const
     };
     const ColliderComponent colliderComponent{collisionData};
 
-    transformComponent.position.x -= colliderComponent.collision.x * config::gameScale;
-    transformComponent.position.y -= colliderComponent.collision.y * config::gameScale;
+    transformComponent.position.x -= colliderComponent.collision.x * configSingleton.GetConfig().gameScale;
+    transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale;
 
     TileComponent tileComponent{enemyToSpawn.texturedata().tileid(), enemyToSpawn.texturedata().tileset(),
                                 enemyToSpawn.texturedata().tilelayer()};
@@ -83,10 +84,24 @@ Entity SpawnerSystem::spawnEnemy(const comm::Enemy& enemyToSpawn) const
         {
             if (!std::regex_match(collision.tag, config::playerRegexTag)) return;
 
+            if (!gCoordinator.hasComponent<CharacterComponent>(collision.entityID)) return;
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collision.entityID)};
             playerCharacterComponent.attacked = true;
 
             playerCharacterComponent.hp -= enemyToSpawn.damage();
+            if (playerCharacterComponent.hp <= 0)
+            {
+                ResourceManager::getInstance().setCurrentShader(video::FragmentShader::DEATH);
+                gCoordinator.removeComponent<CharacterComponent>(collision.entityID);
+                gCoordinator.removeComponent<RenderComponent>(collision.entityID);
+                gCoordinator.removeComponent<PlayerComponent>(collision.entityID);
+                gCoordinator.getComponent<ColliderComponent>(collision.entityID).toRemoveCollider = true;
+            }
+
+            const Entity tag = gCoordinator.createEntity();
+            gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});
+            gCoordinator.addComponent(
+                tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collision.entityID)});
 
             if (!config::applyKnockback) return;
 
@@ -97,7 +112,7 @@ Entity SpawnerSystem::spawnEnemy(const comm::Enemy& enemyToSpawn) const
                                       myCollisionComponent.body->GetPosition()};
             knockbackDirection.Normalize();
 
-            const auto knockbackForce{config::defaultEnemyKnockbackForce * knockbackDirection};
+            const auto knockbackForce{configSingleton.GetConfig().defaultEnemyKnockbackForce * knockbackDirection};
             playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
         },
         [&](const GameType::CollisionData&) {}, false, false);

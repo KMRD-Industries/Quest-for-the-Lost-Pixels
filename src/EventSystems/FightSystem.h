@@ -13,7 +13,7 @@ public:
     void clear();
 
 private:
-    void handleMeleAttack(Entity);
+    void handleMeleeAttack(Entity) const;
     void handleCollision(Entity bullet, const GameType::CollisionData& collisionData) const;
     float calculateAngle(const sf::Vector2f& pivotPoint, const sf::Vector2f& targetPoint) const;
     void handleWandAttack(Entity) const;

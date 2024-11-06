@@ -13,9 +13,12 @@ class Coordinator
 {
 public:
     Coordinator();
+
     void init();
+
     Entity createEntity() const;
     Entity createServerEntity() const;
+
     void destroyEntity(Entity entity) const;
     void destroyServerEntity(Entity entity) const;
     void mapEntity(Entity serverEntity, Entity gameEntity) const;
@@ -29,7 +32,7 @@ public:
     }
 
     template <typename T>
-    void addComponent(const Entity entity, const T& component)
+    void addComponent(const Entity entity, const T &component)
     {
         m_componentManager->addComponent<T>(entity, component);
 
@@ -41,9 +44,15 @@ public:
     }
 
     template <typename... Components>
-    void addComponents(const Entity entity, const Components&... components)
+    void addComponents(const Entity entity, const Components &...components)
     {
         (addComponent(entity, components), ...);
+    }
+
+    template <typename T>
+    void addComponentIfNotExists(const Entity entity, const T &component)
+    {
+        if (!hasComponent<T>(entity)) addComponent(entity, component);
     }
 
     template <typename T>
@@ -59,13 +68,13 @@ public:
     }
 
     template <typename T>
-    T& getComponent(const Entity entity) const
+    T &getComponent(const Entity entity) const
     {
         return m_componentManager->getComponent<T>(entity);
     }
 
     template <typename T>
-    T* tryGetComponent(const Entity entity) const
+    T *tryGetComponent(const Entity entity) const
     {
         return m_componentManager->tryGetComponent<T>(entity);
     }

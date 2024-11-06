@@ -1,7 +1,5 @@
 #pragma once
 #include <unordered_map>
-
-#include <SFML/System/Vector2.hpp>
 #include <SFML/System/Vector3.hpp>
 #include <boost/asio.hpp>
 #include <comm.pb.h>

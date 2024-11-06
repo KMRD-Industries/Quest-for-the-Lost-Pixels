@@ -1,91 +1,141 @@
 #include "ChestSpawnerSystem.h"
-
 #include "AnimationComponent.h"
+#include "BodyArmourComponent.h"
 #include "CharacterComponent.h"
 #include "ChestComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "CreateBodyWithCollisionEvent.h"
+#include "HelmetComponent.h"
+#include "Helpers.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
+#include "PotionComponent.h"
 #include "RenderComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
-ChestSpawnerSystem::ChestSpawnerSystem() { init(); }
+extern PublicConfigSingleton configSingleton;
 
-void ChestSpawnerSystem::init()
+ChestSpawnerSystem::ChestSpawnerSystem()
 {
     m_chestCollision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Items", 819);
     m_potionCollision = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Items", 693);
     m_weaponsIDs = gCoordinator.getRegisterSystem<TextureSystem>()->m_weaponsIDs;
+    m_helmetsIDs = gCoordinator.getRegisterSystem<TextureSystem>()->m_helmets;
+    m_bodyArmoursIDs = gCoordinator.getRegisterSystem<TextureSystem>()->m_bodyArmours;
     m_chestTile = TileComponent{819, "Items", 5};
 }
 
 void ChestSpawnerSystem::spawnChest() const
 {
-    for (const auto entity : m_entities)
-    {
-        processSpawn(gCoordinator.getComponent<TransformComponent>(entity));
-    }
-}
-
-void ChestSpawnerSystem::spawnWeapon(const TransformComponent& spawnerTransformComponent) const
-{
-    const Entity newWeaponEntity = gCoordinator.createEntity();
-    const auto& weaponDesc = getRandomElement(m_weaponsIDs);
-
-    gCoordinator.addComponents(
-        newWeaponEntity, WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second},
-        TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", 7},
-        TransformComponent{spawnerTransformComponent}, RenderComponent{}, ColliderComponent{}, AnimationComponent{},
-        ItemComponent{},
-        ItemAnimationComponent{.animationDuration = 1, .startingPositionY = spawnerTransformComponent.position.y - 75});
+    for (const auto entity : m_entities) processSpawn(gCoordinator.getComponent<TransformComponent>(entity));
 }
 
 void ChestSpawnerSystem::clearSpawners() const {}
 
-void ChestSpawnerSystem::processSpawn(const TransformComponent& spawnerTransformComponent) const
+void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformComponent,
+                                   const GameType::itemLootType itemType) const
+{
+    const Entity newItemEntity = gCoordinator.createEntity();
+
+    gCoordinator.addComponents(newItemEntity, TransformComponent{spawnerTransformComponent}, RenderComponent{},
+                               ColliderComponent{}, AnimationComponent{}, ItemComponent{});
+
+    switch (itemType)
+    {
+    case GameType::itemLootType::HELMET_LOOT:
+        {
+            const auto &helmetDesc = getRandomElement(m_helmetsIDs);
+            gCoordinator.addComponents(
+                newItemEntity, HelmetComponent{.id = helmetDesc},
+                TileComponent{static_cast<uint32_t>(helmetDesc), "Armour", 6},
+                ItemAnimationComponent{.animationDuration = 1,
+                                       .startingPositionY = spawnerTransformComponent.position.y});
+            break;
+        }
+    case GameType::itemLootType::WEAPON_LOOT:
+        {
+            const auto weaponDesc = getRandomElement(m_weaponsIDs);
+            gCoordinator.addComponents(
+                newItemEntity, WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second},
+                TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", 7},
+                ItemAnimationComponent{.animationDuration = 1,
+                                       .startingPositionY = spawnerTransformComponent.position.y - 75});
+            break;
+        }
+    case GameType::itemLootType::BODY_ARMOUR_LOOT:
+        {
+            const auto &bodyArmourDesc = getRandomElement(m_bodyArmoursIDs);
+            gCoordinator.addComponents(
+                newItemEntity, BodyArmourComponent{.id = bodyArmourDesc},
+                TileComponent{static_cast<uint32_t>(bodyArmourDesc), "Armour", 6},
+                ItemAnimationComponent{.animationDuration = 1,
+                                       .startingPositionY = spawnerTransformComponent.position.y});
+            break;
+        }
+    case GameType::itemLootType::POTION_LOOT:
+        {
+            const config::ItemConfig itemConfig = getRandomItemData();
+            gCoordinator.addComponents(
+                newItemEntity, PotionComponent{}, ChestComponent{}, CharacterComponent{}, itemConfig.textureData,
+                ItemAnimationComponent{.animationDuration = 1,
+                                       .startingPositionY = spawnerTransformComponent.position.y});
+            break;
+        }
+    default:;
+    }
+}
+
+void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransformComponent) const
 {
     // Create new entity for chest and add all necessary components
     const Entity newChestEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(newChestEntity, m_chestTile, spawnerTransformComponent,
+    gCoordinator.addComponents(newChestEntity, m_chestTile, TransformComponent{spawnerTransformComponent},
                                ColliderComponent{m_chestCollision}, RenderComponent{}, AnimationComponent{},
-                               CharacterComponent{}, ChestComponent{});
+                               CharacterComponent{}, ItemComponent{}, ChestComponent{});
 
     const Entity newItemEntity = gCoordinator.createEntity();
 
-    auto spawnFunction = [this, spawnerTransformComponent](const GameType::CollisionData&)
+    auto spawnFunction = [this, spawnerTransformComponent](const GameType::CollisionData &)
     {
-        // TODO: Spawning Logic
-        std::time(nullptr) % 3 == 0 ? spawnPotion(spawnerTransformComponent) : spawnWeapon(spawnerTransformComponent);
+        // TODO: Spawn logic
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dist(1, 4);
+
+        switch (dist(gen))
+        {
+        case 1:
+            spawnItem(spawnerTransformComponent, GameType::itemLootType::POTION_LOOT);
+            break;
+        case 2:
+            spawnItem(spawnerTransformComponent, GameType::itemLootType::WEAPON_LOOT);
+            break;
+        case 3:
+            spawnItem(spawnerTransformComponent, GameType::itemLootType::HELMET_LOOT);
+            break;
+        case 4:
+            spawnItem(spawnerTransformComponent, GameType::itemLootType::BODY_ARMOUR_LOOT);
+            break;
+        default:
+            break;
+        }
     };
 
     // Create new object with special eventComponent
     const auto newEventComponent = CreateBodyWithCollisionEvent(
-        newChestEntity, "Chest", [this, newChestEntity](const GameType::CollisionData& collisionData)
+        newChestEntity, "Chest", [this, newChestEntity](const GameType::CollisionData &collisionData)
         { handleChestCollision(newChestEntity, collisionData); }, spawnFunction, true, true);
 
     gCoordinator.addComponent(newItemEntity, newEventComponent);
 }
 
-void ChestSpawnerSystem::handleChestCollision(const Entity chest, const GameType::CollisionData& collisionData) const
+void ChestSpawnerSystem::handleChestCollision(const Entity chest, const GameType::CollisionData &collisionData) const
 {
     if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
     gCoordinator.getComponent<CharacterComponent>(chest).hp = -1;
-}
-
-void ChestSpawnerSystem::spawnPotion(const TransformComponent& spawnerTransformComponent) const
-{
-    const Entity newPotionEntity = gCoordinator.createEntity();
-    const config::ItemConfig itemConfig = getRandomItemData();
-
-    gCoordinator.addComponents(
-        newPotionEntity, itemConfig.textureData, spawnerTransformComponent, ColliderComponent{m_potionCollision},
-        RenderComponent{}, AnimationComponent{}, ChestComponent{}, CharacterComponent{},
-        ItemComponent{itemConfig.name, itemConfig.value, itemConfig.behaviour, itemConfig.textureData},
-        ItemAnimationComponent{.animationDuration = 1, .startingPositionY = spawnerTransformComponent.position.y});
 }

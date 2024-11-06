@@ -1,14 +1,14 @@
 #include "RoomListenerSystem.h"
-
 #include <SpawnerSystem.h>
 #include <iostream>
-
 #include "ChestSpawnerSystem.h"
+#include "PassageSystem.h"
 #include "EnemyComponent.h"
 
 void RoomListenerSystem::update(const float deltaTime)
 {
-    if (m_isCurrentRoomLooted) return;
+    if (m_isCurrentRoomLooted)
+        return;
     if (!m_entities.empty())
         m_toLoot = true;
     else if (m_entities.empty() && m_toLoot)
@@ -48,7 +48,8 @@ void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)
 void RoomListenerSystem::spawnLoot()
 {
     gCoordinator.getRegisterSystem<ChestSpawnerSystem>()->spawnChest();
-    std::cout << "[INFO] Spawning chest\n";
+    gCoordinator.getRegisterSystem<PassageSystem>()->setPassages(true);
+    std::cout << "[INFO] Spawning room content (chests, portals)\n";
 
     m_lootedRooms[m_currentRoom] = true;
     m_isCurrentRoomLooted = true;

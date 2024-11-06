@@ -1,7 +1,5 @@
 #include "MapSystem.h"
-#include <fstream>
 #include <nlohmann/json.hpp>
-#include "AnimationComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Config.h"
@@ -15,6 +13,7 @@
 #include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
+#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
 #include "SpawnerComponent.h"
 #include "TextureSystem.h"
@@ -22,10 +21,7 @@
 #include "TransformComponent.h"
 
 extern Coordinator gCoordinator;
-
-void MapSystem::init() {}
-
-void MapSystem::update() {}
+extern PublicConfigSingleton configSingleton;
 
 /**
  * @brief Load room layout from given path of Tiled Json map format
@@ -145,11 +141,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
 
     doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
-    gCoordinator.addComponents(mapEntity,
-        RenderComponent{},
-        MapComponent{},
-        transformComponent,
-        tileComponent);
+    gCoordinator.addComponents(mapEntity, RenderComponent{}, MapComponent{}, transformComponent, tileComponent);
 
     if (tileComponent.tileSet == "SpecialBlocks") // Handle special Tiles
     {
@@ -194,7 +186,7 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
             }
         case static_cast<int>(SpecialBlocks::Blocks::DOWNDOOR):
             {
-                gCoordinator.addComponent(mapEntity, PassageComponent{});
+                gCoordinator.addComponent(mapEntity, PassageComponent{.activePassage = true});
                 break;
             }
         case static_cast<int>(SpecialBlocks::Blocks::CHESTSPAWNERBLOCK):
@@ -227,26 +219,32 @@ std::string MapSystem::findKeyLessThan(const std::unordered_map<std::string, lon
 
 void MapSystem::resetMap() const
 {
-    std::deque<Entity> entityToRemove;
+    std::unordered_set<Entity> entityToKill{};
 
-    for (const auto& entity : m_entities)
+    for (const auto entity : m_entities)
+    {
         if (!gCoordinator.hasComponent<PlayerComponent>(entity) &&
             !gCoordinator.hasComponent<MultiplayerComponent>(entity))
-            entityToRemove.push_back(entity);
-
-
-    while (!entityToRemove.empty())
-    {
-        gCoordinator.getRegisterSystem<CollisionSystem>()->deleteBody(entityToRemove.front());
-        gCoordinator.destroyEntity(entityToRemove.front());
-        entityToRemove.pop_front();
+        {
+            if (auto* collisionComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
+            {
+                collisionComponent->toDestroy = true;
+            }
+            else
+            {
+                entityToKill.insert(entity);
+            }
+        }
     }
 
-    entityToRemove.clear();
+    gCoordinator.getRegisterSystem<CollisionSystem>()->deleteMarkedBodies();
+
+    for (auto& entity : entityToKill) gCoordinator.destroyEntity(entity);
+    entityToKill.clear();
 }
 
 sf::Vector2f MapSystem::getPosition(const int x_axis, const int y_axis, const int map_tile_width) const
 {
     return sf::Vector2f(static_cast<float>(x_axis), static_cast<float>(y_axis)) * static_cast<float>(map_tile_width) *
-        config::gameScale;
+        configSingleton.GetConfig().gameScale;
 }

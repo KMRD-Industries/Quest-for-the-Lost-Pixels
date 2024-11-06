@@ -5,11 +5,12 @@
 #include "Coordinator.h"
 #include "EnemyComponent.h"
 #include "Physics.h"
+#include "PublicConfigMenager.h"
 #include "TransformComponent.h"
 
-EnemySystem::EnemySystem() { init(); }
+extern PublicConfigSingleton configSingleton;
 
-void EnemySystem::init()
+EnemySystem::EnemySystem()
 {
     gen.seed(rd()); // Seed the generator
     dis = std::uniform_real_distribution<float>(-1, 1); // Range between -1 and 1
@@ -39,12 +40,10 @@ void EnemySystem::deleteEnemies() const
     entitiesToKill.reserve(m_entities.size());
 
     for (const auto entity : m_entities)
-    {
         if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
             colliderComponent->toDestroy = true;
         else
             entitiesToKill.push_back(entity);
-    }
 
     for (const auto entity : entitiesToKill) gCoordinator.destroyEntity(entity);
 }

@@ -10,15 +10,13 @@ extern Coordinator gCoordinator;
 class SpawnerSystem : public System
 {
 public:
-    void init();
+    SpawnerSystem() = default;
+
     void update(float);
     void clearSpawners();
-    void cleanUpUnnecessarySpawners();
     void spawnEnemies();
     std::vector<std::pair<Entity, sf::Vector2<float>>> getSortedSpawnedEnemies();
     void spawnOnDemand(const comm::EnemyPositionsUpdate &enemiesToSpawn) const;
-
-    SpawnerSystem();
 
 private:
     float m_spawnTime{};
@@ -26,6 +24,7 @@ private:
     void incrementSpawnTimer();
     void processSpawner(SpawnerComponent &spawnerComponent, const TransformComponent &spawnerTransformComponent) const;
     bool isReadyToSpawn(int cooldown);
+    void cleanUpUnnecessarySpawners();
     Entity spawnEnemy(const comm::Enemy &enemyToSpawn) const;
     void prepareEnemies();
 };

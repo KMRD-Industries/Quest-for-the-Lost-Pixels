@@ -10,15 +10,18 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#include "Config.h"
 #include "GameTypes.h"
+#include "PublicConfig.h"
+#include "PublicConfigMenager.h"
 #include "glm/gtx/hash.hpp"
+
+extern PublicConfigSingleton configSingleton;
 
 static inline config::EnemyConfig getRandomEnemyData(const Enemies::EnemyType& enemyType)
 {
     static std::mt19937 gen{std::random_device{}()};
 
-    auto enemyConfig = config::enemyData.equal_range(enemyType);
+    auto enemyConfig = configSingleton.GetConfig().enemyData.equal_range(enemyType);
     std::vector<config::EnemyConfig> enemiesConfig;
     for (auto it = enemyConfig.first; it != enemyConfig.second; ++it) enemiesConfig.push_back(it->second);
 
@@ -38,10 +41,10 @@ static inline config::ItemConfig getRandomItemData()
 {
     static std::mt19937 gen{std::random_device{}()};
 
-    std::uniform_int_distribution<int> distrib(0, config::itemsData.size() - 1);
+    std::uniform_int_distribution<int> distrib(0, configSingleton.GetConfig().itemsData.size() - 1);
     const auto randomIndex{distrib(gen)};
 
-    return config::itemsData[randomIndex];
+    return configSingleton.GetConfig().itemsData[randomIndex];
 }
 
 static inline ImVec4 interpolateColor(const ImVec4& color1, const ImVec4& color2, const float t)
@@ -210,6 +213,20 @@ static std::unordered_multimap<glm::ivec2, int> findSpecialBlocks(const nlohmann
     return result;
 }
 
+inline sf::Color hexStringToSfmlColor(const std::string& hexColor)
+{
+    const std::string& hex = hexColor[0] == '#' ? hexColor.substr(1) : hexColor;
+
+    std::istringstream iss(hex);
+    int rgbValue = 0;
+    iss >> std::hex >> rgbValue;
+
+    const uint8 red = rgbValue >> 16 & 0xFF;
+    const uint8 green = rgbValue >> 8 & 0xFF;
+    const uint8 blue = rgbValue & 0xFF;
+
+    return {red, green, blue};
+}
 
 template <typename T>
 static T roundTo(T value, int places)
@@ -239,11 +256,31 @@ static T convertPixelsToMeters(const T pixelValue)
     return roundTo(result, 10);
 }
 
+template <typename, typename T, typename = void>
+struct has_member : std::false_type
+{
+};
+
+template <typename T, typename U>
+struct has_member<T, U, std::void_t<decltype(std::declval<U>())>> : std::true_type
+{
+};
+
+template <typename Struct, typename MemberType>
+void set(Struct& obj, MemberType Struct::*member, MemberType value)
+{
+    // Check if the member exists
+    if constexpr (has_member<Struct, decltype(obj.*member)>::value)
+    {
+        obj.*member = value; // Set the member to the new value
+    }
+}
+
 static sf::Vector2f convertPixelsToMeters(const sf::Vector2f& pixelValue)
 {
     sf::Vector2f result = {};
-    result.x = static_cast<float>(pixelValue.x * config::pixelToMeterRatio);
-    result.y = static_cast<float>(pixelValue.y * config::pixelToMeterRatio);
+    result.x = static_cast<float>(pixelValue.x * configSingleton.GetConfig().pixelToMeterRatio);
+    result.y = static_cast<float>(pixelValue.y * configSingleton.GetConfig().pixelToMeterRatio);
 
     result.x = roundTo(result.x, 10);
     result.y = roundTo(result.y, 10);

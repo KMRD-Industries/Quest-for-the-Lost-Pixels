@@ -164,33 +164,6 @@ void MultiplayerSystem::update()
                                                  colliderComponent.body->GetAngle());
         }
 
-        // comm::StateUpdate stateUpdate;
-        // stateUpdate.ParseFromArray(&m_buf, received);
-        // //        m_position.ParseFromArray(&m_buf, received);
-        // std::cout << "Received message...";
-        // switch (stateUpdate.variant())
-        // {
-        // case comm::StateVariant::MAP_UPDATE:
-        //     std::cout << "Map update...\n";
-        //     break;
-        // case comm::StateVariant::PLAYER_POSITION_UPDATE:
-        //     //idk czy git
-        //     m_position = stateUpdate.positionupdate();
-        //     const std::uint32_t id = m_position.entity_id();
-        //     std::cout << "Position update from: " << "id:" << id <<"\n";
-
-        //     if (m_entity_map.contains(id))
-        //     {
-        //         Entity& target = m_entity_map[id];
-        //         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
-
-        //         transformComponent.position = {m_position.x(), m_position.y()};
-        //     }
-        //     break;
-        // default:
-        //     std::cout << "Unknown type!\n";
-        //     break;
-        // }
     }
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
@@ -208,12 +181,6 @@ void MultiplayerSystem::update()
 
     auto serialized = m_position.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
-
-    // std::cout << "Player: " << m_player_id << " is moving to: " << m_position.x() << ", " << m_position.y() << "\n";
-    // comm::StateUpdate update;
-    // update.set_variant(comm::PLAYER_POSITION_UPDATE);
-    //*(update.mutable_positionupdate()) = m_position;
-    // auto serialized = update.SerializeAsString();
 }
 
 void MultiplayerSystem::disconnect()

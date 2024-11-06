@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "InputHandler.h"
 #include "System.h"
 
@@ -16,6 +14,7 @@ private:
     void handleMovement();
     void handleAttack() const;
     void handlePickUpAction();
+    void handleSpecialKeys();
     InputHandler* inputHandler = nullptr;
     float m_frameTime{};
 };

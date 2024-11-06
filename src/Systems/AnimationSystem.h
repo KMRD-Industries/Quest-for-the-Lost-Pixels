@@ -8,12 +8,14 @@ extern Coordinator gCoordinator;
 class AnimationSystem : public System
 {
 public:
-    AnimationSystem();
-    void init();
-    void update(float timeStep) const;
-    void updateEntityAnimationFrame(AnimationComponent&, TileComponent&, float) const;
-    void loadNextFrame(AnimationComponent&, TileComponent&) const;
+    AnimationSystem() = default;
+    void update(const float &deltaTime) const;
 
 private:
+    void updateEntityAnimation(AnimationComponent &, TileComponent &, float) const;
+    void advanceFrame(AnimationComponent &) const;
+    void updateTileComponent(TileComponent &, const AnimationComponent &) const;
+
+    float m_animationFrameTime{};
     float m_frameTime{};
 };

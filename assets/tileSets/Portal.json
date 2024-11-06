@@ -1,20 +1,20 @@
 { "columns":1,
  "grid":
     {
-     "height":35,
+     "height":40,
      "orientation":"orthogonal",
-     "width":40
+     "width":43
     },
  "image":"..\/floorAtlas\/portal.png",
- "imageheight":25,
- "imagewidth":28,
+ "imageheight":27,
+ "imagewidth":30,
  "margin":0,
  "name":"portal",
  "spacing":0,
  "tilecount":1,
  "tiledversion":"1.11.0",
- "tileheight":25,
- "tilewidth":28,
+ "tileheight":27,
+ "tilewidth":30,
  "type":"tileset",
  "version":"1.10"
 }

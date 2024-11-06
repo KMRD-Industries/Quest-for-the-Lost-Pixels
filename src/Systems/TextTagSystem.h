@@ -1,29 +1,21 @@
 #pragma once
 
-#include "System.h"
 #include "SFML/Graphics/Font.hpp"
-
+#include "System.h"
 
 struct TextTag;
 
 class TextTagSystem : public System
 {
 public:
-
     TextTagSystem();
-
-    void init();
-    void update();
-    void loadFont(const std::string&);
-    void initPresets();
-    void render(sf::RenderTarget&);
-    void deleteTags();
-
-    enum TextTagPresets : int
-    {
-        DAMAGE_TAKEN = 0
-    };
+    void update(const float &deltaTime);
+    void render(sf::RenderTarget &);
 
 private:
+    void deleteTags();
+    void loadFont(const std::string &);
+    void performFixedUpdate() const;
     sf::Font font;
+    float m_frameTime{};
 };

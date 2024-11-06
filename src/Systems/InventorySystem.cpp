@@ -1,77 +1,79 @@
 #include "InventorySystem.h"
 #include "AnimationSystem.h"
+#include "BindSwingWeaponEvent.h"
+#include "BodyArmourComponent.h"
+#include "CharacterComponent.h"
 #include "ColliderComponent.h"
+#include "CollisionSystem.h"
 #include "CreateBodyWithCollisionEvent.h"
-#include "EquipWeaponSystem.h"
-#include "EquippedWeaponComponent.h"
-#include "InventoryComponent.h"
+#include "EquipmentComponent.h"
+#include "GameTypes.h"
+#include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
-#include "Physics.h"
+#include "PotionComponent.h"
+#include "RenderComponent.h"
+#include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
+#include "WeaponSwingComponent.h"
 
-void InventorySystem::dropWeapon(const Entity player)
+void InventorySystem::dropItem(const Entity player, const Entity item, const GameType::slotType slot) const
 {
-    auto& inventory = gCoordinator.getComponent<InventoryComponent>(player);
-    gCoordinator.getComponent<WeaponComponent>(inventory.weapons[0]).equipped = false;
-
-    if (!gCoordinator.hasComponent<ItemComponent>(inventory.weapons[0]))
-        gCoordinator.addComponent(inventory.weapons[0], ItemComponent{});
-
+    auto& equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
     const Entity newItemEntity = gCoordinator.createEntity();
-    gCoordinator.getComponent<TransformComponent>(inventory.weapons[0]).rotation = 0;
 
-    const auto newEvent = CreateBodyWithCollisionEvent(
-        inventory.weapons[0], "Item", [this](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {},
-        false, false);
+    gCoordinator.addComponents(
+        newItemEntity, TileComponent{gCoordinator.getComponent<TileComponent>(item)},
+        TransformComponent{gCoordinator.getComponent<TransformComponent>(player)}, RenderComponent{},
+        ColliderComponent{}, AnimationComponent{}, ItemComponent{},
+        ItemAnimationComponent{
+            .animationDuration = 1,
+            .startingPositionY = gCoordinator.getComponent<TransformComponent>(player).position.y - 75});
 
-    gCoordinator.addComponent(newItemEntity, newEvent);
+    switch (slot)
+    {
+    case GameType::slotType::WEAPON:
+        {
+            gCoordinator.addComponent(newItemEntity, gCoordinator.getComponent<WeaponComponent>(item));
+            break;
+        }
+    case GameType::slotType::HELMET:
+        {
+            gCoordinator.addComponent(newItemEntity, gCoordinator.getComponent<HelmetComponent>(item));
+            break;
+        }
+    case GameType::slotType::BODY_ARMOUR:
+        {
+            gCoordinator.addComponent(newItemEntity, gCoordinator.getComponent<BodyArmourComponent>(item));
+            break;
+        }
+    }
 
-    inventory.weapons.clear();
+    gCoordinator.destroyEntity(equipmentComponent.slots.at(slot));
+    equipmentComponent.slots.erase(slot);
 }
 
-void InventorySystem::pickUpWeapon(const Entity player, const Entity weapon)
+void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) const
 {
-    if (auto* colliderComponent = gCoordinator.tryGetComponent<ColliderComponent>(weapon))
+    if (gCoordinator.hasComponent<PotionComponent>(pickUpItemInfo.itemEntity)) return;
+    gCoordinator.getRegisterSystem<CollisionSystem>()->deleteBody(pickUpItemInfo.itemEntity);
+
+    if (gCoordinator.hasComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity))
+        gCoordinator.removeComponent<ItemAnimationComponent>(pickUpItemInfo.itemEntity);
+
+    gCoordinator.getComponent<ItemComponent>(pickUpItemInfo.itemEntity).equipped = true;
+
+    auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(pickUpItemInfo.characterEntity);
+
+    if (const auto it = equipment.find(pickUpItemInfo.slot); it != equipment.end())
+        dropItem(pickUpItemInfo.characterEntity, it->second, it->first);
+
+    equipment.emplace(pickUpItemInfo.slot, pickUpItemInfo.itemEntity);
+
+    if (pickUpItemInfo.slot == GameType::WEAPON)
     {
-        if (colliderComponent->body != nullptr)
-        {
-            Physics::getWorld()->DestroyBody(colliderComponent->body);
-            colliderComponent->body = nullptr;
-            colliderComponent->collision = {};
-        }
+        gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
+        gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
     }
-
-    if (const auto* equippedWeaponComponent = gCoordinator.tryGetComponent<EquippedWeaponComponent>(player))
-    {
-        if (gCoordinator.hasComponent<TransformComponent>(equippedWeaponComponent->currentWeapon))
-        {
-            const auto& equippedWeaponCollisionComponent =
-                gCoordinator.getComponent<ColliderComponent>(equippedWeaponComponent->currentWeapon);
-            const auto& newWeaponCollisionComponent = gCoordinator.getComponent<ColliderComponent>(weapon);
-
-            auto& equippedTransformComponent =
-                gCoordinator.getComponent<TransformComponent>(equippedWeaponComponent->currentWeapon);
-
-            equippedTransformComponent = gCoordinator.getComponent<TransformComponent>(weapon);
-
-            equippedTransformComponent.position.y +=
-                (newWeaponCollisionComponent.collision.height - equippedWeaponCollisionComponent.collision.height) *
-                config::gameScale;
-
-            dropWeapon(player);
-        }
-    }
-
-    auto& inventory = gCoordinator.getComponent<InventoryComponent>(player);
-    inventory.weapons.push_back(weapon);
-    gCoordinator.getComponent<WeaponComponent>(weapon).equipped = true;
-
-    if (gCoordinator.hasComponent<ItemComponent>(weapon)) gCoordinator.removeComponent<ItemComponent>(weapon);
-
-    if (gCoordinator.hasComponent<ItemAnimationComponent>(weapon))
-        gCoordinator.removeComponent<ItemAnimationComponent>(weapon);
-
-    gCoordinator.getRegisterSystem<EquipWeaponSystem>()->equipWeapon(player, weapon);
 }

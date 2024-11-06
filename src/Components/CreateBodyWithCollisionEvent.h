@@ -14,27 +14,26 @@ struct CreateBodyWithCollisionEvent
     std::function<void(GameType::CollisionData)> onCollisionOut{};
     bool isStatic{};
     bool useTextureSize{};
+    bool trigger{};
     GameType::ObjectType type{GameType::ObjectType::NORMAL};
 
-    CreateBodyWithCollisionEvent() :
-        onCollisionEnter([](const GameType::CollisionData&) {}),
-        onCollisionOut([](const GameType::CollisionData&) {}),
-        isStatic(true),
-        useTextureSize(true)
-    {
-    }
+    CreateBodyWithCollisionEvent() = default;
 
     CreateBodyWithCollisionEvent(
         const Entity entity, std::string tag,
-        const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&) {},
-        const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&) {},
-        const bool isStatic = true, const bool useTextureSize = true) :
-        entity{entity},
+        const std::function<void(GameType::CollisionData)>& onCollisionEnter = [](const GameType::CollisionData&)
+        {
+        },
+        const std::function<void(GameType::CollisionData)>& onCollisionOut = [](const GameType::CollisionData&)
+        {
+        },
+        const bool isStatic = true, const bool useTextureSize = true, const bool trigger = false) : entity{entity},
         tag{std::move(tag)},
         onCollisionEnter{onCollisionEnter},
         onCollisionOut{onCollisionOut},
         isStatic{isStatic},
-        useTextureSize{useTextureSize}
+        useTextureSize{useTextureSize},
+        trigger{trigger}
     {
     }
 };
