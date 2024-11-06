@@ -10,12 +10,15 @@
 #include "Helpers.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
+#include "MultiplayerSystem.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
+#include "SpawnerSystem.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
+#include "comm.pb.h"
 
 extern PublicConfigSingleton configSingleton;
 
@@ -36,47 +39,69 @@ void ChestSpawnerSystem::spawnChest() const
 
 void ChestSpawnerSystem::clearSpawners() const {}
 
-void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformComponent,
-                                   const GameType::itemLootType itemType) const
+void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformComponent) const
 {
     const Entity newItemEntity = gCoordinator.createEntity();
 
     gCoordinator.addComponents(newItemEntity, TransformComponent{spawnerTransformComponent}, RenderComponent{},
                                ColliderComponent{}, AnimationComponent{}, ItemComponent{});
 
-    switch (itemType)
+    // for single player compatibility
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist1(1, 4);
+    std::uniform_int_distribution<> dist2(0, 100);
+    ItemGenerator itemGenerator{0, static_cast<uint32_t>(dist2(gen)), static_cast<comm::ItemType>(dist1(gen))};
+    uint32_t id = 0;
+
+    const auto& multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
+    if (multiplayerSystem->isConnected())
     {
-    case GameType::itemLootType::HELMET_LOOT:
+        itemGenerator = multiplayerSystem->getItemGenerator();
+
+        if (itemGenerator.type != comm::POTION)
+            multiplayerSystem->registerItem(itemGenerator.id, newItemEntity);
+    }
+
+    switch (itemGenerator.type)
+    {
+        case comm::HELMET:
         {
-            const auto &helmetDesc = getRandomElement(m_helmetsIDs);
+            const uint32_t tileID = m_helmetsIDs[itemGenerator.gen % m_helmetsIDs.size()];
+            if (id == 0) id = tileID;
+
             gCoordinator.addComponents(
-                newItemEntity, HelmetComponent{.id = helmetDesc},
-                TileComponent{static_cast<uint32_t>(helmetDesc), "Armour", 6},
+                newItemEntity, HelmetComponent{.id = id},
+                TileComponent{tileID, "Armour", 6},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;
         }
-    case GameType::itemLootType::WEAPON_LOOT:
+        case comm::WEAPON:
         {
-            const auto weaponDesc = getRandomElement(m_weaponsIDs);
+            const auto& weaponDesc = m_weaponsIDs[itemGenerator.gen % m_weaponsIDs.size()];
+            if (id == 0) id = weaponDesc.first;
+
             gCoordinator.addComponents(
-                newItemEntity, WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second},
-                TileComponent{static_cast<uint32_t>(weaponDesc.first), "Weapons", 7},
+                newItemEntity, WeaponComponent{.id = id, .type = weaponDesc.second},
+                TileComponent{weaponDesc.first, "Weapons", 7},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y - 75});
             break;
         }
-    case GameType::itemLootType::BODY_ARMOUR_LOOT:
+        case comm::ARMOUR:
         {
-            const auto &bodyArmourDesc = getRandomElement(m_bodyArmoursIDs);
+            const uint32_t tileID = m_bodyArmoursIDs[itemGenerator.gen % m_bodyArmoursIDs.size()];
+            if (id == 0) id = tileID;
+
             gCoordinator.addComponents(
-                newItemEntity, BodyArmourComponent{.id = bodyArmourDesc},
-                TileComponent{static_cast<uint32_t>(bodyArmourDesc), "Armour", 6},
+                newItemEntity, BodyArmourComponent{.id = id},
+                TileComponent{tileID, "Armour", 6},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;
         }
-    case GameType::itemLootType::POTION_LOOT:
+        case comm::POTION:
         {
             const config::ItemConfig itemConfig = getRandomItemData();
             gCoordinator.addComponents(
@@ -102,28 +127,7 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransform
 
     auto spawnFunction = [this, spawnerTransformComponent](const GameType::CollisionData &)
     {
-        // TODO: Spawn logic
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dist(1, 4);
-
-        switch (dist(gen))
-        {
-        case 1:
-            spawnItem(spawnerTransformComponent, GameType::itemLootType::POTION_LOOT);
-            break;
-        case 2:
-            spawnItem(spawnerTransformComponent, GameType::itemLootType::WEAPON_LOOT);
-            break;
-        case 3:
-            spawnItem(spawnerTransformComponent, GameType::itemLootType::HELMET_LOOT);
-            break;
-        case 4:
-            spawnItem(spawnerTransformComponent, GameType::itemLootType::BODY_ARMOUR_LOOT);
-            break;
-        default:
-            break;
-        }
+        spawnItem(spawnerTransformComponent);
     };
 
     // Create new object with special eventComponent

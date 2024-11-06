@@ -20,7 +20,8 @@ PublicConfigSingleton configSingleton;
 void handleInput(sf::RenderWindow& window)
 {
     sf::Event event{};
-    InputHandler::getInstance()->update();
+    const auto inputHandler = InputHandler::getInstance();
+    inputHandler->update();
 
     while (window.pollEvent(event))
     {
@@ -29,27 +30,31 @@ void handleInput(sf::RenderWindow& window)
         if (event.type == sf::Event::KeyPressed)
         {
             const auto keyCode = event.key.code;
-            InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+            inputHandler->handleKeyboardInput(keyCode, true);
         }
         else if (event.type == sf::Event::MouseButtonPressed)
         {
             const auto keyCode = event.mouseButton.button;
-            InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+            inputHandler->handleKeyboardInput(keyCode, true);
         }
         else if (event.type == sf::Event::KeyReleased)
         {
             const auto keyCode = event.key.code;
-            InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+            inputHandler->handleKeyboardInput(keyCode, false);
         }
         else if (event.type == sf::Event::MouseButtonReleased)
         {
             const auto keyCode = event.mouseButton.button;
-            InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+            inputHandler->handleKeyboardInput(keyCode, false);
         }
         else if (event.type == sf::Event::MouseMoved)
         {
             const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
-            InputHandler::getInstance()->updateMousePosition(mousePosition);
+            inputHandler->updateMousePosition(mousePosition);
+        }
+        else if (event.type == sf::Event::Resized)
+        {
+            inputHandler->updateWindowSize({event.size.width, event.size.height});
         }
         if (event.type == sf::Event::Closed) window.close();
     }

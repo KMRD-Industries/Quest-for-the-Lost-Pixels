@@ -4,7 +4,9 @@ bool InputHandler::isHeld(const InputType input) const { return m_keysHeld.conta
 
 bool InputHandler::isPressed(const InputType input) const { return m_keysPressed.contains(input); }
 
-sf::Vector2f InputHandler::getMousePosition() const { return m_mousePosition; }
+const sf::Vector2f& InputHandler::getMousePosition() const { return m_mousePosition; }
+
+const sf::Vector2u& InputHandler::getWindowSize() const { return m_windowSize; }
 
 void InputHandler::handleKeyboardInput(const InputKey& key, const bool& isPressed)
 {
@@ -22,6 +24,11 @@ void InputHandler::handleKeyboardInput(const InputKey& key, const bool& isPresse
 void InputHandler::updateMousePosition(const sf::Vector2f& newMousePosition)
 {
     this->m_mousePosition = newMousePosition;
+}
+
+void InputHandler::updateWindowSize(const sf::Vector2u& size)
+{
+    this->m_windowSize = size;
 }
 
 void InputHandler::clearPressedInputs() { m_keysPressed.clear(); }
