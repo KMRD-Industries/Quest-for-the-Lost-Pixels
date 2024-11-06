@@ -9,6 +9,7 @@
 #include "Timer.h"
 #include "Types.h"
 #include "glm/ext/vector_int2.hpp"
+#include <zlib.h>
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
@@ -27,6 +28,7 @@ private:
     comm::PositionUpdate m_position{};
     comm::StateUpdate m_state{};
     std::unordered_map<std::uint32_t, Entity> m_entity_map{};
+    std::unordered_map<std::uint32_t, ObstacleData> m_walls{};
 
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
@@ -37,9 +39,9 @@ public:
     void roomChanged(const glm::ivec2& room);
     void init();
     void update();
-    void updateMap(const std::map<Entity, sf::Vector2<float>>& enemies, const std::map<Entity, ObstacleData>& obstacles,
+    void updateMap(const std::map<Entity, sf::Vector2<float>>& enemies,
                    const std::map<Entity, sf::Vector2<int>>& players);
-    void setMapDimensions(const std::map<Entity, ObstacleData>& obstacles);
+    void sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles);
     void sendSpawnerPosition(std::vector<std::pair<Entity, sf::Vector2<float>>> spawners);
     void updateEnemyHp(Entity id, float hp, sf::Vector2<float> position);
     void disconnect();

@@ -294,8 +294,6 @@ void Dungeon::update(const float deltaTime)
             break;
         }
 
-        m_multiplayerSystem->update();
-
         // TODO na pewno da się zrobić to lepiej
         // docelowo będzie to w momencie kiedy jest wysyłany event ROOM_CHANGED, aktualnie jest wysyłane na początku gry
         // sprawdź czy możesz dać w setupie
@@ -309,8 +307,10 @@ void Dungeon::update(const float deltaTime)
         if (elapsedTime > m_timer->DeltaTime() * 10)
         {
             elapsedTime = m_timer->DeltaTime() * 3;
-            updateMap();
+            // updateMap();
         }
+
+        m_multiplayerSystem->update();
     }
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
@@ -351,12 +351,12 @@ void Dungeon::sendRoomDimensions()
             if (colliderComponent.tag == "Wall")
             {
                 auto sprite = renderComponent.sprite.getGlobalBounds();
-                ObstacleData obstacle{sprite.height, sprite.width, position.x, position.y};
+                ObstacleData obstacle{position.x, position.y};
                 m_obstaclePositions.insert({entity, obstacle});
             }
         }
     }
-    m_multiplayerSystem->setMapDimensions(m_obstaclePositions);
+    m_multiplayerSystem->sendMapDimensions(m_obstaclePositions);
 }
 
 void Dungeon::updateMap()
@@ -382,7 +382,7 @@ void Dungeon::updateMap()
         }
     }
     // std::cout << "Length of the table sent to the server: " << m_obstaclePositions.size() << std::endl;
-    m_multiplayerSystem->updateMap(m_enemyPositions, m_obstaclePositions, m_playersPositions);
+    m_multiplayerSystem->updateMap(m_enemyPositions, m_playersPositions);
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
@@ -412,7 +412,7 @@ void Dungeon::changeRoom(const glm::ivec2& room)
 
 void Dungeon::makeStartFloor()
 {
-    Room room{"110", 0};
+    Room room{"0", 0};
     m_roomMap.clear();
     m_roomMap.emplace(glm::ivec2{0, 0}, room);
     m_currentPlayerPos = {0.f, 0.f};
@@ -592,9 +592,10 @@ void Dungeon::setECS()
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     {
         Signature signature;
-        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        // signature.set(gCoordinator.getComponentType<TransformComponent>());
         signature.set(gCoordinator.getComponentType<MultiplayerComponent>());
-        signature.set(gCoordinator.getComponentType<ColliderComponent>());
+        // signature.set(gCoordinator.getComponentType<ColliderComponent>());
+
         gCoordinator.setSystemSignature<MultiplayerSystem>(signature);
     }
 

@@ -308,13 +308,18 @@ namespace std
 
 struct ObstacleData
 {
-    int height{}, width{}, left{}, top{}; // where x and y are the left top position
+    int left{}, top{}; // where x and y are the left top position
 
     ObstacleData() = default;
 
-    ObstacleData(const float height, const float width, const float left, const float top):
-    height{static_cast<int>(height)}, width{static_cast<int>(width)}, left{static_cast<int>(left)}, top{static_cast<int>(top)}
+    ObstacleData(const float left, const float top):
+    left{static_cast<int>(left)}, top{static_cast<int>(top)}
     {
     }
 
+};
+
+enum class multiplayerType : int
+{
+    MAP_DIMENSION = 1,
 };

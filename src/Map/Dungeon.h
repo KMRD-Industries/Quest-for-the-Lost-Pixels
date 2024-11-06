@@ -84,7 +84,7 @@ private:
     bool m_endGame{};
     Entity m_weapon{};
     std::map<Entity, sf::Vector2<float>> m_enemyPositions;
-    std::map<Entity, ObstacleData> m_obstaclePositions;
+    std::unordered_map<Entity, ObstacleData> m_obstaclePositions;
     std::map<Entity, sf::Vector2<int>> m_playersPositions;
     Timer* m_timer;
     float elapsedTime = 0.0f;

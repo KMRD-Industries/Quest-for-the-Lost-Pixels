@@ -1,6 +1,7 @@
 #include "ObjectCreatorSystem.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
+#include "MultiplayerComponent.h"
 #include "Physics.h"
 #include "PublicConfigMenager.h"
 #include "RenderComponent.h"
@@ -152,6 +153,9 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
     colliderComponent.onCollisionEnter = eventInfo.onCollisionEnter;
     colliderComponent.onCollisionOut = eventInfo.onCollisionOut;
     colliderComponent.tag = eventInfo.tag;
+
+    const auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::MAP_DIMENSION};
+    gCoordinator.addComponent(eventInfo.entity, multiplayerEventComponent);
 }
 
 

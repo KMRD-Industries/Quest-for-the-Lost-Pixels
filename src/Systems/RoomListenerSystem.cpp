@@ -26,6 +26,7 @@ void RoomListenerSystem::reset()
     m_isCurrentRoomClear = false;
     m_lootedRooms.clear();
     m_toLoot = false;
+    m_areEnemiesSpawned = false;
 }
 
 void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)
@@ -43,6 +44,7 @@ void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)
     }
     m_currentRoom = newRoom;
     m_toLoot = false;
+    m_areEnemiesSpawned = false;
 }
 
 void RoomListenerSystem::spawnLoot()

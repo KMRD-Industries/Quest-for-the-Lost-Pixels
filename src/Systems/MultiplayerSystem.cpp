@@ -11,7 +11,11 @@
 #include "Helpers.h"
 #include "MultiplayerSystem.h"
 
+#include <zconf.h>
+#include <zlib.h>
+
 #include "CharacterComponent.h"
+#include "MultiplayerComponent.h"
 #include "SFML/System/Vector3.hpp"
 #include "TransformComponent.h"
 #include "Types.h"
@@ -49,7 +53,8 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port) no
 
         auto r2 = new comm::Room();
         m_position.set_allocated_curr_room(r2);
-        //TODO wyślij tutaj info o wymiarach pierwszej mapy i potem spradź jak działa wysłanie mapy razem z updatem pokoju
+        // TODO wyślij tutaj info o wymiarach pierwszej mapy i potem spradź jak działa wysłanie mapy razem z updatem
+        // pokoju
     }
     catch (boost::system::system_error)
     {
@@ -163,7 +168,6 @@ void MultiplayerSystem::update()
             colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
                                                  colliderComponent.body->GetAngle());
         }
-
     }
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
@@ -181,6 +185,40 @@ void MultiplayerSystem::update()
 
     auto serialized = m_position.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
+
+    std::deque<Entity> entities;
+    for (auto entity : m_entities)
+    {
+        auto multiplayerComponent = gCoordinator.getComponent<MultiplayerComponent>(entity);
+        switch (multiplayerComponent.type)
+        {
+        case multiplayerType::MAP_DIMENSION:
+            if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
+
+            const auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            if (position.x != 0 && position.y != 0)
+            {
+                if (colliderComponent.tag == "Wall")
+                {
+                    ObstacleData obstacle{position.x, position.y};
+                    // printf("Collision detected at position %f, %f\n", position.x, position.y);
+                    m_walls.insert({entity, obstacle});
+                }
+            }
+        }
+        entities.push_back(entity);
+    }
+
+    for (const auto entity : entities)
+    {
+        gCoordinator.removeComponent<MultiplayerComponent>(entity);
+    }
+    if (m_walls.size() > 0)
+    {
+        sendMapDimensions(m_walls);
+        m_walls.clear();
+    }
 }
 
 void MultiplayerSystem::disconnect()
@@ -193,7 +231,6 @@ void MultiplayerSystem::disconnect()
 }
 
 void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& enemies,
-                                  const std::map<Entity, ObstacleData>& obstacles,
                                   const std::map<Entity, sf::Vector2<int>>& players)
 {
     comm::MapPositionsUpdate mapUpdate;
@@ -202,7 +239,7 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
     {
         if (gCoordinator.getServerEntity(enemy.first) == 0)
         {
-            //TODO imo powinno być return
+            // TODO imo powinno być return
             continue;
         }
         // std::cout << "enemy's position: x: " << enemy.second.x << " y: " << enemy.second.y << "\n";
@@ -230,32 +267,54 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
     m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
 
-void MultiplayerSystem::setMapDimensions(const std::map<Entity, ObstacleData>& obstacles)
+void MultiplayerSystem::sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles)
 {
+    printf("Obstacles size %lu\n", obstacles.size());
     comm::MapDimensionsUpdate mapDimensionsUpdate;
+
     for (const auto& obstacle : obstacles)
     {
         comm::Obstacle* obstacle_position = mapDimensionsUpdate.add_obstacles();
 
-        obstacle_position->set_height(obstacle.second.height);
-        obstacle_position->set_width(obstacle.second.width);
         obstacle_position->set_left(obstacle.second.left);
         obstacle_position->set_top(obstacle.second.top);
+        // printf("Obstacle size: %lu\n", obstacle_position->ByteSizeLong());
     }
-    comm::StateUpdate message;
-    message.set_variant(comm::StateVariant::MAP_DIMENSIONS_UPDATE);
-    *message.mutable_mapdimensionsupdate() = mapDimensionsUpdate;
+    printf("Map dimensions size: %d\n", mapDimensionsUpdate.obstacles_size());
 
-    auto serializedMessage = message.SerializeAsString();
-    // std::cout << "Sending map dimension update message, size: " << serializedMessage.size() << "\n";
+    std::vector<char> serializedMapDimensions(mapDimensionsUpdate.ByteSizeLong());
+    mapDimensionsUpdate.SerializeToArray(serializedMapDimensions.data(), serializedMapDimensions.size());
 
-    m_tcp_socket.send(boost::asio::buffer(serializedMessage));
+    std::cout << "Original size: " << serializedMapDimensions.size() << "\n";
+    uLongf compressedSize = compressBound(serializedMapDimensions.size());
+    std::vector<char> compressedMessage(compressedSize);
+
+    if (compress(reinterpret_cast<Bytef*>(compressedMessage.data()), &compressedSize,
+                 reinterpret_cast<const Bytef*>(serializedMapDimensions.data()),
+                 serializedMapDimensions.size()) == Z_OK)
+    {
+        compressedMessage.resize(compressedSize);
+
+        comm::StateUpdate message;
+        message.set_variant(comm::StateVariant::MAP_DIMENSIONS_UPDATE);
+
+        message.set_compressed_map_dimensions_update(compressedMessage.data(), compressedMessage.size());
+        auto serializedMessage = message.SerializeAsString();
+        std::cout << "Sending compressed map dimension update message, compressed size: " << compressedMessage.size()
+                  << "\n";
+        m_tcp_socket.send(boost::asio::buffer(serializedMessage));
+    }
+    else
+    {
+        // TODO zrób obsługę błędu kompresji
+        printf("Failed to send map dimension update message - compression error\n");
+    }
 }
 
 // TODO w przyszłości będzie też zapytanie o stworznie spawnerów
 void MultiplayerSystem::sendSpawnerPosition(std::vector<std::pair<Entity, sf::Vector2<float>>> spawners)
 {
-    //TODO to jest kurwa spawner
+    // TODO to jest kurwa spawner
     comm::EnemyPositionsUpdate spawnEnemyRequest;
 
     for (const auto& spawner : spawners)
