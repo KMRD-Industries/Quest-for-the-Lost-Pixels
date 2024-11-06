@@ -19,7 +19,6 @@
 #include "Types.h"
 
 #include "WeaponComponent.h"
-#include "boost/system/system_error.hpp"
 
 extern Coordinator gCoordinator;
 

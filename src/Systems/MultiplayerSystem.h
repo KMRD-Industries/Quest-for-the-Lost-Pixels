@@ -19,6 +19,7 @@ struct ItemGenerator
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
+
 class MultiplayerSystem : public System
 {
 private:
