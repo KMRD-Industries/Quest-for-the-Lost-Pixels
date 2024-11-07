@@ -106,7 +106,10 @@ void Dungeon::init()
         }
     }
     else
+    {
+        m_multiplayerSystem->playerConnected(m_id, config::playerEntity);
         std::cout << "Starting in single-player mode\n";
+    }
 
     if (m_multiplayerSystem->isConnected()) m_multiplayerSystem->setRoom(m_currentPlayerPos);
 
