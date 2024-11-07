@@ -24,9 +24,11 @@ class MultiplayerSystem : public System
 {
 private:
     bool m_connected = false;
+    bool m_alive = true;
     bool m_inside_initial_room = true;
     Entity m_player_entity = 0;
     uint32_t m_player_id = 0;
+    int64_t m_seed = 0;
 
     boost::asio::io_context m_io_context;
     tcp::socket m_tcp_socket;
@@ -54,11 +56,13 @@ public:
     void setRoom(const glm::ivec2& room) noexcept;
     void playerConnected(const uint32_t id, const Entity entity) noexcept;
     void playerDisconnected(const uint32_t id) noexcept;
+    void playerKilled(const Entity entity);
     void registerItem(const uint32_t id, const Entity entity);
     void updateItemEntity(const Entity oldEntity, const Entity newEntity);
     void itemEquipped(const GameType::PickUpInfo& entity);
     void roomChanged(const glm::ivec2& room);
     void roomCleared();
+    void levelChanged();
     void onAttack();
     void update();
     void disconnect();
@@ -69,6 +73,8 @@ public:
     const glm::ivec2& getRoom() const noexcept;
     const ItemGenerator& getItemGenerator();
     Entity getItemEntity(const uint32_t id);
+    int64_t getSeed();
+    const std::unordered_map<uint32_t, Entity>& getPlayers();
     comm::InitialInfo registerPlayer(const Entity player);
     const comm::StateUpdate& pollStateUpdates();
 };

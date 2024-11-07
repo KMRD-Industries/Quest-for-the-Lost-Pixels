@@ -102,7 +102,6 @@ void Dungeon::init()
         {
             const uint32_t playerID = player.id();
             createRemotePlayer(player);
-            m_players.insert(playerID);
             std::cout << "Connected remote player: " << playerID << '\n';
         }
     }
@@ -116,7 +115,6 @@ void Dungeon::init()
     loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
 
     m_entities[m_id] = config::playerEntity;
-    m_players.insert(m_id);
 
     addPlayerComponents(m_entities[m_id]);
     setupPlayerCollision(m_entities[m_id]);
@@ -311,17 +309,21 @@ void Dungeon::update(const float deltaTime)
         {
         case comm::DISCONNECTED:
             m_multiplayerSystem->playerDisconnected(playerID);
-            m_players.erase(playerID);
             break;
         case comm::CONNECTED:
             createRemotePlayer(player);
-            m_players.insert(playerID);
+            break;
+        case comm::PLAYER_DIED:
+            m_multiplayerSystem->playerDisconnected(playerID);
             break;
         case comm::ROOM_CHANGED:
-            changeRoom(m_multiplayerSystem->getRoom());
+            changeRoom(m_multiplayerSystem->getRoom(), false);
             break;
         case comm::ROOM_CLEARED:
             m_roomListenerSystem->spawnLoot();
+            break;
+        case comm::LEVEL_CHANGED:
+            changeRoom(m_multiplayerSystem->getRoom(), true);
             break;
         case comm::ITEM_EQUIPPED:
             switch (item.type())
@@ -431,9 +433,8 @@ void Dungeon::moveDownDungeon()
 
     b2Vec2 colliderPosition{};
 
-    for (uint32_t id : m_players)
+    for (const auto& [id, player] : m_multiplayerSystem->getPlayers())
     {
-        Entity player = m_entities[id];
         auto transformComponent = gCoordinator.getComponent<TransformComponent>(player);
 
         transformComponent.position = {getSpawnOffset(pos.x, id), getSpawnOffset(pos.y, id)};
@@ -450,8 +451,8 @@ void Dungeon::moveDownDungeon()
 
     m_roomListenerSystem->reset();
 
-    if (m_multiplayerSystem->isConnected() && m_multiplayerSystem->isInsideInitialRoom(true))
-        m_multiplayerSystem->roomChanged(m_currentPlayerPos);
+    if (m_multiplayerSystem->isConnected())
+        m_multiplayerSystem->levelChanged();
 }
 
 void Dungeon::moveInDungeon(const glm::ivec2& dir)
@@ -473,9 +474,8 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 
         b2Vec2 colliderPosition{};
 
-        for (const auto id : m_players)
+        for (const auto& [id, player] : m_multiplayerSystem->getPlayers())
         {
-            const Entity player = m_entities[id];
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(player);
 
             transformComponent.position = position + offset + GameType::MyVec2(id, id);
@@ -493,14 +493,14 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
 }
 
 // when room is changed by remote player
-void Dungeon::changeRoom(const glm::ivec2& room)
+void Dungeon::changeRoom(const glm::ivec2& room, const bool changeLevel)
 {
     GameType::MyVec2 position{0.0, 0.0};
     b2Vec2 colliderPosition{};
     glm::vec2 offset{};
 
     bool insideInitialRoom = m_multiplayerSystem->isInsideInitialRoom(true);
-    if (insideInitialRoom)
+    if (changeLevel)
     {
         gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
         makeSimpleFloor();
@@ -526,9 +526,8 @@ void Dungeon::changeRoom(const glm::ivec2& room)
         offset = glm::vec2{dir.x * 100, -dir.y * 100};
     }
 
-    for (const auto id : m_players)
+    for (const auto& [id, player] : m_multiplayerSystem->getPlayers())
     {
-        const Entity player = m_entities[id];
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(player);
 
         if (insideInitialRoom)
@@ -554,9 +553,9 @@ float Dungeon::getSpawnOffset(const float position, const uint32_t id)
 
 void Dungeon::checkForEndOfTheGame()
 {
-    for (const Entity player : m_players)
+    for (const auto& [id, player] : m_multiplayerSystem->getPlayers())
     {
-        if (gCoordinator.hasComponent<PlayerComponent>(m_entities[player])) return;
+        if (gCoordinator.hasComponent<PlayerComponent>(player)) return;
     }
     m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<LostGameState>()});
 }

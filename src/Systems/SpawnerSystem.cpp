@@ -8,6 +8,8 @@
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "Helpers.h"
+#include "MultiplayerComponent.h"
+#include "MultiplayerSystem.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "ResourceManager.h"
@@ -73,7 +75,9 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
         {
             if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
-            if (!gCoordinator.hasComponent<CharacterComponent>(collisionData.entityID)) return;
+            if (!gCoordinator.hasComponent<CharacterComponent>(collisionData.entityID) ||
+                gCoordinator.hasComponent<MultiplayerComponent>(collisionData.entityID))
+                return;
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
             playerCharacterComponent.attacked = true;
 
@@ -81,10 +85,10 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
             if (playerCharacterComponent.hp <= 0)
             {
                 ResourceManager::getInstance().setCurrentShader(video::FragmentShader::DEATH);
-                gCoordinator.removeComponent<CharacterComponent>(collisionData.entityID);
                 gCoordinator.removeComponent<RenderComponent>(collisionData.entityID);
                 gCoordinator.removeComponent<PlayerComponent>(collisionData.entityID);
                 gCoordinator.getComponent<ColliderComponent>(collisionData.entityID).toRemoveCollider = true;
+                gCoordinator.getRegisterSystem<MultiplayerSystem>()->playerKilled(collisionData.entityID);
             }
 
             const Entity tag = gCoordinator.createEntity();

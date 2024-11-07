@@ -128,6 +128,14 @@ void MultiplayerSystem::roomCleared()
     m_tcp_socket.send(boost::asio::buffer(serialized));
 }
 
+void MultiplayerSystem::levelChanged()
+{
+    m_state.set_variant(comm::LEVEL_CHANGED);
+    const auto serialized = m_state.SerializeAsString();
+
+    m_tcp_socket.send(boost::asio::buffer(serialized));
+}
+
 void MultiplayerSystem::onAttack() { m_outgoing_movement.set_attack(true); }
 
 bool MultiplayerSystem::isInsideInitialRoom(const bool change) noexcept
@@ -151,6 +159,8 @@ comm::InitialInfo MultiplayerSystem::registerPlayer(const Entity playerEntity)
     m_entity_map[id] = playerEntity;
     m_player_entity = playerEntity;
     m_player_id = id;
+
+    m_seed = initialInfo.seed();
 
     const auto& nextItem = initialInfo.next_item();
     m_item_generator.id = nextItem.id();
@@ -221,6 +231,24 @@ void MultiplayerSystem::playerDisconnected(const uint32_t id) noexcept
     }
     m_entity_map.erase(id);
 }
+void MultiplayerSystem::playerKilled(const Entity entity)
+{
+    m_alive = false;
+    for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[m_player_id]).slots)
+    {
+        if (slot.second != 0)
+        {
+            m_registered_items.erase(slot.second);
+            gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
+        }
+    }
+
+    m_state.set_variant(comm::PLAYER_DIED);
+    m_state.mutable_player()->set_id(m_player_id);
+    const auto serialized = m_state.SerializeAsString();
+
+    m_tcp_socket.send(boost::asio::buffer(serialized));
+}
 
 void MultiplayerSystem::registerItem(const uint32_t id, const Entity entity) { m_registered_items[id] = entity; }
 
@@ -273,6 +301,10 @@ void MultiplayerSystem::itemEquipped(const GameType::PickUpInfo& pickUpInfo)
     }
 }
 
+int64_t MultiplayerSystem::getSeed() { return m_seed; }
+
+const std::unordered_map<uint32_t, Entity>& MultiplayerSystem::getPlayers() { return m_entity_map; }
+
 void MultiplayerSystem::update()
 {
     std::size_t received = 0;
@@ -320,6 +352,8 @@ void MultiplayerSystem::update()
                                                  colliderComponent.body->GetAngle());
         }
     }
+
+    if (!m_alive) return;
 
     auto tick = sysClock::now();
     if (!readyToTick(m_last_tick, tick)) return;

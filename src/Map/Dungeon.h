@@ -57,7 +57,7 @@ private:
     void makeSimpleFloor();
     void createRemotePlayer(const comm::Player& player);
     void moveInDungeon(const glm::ivec2& dir);
-    void changeRoom(const glm::ivec2& dir);
+    void changeRoom(const glm::ivec2& dir, const bool changeLevel);
     void clearDungeon();
     void loadMap(const std::string& path) const;
     void checkForEndOfTheGame();
