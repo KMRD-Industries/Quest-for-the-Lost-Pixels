@@ -70,7 +70,6 @@ private:
     std::vector<Entity> m_entities{};
     uint32_t m_id{};
     int64_t m_seed{};
-    std::set<uint32_t> m_players{};
     std::deque<glm::ivec2> m_moveInDungeon;
     float counter;
     bool m_passedBy;
