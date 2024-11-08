@@ -1,13 +1,13 @@
 {
-    "activeFile": "assets/maps/floor_01/map_17.json",
+    "activeFile": "assets/tileSets/CosmicLilac.json",
     "expandedProjectPaths": [
-        "assets/maps",
         "assets/maps/floor_01",
-        "assets/tileSets",
-        "assets",
+        "assets/maps",
         "build",
         ".",
-        "assets/maps/floor_00"
+        "assets",
+        "assets/maps/floor_00",
+        "assets/tileSets"
     ],
     "file.lastUsedOpenFilter": "Wszystkie pliki (*)",
     "fileStates": {
@@ -76,7 +76,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 120.08496577767289,
-                "y": 119.80174651876327
+                "y": 119.94335614821809
             }
         },
         "assets/maps/floor_01/map_16.json": {
@@ -84,23 +84,63 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 120.08496577767289,
-                "y": 120.08496577767288
+                "y": 119.94335614821809
             }
         },
         "assets/maps/floor_01/map_17.json": {
             "scale": 2,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 140.5,
-                "y": 194
+                "x": 400,
+                "y": 200.25
+            }
+        },
+        "assets/maps/floor_01/map_18.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 312,
+                "y": 320.5
+            }
+        },
+        "assets/maps/floor_01/map_19.json": {
+            "scale": 2,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 172,
+                "y": 173.25
+            }
+        },
+        "assets/maps/floor_01/map_20.json": {
+            "scale": 1.5,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 127.99999999999997,
+                "y": 127.66666666666669
+            }
+        },
+        "assets/maps/floor_01/map_21.json": {
+            "scale": 3,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 128.66666666666669,
+                "y": 126.16666666666664
+            }
+        },
+        "assets/maps/floor_01/map_22.json": {
+            "scale": 4,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 90.5,
+                "y": 87.875
             }
         },
         "assets/maps/floor_01/map_3.json": {
             "scale": 3.0726562499999996,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 159.79659293160438,
-                "y": 40.03051106025933
+                "x": 148.0803457920163,
+                "y": 39.86778540554285
             }
         },
         "assets/maps/floor_01/map_4.json": {
@@ -108,15 +148,15 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 120.08496577767289,
-                "y": 120.08496577767288
+                "y": 119.94335614821809
             }
         },
         "assets/maps/floor_01/map_5.json": {
             "scale": 2.3635817307692304,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 207.94711416221716,
-                "y": 120.15662344266465
+                "x": 208.1586575133486,
+                "y": 119.9450800915332
             }
         },
         "assets/maps/floor_01/map_6.json": {
@@ -124,7 +164,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 208.1586575133486,
-                "y": 119.73353674040172
+                "y": 119.9450800915332
             }
         },
         "assets/maps/floor_01/map_7.json": {
@@ -435,8 +475,13 @@
             "scaleInDock": 1,
             "scaleInEditor": 8
         },
+        "assets/tileSets/CosmicLegacy.json": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "assets/tileSets/CosmicLilac.json": {
-            "scaleInDock": 1
+            "scaleInDock": 3,
+            "scaleInEditor": 3
         },
         "assets/tileSets/Decorative.json": {
             "scaleInDock": 1
@@ -452,7 +497,8 @@
             "scaleInEditor": 5.5
         },
         "assets/tileSets/Jungle.json": {
-            "scaleInDock": 1
+            "scaleInDock": 2,
+            "scaleInEditor": 1
         },
         "assets/tileSets/SpecialBlocks.json": {
             "scaleInDock": 1,
@@ -475,7 +521,15 @@
         "assets/maps/floor_01/map_6.json",
         "assets/maps/floor_01/map_4.json",
         "assets/maps/floor_01/map_15.json",
-        "assets/maps/floor_01/map_17.json"
+        "assets/maps/floor_01/map_17.json",
+        "assets/maps/floor_01/map_18.json",
+        "assets/tileSets/CosmicLilac.json",
+        "assets/maps/floor_01/map_5.json",
+        "assets/maps/floor_01/map_20.json",
+        "assets/maps/floor_01/map_21.json",
+        "assets/tileSets/Jungle.json",
+        "assets/maps/floor_01/map_22.json",
+        "assets/tileSets/CosmicLegacy.json"
     ],
     "project": "bez nazwy.tiled-project",
     "recentFiles": [
@@ -490,7 +544,7 @@
         "assets/maps/floor_01/map_4.json",
         "assets/maps/floor_01/map_15.json",
         "assets/maps/floor_01/map_17.json",
-        "assets/maps/floor_01/map_110.json"
+        "assets/maps/floor_01/map_18.json"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {

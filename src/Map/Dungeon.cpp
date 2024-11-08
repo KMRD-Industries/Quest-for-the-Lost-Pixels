@@ -346,7 +346,7 @@ void Dungeon::changeRoom(const glm::ivec2& room)
 
 void Dungeon::makeStartFloor()
 {
-    Room room{"0", 0};
+    Room room{"17", 1};
     m_roomMap.clear();
     m_roomMap.emplace(glm::ivec2{0, 0}, room);
     m_currentPlayerPos = {0.f, 0.f};

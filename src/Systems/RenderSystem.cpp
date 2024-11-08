@@ -117,26 +117,15 @@ void RenderSystem::updateCamera(Camera& camera, const sf::Vector2f targetPos, co
     halfView.x = static_cast<float>(windowSize.x) / 2;
     halfView.y = static_cast<float>(windowSize.y) / 2;
 
-    // Check if the map is larger than window.
-    // If the map is larger, we need to ensure that the camera view
-    // stays within the boundaries of the map while following the target position.
-    if (GameUtility::mapWidth > static_cast<float>(windowSize.x) &&
-        GameUtility::mapHeight > static_cast<float>(windowSize.y))
-    {
-        // Clamp the camera position to ensure it stays within the boundaries of the map.
-        // This prevents the camera from moving too far to the left or right,
-        // without exposing empty space - outsides of map.
-        const float clampedX = std::clamp(targetPos.x, halfView.x, GameUtility::mapWidth - halfView.x);
-        const float clampedY = std::clamp(targetPos.y, halfView.y, GameUtility::mapHeight - halfView.y);
-        camera.setPosition({clampedX, clampedY});
-    }
-    else
-    {
-        // If whole map can be displayed on window, then set camera to the middle of the window
-        const float centerX = GameUtility::mapWidth / 2.0f;
-        const float centerY = GameUtility::mapHeight / 2.0f;
-        camera.setPosition({centerX, centerY});
-    }
+    // Clamp the camera position to ensure it stays within the boundaries of the map.
+    // This prevents the camera from moving too far to the left or right,
+    // without exposing empty space - outsides of map.
+
+    const float clampedX = std::clamp(targetPos.x, halfView.x, GameUtility::mapWidth - halfView.x);
+    const float clampedY = std::clamp(targetPos.y, halfView.y, GameUtility::mapHeight - halfView.y);
+    camera.setPosition({clampedX, clampedY});
+
+    // camera.setPosition(targetPos);
 
     // Set camera size to match window size
     camera.setSize(windowSize);
