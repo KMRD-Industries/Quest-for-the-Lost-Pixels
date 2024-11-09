@@ -5,6 +5,7 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "DealDMGToEnemyEvent.h"
+#include "MultiplayerComponent.h"
 #include "WeaponComponent.h"
 #include "WeaponSwingComponent.h"
 
@@ -39,6 +40,10 @@ void WeaponBindSystem::update()
 
                 swingComponent.enemyHited.insert(data.entityID);
                 gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
+
+                constexpr auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::ENEMY_GOT_HIT};
+                gCoordinator.addComponent(data.entityID, multiplayerEventComponent);
+
             },
             [entity](const GameType::CollisionData& data)
             {

@@ -33,8 +33,12 @@ private:
     std::unordered_map<std::uint32_t, ObstacleData> m_walls{};
     std::map<Entity, sf::Vector2<float>> m_enemyPositions;
     std::map<Entity, sf::Vector2<int>> m_playersPositions;
+    std::vector<std::pair<Entity, sf::Vector2<float>>> m_spawners{};
     float m_frameTime{};
     CollisionSystem* m_collisionSystem;
+    void enemyGotHitUpdate(Entity enemyId);
+    bool isMapDimensionsSent{};
+    bool areSpawnersSent{};
 
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
@@ -49,7 +53,6 @@ public:
                    const std::map<Entity, sf::Vector2<int>>& players);
     void sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles);
     void sendSpawnerPosition(std::vector<std::pair<Entity, sf::Vector2<float>>> spawners);
-    void updateEnemyHp(Entity id, float hp, sf::Vector2<float> position);
     void disconnect();
 
     bool isConnected() const noexcept;

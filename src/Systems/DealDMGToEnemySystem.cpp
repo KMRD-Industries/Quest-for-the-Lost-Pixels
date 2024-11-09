@@ -3,6 +3,7 @@
 #include "CharacterComponent.h"
 #include "Coordinator.h"
 #include "DealDMGToEnemyEvent.h"
+#include "MultiplayerComponent.h"
 #include "TextTagComponent.h"
 #include "TransformComponent.h"
 

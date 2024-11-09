@@ -348,27 +348,27 @@ void Dungeon::sendRoomDimensions()
 
 void Dungeon::updateMap()
 {
-    for (const auto entity : m_collisionSystem->m_entities)
-    {
-        if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
-
-        auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
-        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-        if (position.x != 0 && position.y != 0)
-        {
-            if (colliderComponent.tag == "Enemy")
-            {
-                // TODO sprawdź czy to poprawne tak dodawać do mapy w c++
-                m_enemyPositions[entity] = {position.x, position.y};
-            }
-            // TODO regex może overkill sprawdź jakieś prostsze
-            else if (std::regex_match(colliderComponent.tag, config::playerRegexTag))
-            {
-                m_playersPositions[entity] = {static_cast<int>(position.x), static_cast<int>(position.y)};
-            }
-        }
-    }
-    m_multiplayerSystem->updateMap(m_enemyPositions, m_playersPositions);
+    // for (const auto entity : m_collisionSystem->m_entities)
+    // {
+    //     if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
+    //
+    //     auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
+    //     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+    //     if (position.x != 0 && position.y != 0)
+    //     {
+    //         if (colliderComponent.tag == "Enemy")
+    //         {
+    //             // TODO sprawdź czy to poprawne tak dodawać do mapy w c++
+    //             m_enemyPositions[entity] = {position.x, position.y};
+    //         }
+    //         // TODO regex może overkill sprawdź jakieś prostsze
+    //         else if (std::regex_match(colliderComponent.tag, config::playerRegexTag))
+    //         {
+    //             m_playersPositions[entity] = {static_cast<int>(position.x), static_cast<int>(position.y)};
+    //         }
+    //     }
+    // }
+    // m_multiplayerSystem->updateMap(m_enemyPositions, m_playersPositions);
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)

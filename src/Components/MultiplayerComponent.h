@@ -1,4 +1,5 @@
 #pragma once
+#include "GameTypes.h"
 
 struct MultiplayerComponent
 {

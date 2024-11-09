@@ -8,8 +8,9 @@
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
 #include "Helpers.h"
-#include "PlayerComponent.h"
+#include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "ResourceManager.h"
 #include "SpawnerComponent.h"
@@ -166,18 +167,20 @@ std::vector<std::pair<Entity, sf::Vector2<float>>> SpawnerSystem::getSortedSpawn
 
 void SpawnerSystem::prepareEnemies()
 {
-    for (auto enemyEntity : m_entities)
+    for (const auto enemyEntity : m_entities)
     {
-        m_spawnedEnemies.push_back(
-            std::make_pair(enemyEntity, gCoordinator.getComponent<TransformComponent>(enemyEntity).position));
+        constexpr auto multiplayerComponent = MultiplayerComponent{.type = multiplayerType::SEND_SPAWNERS_POSITIONS};
+        gCoordinator.addComponent(enemyEntity, multiplayerComponent);
+        // m_spawnedEnemies.push_back(
+        //     std::make_pair(enemyEntity, gCoordinator.getComponent<TransformComponent>(enemyEntity).position));
     }
-
-    std::sort(m_spawnedEnemies.begin(), m_spawnedEnemies.end(),
-              [](const std::pair<Entity, sf::Vector2<float>>& a, const std::pair<Entity, sf::Vector2<float>>& b)
-              { return a.second.x > b.second.x; });
-
-    std::shared_ptr<MultiplayerSystem> multiplayer_system = gCoordinator.getRegisterSystem<MultiplayerSystem>();
-    multiplayer_system->sendSpawnerPosition(m_spawnedEnemies);
+    //
+    // std::sort(m_spawnedEnemies.begin(), m_spawnedEnemies.end(),
+    //           [](const std::pair<Entity, sf::Vector2<float>>& a, const std::pair<Entity, sf::Vector2<float>>& b)
+    //           { return a.second.x > b.second.x; });
+    //
+    // std::shared_ptr<MultiplayerSystem> multiplayer_system = gCoordinator.getRegisterSystem<MultiplayerSystem>();
+    // multiplayer_system->sendSpawnerPosition(m_spawnedEnemies);
 }
 
 void SpawnerSystem::spawnOnDemand(const comm::EnemyPositionsUpdate& enemiesToSpawn) const

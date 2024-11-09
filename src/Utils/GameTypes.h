@@ -321,5 +321,7 @@ struct ObstacleData
 
 enum class multiplayerType : int
 {
-    MAP_DIMENSION = 1,
+    ROOM_DIMENSIONS_CHANGED = 1,
+    ENEMY_GOT_HIT = 2,
+    SEND_SPAWNERS_POSITIONS = 3,
 };

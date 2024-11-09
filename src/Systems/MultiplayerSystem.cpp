@@ -76,18 +76,6 @@ void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
 
 glm::ivec2& MultiplayerSystem::getRoom() noexcept { return m_current_room; }
 
-std::string MultiplayerSystem::addMessageSize(const std::string& serializedMsg)
-{
-    std::string msgWithSize;
-    msgWithSize.reserve(2 + serializedMsg.size());
-
-    uint16_t size = htons(static_cast<uint16_t>(serializedMsg.size()));
-    msgWithSize.append(reinterpret_cast<const char*>(&size), 2);
-
-    msgWithSize.append(serializedMsg);
-    return msgWithSize;
-}
-
 void MultiplayerSystem::roomChanged(const glm::ivec2& room)
 {
     setRoom(room);
@@ -95,6 +83,8 @@ void MultiplayerSystem::roomChanged(const glm::ivec2& room)
     m_state.set_variant(comm::ROOM_CHANGED);
     auto serialized = m_state.SerializeAsString();
     printf("Sending room change update\n");
+    isMapDimensionsSent = false;
+    areSpawnersSent = false;
 
     m_tcp_socket.send(boost::asio::buffer(addMessageSize(serialized)));
 }
@@ -150,6 +140,19 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
 void MultiplayerSystem::entityConnected(const uint32_t id, const Entity entity) noexcept { m_entity_map[id] = entity; }
 void MultiplayerSystem::entityDisconnected(const uint32_t id) noexcept { m_entity_map.erase(id); }
 
+
+std::string MultiplayerSystem::addMessageSize(const std::string& serializedMsg)
+{
+    std::string msgWithSize;
+    msgWithSize.reserve(2 + serializedMsg.size());
+
+    uint16_t size = htons(static_cast<uint16_t>(serializedMsg.size()));
+    msgWithSize.append(reinterpret_cast<const char*>(&size), 2);
+
+    msgWithSize.append(serializedMsg);
+    return msgWithSize;
+}
+
 void MultiplayerSystem::update(const float deltaTime)
 {
     std::size_t received = 0;
@@ -193,6 +196,10 @@ void MultiplayerSystem::update(const float deltaTime)
     m_position.set_x(next.x);
     m_position.set_y(next.y);
     m_position.set_direction(next.z);
+    // comm::StateUpdate update;
+    // TODO jak zadziała to do zmiany
+    // update.set_allocated_positionupdate(&m_position);
+    // update.set_variant(comm::PLAYER_POSITION_UPDATE);
 
     auto serialized = m_position.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
@@ -203,20 +210,40 @@ void MultiplayerSystem::update(const float deltaTime)
         auto multiplayerComponent = gCoordinator.getComponent<MultiplayerComponent>(entity);
         switch (multiplayerComponent.type)
         {
-        case multiplayerType::MAP_DIMENSION:
-            if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
-
-            const auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
-            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-            if (position.x != 0 && position.y != 0)
+        case multiplayerType::ROOM_DIMENSIONS_CHANGED:
             {
-                if (colliderComponent.tag == "Wall")
+                if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
+
+                const auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
+                auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+                // TODO sprawdź co się stanie jak wywalisz tego ifa
+                if (position.x != 0 && position.y != 0)
                 {
-                    ObstacleData obstacle{position.x, position.y};
-                    // printf("Collision detected at position %f, %f\n", position.x, position.y);
-                    m_walls.insert({entity, obstacle});
+                    if (colliderComponent.tag == "Wall")
+                    {
+                        ObstacleData obstacle{position.x, position.y};
+                        // printf("Collision detected at position %f, %f\n", position.x, position.y);
+                        m_walls.insert({entity, obstacle});
+                    }
                 }
+
+                break;
             }
+        case multiplayerType::ENEMY_GOT_HIT:
+            {
+                printf("enemy got hit\n");
+
+                break;
+            }
+        case multiplayerType::SEND_SPAWNERS_POSITIONS:
+            {
+                m_spawners.push_back(
+                    std::make_pair(entity, gCoordinator.getComponent<TransformComponent>(entity).position));
+
+                break;
+            }
+        default:
+            break;
         }
         entities.push_back(entity);
     }
@@ -225,14 +252,25 @@ void MultiplayerSystem::update(const float deltaTime)
     {
         gCoordinator.removeComponent<MultiplayerComponent>(entity);
     }
-    if (m_walls.size() > 0)
+
+    if (!m_walls.empty())
     {
         sendMapDimensions(m_walls);
         m_walls.clear();
+        isMapDimensionsSent = true;
     }
 
+    if (m_frameTime >= configSingleton.GetConfig().oneFrameTime * 500 && !m_spawners.empty() && isMapDimensionsSent)
+    {
+        std::sort(m_spawners.begin(), m_spawners.end(),
+                  [](const std::pair<Entity, sf::Vector2<float>>& a, const std::pair<Entity, sf::Vector2<float>>& b)
+                  { return a.second.x > b.second.x; });
+        sendSpawnerPosition(m_spawners);
+        m_spawners.clear();
+        areSpawnersSent = true;
+    }
 
-    if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 1000)
+    if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 2000 && areSpawnersSent)
     {
         auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
         for (const auto entity : collisionSystem->m_entities)
@@ -256,7 +294,7 @@ void MultiplayerSystem::update(const float deltaTime)
             }
         }
         updateMap(m_enemyPositions, m_playersPositions);
-        m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
+        m_frameTime -= configSingleton.GetConfig().oneFrameTime * 2000;
     }
 }
 
@@ -273,7 +311,6 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
                                   const std::map<Entity, sf::Vector2<int>>& players)
 {
     comm::MapPositionsUpdate mapUpdate;
-    // std::cout << "another update!!!!\n";
     for (const auto& enemy : enemies)
     {
         if (gCoordinator.getServerEntity(enemy.first) == 0)
@@ -281,7 +318,6 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
             // TODO imo powinno być return
             continue;
         }
-        // std::cout << "enemy's position: x: " << enemy.second.x << " y: " << enemy.second.y << "\n";
         comm::Enemy* enemy_position = mapUpdate.add_enemies();
         enemy_position->set_x(enemy.second.x);
         enemy_position->set_y(enemy.second.y);
@@ -298,17 +334,16 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
 
     comm::StateUpdate message;
     message.set_variant(comm::StateVariant::MAP_UPDATE);
+    // message.set_allocated_mappositionsupdate(&mapUpdate);
     *message.mutable_mappositionsupdate() = mapUpdate;
 
     auto serializedMessage = message.SerializeAsString();
-    // std::cout << "Sending map updated message, size: " << serializedMessage.size() << "\n";
 
-    m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
+    m_tcp_socket.send(boost::asio::buffer(serializedMessage));
 }
 
 void MultiplayerSystem::sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles)
 {
-    printf("Obstacles size %lu\n", obstacles.size());
     comm::MapDimensionsUpdate mapDimensionsUpdate;
 
     for (const auto& obstacle : obstacles)
@@ -342,6 +377,8 @@ void MultiplayerSystem::sendMapDimensions(const std::unordered_map<Entity, Obsta
         std::cout << "Sending compressed map dimension update message, compressed size: " << compressedMessage.size()
                   << "\n";
 
+        auto available = m_tcp_socket.available();
+        printf("[Dimensions Update]Available space in tcp_socket: %lu, message size: %lu\n", available, serializedMessage.size());
         m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
     }
     else
@@ -369,10 +406,12 @@ void MultiplayerSystem::sendSpawnerPosition(std::vector<std::pair<Entity, sf::Ve
     message.set_variant(comm::StateVariant::SPAWN_ENEMY_REQUEST);
 
     auto serializedMessage = message.SerializeAsString();
+    printf("sending spawners position\n");
+    printf("[EnemyPositionUpdate]Available space in tcp_socket: %lu, message size: %lu\n", m_tcp_socket.available(), serializedMessage.size());
     m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
 }
 
-void MultiplayerSystem::updateEnemyHp(Entity id, float hp, sf::Vector2<float> position)
+void MultiplayerSystem::enemyGotHitUpdate(Entity enemyId)
 {
 
 }
