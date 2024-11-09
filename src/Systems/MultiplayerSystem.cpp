@@ -53,8 +53,6 @@ void MultiplayerSystem::setup(const std::string& ip, const std::string& port) no
 
         auto r2 = new comm::Room();
         m_position.set_allocated_curr_room(r2);
-        // TODO wyślij tutaj info o wymiarach pierwszej mapy i potem spradź jak działa wysłanie mapy razem z updatem
-        // pokoju
     }
     catch (boost::system::system_error)
     {
@@ -78,14 +76,27 @@ void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
 
 glm::ivec2& MultiplayerSystem::getRoom() noexcept { return m_current_room; }
 
+std::string MultiplayerSystem::addMessageSize(const std::string& serializedMsg)
+{
+    std::string msgWithSize;
+    msgWithSize.reserve(2 + serializedMsg.size());
+
+    uint16_t size = htons(static_cast<uint16_t>(serializedMsg.size()));
+    msgWithSize.append(reinterpret_cast<const char*>(&size), 2);
+
+    msgWithSize.append(serializedMsg);
+    return msgWithSize;
+}
+
 void MultiplayerSystem::roomChanged(const glm::ivec2& room)
 {
     setRoom(room);
 
     m_state.set_variant(comm::ROOM_CHANGED);
     auto serialized = m_state.SerializeAsString();
+    printf("Sending room change update\n");
 
-    m_tcp_socket.send(boost::asio::buffer(serialized));
+    m_tcp_socket.send(boost::asio::buffer(addMessageSize(serialized)));
 }
 
 bool MultiplayerSystem::isConnected() const noexcept { return m_connected; }
@@ -139,7 +150,7 @@ comm::StateUpdate MultiplayerSystem::pollStateUpdates()
 void MultiplayerSystem::entityConnected(const uint32_t id, const Entity entity) noexcept { m_entity_map[id] = entity; }
 void MultiplayerSystem::entityDisconnected(const uint32_t id) noexcept { m_entity_map.erase(id); }
 
-void MultiplayerSystem::update()
+void MultiplayerSystem::update(const float deltaTime)
 {
     std::size_t received = 0;
     const std::size_t available = m_udp_socket.available();
@@ -219,6 +230,34 @@ void MultiplayerSystem::update()
         sendMapDimensions(m_walls);
         m_walls.clear();
     }
+
+
+    if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * 1000)
+    {
+        auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+        for (const auto entity : collisionSystem->m_entities)
+        {
+            if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
+
+            auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
+            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+            if (position.x != 0 && position.y != 0)
+            {
+                if (colliderComponent.tag == "Enemy")
+                {
+                    // TODO sprawdź czy to poprawne tak dodawać do mapy w c++
+                    m_enemyPositions[entity] = {position.x, position.y};
+                }
+                // TODO regex może overkill sprawdź jakieś prostsze
+                else if (std::regex_match(colliderComponent.tag, config::playerRegexTag))
+                {
+                    m_playersPositions[entity] = {static_cast<int>(position.x), static_cast<int>(position.y)};
+                }
+            }
+        }
+        updateMap(m_enemyPositions, m_playersPositions);
+        m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
+    }
 }
 
 void MultiplayerSystem::disconnect()
@@ -264,7 +303,7 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
     auto serializedMessage = message.SerializeAsString();
     // std::cout << "Sending map updated message, size: " << serializedMessage.size() << "\n";
 
-    m_tcp_socket.send(boost::asio::buffer(serializedMessage));
+    m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
 }
 
 void MultiplayerSystem::sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles)
@@ -302,7 +341,8 @@ void MultiplayerSystem::sendMapDimensions(const std::unordered_map<Entity, Obsta
         auto serializedMessage = message.SerializeAsString();
         std::cout << "Sending compressed map dimension update message, compressed size: " << compressedMessage.size()
                   << "\n";
-        m_tcp_socket.send(boost::asio::buffer(serializedMessage));
+
+        m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
     }
     else
     {
@@ -314,7 +354,6 @@ void MultiplayerSystem::sendMapDimensions(const std::unordered_map<Entity, Obsta
 // TODO w przyszłości będzie też zapytanie o stworznie spawnerów
 void MultiplayerSystem::sendSpawnerPosition(std::vector<std::pair<Entity, sf::Vector2<float>>> spawners)
 {
-    // TODO to jest kurwa spawner
     comm::EnemyPositionsUpdate spawnEnemyRequest;
 
     for (const auto& spawner : spawners)
@@ -330,7 +369,7 @@ void MultiplayerSystem::sendSpawnerPosition(std::vector<std::pair<Entity, sf::Ve
     message.set_variant(comm::StateVariant::SPAWN_ENEMY_REQUEST);
 
     auto serializedMessage = message.SerializeAsString();
-    m_tcp_socket.send(boost::asio::buffer(serializedMessage));
+    m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
 }
 
 void MultiplayerSystem::updateEnemyHp(Entity id, float hp, sf::Vector2<float> position)

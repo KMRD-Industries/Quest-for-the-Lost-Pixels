@@ -246,6 +246,9 @@ void Dungeon::setupHelmetEntity(const Entity player) const
     m_inventorySystem->pickUpItem(GameType::PickUpInfo{player, helmetEntity, GameType::slotType::HELMET});
 }
 
+//TODO dalej jest problem z wysyłaniem drugiej mapy - podczas przechodzenia z pokoju startowego do pierwszego pokoju w grze
+// nie jest odbierana mapa na serwerze, wynika to z tego, że flaga odpowiedzialna za updatowanie mapy jest false, bo
+// prawdopodobnie przejście z pokoju start do pokoju1 nie jest rejestrowane jako changeRoom(), idk czemu
 void Dungeon::update(const float deltaTime)
 {
     m_itemSystem->update();
@@ -294,23 +297,7 @@ void Dungeon::update(const float deltaTime)
             break;
         }
 
-        // TODO na pewno da się zrobić to lepiej
-        // docelowo będzie to w momencie kiedy jest wysyłany event ROOM_CHANGED, aktualnie jest wysyłane na początku gry
-        // sprawdź czy możesz dać w setupie
-        if (elapsedTime < m_timer->DeltaTime())
-        {
-            // std::cout << elapsedTime << std::endl;
-            sendRoomDimensions();
-        }
-
-        elapsedTime += m_timer->DeltaTime();
-        if (elapsedTime > m_timer->DeltaTime() * 10)
-        {
-            elapsedTime = m_timer->DeltaTime() * 3;
-            // updateMap();
-        }
-
-        m_multiplayerSystem->update();
+        m_multiplayerSystem->update(deltaTime);
     }
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
@@ -381,7 +368,6 @@ void Dungeon::updateMap()
             }
         }
     }
-    // std::cout << "Length of the table sent to the server: " << m_obstaclePositions.size() << std::endl;
     m_multiplayerSystem->updateMap(m_enemyPositions, m_playersPositions);
 }
 

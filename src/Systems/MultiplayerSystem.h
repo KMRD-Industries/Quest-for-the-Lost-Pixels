@@ -4,12 +4,14 @@
 #include <boost/asio.hpp>
 #include <comm.pb.h>
 
+#include <zlib.h>
 #include "GameTypes.h"
 #include "System.h"
 #include "Timer.h"
 #include "Types.h"
 #include "glm/ext/vector_int2.hpp"
-#include <zlib.h>
+
+#include "CollisionSystem.h"
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
@@ -29,6 +31,10 @@ private:
     comm::StateUpdate m_state{};
     std::unordered_map<std::uint32_t, Entity> m_entity_map{};
     std::unordered_map<std::uint32_t, ObstacleData> m_walls{};
+    std::map<Entity, sf::Vector2<float>> m_enemyPositions;
+    std::map<Entity, sf::Vector2<int>> m_playersPositions;
+    float m_frameTime{};
+    CollisionSystem* m_collisionSystem;
 
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
@@ -38,7 +44,7 @@ public:
     void entityDisconnected(const std::uint32_t id) noexcept;
     void roomChanged(const glm::ivec2& room);
     void init();
-    void update();
+    void update(const float deltaTime);
     void updateMap(const std::map<Entity, sf::Vector2<float>>& enemies,
                    const std::map<Entity, sf::Vector2<int>>& players);
     void sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles);
@@ -49,6 +55,7 @@ public:
     bool isConnected() const noexcept;
     std::uint32_t playerID() const noexcept;
     glm::ivec2& getRoom() noexcept;
+    std::string addMessageSize(const std::string& serializedMsg);
     comm::GameState registerPlayer(const Entity player);
     comm::StateUpdate pollStateUpdates();
 };
