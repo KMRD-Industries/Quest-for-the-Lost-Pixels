@@ -28,10 +28,9 @@ void Coordinator::destroyEntity(const Entity entity) const
 
 void Coordinator::destroyServerEntity(const Entity entity) const { m_serverEntityManager->destroyEntity(entity); }
 
-void Coordinator::mapEntity(const Entity serverEntity, const Entity gameEntity) const
+bool Coordinator::mapEntity(const Entity serverEntity, const Entity gameEntity) const
 {
-    m_serverEntityManager->mapEntity(serverEntity, gameEntity);
-    std::cout << "Mapped serverEntity: " << serverEntity << " to gameEntity: " << gameEntity << std::endl;
+    return m_serverEntityManager->mapEntity(serverEntity, gameEntity);
 }
 
 Entity Coordinator::getServerEntity(const Entity gameEntity) const

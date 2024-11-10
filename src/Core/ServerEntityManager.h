@@ -11,7 +11,7 @@ public:
     ServerEntityManager();
     Entity createEntity();
     void destroyEntity(Entity entity);
-    void mapEntity(Entity serverEntity, Entity gameEntity);
+    bool mapEntity(Entity serverEntity, Entity gameEntity);
     Entity getServerEntity(Entity gameEntity) const;
     Entity getGameEntity(Entity serverEntity) const;
 

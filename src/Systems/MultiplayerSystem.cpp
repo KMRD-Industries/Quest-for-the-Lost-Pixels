@@ -158,34 +158,71 @@ void MultiplayerSystem::update(const float deltaTime)
     std::size_t received = 0;
     const std::size_t available = m_udp_socket.available();
 
-    //    std::cout << "[update] Bytes available: " << available << std::endl;
+    // std::cout << "[update] Bytes available: " << available << std::endl;
     if (available > 0)
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
-        m_position.ParseFromArray(&m_buf, int(received));
-        std::uint32_t id = m_position.entity_id();
-        auto r = m_position.curr_room();
-
-        if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
+        comm::StateUpdate m_message;
+        m_message.ParseFromArray(m_buf.data(), int(received));
+        switch (m_message.variant())
         {
-            Entity& target = m_entity_map[id];
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
-            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
+        case comm::PLAYER_POSITION_UPDATE:
+            {
+                // TODO nie wiem czy to działa, trzeba potem sprawdzić bo aktualnie to łączeni drugiego playare mi nie
+                // działa
+                m_position = m_message.positionupdate();
+                // m_position.ParseFromArray(&m_buf, int(received));
+                std::uint32_t id = m_position.entity_id();
+                auto r = m_position.curr_room();
 
-            float x = m_position.x();
-            float y = m_position.y();
-            float r = m_position.direction();
+                if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
+                {
+                    Entity& target = m_entity_map[id];
+                    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
+                    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
 
-            transformComponent.position.x = x;
-            transformComponent.position.y = y;
-            transformComponent.scale.x = r;
-            colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
-                                                 colliderComponent.body->GetAngle());
+                    float x = m_position.x();
+                    float y = m_position.y();
+                    float r = m_position.direction();
+
+                    transformComponent.position.x = x;
+                    transformComponent.position.y = y;
+                    transformComponent.scale.x = r;
+                    colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
+                                                         colliderComponent.body->GetAngle());
+                }
+                break;
+            }
+        case comm::MAP_UPDATE:
+            {
+                const comm::EnemyPositionsUpdate enemyPositionsUpdate = m_message.enemypositionsupdate();
+
+                for (auto enemy : enemyPositionsUpdate.enemypositions())
+                {
+                    auto gameEntityId = gCoordinator.getGameEntity(enemy.id());
+
+                    if (gameEntityId == 0)
+                    {
+                        continue;
+                    }
+
+                    if (gCoordinator.hasComponent<TransformComponent>(gameEntityId))
+                    {
+                        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(gameEntityId);
+
+                        // TODO przsyłam pozycje serwera i odejmuję aktualną pozycję na kliencie
+                        transformComponent.velocity.x = enemy.x() * 50;
+                        transformComponent.velocity.y = -enemy.y() * 50;
+                    }
+                }
+                break;
+            }
+        default:
+            break;
         }
     }
 
     auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
-
 
     sf::Vector3<float> next = {transformComponent.position.x, transformComponent.position.y,
                                transformComponent.scale.x};
@@ -196,12 +233,13 @@ void MultiplayerSystem::update(const float deltaTime)
     m_position.set_x(next.x);
     m_position.set_y(next.y);
     m_position.set_direction(next.z);
-    // comm::StateUpdate update;
+    comm::StateUpdate update;
     // TODO jak zadziała to do zmiany
-    // update.set_allocated_positionupdate(&m_position);
-    // update.set_variant(comm::PLAYER_POSITION_UPDATE);
+    *update.mutable_positionupdate() = m_position;
+    update.set_variant(comm::PLAYER_POSITION_UPDATE);
+    auto serialized = update.SerializeAsString();
 
-    auto serialized = m_position.SerializeAsString();
+    // auto serialized = m_position.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
 
     std::deque<Entity> entities;
@@ -226,7 +264,6 @@ void MultiplayerSystem::update(const float deltaTime)
                         m_walls.insert({entity, obstacle});
                     }
                 }
-
                 break;
             }
         case multiplayerType::ENEMY_GOT_HIT:
@@ -239,7 +276,6 @@ void MultiplayerSystem::update(const float deltaTime)
             {
                 m_spawners.push_back(
                     std::make_pair(entity, gCoordinator.getComponent<TransformComponent>(entity).position));
-
                 break;
             }
         default:
@@ -260,7 +296,7 @@ void MultiplayerSystem::update(const float deltaTime)
         isMapDimensionsSent = true;
     }
 
-    if (m_frameTime >= configSingleton.GetConfig().oneFrameTime * 500 && !m_spawners.empty() && isMapDimensionsSent)
+    if (!m_spawners.empty())
     {
         std::sort(m_spawners.begin(), m_spawners.end(),
                   [](const std::pair<Entity, sf::Vector2<float>>& a, const std::pair<Entity, sf::Vector2<float>>& b)
@@ -334,12 +370,11 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
 
     comm::StateUpdate message;
     message.set_variant(comm::StateVariant::MAP_UPDATE);
-    // message.set_allocated_mappositionsupdate(&mapUpdate);
     *message.mutable_mappositionsupdate() = mapUpdate;
 
     auto serializedMessage = message.SerializeAsString();
 
-    m_tcp_socket.send(boost::asio::buffer(serializedMessage));
+    m_udp_socket.send(boost::asio::buffer(serializedMessage));
 }
 
 void MultiplayerSystem::sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles)
@@ -377,8 +412,6 @@ void MultiplayerSystem::sendMapDimensions(const std::unordered_map<Entity, Obsta
         std::cout << "Sending compressed map dimension update message, compressed size: " << compressedMessage.size()
                   << "\n";
 
-        auto available = m_tcp_socket.available();
-        printf("[Dimensions Update]Available space in tcp_socket: %lu, message size: %lu\n", available, serializedMessage.size());
         m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
     }
     else
@@ -407,8 +440,11 @@ void MultiplayerSystem::sendSpawnerPosition(std::vector<std::pair<Entity, sf::Ve
 
     auto serializedMessage = message.SerializeAsString();
     printf("sending spawners position\n");
-    printf("[EnemyPositionUpdate]Available space in tcp_socket: %lu, message size: %lu\n", m_tcp_socket.available(), serializedMessage.size());
-    m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
+    for (int i = 0; i < 5; ++i)
+    {
+        m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }
 
 void MultiplayerSystem::enemyGotHitUpdate(Entity enemyId)

@@ -46,7 +46,7 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
                                    const TransformComponent& spawnerTransformComponent) const
 {
     // Check if the spawner is ready to spawn the enemy.
-    //TODO idk czy to nie psuje
+    // TODO idk czy to nie psuje
     if (m_spawnTime < SPAWN_RATE) return;
 
     // Spawn the enemy and increment the spawn count.
@@ -54,12 +54,11 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
     // auto _ = spawnEnemy(spawnerTransformComponent, spawnerComponent.enemyType);
 }
 
-Entity SpawnerSystem::spawnEnemy(const comm::Enemy& enemyToSpawn) const
+void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemyToSpawn) const
 {
     auto positionsVec = sf::Vector2f(enemyToSpawn.x(), enemyToSpawn.y());
     TransformComponent transformComponent{positionsVec};
 
-    const Entity newMonsterEntity = gCoordinator.createEntity();
     const Collision collisionData{
         enemyToSpawn.collisiondata().type(),    enemyToSpawn.collisiondata().xoffset(),
         enemyToSpawn.collisiondata().yoffset(), enemyToSpawn.collisiondata().width(),
@@ -119,7 +118,6 @@ Entity SpawnerSystem::spawnEnemy(const comm::Enemy& enemyToSpawn) const
         [&](const GameType::CollisionData&) {}, false, false);
 
     gCoordinator.addComponent(newEventEntity, newEvent);
-    return newMonsterEntity;
 }
 
 void SpawnerSystem::clearSpawners()
@@ -187,9 +185,13 @@ void SpawnerSystem::spawnOnDemand(const comm::EnemyPositionsUpdate& enemiesToSpa
 {
     for (auto enemyToSpawn : enemiesToSpawn.enemypositions())
     {
-        SpawnerComponent spawnerComponent{};
-        spawnerComponent.enemyType = Enemies::EnemyType::MELEE;
-        const Entity newEnemyEntity = spawnEnemy(enemyToSpawn);
-        gCoordinator.mapEntity(enemyToSpawn.id(), newEnemyEntity);
+        const Entity newEnemyEntity = gCoordinator.createEntity();
+
+        if (gCoordinator.mapEntity(enemyToSpawn.id(), newEnemyEntity))
+        {
+            spawnEnemy(newEnemyEntity, enemyToSpawn);
+            SpawnerComponent spawnerComponent{};
+            spawnerComponent.enemyType = Enemies::EnemyType::MELEE;
+        }
     }
 }

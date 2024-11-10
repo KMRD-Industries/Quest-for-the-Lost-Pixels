@@ -21,7 +21,7 @@ public:
 
     void destroyEntity(Entity entity) const;
     void destroyServerEntity(Entity entity) const;
-    void mapEntity(Entity serverEntity, Entity gameEntity) const;
+    bool mapEntity(Entity serverEntity, Entity gameEntity) const;
     Entity getServerEntity(Entity gameEntity) const;
     Entity getGameEntity(Entity serverEntity) const;
 

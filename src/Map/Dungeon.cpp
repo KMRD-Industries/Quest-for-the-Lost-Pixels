@@ -257,7 +257,6 @@ void Dungeon::update(const float deltaTime)
     m_animationSystem->update(deltaTime);
     m_roomListenerSystem->update(deltaTime);
     m_itemSpawnerSystem->updateAnimation(deltaTime);
-    m_enemySystem->update(m_enemyPositionsUpdate);
     m_travellingSystem->update();
     m_passageSystem->update();
     m_characterSystem->update();
@@ -283,11 +282,6 @@ void Dungeon::update(const float deltaTime)
             break;
         case comm::ROOM_CHANGED:
             changeRoom(m_multiplayerSystem->getRoom());
-            // TODO przetestować na normalnej mapie
-            // sendRoomDimensions();
-            break;
-        case comm::MAP_UPDATE:
-            updateEnemyPositions(stateUpdate.enemypositionsupdate());
             break;
         case comm::SPAWN_ENEMY_REQUEST:
             printf("RECEIVED spawned enemy\n");
@@ -344,31 +338,6 @@ void Dungeon::sendRoomDimensions()
         }
     }
     m_multiplayerSystem->sendMapDimensions(m_obstaclePositions);
-}
-
-void Dungeon::updateMap()
-{
-    // for (const auto entity : m_collisionSystem->m_entities)
-    // {
-    //     if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
-    //
-    //     auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
-    //     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-    //     if (position.x != 0 && position.y != 0)
-    //     {
-    //         if (colliderComponent.tag == "Enemy")
-    //         {
-    //             // TODO sprawdź czy to poprawne tak dodawać do mapy w c++
-    //             m_enemyPositions[entity] = {position.x, position.y};
-    //         }
-    //         // TODO regex może overkill sprawdź jakieś prostsze
-    //         else if (std::regex_match(colliderComponent.tag, config::playerRegexTag))
-    //         {
-    //             m_playersPositions[entity] = {static_cast<int>(position.x), static_cast<int>(position.y)};
-    //         }
-    //     }
-    // }
-    // m_multiplayerSystem->updateMap(m_enemyPositions, m_playersPositions);
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
@@ -523,19 +492,6 @@ void Dungeon::checkForEndOfTheGame()
         if (gCoordinator.hasComponent<PlayerComponent>(m_entities[player])) return;
     }
     m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<LostGameState>()});
-}
-
-void Dungeon::updateEnemyPositions(const comm::EnemyPositionsUpdate& enemyPositionsUpdate)
-{
-    for (auto enemy : enemyPositionsUpdate.enemypositions())
-    {
-        auto gameEntityId = gCoordinator.getGameEntity(enemy.id());
-        if (gameEntityId == 0)
-        {
-            continue;
-        }
-        m_enemyPositionsUpdate[gameEntityId] = {enemy.x(), enemy.y()};
-    }
 }
 
 void Dungeon::setECS()

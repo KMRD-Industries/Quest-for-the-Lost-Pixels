@@ -39,6 +39,7 @@ private:
     void enemyGotHitUpdate(Entity enemyId);
     bool isMapDimensionsSent{};
     bool areSpawnersSent{};
+    comm::StateUpdate m_message{};
 
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};

@@ -32,17 +32,21 @@ void ServerEntityManager::destroyEntity(const Entity entity)
     --m_livingEntityCount;
 }
 
-void ServerEntityManager::mapEntity(Entity serverEntity, Entity gameEntity)
+bool ServerEntityManager::mapEntity(Entity serverEntity, Entity gameEntity)
 {
     if (const auto [fst, snd] = m_serverEntityToGameEntity.emplace(serverEntity, gameEntity); !snd)
     {
         std::cerr << "ServerEntityManager::mapEntity: Entity already exists.\n";
+        return false;
     }
 
     if (const auto [fst, snd] = m_gameEntityToServerEntity.emplace(gameEntity, serverEntity); !snd)
     {
         std::cerr << "ServerEntityManager::mapEntity: Entity already exists.\n";
+        return false;
     }
+    std::cout << "Mapped serverEntity: " << serverEntity << " to gameEntity: " << gameEntity << std::endl;
+    return true;
 }
 
 Entity ServerEntityManager::getServerEntity(const Entity gameEntity) const

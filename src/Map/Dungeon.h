@@ -88,7 +88,6 @@ private:
     std::map<Entity, sf::Vector2<int>> m_playersPositions;
     Timer* m_timer;
     float elapsedTime = 0.0f;
-    std::unordered_map<Entity, sf::Vector2<float>> m_enemyPositionsUpdate;
     std::queue<comm::Enemy> m_enemyQueue;
 
     PlayerMovementSystem* m_playerMovementSystem;

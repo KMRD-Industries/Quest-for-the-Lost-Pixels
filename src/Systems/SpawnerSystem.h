@@ -25,6 +25,6 @@ private:
     void processSpawner(SpawnerComponent &spawnerComponent, const TransformComponent &spawnerTransformComponent) const;
     bool isReadyToSpawn(int cooldown);
     void cleanUpUnnecessarySpawners();
-    Entity spawnEnemy(const comm::Enemy &enemyToSpawn) const;
+    void spawnEnemy(Entity newMonsterEntity, const comm::Enemy &enemyToSpawn) const;
     void prepareEnemies();
 };
