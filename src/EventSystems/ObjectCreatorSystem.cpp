@@ -132,7 +132,7 @@ b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEve
 void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& eventInfo) const
 {
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
-    auto* collisionData = new GameType::CollisionData{.entityID = eventInfo.entity, .tag = eventInfo.tag};
+    auto* collisionData = new GameType::CollisionData{.entity = eventInfo.entity, .tag = eventInfo.tag};
 
     // Create all components
     const b2PolygonShape shape = defineShape(eventInfo);

@@ -6,7 +6,6 @@
 #include <comm.pb.h>
 #include <glm/ext/vector_int2.hpp>
 
-#include "GameTypes.h"
 #include "System.h"
 #include "Types.h"
 
@@ -49,22 +48,16 @@ private:
     comm::MovementUpdate m_incomming_movement{};
     comm::MovementUpdate m_outgoing_movement{};
     comm::StateUpdate m_state{};
+    comm::StateUpdateSeries m_updates{};
 
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
     void setup(const std::string_view& ip, const std::string_view& port) noexcept;
+    void setPlayer(const uint32_t id, const Entity entity);
     void setRoom(const glm::ivec2& room) noexcept;
-    void playerConnected(const uint32_t id, const Entity entity) noexcept;
-    void playerDisconnected(const uint32_t id) noexcept;
-    void playerKilled(const Entity entity);
-    void registerItem(const uint32_t id, const Entity entity);
-    void updateItemEntity(const Entity oldEntity, const Entity newEntity);
-    void itemEquipped(const GameType::PickUpInfo& entity);
-    void roomChanged(const glm::ivec2& room);
-    void roomCleared();
-    void levelChanged();
     void onAttack();
     void update();
+    void updateMovement();
     void disconnect();
 
     bool isConnected() const noexcept;

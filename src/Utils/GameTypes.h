@@ -254,7 +254,7 @@ namespace GameType
 
     struct CollisionData
     {
-        Entity entityID;
+        Entity entity;
         std::string tag;
     };
 

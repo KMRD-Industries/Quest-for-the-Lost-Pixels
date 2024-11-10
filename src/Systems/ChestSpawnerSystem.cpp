@@ -14,6 +14,7 @@
 #include "PotionComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerSystem.h"
+#include "SynchronisedEvent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
@@ -58,9 +59,20 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
     if (multiplayerSystem->isConnected())
     {
         itemGenerator = multiplayerSystem->getItemGenerator();
+        const Entity eventEntity = gCoordinator.createEntity();
+        gCoordinator.addComponent(eventEntity,
+                                  SynchronisedEvent{
+                                      .variant = SynchronisedEvent::REQUEST_ITEM_GENERATOR,
+                                  });
 
         if (itemGenerator.type != comm::POTION)
-            multiplayerSystem->registerItem(itemGenerator.id, newItemEntity);
+        {
+            const Entity eventEntity = gCoordinator.createEntity();
+            gCoordinator.addComponent(eventEntity,
+                                      SynchronisedEvent{.variant = SynchronisedEvent::REGISTER_ITEM,
+                                                        .entityID = itemGenerator.id,
+                                                        .entity = newItemEntity});
+        }
     }
 
     switch (itemGenerator.type)

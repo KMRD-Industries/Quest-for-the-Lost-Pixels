@@ -14,6 +14,7 @@
 #include "RenderComponent.h"
 #include "ResourceManager.h"
 #include "SpawnerComponent.h"
+#include "SynchronisedEvent.h"
 #include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TransformComponent.h"
@@ -75,30 +76,34 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
         {
             if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
-            if (!gCoordinator.hasComponent<CharacterComponent>(collisionData.entityID) ||
-                gCoordinator.hasComponent<MultiplayerComponent>(collisionData.entityID))
+            if (!gCoordinator.hasComponent<CharacterComponent>(collisionData.entity) ||
+                gCoordinator.hasComponent<MultiplayerComponent>(collisionData.entity))
                 return;
-            auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
+            auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entity)};
             playerCharacterComponent.attacked = true;
 
             playerCharacterComponent.hp -= enemyConfig.damage;
             if (playerCharacterComponent.hp <= 0)
             {
                 ResourceManager::getInstance().setCurrentShader(video::FragmentShader::DEATH);
-                gCoordinator.removeComponent<RenderComponent>(collisionData.entityID);
-                gCoordinator.removeComponent<PlayerComponent>(collisionData.entityID);
-                gCoordinator.getComponent<ColliderComponent>(collisionData.entityID).toRemoveCollider = true;
-                gCoordinator.getRegisterSystem<MultiplayerSystem>()->playerKilled(collisionData.entityID);
+                gCoordinator.removeComponent<RenderComponent>(collisionData.entity);
+                gCoordinator.removeComponent<PlayerComponent>(collisionData.entity);
+                gCoordinator.getComponent<ColliderComponent>(collisionData.entity).toRemoveCollider = true;
+
+                const Entity eventEntity = gCoordinator.createEntity();
+                gCoordinator.addComponent(
+                    eventEntity,
+                    SynchronisedEvent{.variant = SynchronisedEvent::PLAYER_KILLED, .entity = collisionData.entity});
             }
 
             const Entity tag = gCoordinator.createEntity();
             gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});
             gCoordinator.addComponent(
-                tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collisionData.entityID)});
+                tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collisionData.entity)});
 
             if (!config::applyKnockback) return;
 
-            auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
+            auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entity)};
             auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
 
             b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -

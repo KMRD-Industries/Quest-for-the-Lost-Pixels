@@ -15,6 +15,7 @@
 #include "Helpers.h"
 #include "InputHandler.h"
 #include "MultiplayerSystem.h"
+#include "SynchronisedEvent.h"
 #include "TransformComponent.h"
 #include "Types.h"
 
@@ -78,6 +79,8 @@ void MultiplayerSystem::setup(const std::string_view& ip, const std::string_view
     prefixDummy.set_bytes(1);
     m_prefix_size = static_cast<int>(prefixDummy.ByteSizeLong());
     m_prefix_buf.resize(m_prefix_size);
+
+    m_updates.mutable_updates()->Reserve(64);
 }
 
 void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
@@ -97,44 +100,7 @@ void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
 
 const glm::ivec2& MultiplayerSystem::getRoom() const noexcept { return m_current_room; }
 
-const ItemGenerator& MultiplayerSystem::getItemGenerator()
-{
-    m_generator_ready = false;
-
-    m_state.set_variant(comm::REQUEST_ITEM_GENERATOR);
-    m_state.mutable_player()->set_id(m_player_id);
-
-    const auto serialized = m_state.SerializeAsString();
-
-    m_tcp_socket.send(boost::asio::buffer(serialized));
-    return m_item_generator;
-}
-
-void MultiplayerSystem::roomChanged(const glm::ivec2& room)
-{
-    setRoom(room);
-
-    m_state.set_variant(comm::ROOM_CHANGED);
-    auto serialized = m_state.SerializeAsString();
-
-    m_tcp_socket.send(boost::asio::buffer(serialized));
-}
-
-void MultiplayerSystem::roomCleared()
-{
-    m_state.set_variant(comm::ROOM_CLEARED);
-    const auto serialized = m_state.SerializeAsString();
-
-    m_tcp_socket.send(boost::asio::buffer(serialized));
-}
-
-void MultiplayerSystem::levelChanged()
-{
-    m_state.set_variant(comm::LEVEL_CHANGED);
-    const auto serialized = m_state.SerializeAsString();
-
-    m_tcp_socket.send(boost::asio::buffer(serialized));
-}
+const ItemGenerator& MultiplayerSystem::getItemGenerator() { return m_item_generator; }
 
 void MultiplayerSystem::onAttack() { m_outgoing_movement.set_attack(true); }
 
@@ -146,6 +112,7 @@ bool MultiplayerSystem::isInsideInitialRoom(const bool change) noexcept
 }
 
 bool MultiplayerSystem::isConnected() const noexcept { return m_connected; }
+void MultiplayerSystem::setPlayer(const uint32_t id, const Entity entity) { m_entity_map[id] = entity; }
 uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
 
 comm::InitialInfo MultiplayerSystem::registerPlayer(const Entity playerEntity)
@@ -217,88 +184,10 @@ const comm::StateUpdate& MultiplayerSystem::pollStateUpdates()
     return m_state;
 }
 
-void MultiplayerSystem::playerConnected(const uint32_t id, const Entity entity) noexcept { m_entity_map[id] = entity; }
-void MultiplayerSystem::playerDisconnected(const uint32_t id) noexcept
-{
-    gCoordinator.getComponent<ColliderComponent>(m_entity_map[id]).toDestroy = true;
-    for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[id]).slots)
-    {
-        if (slot.second != 0)
-        {
-            m_registered_items.erase(slot.second);
-            gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
-        }
-    }
-    m_entity_map.erase(id);
-}
-void MultiplayerSystem::playerKilled(const Entity entity)
-{
-    m_alive = false;
-    for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[m_player_id]).slots)
-    {
-        if (slot.second != 0)
-        {
-            m_registered_items.erase(slot.second);
-            gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
-        }
-    }
-
-    m_state.set_variant(comm::PLAYER_DIED);
-    m_state.mutable_player()->set_id(m_player_id);
-    const auto serialized = m_state.SerializeAsString();
-
-    m_tcp_socket.send(boost::asio::buffer(serialized));
-}
-
-void MultiplayerSystem::registerItem(const uint32_t id, const Entity entity) { m_registered_items[id] = entity; }
-
-void MultiplayerSystem::updateItemEntity(const Entity oldEntity, const Entity newEntity)
-{
-    for (const auto& p : m_registered_items)
-    {
-        if (p.second != oldEntity) continue;
-
-        m_registered_items[p.first] = newEntity;
-        return;
-    }
-}
-
 Entity MultiplayerSystem::getItemEntity(const uint32_t id)
 {
     if (m_registered_items.contains(id)) return m_registered_items[id];
     return 0;
-}
-void MultiplayerSystem::itemEquipped(const GameType::PickUpInfo& pickUpInfo)
-{
-    for (const auto& p : m_registered_items)
-    {
-        if (p.second != pickUpInfo.itemEntity) continue;
-
-        m_state.set_variant(comm::ITEM_EQUIPPED);
-        m_state.mutable_player()->set_id(m_player_id);
-        auto item = m_state.mutable_item();
-        item->set_id(p.first);
-
-        switch (pickUpInfo.slot)
-        {
-        case GameType::slotType::WEAPON:
-            item->set_type(comm::WEAPON);
-            break;
-        case GameType::slotType::HELMET:
-            item->set_type(comm::HELMET);
-            break;
-        case GameType::slotType::BODY_ARMOUR:
-            item->set_type(comm::ARMOUR);
-            break;
-        default:
-            break;
-        }
-
-        const auto serialized = m_state.SerializeAsString();
-
-        m_tcp_socket.send(boost::asio::buffer(serialized));
-        return;
-    }
 }
 
 int64_t MultiplayerSystem::getSeed() { return m_seed; }
@@ -307,8 +196,200 @@ const std::unordered_map<uint32_t, Entity>& MultiplayerSystem::getPlayers() { re
 
 void MultiplayerSystem::update()
 {
-    std::size_t received = 0;
-    const std::size_t available = m_udp_socket.available();
+    if (!m_connected)
+    {
+        std::deque<Entity> eventEntities;
+
+        for (const Entity entity : m_entities) eventEntities.push_back(entity);
+
+        while (!eventEntities.empty())
+        {
+            gCoordinator.destroyEntity(eventEntities.front());
+            eventEntities.pop_front();
+        }
+        return;
+    }
+
+    comm::StateUpdate* update = nullptr;
+    bool anythingToSend = false, usedPreviousUpdate = true;
+
+    m_updates.mutable_updates()->Clear();
+
+    for (const Entity eventEntity : m_entities)
+    {
+        const auto& [variant, entityID, entity, updatedEntity, pickUpInfo, room] =
+            gCoordinator.getComponent<SynchronisedEvent>(eventEntity);
+
+        if (usedPreviousUpdate) update = m_updates.add_updates();
+
+        switch (variant)
+        {
+        case SynchronisedEvent::PLAYER_CONNECTED:
+            usedPreviousUpdate = false;
+            if (entity == 0 || entityID == 0) continue;
+
+            m_entity_map[entityID] = entity;
+            break;
+
+        case SynchronisedEvent::PLAYER_DISCONNECTED:
+            usedPreviousUpdate = false;
+            if (entityID == 0 || !m_entity_map.contains(entityID)) continue;
+
+            gCoordinator.getComponent<ColliderComponent>(m_entity_map[entityID]).toDestroy = true;
+            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[entityID]).slots)
+            {
+                if (slot.second != 0)
+                {
+                    m_registered_items.erase(slot.second);
+                    gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
+                }
+            }
+            m_entity_map.erase(entityID);
+            break;
+
+        case SynchronisedEvent::PLAYER_KILLED:
+            usedPreviousUpdate = true;
+            anythingToSend = true;
+
+            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[m_player_id]).slots)
+            {
+                if (slot.second != 0)
+                {
+                    m_registered_items.erase(slot.second);
+                    gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
+                }
+            }
+
+            update->set_variant(comm::PLAYER_DIED);
+            update->mutable_player()->set_id(m_player_id);
+            break;
+
+        case SynchronisedEvent::REGISTER_ITEM:
+            usedPreviousUpdate = false;
+            if (entity == 0 || entityID == 0) continue;
+
+            m_registered_items[entityID] = entity;
+            break;
+
+        case SynchronisedEvent::REQUEST_ITEM_GENERATOR:
+            usedPreviousUpdate = true;
+            anythingToSend = true;
+
+            update->set_variant(comm::REQUEST_ITEM_GENERATOR);
+            update->mutable_player()->set_id(m_player_id);
+            break;
+
+        case SynchronisedEvent::UPDATE_ITEM_ENTITY:
+            usedPreviousUpdate = false;
+            if (entity == 0 || updatedEntity == 0) continue;
+
+            for (const auto& p : m_registered_items)
+            {
+                if (p.second != entity) continue;
+
+                m_registered_items[p.first] = updatedEntity;
+                break;
+            }
+            break;
+
+        case SynchronisedEvent::ITEM_EQUIPPED:
+            usedPreviousUpdate = true;
+            anythingToSend = true;
+
+            if (!pickUpInfo.has_value())
+            {
+                usedPreviousUpdate = false;
+                continue;
+            }
+
+            for (const auto& p : m_registered_items)
+            {
+                if (p.second != pickUpInfo->itemEntity) continue;
+
+                update->set_variant(comm::ITEM_EQUIPPED);
+                update->mutable_player()->set_id(m_player_id);
+
+                auto item = update->mutable_item();
+                item->set_id(p.first);
+
+                switch (pickUpInfo->slot)
+                {
+                case GameType::slotType::WEAPON:
+                    item->set_type(comm::WEAPON);
+                    break;
+                case GameType::slotType::HELMET:
+                    item->set_type(comm::HELMET);
+                    break;
+                case GameType::slotType::BODY_ARMOUR:
+                    item->set_type(comm::ARMOUR);
+                    break;
+                default:
+                    break;
+                }
+                break;
+            }
+            break;
+
+        case SynchronisedEvent::ROOM_CHANGED:
+            usedPreviousUpdate = true;
+            anythingToSend = true;
+
+            if (!room.has_value())
+            {
+                usedPreviousUpdate = false;
+                continue;
+            }
+
+            setRoom(*room);
+
+            update->set_variant(comm::ROOM_CHANGED);
+            update->mutable_room()->set_x(room->x);
+            update->mutable_room()->set_y(room->y);
+            break;
+
+        case SynchronisedEvent::ROOM_CLEARED:
+            usedPreviousUpdate = true;
+            anythingToSend = true;
+
+            update->set_variant(comm::ROOM_CLEARED);
+            break;
+
+        case SynchronisedEvent::LEVEL_CHANGED:
+            usedPreviousUpdate = true;
+            anythingToSend = true;
+
+            update->set_variant(comm::LEVEL_CHANGED);
+            break;
+
+        default:
+            usedPreviousUpdate = false;
+            break;
+        }
+    }
+
+    std::deque<Entity> eventEntities;
+
+    for (const Entity entity : m_entities) eventEntities.push_back(entity);
+
+    while (!eventEntities.empty())
+    {
+        gCoordinator.destroyEntity(eventEntities.front());
+        eventEntities.pop_front();
+    }
+
+    if (!usedPreviousUpdate) m_updates.mutable_updates()->RemoveLast();
+
+    if (anythingToSend)
+    {
+        const auto serialized = m_updates.SerializeAsString();
+        m_tcp_socket.send(boost::asio::buffer(serialized));
+    }
+}
+
+void MultiplayerSystem::updateMovement()
+{
+    size_t received = 0;
+    const size_t available = m_udp_socket.available();
 
     if (available > 0)
     {

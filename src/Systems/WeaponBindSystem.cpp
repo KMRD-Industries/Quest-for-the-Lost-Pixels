@@ -32,24 +32,24 @@ void WeaponBindSystem::update()
             [this, entity](const GameType::CollisionData& data)
             {
                 auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
-                swingComponent.enemyColided.insert(data.entityID);
+                swingComponent.enemyColided.insert(data.entity);
                 const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
                 if (!weaponComponent.isAttacking) return;
-                if (swingComponent.enemyHited.contains(data.entityID)) return;
+                if (swingComponent.enemyHited.contains(data.entity)) return;
 
-                swingComponent.enemyHited.insert(data.entityID);
-                gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
+                swingComponent.enemyHited.insert(data.entity);
+                gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
             },
             [entity](const GameType::CollisionData& data)
             {
                 auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
-                swingComponent.enemyColided.erase(data.entityID);
+                swingComponent.enemyColided.erase(data.entity);
                 const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
                 if (!weaponComponent.isAttacking) return;
-                if (swingComponent.enemyHited.contains(data.entityID)) return;
+                if (swingComponent.enemyHited.contains(data.entity)) return;
 
-                swingComponent.enemyHited.insert(data.entityID);
-                gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
+                swingComponent.enemyHited.insert(data.entity);
+                gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
             },
             false, false, true);
 
