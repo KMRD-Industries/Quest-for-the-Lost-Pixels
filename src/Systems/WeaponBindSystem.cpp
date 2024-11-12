@@ -41,7 +41,7 @@ void WeaponBindSystem::update()
                 swingComponent.enemyHited.insert(data.entityID);
                 gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
 
-                constexpr auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::ENEMY_GOT_HIT};
+                const auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::ENEMY_GOT_HIT};
                 gCoordinator.addComponent(data.entityID, multiplayerEventComponent);
 
             },

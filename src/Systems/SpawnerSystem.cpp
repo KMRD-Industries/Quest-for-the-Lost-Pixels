@@ -167,7 +167,7 @@ void SpawnerSystem::prepareEnemies()
 {
     for (const auto enemyEntity : m_entities)
     {
-        constexpr auto multiplayerComponent = MultiplayerComponent{.type = multiplayerType::SEND_SPAWNERS_POSITIONS};
+        const auto multiplayerComponent = MultiplayerComponent{.type = multiplayerType::SEND_SPAWNERS_POSITIONS};
         gCoordinator.addComponent(enemyEntity, multiplayerComponent);
         // m_spawnedEnemies.push_back(
         //     std::make_pair(enemyEntity, gCoordinator.getComponent<TransformComponent>(enemyEntity).position));

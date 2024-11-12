@@ -150,8 +150,14 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
     colliderComponent.onCollisionOut = eventInfo.onCollisionOut;
     colliderComponent.tag = eventInfo.tag;
 
-    constexpr auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::ROOM_DIMENSIONS_CHANGED};
-    gCoordinator.addComponent(eventInfo.entity, multiplayerEventComponent);
+    if (collisionData->tag == "Wall" && !gCoordinator.hasComponent<MultiplayerComponent>(eventInfo.entity))
+    {
+        //TODO jakimś cudem przy dołączania drugiego gracza dwa razy do jakiegoś entity chce dodać multiplayer component,
+        // moja opinia jest taka, zę to przez obecność jego przy tworzeniu player entity ale chuj wie
+        const auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::ROOM_DIMENSIONS_CHANGED};
+        gCoordinator.addComponent(eventInfo.entity, multiplayerEventComponent);
+    }
+
 }
 
 

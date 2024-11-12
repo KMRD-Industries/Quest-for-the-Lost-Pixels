@@ -39,7 +39,8 @@ private:
     void enemyGotHitUpdate(Entity enemyId);
     bool isMapDimensionsSent{};
     bool areSpawnersSent{};
-    comm::StateUpdate m_message{};
+    // comm::StateUpdate m_message{};
+    std::deque<Entity> m_multiplayerEntities;
 
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
@@ -53,13 +54,18 @@ public:
     void updateMap(const std::map<Entity, sf::Vector2<float>>& enemies,
                    const std::map<Entity, sf::Vector2<int>>& players);
     void sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles);
+    void gatherEnemyAndPlayerPositions();
     void sendSpawnerPosition(std::vector<std::pair<Entity, sf::Vector2<float>>> spawners);
+    void handlePlayerPositionUpdate(const comm::PositionUpdate& positionUpdate);
+    void handleMapUpdate(const comm::EnemyPositionsUpdate& enemyPositionUpdate);
     void disconnect();
 
     bool isConnected() const noexcept;
     std::uint32_t playerID() const noexcept;
     glm::ivec2& getRoom() noexcept;
     std::string addMessageSize(const std::string& serializedMsg);
+    void receiveMessages();
+    void sendPlayerPosition();
     comm::GameState registerPlayer(const Entity player);
     comm::StateUpdate pollStateUpdates();
 };

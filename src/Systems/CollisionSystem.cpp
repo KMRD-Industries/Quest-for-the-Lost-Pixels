@@ -4,6 +4,7 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "HelmetComponent.h"
+#include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
 #include "Physics.h"
 #include "PlayerComponent.h"
@@ -92,7 +93,12 @@ void CollisionSystem::createMapCollision()
         else
         {
             if (colliderComponent.collision.width > 0 && colliderComponent.collision.height > 0)
+            {
                 createCollisionBody(entity, "Wall", true, false);
+
+                // const auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::ROOM_DIMENSIONS_CHANGED};
+                // gCoordinator.addComponent(entity, multiplayerEventComponent);
+            }
         }
     }
 }

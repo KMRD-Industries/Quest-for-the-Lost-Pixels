@@ -246,9 +246,6 @@ void Dungeon::setupHelmetEntity(const Entity player) const
     m_inventorySystem->pickUpItem(GameType::PickUpInfo{player, helmetEntity, GameType::slotType::HELMET});
 }
 
-//TODO dalej jest problem z wysyłaniem drugiej mapy - podczas przechodzenia z pokoju startowego do pierwszego pokoju w grze
-// nie jest odbierana mapa na serwerze, wynika to z tego, że flaga odpowiedzialna za updatowanie mapy jest false, bo
-// prawdopodobnie przejście z pokoju start do pokoju1 nie jest rejestrowane jako changeRoom(), idk czemu
 void Dungeon::update(const float deltaTime)
 {
     m_itemSystem->update();
@@ -305,39 +302,6 @@ void Dungeon::update(const float deltaTime)
         return;
     }
     checkForEndOfTheGame();
-}
-
-void Dungeon::mapServerIdToGameId(const comm::SpawningEnemiesResponse& ids) const
-{
-    auto const test = m_spawnerSystem->getSortedSpawnedEnemies();
-    int i = 0;
-    for (const auto enemy : m_spawnerSystem->getSortedSpawnedEnemies())
-    {
-        gCoordinator.mapEntity(ids.enemyid().Get(i), enemy.first);
-        i++;
-    }
-}
-
-void Dungeon::sendRoomDimensions()
-{
-    for (const auto entity : m_collisionSystem->m_entities)
-    {
-        if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
-
-        auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
-        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-        if (position.x != 0 && position.y != 0)
-        {
-            if (colliderComponent.tag == "Wall")
-            {
-                auto sprite = renderComponent.sprite.getGlobalBounds();
-                ObstacleData obstacle{position.x, position.y};
-                m_obstaclePositions.insert({entity, obstacle});
-            }
-        }
-    }
-    m_multiplayerSystem->sendMapDimensions(m_obstaclePositions);
 }
 
 void Dungeon::changeRoom(const glm::ivec2& room)
