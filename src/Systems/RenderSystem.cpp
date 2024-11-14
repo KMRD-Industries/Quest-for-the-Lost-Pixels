@@ -14,6 +14,7 @@
 #include "ItemComponent.h"
 #include "MultiplayerComponent.h"
 #include "PassageComponent.h"
+#include "Paths.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
@@ -24,6 +25,7 @@
 #include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
+#include "glm/gtx/string_cast.hpp"
 #include "imgui.h"
 
 extern Coordinator gCoordinator;
@@ -41,13 +43,25 @@ RenderSystem::RenderSystem()
     // Load spacial sprites
     portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getSprite("portal", 0);
 
+
     // Load camera
     camera = Camera{{0.f, 0.f}, {0.f, 0.f}};
+
+    if (!shader.loadFromFile(std::string(ASSET_PATH) + "/shaders/vertex_shader.vert",
+                             std::string(ASSET_PATH) + "/shaders/fragment_shader.frag"))
+    {
+        std::cerr << "Failed to load shader!" << std::endl;
+    }
+    else
+    {
+        std::cout << "OK";
+    }
 }
 
 void RenderSystem::draw(sf::RenderWindow& window)
 {
     clearSpriteArray(); // Perform pre-draw cleaning
+    lightSources.clear();
     std::deque<Entity> entityToRemoveDirtyComponent;
 
     for (const auto entity : m_entities)
@@ -56,11 +70,6 @@ void RenderSystem::draw(sf::RenderWindow& window)
         if (gCoordinator.hasComponent<PassageComponent>(entity)) specialObjects.insert(entity);
 
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-
-        // Static map objects won't be updated frequently, so we will remove their DirtyComponent.
-        // This will exclude this entity from consideration in the next for loop,
-        // improving performance while still keeping the sprite data in the VertexArrays.
-        // To update using updateQuad, a DirtyFlagComponent needs to be added to the entity.
 
         if (renderComponent.staticMapTile)
         {
@@ -73,7 +82,7 @@ void RenderSystem::draw(sf::RenderWindow& window)
         }
     }
 
-    updateCamera(camera, getPosition(config::playerEntity), window); // Update camera
+    updateCamera(camera, getPosition(config::playerEntity), window);
 
     // Remove DirtyFlagComponent from static entities
     for (const auto entity : entityToRemoveDirtyComponent)
@@ -81,25 +90,44 @@ void RenderSystem::draw(sf::RenderWindow& window)
         gCoordinator.removeComponent<DirtyFlagComponent>(entity);
     }
 
-    // Update special objects rendering (passages etc.)
+    // Update special objects rendering
     for (const auto entity : specialObjects)
     {
         displayPortal(entity);
     }
 
-    // Update specific player related rendering features
+    // Update specific player-related rendering features
     for (const auto player : players)
     {
         updatePlayerSprite(player);
+
+        // Generate lighting for each player
+        auto& transform = gCoordinator.getComponent<TransformComponent>(player);
+        lightSources.push_back({transform.position, 100.f, 200});
     }
 
     window.setView(camera.getView());
 
-    // Render layers in order. Newer layers are rendered on top of the previous ones.
+    // Render layers in order
     for (int i = 0; i < configSingleton.GetConfig().maximumNumberOfLayers; i++)
     {
-        for (const auto& [texture, vertexArray] : m_layeredTextureVertexArrays[i]) window.draw(vertexArray, texture);
-        for (const auto& sprite : m_vecSpriteArray[i]) window.draw(*sprite);
+        // Render layered textures (vertex arrays)
+        for (const auto& [texture, vertexArray] : m_layeredTextureVertexArrays[i])
+        {
+            sf::RenderStates states;
+            states.texture = texture;
+            window.draw(vertexArray, states);
+        }
+
+        // Render sprite arrays
+        for (const auto& sprite : m_vecSpriteArray[i])
+        {
+            if (!sprite || !sprite->getTexture()) continue; // Skip invalid sprites
+
+            sf::RenderStates states;
+            states.texture = sprite->getTexture();
+            window.draw(*sprite, states);
+        }
     }
 
     if (configSingleton.GetConfig().debugMode) debugBoundingBoxes(window);
@@ -117,15 +145,26 @@ void RenderSystem::updateCamera(Camera& camera, const sf::Vector2f targetPos, co
     halfView.x = static_cast<float>(windowSize.x) / 2;
     halfView.y = static_cast<float>(windowSize.y) / 2;
 
-    // Clamp the camera position to ensure it stays within the boundaries of the map.
-    // This prevents the camera from moving too far to the left or right,
-    // without exposing empty space - outsides of map.
-
-    const float clampedX = std::clamp(targetPos.x, halfView.x, GameUtility::mapWidth - halfView.x);
-    const float clampedY = std::clamp(targetPos.y, halfView.y, GameUtility::mapHeight - halfView.y);
-    camera.setPosition({clampedX, clampedY});
-
-    // camera.setPosition(targetPos);
+    // Check if the map is larger than window.
+    // If the map is larger, we need to ensure that the camera view
+    // stays within the boundaries of the map while following the target position.
+    if (GameUtility::mapWidth > static_cast<float>(windowSize.x) &&
+        GameUtility::mapHeight > static_cast<float>(windowSize.y))
+    {
+        // Clamp the camera position to ensure it stays within the boundaries of the map.
+        // This prevents the camera from moving too far to the left or right,
+        // without exposing empty space - outsides of map.
+        const float clampedX = std::clamp(targetPos.x, halfView.x, GameUtility::mapWidth - halfView.x);
+        const float clampedY = std::clamp(targetPos.y, halfView.y, GameUtility::mapHeight - halfView.y);
+        camera.setPosition({clampedX, clampedY});
+    }
+    else
+    {
+        // If whole map can be displayed on window, then set camera to the middle of the window
+        const float centerX = GameUtility::mapWidth / 2.0f;
+        const float centerY = GameUtility::mapHeight / 2.0f;
+        camera.setPosition({centerX, centerY});
+    }
 
     // Set camera size to match window size
     camera.setSize(windowSize);

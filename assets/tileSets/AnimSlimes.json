@@ -6,7 +6,7 @@
  "name":"AnimSlimes",
  "spacing":0,
  "tilecount":72,
- "tiledversion":"1.8.2",
+ "tiledversion":"1.11.0",
  "tileheight":32,
  "tiles":[
         {
@@ -279,6 +279,7 @@
          "objectgroup":
             {
              "draworder":"index",
+             "id":2,
              "name":"",
              "objects":[
                     {
@@ -294,8 +295,8 @@
                      "rotation":0,
                      "type":"",
                      "visible":true,
-                     "width":16.375,
-                     "x":8.5625,
+                     "width":25.5,
+                     "x":3.3125,
                      "y":13.23865
                     }],
              "opacity":1,
@@ -696,5 +697,5 @@
         }],
  "tilewidth":32,
  "type":"tileset",
- "version":"1.8"
+ "version":"1.10"
 }

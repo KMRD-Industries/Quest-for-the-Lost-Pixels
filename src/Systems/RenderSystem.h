@@ -4,7 +4,9 @@
 #include <vector>
 #include "Camera.h"
 #include "Config.h"
+#include "GameUtility.h"
 #include "RenderComponent.h"
+#include "SFML/Graphics/Shader.hpp"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/VertexArray.hpp"
 #include "SFML/System/Vector2.hpp"
@@ -63,8 +65,10 @@ private:
     std::vector<std::unordered_map<sf::Texture*, sf::VertexArray>> m_layeredTextureVertexArrays;
     std::set<Entity> players;
     std::set<Entity> specialObjects;
+    std::vector<GameType::LightSource> lightSources;
     sf::Vector2u windowSize{};
     sf::Vector2f newMapOffset{};
     sf::Sprite portalSprite;
+    sf::Shader shader;
     Camera camera{};
 };

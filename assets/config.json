@@ -1,5 +1,5 @@
 {
-  "debugMode": true,
+  "debugMode": false,
   "gameScale": 3.0,
   "meterToPixelRatio": 30.0,
   "pixelToMeterRatio": 0.033333333,
@@ -27,11 +27,24 @@
   "defaultEnemyKnockbackForce": 300.0,
   "applyKnockback": false,
   "maxDungeonDepth": 5,
-  "startingPosition": [325.0, 325.0],
+  "startingPosition": [
+    325.0,
+    325.0
+  ],
   "spawnOffset": 25.0,
   "invulnerabilityTimeAfterDMG": 30.0,
-  "fullHPColor": [0.0, 1.0, 0.0, 1.0],
-  "lowHPColor": [1.0, 0.0, 0.0, 1.0],
+  "fullHPColor": [
+    0.0,
+    1.0,
+    0.0,
+    1.0
+  ],
+  "lowHPColor": [
+    1.0,
+    0.0,
+    0.0,
+    1.0
+  ],
   "textTagDefaultSize": 20,
   "textTagDefaultLifetime": 60.0,
   "textTagDefaultSpeed": 1.0,

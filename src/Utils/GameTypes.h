@@ -278,6 +278,13 @@ namespace GameType
         HELMET_LOOT = 4
     };
 
+    struct LightSource
+    {
+        sf::Vector2f position;
+        float radius;
+        uint8_t alpha;
+    };
+
     struct slotTypeHash
     {
         template <typename T>

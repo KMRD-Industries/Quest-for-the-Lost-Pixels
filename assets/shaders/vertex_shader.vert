@@ -1,16 +1,13 @@
-// vertex_shader.vert
+#version 120
 
-varying vec4 vert_pos;  // Declaring a varying variable to pass to the fragment shader
+// Input vertex data
+attribute vec2 position;
+attribute vec2 texCoord;
 
-void main()
-{
-    // Transform the vertex position
-    vert_pos = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_Position = vert_pos;
+// Output to fragment shader
+varying vec2 v_texCoord;
 
-    // Transform the texture coordinates
-    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-
-    // Forward the vertex color
-    gl_FrontColor = gl_Color;
+void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+    v_texCoord = texCoord;
 }

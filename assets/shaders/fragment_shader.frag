@@ -1,16 +1,23 @@
-uniform float shadeFactor;  // Uniform to control shading
-uniform sampler2D texture;  // The texture sampler
+#version 120
 
-varying vec4 vert_pos;      // Varying variable passed from the vertex shader
+varying vec2 v_texCoord;// Passed from the vertex shader
 
-void main()
-{
-    // Sample the texture using the texture coordinates
-    vec4 color = texture2D(texture, gl_TexCoord[0].st);
+// Uniforms passed from C++ code
+uniform vec2 lightPosition;// Position of the light source
+uniform float lightRadius;// Light radius
 
-    // Apply shading based on shadeFactor
-    color.rgb *= shadeFactor;
+uniform sampler2D texture;// The texture of the sprite
 
-    // Output the final color
-    gl_FragColor = color * gl_Color;
+void main() {
+    vec4 texColor = texture2D(texture, v_texCoord);// Get the texture color
+
+    // Calculate the distance from the current fragment to the light source
+    float dist = distance(gl_FragCoord.xy, lightPosition);
+
+    // Light intensity fades with distance
+    float intensity = smoothstep(0.0, lightRadius, dist);
+
+    // Combine the texture color with the lighting effect
+    vec4 lightColor = vec4(1.0, 1.0, 1.0, intensity);// White light with intensity fade
+    gl_FragColor = texColor * lightColor;
 }

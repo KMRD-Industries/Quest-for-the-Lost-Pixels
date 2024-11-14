@@ -27,10 +27,11 @@
          "objectgroup":
             {
              "draworder":"index",
+             "id":2,
              "name":"",
              "objects":[
                     {
-                     "height":7,
+                     "height":8,
                      "id":12,
                      "name":"",
                      "properties":[
@@ -43,7 +44,7 @@
                      "type":"Collision",
                      "visible":true,
                      "width":13,
-                     "x":3,
+                     "x":1,
                      "y":23
                     }, 
                     {
@@ -106,7 +107,7 @@
              "name":"",
              "objects":[
                     {
-                     "height":5.72727,
+                     "height":6,
                      "id":1,
                      "name":"",
                      "properties":[
@@ -118,9 +119,9 @@
                      "rotation":0,
                      "type":"",
                      "visible":true,
-                     "width":12.5,
-                     "x":3.47727272727273,
-                     "y":24.8636377272727
+                     "width":15,
+                     "x":1,
+                     "y":26
                     }, 
                     {
                      "height":1,
@@ -216,8 +217,8 @@
                      "rotation":0,
                      "type":"",
                      "visible":true,
-                     "width":12.5,
-                     "x":1,
+                     "width":16,
+                     "x":0,
                      "y":26.3181831818182
                     }, 
                     {
@@ -302,7 +303,7 @@
              "name":"",
              "objects":[
                     {
-                     "height":5.72727,
+                     "height":7.53977,
                      "id":1,
                      "name":"",
                      "properties":[
@@ -314,8 +315,8 @@
                      "rotation":0,
                      "type":"",
                      "visible":true,
-                     "width":12.5,
-                     "x":3.47727272727273,
+                     "width":15.0625,
+                     "x":0.91477272727273,
                      "y":24.3181831818182
                     }, 
                     {
@@ -400,7 +401,7 @@
              "name":"",
              "objects":[
                     {
-                     "height":5.72727,
+                     "height":9.66477,
                      "id":1,
                      "name":"",
                      "properties":[
@@ -412,8 +413,8 @@
                      "rotation":0,
                      "type":"",
                      "visible":true,
-                     "width":12.5,
-                     "x":3.20454545454545,
+                     "width":16,
+                     "x":0.0795454545454501,
                      "y":22.2272740909091
                     }, 
                     {
@@ -498,7 +499,7 @@
              "name":"",
              "objects":[
                     {
-                     "height":5.72727,
+                     "height":10.35227,
                      "id":1,
                      "name":"",
                      "properties":[
@@ -510,8 +511,8 @@
                      "rotation":0,
                      "type":"",
                      "visible":true,
-                     "width":12.5,
-                     "x":3.20454545454545,
+                     "width":15.5625,
+                     "x":0.14204545454545,
                      "y":21.4090922727273
                     }, 
                     {
@@ -596,7 +597,7 @@
              "name":"",
              "objects":[
                     {
-                     "height":5.72727,
+                     "height":9.03977,
                      "id":1,
                      "name":"",
                      "properties":[
@@ -608,8 +609,8 @@
                      "rotation":0,
                      "type":"",
                      "visible":true,
-                     "width":12.5,
-                     "x":3.20454545454546,
+                     "width":16,
+                     "x":-0.0454545454545401,
                      "y":22.8636377272727
                     }, 
                     {
