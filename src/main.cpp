@@ -66,7 +66,7 @@ int main()
     const PublicConfig& config = configSingleton.GetConfig();
 
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!", sf::Style::Fullscreen);
+    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!");
 
     int _ = ImGui::SFML::Init(window);
     window.setFramerateLimit(config.debugMode ? 144 : config.frameCycle);

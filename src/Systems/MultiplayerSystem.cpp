@@ -14,7 +14,9 @@
 #include "GameTypes.h"
 #include "Helpers.h"
 #include "InputHandler.h"
+#include "InventorySystem.h"
 #include "MultiplayerSystem.h"
+#include "RoomListenerSystem.h"
 #include "SynchronisedEvent.h"
 #include "TransformComponent.h"
 #include "Types.h"
@@ -71,10 +73,6 @@ void MultiplayerSystem::setup(const std::string_view& ip, const std::string_view
 
     m_last_tick = sysClock::now();
 
-    m_state.set_allocated_room(new comm::Room());
-    m_outgoing_movement.set_allocated_curr_room(new comm::Room());
-    m_incomming_movement.set_allocated_curr_room(new comm::Room());
-
     comm::BytePrefix prefixDummy;
     prefixDummy.set_bytes(1);
     m_prefix_size = static_cast<int>(prefixDummy.ByteSizeLong());
@@ -87,22 +85,18 @@ void MultiplayerSystem::setRoom(const glm::ivec2& room) noexcept
 {
     m_current_room = room;
 
-    auto r1 = m_state.release_room();
+    auto r1 = m_state.mutable_room();
     r1->set_x(room.x);
     r1->set_y(room.y);
-    m_state.set_allocated_room(r1);
 
-    auto r2 = m_outgoing_movement.release_curr_room();
+    auto r2 = m_outgoing_movement.mutable_curr_room();
     r2->set_x(room.x);
     r2->set_y(room.y);
-    m_outgoing_movement.set_allocated_curr_room(r2);
 }
 
 const glm::ivec2& MultiplayerSystem::getRoom() const noexcept { return m_current_room; }
 
 const ItemGenerator& MultiplayerSystem::getItemGenerator() { return m_item_generator; }
-
-void MultiplayerSystem::onAttack() { m_outgoing_movement.set_attack(true); }
 
 bool MultiplayerSystem::isInsideInitialRoom(const bool change) noexcept
 {
@@ -138,7 +132,7 @@ comm::InitialInfo MultiplayerSystem::registerPlayer(const Entity playerEntity)
     return initialInfo;
 }
 
-const comm::StateUpdate& MultiplayerSystem::pollStateUpdates()
+void MultiplayerSystem::pollState()
 {
     size_t available = m_tcp_socket.available();
     if (available >= m_prefix_size)
@@ -158,21 +152,78 @@ const comm::StateUpdate& MultiplayerSystem::pollStateUpdates()
         m_state.ParseFromArray(m_buf.data(), static_cast<int>(received));
         std::cout << m_state.ShortDebugString() << '\n';
 
+        const auto& player = m_state.player();
+        const auto& item = m_state.item();
+        const auto& room = m_state.room();
+
+        const uint32_t playerID = player.id();
+
         switch (m_state.variant())
         {
-        case comm::ROOM_CHANGED:
+        case comm::CONNECTED:
             {
-                auto r = m_state.room();
-                setRoom({r.x(), r.y()});
+                auto dungeonUpdate =
+                    MultiplayerDungeonUpdate{.variant = MultiplayerDungeonUpdate::REGISTER_PLAYER, .player = player};
+                m_dungeon_updates.push_back(dungeonUpdate);
                 break;
             }
-        case comm::REQUEST_ITEM_GENERATOR:
+
+        case comm::PLAYER_DIED:
+        case comm::DISCONNECTED:
+            if (playerID == 0 || !m_entity_map.contains(playerID)) break;
+
+            gCoordinator.getComponent<ColliderComponent>(m_entity_map[playerID]).toDestroy = true;
+            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[playerID]).slots)
             {
-                const auto& nextItem = m_state.item();
-                m_generator_ready = true;
-                m_item_generator.id = nextItem.id();
-                m_item_generator.gen = nextItem.gen();
-                m_item_generator.type = nextItem.type();
+                if (slot.second != 0)
+                {
+                    m_registered_items.erase(slot.second);
+                    gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
+                }
+            }
+            m_entity_map.erase(playerID);
+            break;
+        case comm::REQUEST_ITEM_GENERATOR:
+            m_generator_ready = true;
+            m_item_generator.id = item.id();
+            m_item_generator.gen = item.gen();
+            m_item_generator.type = item.type();
+            break;
+        case comm::ITEM_EQUIPPED:
+            switch (item.type())
+            {
+            case comm::WEAPON:
+                gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(
+                    GameType::PickUpInfo{m_entity_map[playerID], getItemEntity(item.id()), GameType::slotType::WEAPON});
+                break;
+            case comm::HELMET:
+                gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(
+                    GameType::PickUpInfo{m_entity_map[playerID], getItemEntity(item.id()), GameType::slotType::HELMET});
+                break;
+            case comm::ARMOUR:
+                gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(GameType::PickUpInfo{
+                    m_entity_map[playerID], getItemEntity(item.id()), GameType::slotType::BODY_ARMOUR});
+                break;
+            default:
+                break;
+            }
+            break;
+        case comm::ROOM_CHANGED:
+            {
+                setRoom({room.x(), room.y()});
+                auto dungeonUpdate =
+                    MultiplayerDungeonUpdate{.variant = MultiplayerDungeonUpdate::CHANGE_ROOM, .room = m_current_room};
+                m_dungeon_updates.push_back(dungeonUpdate);
+                break;
+            }
+        case comm::ROOM_CLEARED:
+            gCoordinator.getRegisterSystem<RoomListenerSystem>()->spawnLoot();
+            break;
+        case comm::LEVEL_CHANGED:
+            {
+                auto dungeonUpdate = MultiplayerDungeonUpdate{.variant = MultiplayerDungeonUpdate::CHANGE_LEVEL};
+                m_dungeon_updates.push_back(dungeonUpdate);
+                break;
             }
         default:
         }
@@ -181,7 +232,6 @@ const comm::StateUpdate& MultiplayerSystem::pollStateUpdates()
     {
         m_state.set_variant(comm::NONE);
     }
-    return m_state;
 }
 
 Entity MultiplayerSystem::getItemEntity(const uint32_t id)
@@ -193,6 +243,8 @@ Entity MultiplayerSystem::getItemEntity(const uint32_t id)
 int64_t MultiplayerSystem::getSeed() { return m_seed; }
 
 const std::unordered_map<uint32_t, Entity>& MultiplayerSystem::getPlayers() { return m_entity_map; }
+
+const std::vector<MultiplayerDungeonUpdate>& MultiplayerSystem::getRemoteDungeonUpdates() { return m_dungeon_updates; }
 
 void MultiplayerSystem::update()
 {
@@ -210,14 +262,52 @@ void MultiplayerSystem::update()
         return;
     }
 
+    if (m_dungeon_updates.size() > 0)
+        m_dungeon_updates.clear();
+
+    pollState();
+    pollMovement();
+
+    std::vector<Entity> synchronisedEvents{};
+    std::vector<Entity> movementEvents{};
+    for (const Entity eventEntity : m_entities)
+    {
+        const auto& eventComponent = gCoordinator.getComponent<SynchronisedEvent>(eventEntity);
+        switch (eventComponent.updateType)
+        {
+        case SynchronisedEvent::STATE:
+            synchronisedEvents.push_back(eventEntity);
+            break;
+        case SynchronisedEvent::MOVEMENT:
+            movementEvents.push_back(eventEntity);
+        default:
+        }
+    }
+
+    if (synchronisedEvents.size() > 0) updateState(synchronisedEvents);
+    if (movementEvents.size() > 0) updateMovement(movementEvents);
+
+    std::deque<Entity> eventEntities;
+
+    for (const Entity entity : m_entities) eventEntities.push_back(entity);
+
+    while (!eventEntities.empty())
+    {
+        gCoordinator.destroyEntity(eventEntities.front());
+        eventEntities.pop_front();
+    }
+}
+
+void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
+{
     comm::StateUpdate* update = nullptr;
     bool anythingToSend = false, usedPreviousUpdate = true;
 
     m_updates.mutable_updates()->Clear();
 
-    for (const Entity eventEntity : m_entities)
+    for (const Entity eventEntity : entities)
     {
-        const auto& [variant, entityID, entity, updatedEntity, pickUpInfo, room] =
+        const auto& [updateType, variant, entityID, entity, updatedEntity, pickUpInfo, room] =
             gCoordinator.getComponent<SynchronisedEvent>(eventEntity);
 
         if (usedPreviousUpdate) update = m_updates.add_updates();
@@ -229,22 +319,6 @@ void MultiplayerSystem::update()
             if (entity == 0 || entityID == 0) continue;
 
             m_entity_map[entityID] = entity;
-            break;
-
-        case SynchronisedEvent::PLAYER_DISCONNECTED:
-            usedPreviousUpdate = false;
-            if (entityID == 0 || !m_entity_map.contains(entityID)) continue;
-
-            gCoordinator.getComponent<ColliderComponent>(m_entity_map[entityID]).toDestroy = true;
-            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[entityID]).slots)
-            {
-                if (slot.second != 0)
-                {
-                    m_registered_items.erase(slot.second);
-                    gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
-                }
-            }
-            m_entity_map.erase(entityID);
             break;
 
         case SynchronisedEvent::PLAYER_KILLED:
@@ -367,16 +441,6 @@ void MultiplayerSystem::update()
         }
     }
 
-    std::deque<Entity> eventEntities;
-
-    for (const Entity entity : m_entities) eventEntities.push_back(entity);
-
-    while (!eventEntities.empty())
-    {
-        gCoordinator.destroyEntity(eventEntities.front());
-        eventEntities.pop_front();
-    }
-
     if (!usedPreviousUpdate) m_updates.mutable_updates()->RemoveLast();
 
     if (anythingToSend)
@@ -386,14 +450,62 @@ void MultiplayerSystem::update()
     }
 }
 
-void MultiplayerSystem::updateMovement()
+void MultiplayerSystem::updateMovement(const std::vector<Entity>& entities)
+{
+    if (!m_alive) return;
+
+    for (const Entity entity : entities)
+    {
+        const auto& eventComponent = gCoordinator.getComponent<SynchronisedEvent>(entity);
+
+        switch (eventComponent.variant)
+        {
+        case SynchronisedEvent::PLAYER_MOVED:
+            {
+                const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
+                const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(m_player_entity);
+                const auto& weaponComponent =
+                    gCoordinator.getComponent<WeaponComponent>(equippedWeapon.slots.at(GameType::slotType::WEAPON));
+
+                const auto& windowSize = InputHandler::getInstance()->getWindowSize();
+                float scaledPivotX = weaponComponent.pivotPoint.x / static_cast<float>(windowSize.x);
+                float scaledPivotY = weaponComponent.pivotPoint.y / static_cast<float>(windowSize.y);
+
+                m_outgoing_movement.set_entity_id(m_player_id);
+                m_outgoing_movement.set_position_x(transformComponent.position.x);
+                m_outgoing_movement.set_position_y(transformComponent.position.y);
+                m_outgoing_movement.set_weapon_pivot_x(scaledPivotX);
+                m_outgoing_movement.set_weapon_pivot_y(scaledPivotY);
+                m_outgoing_movement.set_direction(transformComponent.scale.x);
+                break;
+            }
+        case SynchronisedEvent::PLAYER_ATTACKED:
+            m_outgoing_movement.set_attack(true);
+            break;
+        default:
+            break;
+        }
+    }
+
+    // auto tick = sysClock::now();
+    // if (!readyToTick(m_last_tick, tick)) return;
+    // m_last_tick = tick;
+
+    auto serialized = m_outgoing_movement.SerializeAsString();
+    m_udp_socket.send(boost::asio::buffer(serialized));
+
+    m_outgoing_movement.set_attack(false);
+}
+
+void MultiplayerSystem::pollMovement()
 {
     size_t received = 0;
-    const size_t available = m_udp_socket.available();
+    size_t available = m_udp_socket.available();
 
-    if (available > 0)
+    while (available > 0)
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
+        available = m_udp_socket.available();
         m_incomming_movement.ParseFromArray(&m_buf, int(received));
         uint32_t id = m_incomming_movement.entity_id();
         auto r = m_incomming_movement.curr_room();
@@ -433,41 +545,11 @@ void MultiplayerSystem::updateMovement()
                                                  colliderComponent.body->GetAngle());
         }
     }
-
-    if (!m_alive) return;
-
-    auto tick = sysClock::now();
-    if (!readyToTick(m_last_tick, tick)) return;
-    m_last_tick = tick;
-
-    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
-    const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(m_player_entity);
-    const auto& weaponComponent =
-        gCoordinator.getComponent<WeaponComponent>(equippedWeapon.slots.at(GameType::slotType::WEAPON));
-
-    const auto& windowSize = InputHandler::getInstance()->getWindowSize();
-    float scaledPivotX = weaponComponent.pivotPoint.x / static_cast<float>(windowSize.x);
-    float scaledPivotY = weaponComponent.pivotPoint.y / static_cast<float>(windowSize.y);
-
-    m_outgoing_movement.set_entity_id(m_player_id);
-    m_outgoing_movement.set_position_x(transformComponent.position.x);
-    m_outgoing_movement.set_position_y(transformComponent.position.y);
-    m_outgoing_movement.set_weapon_pivot_x(scaledPivotX);
-    m_outgoing_movement.set_weapon_pivot_y(scaledPivotY);
-    m_outgoing_movement.set_direction(transformComponent.scale.x);
-
-    auto serialized = m_outgoing_movement.SerializeAsString();
-    m_udp_socket.send(boost::asio::buffer(serialized));
-
-    m_outgoing_movement.set_attack(false);
 }
 
 void MultiplayerSystem::disconnect()
 {
     if (!m_connected) return;
-    delete m_state.release_room();
-    delete m_incomming_movement.release_curr_room();
-    delete m_outgoing_movement.release_curr_room();
     m_tcp_socket.close();
     m_udp_socket.close();
 }

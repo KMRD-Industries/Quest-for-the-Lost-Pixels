@@ -315,61 +315,24 @@ void Dungeon::update(const float deltaTime)
     m_dealDMGSystem->update();
     m_multiplayerSystem->update();
 
-    if (m_multiplayerSystem->isConnected())
+    for (const auto& remoteDungeonUpdate: m_multiplayerSystem->getRemoteDungeonUpdates())
     {
-        const auto& stateUpdate = m_multiplayerSystem->pollStateUpdates();
-        const auto& player = stateUpdate.player();
-        const auto& item = stateUpdate.item();
-        const uint32_t playerID = player.id();
-
-        Entity eventEntity = 0;
-
-        switch (stateUpdate.variant())
+        switch (remoteDungeonUpdate.variant)
         {
-        case comm::CONNECTED:
-            createRemotePlayer(player);
+        case MultiplayerDungeonUpdate::REGISTER_PLAYER:
+            createRemotePlayer(remoteDungeonUpdate.player);
             break;
-        case comm::PLAYER_DIED:
-        case comm::DISCONNECTED:
-            eventEntity = gCoordinator.createEntity();
-            gCoordinator.addComponent(
-                eventEntity,
-                SynchronisedEvent{.variant = SynchronisedEvent::PLAYER_DISCONNECTED, .entityID = playerID});
+        case MultiplayerDungeonUpdate::CHANGE_ROOM:
+            changeRoom(*remoteDungeonUpdate.room, false);
             break;
-        case comm::ROOM_CHANGED:
-            changeRoom(m_multiplayerSystem->getRoom(), false);
+        case MultiplayerDungeonUpdate::CHANGE_LEVEL:
+            changeRoom(*remoteDungeonUpdate.room, true);
             break;
-        case comm::ROOM_CLEARED:
-            m_roomListenerSystem->spawnLoot();
-            break;
-        case comm::LEVEL_CHANGED:
-            changeRoom(m_multiplayerSystem->getRoom(), true);
-            break;
-        case comm::ITEM_EQUIPPED:
-            switch (item.type())
-            {
-            case comm::WEAPON:
-                m_inventorySystem->pickUpItem(GameType::PickUpInfo{
-                    m_entities[playerID], m_multiplayerSystem->getItemEntity(item.id()), GameType::slotType::WEAPON});
-                break;
-            case comm::HELMET:
-                m_inventorySystem->pickUpItem(GameType::PickUpInfo{
-                    m_entities[playerID], m_multiplayerSystem->getItemEntity(item.id()), GameType::slotType::HELMET});
-                break;
-            case comm::ARMOUR:
-                m_inventorySystem->pickUpItem(GameType::PickUpInfo{m_entities[playerID],
-                                                                   m_multiplayerSystem->getItemEntity(item.id()),
-                                                                   GameType::slotType::BODY_ARMOUR});
-                break;
-            default:
-                break;
-            }
         default:
             break;
         }
-
-        m_multiplayerSystem->updateMovement();
     }
+
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
     {

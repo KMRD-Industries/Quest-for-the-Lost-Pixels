@@ -8,6 +8,12 @@
 
 struct SynchronisedEvent
 {
+    enum UpdateType
+    {
+        STATE = 1,
+        MOVEMENT = 2,
+    };
+
     enum Variant
     {
         NONE = 0,
@@ -21,9 +27,11 @@ struct SynchronisedEvent
         ROOM_CHANGED = 8,
         ROOM_CLEARED = 9,
         LEVEL_CHANGED = 10,
-        ATTACK = 11,
+        PLAYER_MOVED = 11,
+        PLAYER_ATTACKED = 12,
     };
 
+    UpdateType updateType = STATE;
     Variant variant = NONE;
     uint32_t entityID = 0;
     Entity entity = 0;

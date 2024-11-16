@@ -1,19 +1,14 @@
 #include "PlayerMovementSystem.h"
 #include <EquipmentComponent.h>
-#include "CharacterComponent.h"
-#include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "FightActionEvent.h"
 #include "InputHandler.h"
-#include "InventorySystem.h"
 #include "ItemSystem.h"
-#include "MultiplayerSystem.h"
-#include "Physics.h"
 #include "RenderComponent.h"
+#include "SynchronisedEvent.h"
 #include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
-#include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
@@ -103,7 +98,11 @@ void PlayerMovementSystem::handleAttack() const
 
     if (!inputHandler->isPressed(InputType::Attack)) return;
 
-    gCoordinator.getRegisterSystem<MultiplayerSystem>()->onAttack();
     const Entity fightAction = gCoordinator.createEntity();
     gCoordinator.addComponent(fightAction, FightActionEvent{.entity = config::playerEntity});
+
+    const Entity movementEvent = gCoordinator.createEntity();
+    gCoordinator.addComponent(
+        movementEvent,
+        SynchronisedEvent{.updateType = SynchronisedEvent::MOVEMENT, .variant = SynchronisedEvent::PLAYER_ATTACKED});
 }

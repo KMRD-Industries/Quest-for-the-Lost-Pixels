@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <unordered_map>
 
 #include <SFML/System/Vector3.hpp>
@@ -14,6 +15,21 @@ struct ItemGenerator
     uint32_t id;
     uint32_t gen;
     comm::ItemType type;
+};
+
+struct MultiplayerDungeonUpdate
+{
+    enum Variant
+    {
+        NONE = 0,
+        REGISTER_PLAYER = 1,
+        CHANGE_ROOM = 2,
+        CHANGE_LEVEL = 3,
+    };
+
+    Variant variant = NONE;
+    std::optional<glm::ivec2> room = std::nullopt;
+    comm::Player player{};
 };
 
 using boost::asio::ip::tcp;
@@ -50,14 +66,19 @@ private:
     comm::StateUpdate m_state{};
     comm::StateUpdateSeries m_updates{};
 
+    std::vector<MultiplayerDungeonUpdate> m_dungeon_updates{};
+
+    void pollMovement();
+    void pollState();
+    void updateState(const std::vector<Entity>& entities);
+    void updateMovement(const std::vector<Entity>& entities);
+
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
     void setup(const std::string_view& ip, const std::string_view& port) noexcept;
     void setPlayer(const uint32_t id, const Entity entity);
     void setRoom(const glm::ivec2& room) noexcept;
-    void onAttack();
     void update();
-    void updateMovement();
     void disconnect();
 
     bool isConnected() const noexcept;
@@ -68,6 +89,6 @@ public:
     Entity getItemEntity(const uint32_t id);
     int64_t getSeed();
     const std::unordered_map<uint32_t, Entity>& getPlayers();
+    const std::vector<MultiplayerDungeonUpdate>& getRemoteDungeonUpdates();
     comm::InitialInfo registerPlayer(const Entity player);
-    const comm::StateUpdate& pollStateUpdates();
 };
