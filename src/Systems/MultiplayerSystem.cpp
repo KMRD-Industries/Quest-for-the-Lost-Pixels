@@ -262,8 +262,7 @@ void MultiplayerSystem::update()
         return;
     }
 
-    if (m_dungeon_updates.size() > 0)
-        m_dungeon_updates.clear();
+    if (m_dungeon_updates.size() > 0) m_dungeon_updates.clear();
 
     pollState();
     pollMovement();
@@ -324,6 +323,8 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
         case SynchronisedEvent::PLAYER_KILLED:
             usedPreviousUpdate = true;
             anythingToSend = true;
+
+            m_alive = false;
 
             for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[m_player_id]).slots)
             {

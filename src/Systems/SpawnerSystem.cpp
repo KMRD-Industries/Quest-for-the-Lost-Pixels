@@ -7,6 +7,7 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
+#include "EquipmentComponent.h"
 #include "Helpers.h"
 #include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
