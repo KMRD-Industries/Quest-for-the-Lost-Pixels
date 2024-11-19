@@ -44,6 +44,7 @@ private:
     Entity m_player_entity = 0;
     uint32_t m_player_id = 0;
     int64_t m_seed = 0;
+    float m_frame_time = 0.0;
 
     boost::asio::io_context m_io_context;
     tcp::socket m_tcp_socket;
@@ -78,7 +79,7 @@ public:
     void setup(const std::string_view& ip, const std::string_view& port) noexcept;
     void setPlayer(const uint32_t id, const Entity entity);
     void setRoom(const glm::ivec2& room) noexcept;
-    void update();
+    void update(const float deltaTime);
     void disconnect();
 
     bool isConnected() const noexcept;

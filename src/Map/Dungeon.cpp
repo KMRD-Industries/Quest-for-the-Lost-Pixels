@@ -141,8 +141,8 @@ void Dungeon::addPlayerComponents(const Entity player)
         TransformComponent{GameUtility::startingPosition}, AnimationComponent{},
         CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP}, PlayerComponent{},
         ColliderComponent{}, InventoryComponent{}, EquipmentComponent{}, FloorComponent{},
-        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }},
-        PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
+        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir, true); }},
+        PassageComponent{.moveCallback = [this] { moveDownDungeon(true); }});
 }
 
 void Dungeon::createRemotePlayer(const comm::Player& player)
@@ -155,7 +155,7 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
         TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
                                         getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID)),
                            0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
-        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3},
+        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5},
         RenderComponent{},
         AnimationComponent{},
         CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
@@ -313,7 +313,7 @@ void Dungeon::update(const float deltaTime)
     m_textTagSystem->update(deltaTime);
     m_weaponBindSystem->update();
     m_dealDMGSystem->update();
-    m_multiplayerSystem->update();
+    m_multiplayerSystem->update(deltaTime);
 
     for (const auto& remoteDungeonUpdate: m_multiplayerSystem->getRemoteDungeonUpdates())
     {
@@ -323,11 +323,19 @@ void Dungeon::update(const float deltaTime)
             createRemotePlayer(remoteDungeonUpdate.player);
             break;
         case MultiplayerDungeonUpdate::CHANGE_ROOM:
-            changeRoom(*remoteDungeonUpdate.room, false);
+            moveInDungeon(*remoteDungeonUpdate.room - m_currentPlayerPos, false);
             break;
         case MultiplayerDungeonUpdate::CHANGE_LEVEL:
-            changeRoom(*remoteDungeonUpdate.room, true);
-            break;
+            {
+                auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
+
+                if (!passageComponent.activePassage) return;
+
+                gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
+                passageComponent.activePassage = false;
+                moveDownDungeon(false);
+                break;
+            }
         default:
             break;
         }
@@ -402,7 +410,7 @@ inline void Dungeon::loadMap(const std::string& path) const
     m_collisionSystem->createMapCollision();
 }
 
-void Dungeon::moveDownDungeon()
+void Dungeon::moveDownDungeon(const bool createEvent)
 {
     if (m_dungeonDepth >= configSingleton.GetConfig().maxDungeonDepth) m_endGame = true;
     ++m_dungeonDepth;
@@ -434,11 +442,14 @@ void Dungeon::moveDownDungeon()
 
     m_roomListenerSystem->reset();
 
-    const Entity eventEntity = gCoordinator.createEntity();
-    gCoordinator.addComponent(eventEntity, SynchronisedEvent{.variant = SynchronisedEvent::LEVEL_CHANGED});
+    if (createEvent)
+    {
+        const Entity eventEntity = gCoordinator.createEntity();
+        gCoordinator.addComponent(eventEntity, SynchronisedEvent{.variant = SynchronisedEvent::LEVEL_CHANGED});
+    }
 }
 
-void Dungeon::moveInDungeon(const glm::ivec2& dir)
+void Dungeon::moveInDungeon(const glm::ivec2& dir, const bool createEvent)
 {
     if (m_roomMap.contains(m_currentPlayerPos + dir))
     {
@@ -471,62 +482,12 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir)
             colliderComponent.body->SetTransform(colliderPosition, colliderComponent.body->GetAngle());
         }
 
-        const Entity eventEntity = gCoordinator.createEntity();
-        gCoordinator.addComponent(
-            eventEntity, SynchronisedEvent{.variant = SynchronisedEvent::ROOM_CHANGED, .room = m_currentPlayerPos});
-    }
-}
-
-// when room is changed by remote player
-void Dungeon::changeRoom(const glm::ivec2& room, const bool changeLevel)
-{
-    GameType::MyVec2 position{0.0, 0.0};
-    b2Vec2 colliderPosition{};
-    glm::vec2 offset{};
-
-    bool insideInitialRoom = m_multiplayerSystem->isInsideInitialRoom(true);
-    if (changeLevel)
-    {
-        gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
-        makeSimpleFloor();
-        clearDungeon();
-        m_passageSystem->setPassages(false);
-        loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
-        m_roomListenerSystem->reset();
-
-        position = config::startingPosition;
-    }
-    else
-    {
-        clearDungeon();
-        auto dir = room - m_currentPlayerPos;
-        m_currentPlayerPos = room;
-        m_roomListenerSystem->changeRoom(m_currentPlayerPos);
-        loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
-        m_passageSystem->setPassages(m_currentPlayerPos == m_floorGenerator.getEndingRoom());
-
-        const auto newDoor = dir * -1;
-        const auto doorType = GameType::geoToMapDoors.at(newDoor);
-        position = m_doorSystem->getDoorPosition(doorType);
-        offset = glm::vec2{dir.x * 100, -dir.y * 100};
-    }
-
-    for (const auto& [id, player] : m_multiplayerSystem->getPlayers())
-    {
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(player);
-
-        if (insideInitialRoom)
-            transformComponent.position = {getSpawnOffset(position.x, id), getSpawnOffset(position.y, id)};
-        else
-            transformComponent.position = position + offset + GameType::MyVec2(id, id);
-
-        transformComponent.velocity = {};
-
-        colliderPosition.x = transformComponent.position.x * static_cast<float>(config::pixelToMeterRatio);
-        colliderPosition.y = transformComponent.position.y * static_cast<float>(config::pixelToMeterRatio);
-
-        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(player);
-        colliderComponent.body->SetTransform(colliderPosition, colliderComponent.body->GetAngle());
+        if (createEvent)
+        {
+            const Entity eventEntity = gCoordinator.createEntity();
+            gCoordinator.addComponent(
+                eventEntity, SynchronisedEvent{.variant = SynchronisedEvent::ROOM_CHANGED, .room = m_currentPlayerPos});
+        }
     }
 }
 

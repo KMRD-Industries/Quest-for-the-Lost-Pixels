@@ -16,6 +16,7 @@
 #include "InputHandler.h"
 #include "InventorySystem.h"
 #include "MultiplayerSystem.h"
+#include "RenderComponent.h"
 #include "RoomListenerSystem.h"
 #include "SynchronisedEvent.h"
 #include "TransformComponent.h"
@@ -246,7 +247,7 @@ const std::unordered_map<uint32_t, Entity>& MultiplayerSystem::getPlayers() { re
 
 const std::vector<MultiplayerDungeonUpdate>& MultiplayerSystem::getRemoteDungeonUpdates() { return m_dungeon_updates; }
 
-void MultiplayerSystem::update()
+void MultiplayerSystem::update(const float deltaTime)
 {
     if (!m_connected)
     {
@@ -261,6 +262,10 @@ void MultiplayerSystem::update()
         }
         return;
     }
+
+    if (m_frame_time += deltaTime; m_frame_time < configSingleton.GetConfig().oneFrameTime * 1000) return;
+
+    m_frame_time -= configSingleton.GetConfig().oneFrameTime * 1000;
 
     if (m_dungeon_updates.size() > 0) m_dungeon_updates.clear();
 
@@ -509,7 +514,7 @@ void MultiplayerSystem::pollMovement()
         available = m_udp_socket.available();
         m_incomming_movement.ParseFromArray(&m_buf, int(received));
         uint32_t id = m_incomming_movement.entity_id();
-        auto r = m_incomming_movement.curr_room();
+        const auto& r = m_incomming_movement.curr_room();
 
         if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
         {
@@ -518,15 +523,18 @@ void MultiplayerSystem::pollMovement()
             auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
 
             const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(target);
-            const Entity& weaponEntity = equippedWeapon.slots.at(GameType::slotType::WEAPON);
+            const Entity weaponEntity = equippedWeapon.slots.at(GameType::slotType::WEAPON);
             auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
+            auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
             auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
 
             const auto& windowSize = InputHandler::getInstance()->getWindowSize();
 
-            weaponComponent.pivotPoint.x = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
-            weaponComponent.pivotPoint.y = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
+            float newPivotX = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
+            float newPivotY = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
+            // weaponRenderComponent.dirty = true;
 
+            //TODO: fix remote players' "jumping" - the animation is bugged
             if (m_incomming_movement.attack())
             {
                 const Entity fightAction = gCoordinator.createEntity();
@@ -536,6 +544,14 @@ void MultiplayerSystem::pollMovement()
             float x = m_incomming_movement.position_x();
             float y = m_incomming_movement.position_y();
             float r = m_incomming_movement.direction();
+
+            const float eps = 0.01f;
+            if (!(std::abs(transformComponent.velocity.x - x) > eps ||
+                  std::abs(transformComponent.velocity.y - y) > eps || transformComponent.scale.x != r))
+                return;
+
+            weaponComponent.pivotPoint.x = newPivotX;
+            weaponComponent.pivotPoint.y = newPivotY;
 
             transformComponent.velocity.x = x - transformComponent.position.x;
             transformComponent.velocity.y = y - transformComponent.position.y;

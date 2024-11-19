@@ -75,7 +75,6 @@ void PlayerMovementSystem::handleMovement()
 
     if (!gCoordinator.hasComponent<EquipmentComponent>(config::playerEntity)) return;
 
-    bool weaponMoved = false;
     if (equipment.slots.contains(GameType::slotType::WEAPON))
     {
         const Entity weaponEntity = equipment.slots.at(GameType::slotType::WEAPON);
@@ -85,29 +84,19 @@ void PlayerMovementSystem::handleMovement()
             auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
             auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
 
-            auto& currentMousePos = inputHandler->getMousePosition();
+            weaponComponent->pivotPoint = inputHandler->getMousePosition();
+            weaponRenderComponent.dirty = true;
 
-            if (currentMousePos != weaponComponent->pivotPoint)
-            {
-                weaponMoved = true;
-                weaponComponent->pivotPoint = currentMousePos;
-                weaponRenderComponent.dirty = true;
-
-                transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
-                                            transformComponent.scale.y};
-                weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
-                                                  weaponTransformComponent.scale.y};
-            }
+            transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y};
+            weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+                                              weaponTransformComponent.scale.y};
         }
     }
 
-    if (weaponMoved || dir != glm::vec2{})
-    {
-        Entity eventEntity = gCoordinator.createEntity();
-        gCoordinator.addComponent(
-            eventEntity,
-            SynchronisedEvent{.updateType = SynchronisedEvent::MOVEMENT, .variant = SynchronisedEvent::PLAYER_MOVED});
-    }
+    Entity eventEntity = gCoordinator.createEntity();
+    gCoordinator.addComponent(
+        eventEntity,
+        SynchronisedEvent{.updateType = SynchronisedEvent::MOVEMENT, .variant = SynchronisedEvent::PLAYER_MOVED});
 }
 
 void PlayerMovementSystem::handleAttack() const
