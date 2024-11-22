@@ -19,15 +19,15 @@ struct ItemGenerator
 
 struct MultiplayerDungeonUpdate
 {
-    enum Variant
+    enum class Variant
     {
         NONE = 0,
-        REGISTER_PLAYER = 1,
-        CHANGE_ROOM = 2,
-        CHANGE_LEVEL = 3,
+        REGISTER_PLAYER,
+        CHANGE_ROOM,
+        CHANGE_LEVEL,
     };
 
-    Variant variant = NONE;
+    Variant variant = Variant::NONE;
     std::optional<glm::ivec2> room = std::nullopt;
     comm::Player player{};
 };

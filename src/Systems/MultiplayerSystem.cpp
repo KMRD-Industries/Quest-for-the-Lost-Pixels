@@ -163,8 +163,8 @@ void MultiplayerSystem::pollState()
         {
         case comm::CONNECTED:
             {
-                auto dungeonUpdate =
-                    MultiplayerDungeonUpdate{.variant = MultiplayerDungeonUpdate::REGISTER_PLAYER, .player = player};
+                auto dungeonUpdate = MultiplayerDungeonUpdate{
+                    .variant = MultiplayerDungeonUpdate::Variant::REGISTER_PLAYER, .player = player};
                 m_dungeon_updates.push_back(dungeonUpdate);
                 break;
             }
@@ -212,8 +212,8 @@ void MultiplayerSystem::pollState()
         case comm::ROOM_CHANGED:
             {
                 setRoom({room.x(), room.y()});
-                auto dungeonUpdate =
-                    MultiplayerDungeonUpdate{.variant = MultiplayerDungeonUpdate::CHANGE_ROOM, .room = m_current_room};
+                auto dungeonUpdate = MultiplayerDungeonUpdate{.variant = MultiplayerDungeonUpdate::Variant::CHANGE_ROOM,
+                                                              .room = m_current_room};
                 m_dungeon_updates.push_back(dungeonUpdate);
                 break;
             }
@@ -222,7 +222,8 @@ void MultiplayerSystem::pollState()
             break;
         case comm::LEVEL_CHANGED:
             {
-                auto dungeonUpdate = MultiplayerDungeonUpdate{.variant = MultiplayerDungeonUpdate::CHANGE_LEVEL};
+                auto dungeonUpdate =
+                    MultiplayerDungeonUpdate{.variant = MultiplayerDungeonUpdate::Variant::CHANGE_LEVEL};
                 m_dungeon_updates.push_back(dungeonUpdate);
                 break;
             }
@@ -279,10 +280,10 @@ void MultiplayerSystem::update(const float deltaTime)
         const auto& eventComponent = gCoordinator.getComponent<SynchronisedEvent>(eventEntity);
         switch (eventComponent.updateType)
         {
-        case SynchronisedEvent::STATE:
+        case SynchronisedEvent::UpdateType::STATE:
             synchronisedEvents.push_back(eventEntity);
             break;
-        case SynchronisedEvent::MOVEMENT:
+        case SynchronisedEvent::UpdateType::MOVEMENT:
             movementEvents.push_back(eventEntity);
         default:
         }
@@ -318,14 +319,14 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
 
         switch (variant)
         {
-        case SynchronisedEvent::PLAYER_CONNECTED:
+        case SynchronisedEvent::Variant::PLAYER_CONNECTED:
             usedPreviousUpdate = false;
             if (entity == 0 || entityID == 0) continue;
 
             m_entity_map[entityID] = entity;
             break;
 
-        case SynchronisedEvent::PLAYER_KILLED:
+        case SynchronisedEvent::Variant::PLAYER_KILLED:
             usedPreviousUpdate = true;
             anythingToSend = true;
 
@@ -344,14 +345,14 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             update->mutable_player()->set_id(m_player_id);
             break;
 
-        case SynchronisedEvent::REGISTER_ITEM:
+        case SynchronisedEvent::Variant::REGISTER_ITEM:
             usedPreviousUpdate = false;
             if (entity == 0 || entityID == 0) continue;
 
             m_registered_items[entityID] = entity;
             break;
 
-        case SynchronisedEvent::REQUEST_ITEM_GENERATOR:
+        case SynchronisedEvent::Variant::REQUEST_ITEM_GENERATOR:
             usedPreviousUpdate = true;
             anythingToSend = true;
 
@@ -359,7 +360,7 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             update->mutable_player()->set_id(m_player_id);
             break;
 
-        case SynchronisedEvent::UPDATE_ITEM_ENTITY:
+        case SynchronisedEvent::Variant::UPDATE_ITEM_ENTITY:
             usedPreviousUpdate = false;
             if (entity == 0 || updatedEntity == 0) continue;
 
@@ -372,7 +373,7 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             }
             break;
 
-        case SynchronisedEvent::ITEM_EQUIPPED:
+        case SynchronisedEvent::Variant::ITEM_EQUIPPED:
             usedPreviousUpdate = true;
             anythingToSend = true;
 
@@ -410,7 +411,7 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             }
             break;
 
-        case SynchronisedEvent::ROOM_CHANGED:
+        case SynchronisedEvent::Variant::ROOM_CHANGED:
             usedPreviousUpdate = true;
             anythingToSend = true;
 
@@ -427,14 +428,14 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             update->mutable_room()->set_y(room->y);
             break;
 
-        case SynchronisedEvent::ROOM_CLEARED:
+        case SynchronisedEvent::Variant::ROOM_CLEARED:
             usedPreviousUpdate = true;
             anythingToSend = true;
 
             update->set_variant(comm::ROOM_CLEARED);
             break;
 
-        case SynchronisedEvent::LEVEL_CHANGED:
+        case SynchronisedEvent::Variant::LEVEL_CHANGED:
             usedPreviousUpdate = true;
             anythingToSend = true;
 
@@ -466,7 +467,7 @@ void MultiplayerSystem::updateMovement(const std::vector<Entity>& entities)
 
         switch (eventComponent.variant)
         {
-        case SynchronisedEvent::PLAYER_MOVED:
+        case SynchronisedEvent::Variant::PLAYER_MOVED:
             {
                 const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(m_player_entity);
                 const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(m_player_entity);
@@ -485,7 +486,7 @@ void MultiplayerSystem::updateMovement(const std::vector<Entity>& entities)
                 m_outgoing_movement.set_direction(transformComponent.scale.x);
                 break;
             }
-        case SynchronisedEvent::PLAYER_ATTACKED:
+        case SynchronisedEvent::Variant::PLAYER_ATTACKED:
             m_outgoing_movement.set_attack(true);
             break;
         default:
@@ -534,7 +535,7 @@ void MultiplayerSystem::pollMovement()
             float newPivotY = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
             // weaponRenderComponent.dirty = true;
 
-            //TODO: fix remote players' "jumping" - the animation is bugged
+            // TODO: fix remote players' "jumping" - the animation is bugged
             if (m_incomming_movement.attack())
             {
                 const Entity fightAction = gCoordinator.createEntity();

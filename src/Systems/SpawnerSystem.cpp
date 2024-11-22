@@ -92,9 +92,9 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
                 gCoordinator.getComponent<ColliderComponent>(collisionData.entity).toRemoveCollider = true;
 
                 const Entity eventEntity = gCoordinator.createEntity();
-                gCoordinator.addComponent(
-                    eventEntity,
-                    SynchronisedEvent{.variant = SynchronisedEvent::PLAYER_KILLED, .entity = collisionData.entity});
+                gCoordinator.addComponent(eventEntity,
+                                          SynchronisedEvent{.variant = SynchronisedEvent::Variant::PLAYER_KILLED,
+                                                            .entity = collisionData.entity});
             }
 
             const Entity tag = gCoordinator.createEntity();

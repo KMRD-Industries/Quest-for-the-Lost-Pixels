@@ -159,7 +159,8 @@ void ItemSystem::input(const Entity player)
 
     const Entity eventEntity = gCoordinator.createEntity();
     gCoordinator.addComponent(
-        eventEntity, SynchronisedEvent{.variant = SynchronisedEvent::ITEM_EQUIPPED, .pickUpInfo = closestItem});
+        eventEntity,
+        SynchronisedEvent{.variant = SynchronisedEvent::Variant::ITEM_EQUIPPED, .pickUpInfo = closestItem});
 }
 
 void ItemSystem::deleteItems() const

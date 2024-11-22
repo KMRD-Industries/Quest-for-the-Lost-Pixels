@@ -180,10 +180,10 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
     setupHelmetEntity(player);
 
     const Entity eventEntity = gCoordinator.createEntity();
-    gCoordinator.addComponent(
-        eventEntity,
-        SynchronisedEvent{
-            .variant = SynchronisedEvent::PLAYER_CONNECTED, .entityID = playerID, .entity = m_entities[playerID]});
+    gCoordinator.addComponent(eventEntity,
+                              SynchronisedEvent{.variant = SynchronisedEvent::Variant::PLAYER_CONNECTED,
+                                                .entityID = playerID,
+                                                .entity = m_entities[playerID]});
 }
 
 void Dungeon::setupPlayerCollision(const Entity player)
@@ -263,7 +263,7 @@ void Dungeon::setupWeaponEntity(const comm::Player& player) const
     gCoordinator.addComponent(
         eventEntity,
         SynchronisedEvent{
-            .variant = SynchronisedEvent::REGISTER_ITEM, .entityID = weapon.id(), .entity = weaponEntity});
+            .variant = SynchronisedEvent::Variant::REGISTER_ITEM, .entityID = weapon.id(), .entity = weaponEntity});
 }
 
 void Dungeon::setupHelmetEntity(const comm::Player& player) const
@@ -295,7 +295,7 @@ void Dungeon::setupHelmetEntity(const comm::Player& player) const
     gCoordinator.addComponent(
         eventEntity,
         SynchronisedEvent{
-            .variant = SynchronisedEvent::REGISTER_ITEM, .entityID = helmet.id(), .entity = helmetEntity});
+            .variant = SynchronisedEvent::Variant::REGISTER_ITEM, .entityID = helmet.id(), .entity = helmetEntity});
 }
 
 void Dungeon::update(const float deltaTime)
@@ -315,17 +315,17 @@ void Dungeon::update(const float deltaTime)
     m_dealDMGSystem->update();
     m_multiplayerSystem->update(deltaTime);
 
-    for (const auto& remoteDungeonUpdate: m_multiplayerSystem->getRemoteDungeonUpdates())
+    for (const auto& remoteDungeonUpdate : m_multiplayerSystem->getRemoteDungeonUpdates())
     {
         switch (remoteDungeonUpdate.variant)
         {
-        case MultiplayerDungeonUpdate::REGISTER_PLAYER:
+        case MultiplayerDungeonUpdate::Variant::REGISTER_PLAYER:
             createRemotePlayer(remoteDungeonUpdate.player);
             break;
-        case MultiplayerDungeonUpdate::CHANGE_ROOM:
+        case MultiplayerDungeonUpdate::Variant::CHANGE_ROOM:
             moveInDungeon(*remoteDungeonUpdate.room - m_currentPlayerPos, false);
             break;
-        case MultiplayerDungeonUpdate::CHANGE_LEVEL:
+        case MultiplayerDungeonUpdate::Variant::CHANGE_LEVEL:
             {
                 auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
 
@@ -445,7 +445,7 @@ void Dungeon::moveDownDungeon(const bool createEvent)
     if (createEvent)
     {
         const Entity eventEntity = gCoordinator.createEntity();
-        gCoordinator.addComponent(eventEntity, SynchronisedEvent{.variant = SynchronisedEvent::LEVEL_CHANGED});
+        gCoordinator.addComponent(eventEntity, SynchronisedEvent{.variant = SynchronisedEvent::Variant::LEVEL_CHANGED});
     }
 }
 
@@ -486,7 +486,8 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir, const bool createEvent)
         {
             const Entity eventEntity = gCoordinator.createEntity();
             gCoordinator.addComponent(
-                eventEntity, SynchronisedEvent{.variant = SynchronisedEvent::ROOM_CHANGED, .room = m_currentPlayerPos});
+                eventEntity,
+                SynchronisedEvent{.variant = SynchronisedEvent::Variant::ROOM_CHANGED, .room = m_currentPlayerPos});
         }
     }
 }

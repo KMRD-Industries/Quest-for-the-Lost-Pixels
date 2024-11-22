@@ -94,9 +94,9 @@ void PlayerMovementSystem::handleMovement()
     }
 
     Entity eventEntity = gCoordinator.createEntity();
-    gCoordinator.addComponent(
-        eventEntity,
-        SynchronisedEvent{.updateType = SynchronisedEvent::MOVEMENT, .variant = SynchronisedEvent::PLAYER_MOVED});
+    gCoordinator.addComponent(eventEntity,
+                              SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::MOVEMENT,
+                                                .variant = SynchronisedEvent::Variant::PLAYER_MOVED});
 }
 
 void PlayerMovementSystem::handleAttack() const
@@ -109,7 +109,7 @@ void PlayerMovementSystem::handleAttack() const
     gCoordinator.addComponent(fightAction, FightActionEvent{.entity = config::playerEntity});
 
     const Entity movementEvent = gCoordinator.createEntity();
-    gCoordinator.addComponent(
-        movementEvent,
-        SynchronisedEvent{.updateType = SynchronisedEvent::MOVEMENT, .variant = SynchronisedEvent::PLAYER_ATTACKED});
+    gCoordinator.addComponent(movementEvent,
+                              SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::MOVEMENT,
+                                                .variant = SynchronisedEvent::Variant::PLAYER_ATTACKED});
 }

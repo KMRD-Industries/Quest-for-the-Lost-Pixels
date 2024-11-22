@@ -8,31 +8,31 @@
 
 struct SynchronisedEvent
 {
-    enum UpdateType
+    enum class UpdateType
     {
         STATE = 1,
-        MOVEMENT = 2,
+        MOVEMENT,
     };
 
-    enum Variant
+    enum class Variant
     {
         NONE = 0,
-        PLAYER_CONNECTED = 1,
-        PLAYER_DISCONNECTED = 2,
-        PLAYER_KILLED = 3,
-        REGISTER_ITEM = 4,
-        REQUEST_ITEM_GENERATOR = 5,
-        UPDATE_ITEM_ENTITY = 6,
-        ITEM_EQUIPPED = 7,
-        ROOM_CHANGED = 8,
-        ROOM_CLEARED = 9,
-        LEVEL_CHANGED = 10,
-        PLAYER_MOVED = 11,
-        PLAYER_ATTACKED = 12,
+        PLAYER_CONNECTED,
+        PLAYER_DISCONNECTED,
+        PLAYER_KILLED,
+        REGISTER_ITEM,
+        REQUEST_ITEM_GENERATOR,
+        UPDATE_ITEM_ENTITY,
+        ITEM_EQUIPPED,
+        ROOM_CHANGED,
+        ROOM_CLEARED,
+        LEVEL_CHANGED,
+        PLAYER_MOVED,
+        PLAYER_ATTACKED,
     };
 
-    UpdateType updateType = STATE;
-    Variant variant = NONE;
+    UpdateType updateType = UpdateType::STATE;
+    Variant variant = Variant::NONE;
     uint32_t entityID = 0;
     Entity entity = 0;
     Entity updatedEntity = 0;

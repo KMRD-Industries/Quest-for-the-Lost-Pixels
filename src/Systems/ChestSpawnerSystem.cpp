@@ -62,14 +62,14 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
         const Entity eventEntity = gCoordinator.createEntity();
         gCoordinator.addComponent(eventEntity,
                                   SynchronisedEvent{
-                                      .variant = SynchronisedEvent::REQUEST_ITEM_GENERATOR,
+                                      .variant = SynchronisedEvent::Variant::REQUEST_ITEM_GENERATOR,
                                   });
 
         if (itemGenerator.type != comm::POTION)
         {
             const Entity eventEntity = gCoordinator.createEntity();
             gCoordinator.addComponent(eventEntity,
-                                      SynchronisedEvent{.variant = SynchronisedEvent::REGISTER_ITEM,
+                                      SynchronisedEvent{.variant = SynchronisedEvent::Variant::REGISTER_ITEM,
                                                         .entityID = itemGenerator.id,
                                                         .entity = newItemEntity});
         }

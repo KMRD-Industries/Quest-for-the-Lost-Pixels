@@ -26,7 +26,7 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const Gam
     gCoordinator.addComponent(
         eventEntity,
         SynchronisedEvent{
-            .variant = SynchronisedEvent::UPDATE_ITEM_ENTITY, .entity = item, .updatedEntity = newItemEntity});
+            .variant = SynchronisedEvent::Variant::UPDATE_ITEM_ENTITY, .entity = item, .updatedEntity = newItemEntity});
 
     gCoordinator.addComponents(
         newItemEntity, TileComponent{gCoordinator.getComponent<TileComponent>(item)},
