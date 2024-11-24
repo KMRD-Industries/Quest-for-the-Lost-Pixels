@@ -332,7 +332,7 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
 
             m_alive = false;
 
-            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_entity_map[m_player_id]).slots)
+            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_player_entity).slots)
             {
                 if (slot.second != 0)
                 {
@@ -340,6 +340,8 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
                     gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
                 }
             }
+
+            gCoordinator.getComponent<ColliderComponent>(m_player_entity).toDestroy = true;
 
             update->set_variant(comm::PLAYER_DIED);
             update->mutable_player()->set_id(m_player_id);
