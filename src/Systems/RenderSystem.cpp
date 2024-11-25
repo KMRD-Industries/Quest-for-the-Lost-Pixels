@@ -10,7 +10,6 @@
 #include "GameUtility.h"
 #include "Helpers.h"
 #include "ItemComponent.h"
-#include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
@@ -112,10 +111,10 @@ void RenderSystem::updatePlayerSprite(const Entity entity) { setEquipment(entity
 
 void RenderSystem::setEquipment(const Entity entity)
 {
-    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(config::playerEntity);
+    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
 
     auto& playerRenderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-    auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(config::playerEntity);
+    auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
     for (const auto it : equipment)
     {
@@ -437,9 +436,8 @@ void RenderSystem::debugBoundingBoxes(sf::RenderTexture& window)
             !gCoordinator.hasComponent<RenderComponent>(entity))
             continue;
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
-            gCoordinator.hasComponent<MultiplayerComponent>(entity) ||
-            gCoordinator.hasComponent<EnemyComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<EnemyComponent>(entity) ||
+            gCoordinator.hasComponent<WeaponComponent>(entity))
             drawSprite(entity);
 
         if (gCoordinator.hasComponent<EquipmentComponent>(entity))
@@ -448,12 +446,13 @@ void RenderSystem::debugBoundingBoxes(sf::RenderTexture& window)
             displayPlayerStatsTable(window, entity);
         }
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) && gCoordinator.hasComponent<EquipmentComponent>(entity))
+        if (gCoordinator.hasComponent<PlayerComponent>(entity))
         {
-            auto& weaponComponent = gCoordinator.getComponent<EquipmentComponent>(entity);
+            const auto& weaponComponent = gCoordinator.getComponent<EquipmentComponent>(entity);
+            const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
             sf::VertexArray swordLine(sf::Lines, 2);
-            swordLine[0].position = center;
+            swordLine[0].position = transformComponent.position + GameUtility::mapOffset;
             swordLine[0].color = sf::Color::Red;
             swordLine[1].position =
                 gCoordinator.getComponent<WeaponComponent>(weaponComponent.slots.at(GameType::slotType::WEAPON))

@@ -11,8 +11,10 @@
 #include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
+#include "MultiplayerSystem.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
+#include "SpawnerSystem.h"
 #include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
@@ -22,6 +24,8 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const Gam
 {
     auto& equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
     const Entity newItemEntity = gCoordinator.createEntity();
+
+    gCoordinator.getRegisterSystem<MultiplayerSystem>()->updateItemEntity(item, newItemEntity);
 
     gCoordinator.addComponents(
         newItemEntity, TileComponent{gCoordinator.getComponent<TileComponent>(item)},
@@ -73,7 +77,10 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
 
     if (pickUpItemInfo.slot == GameType::WEAPON)
     {
-        gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
-        gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
+        if (!gCoordinator.hasComponent<BindSwingWeaponEvent>(pickUpItemInfo.itemEntity))
+            gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
+
+        if (!gCoordinator.hasComponent<WeaponSwingComponent>(pickUpItemInfo.itemEntity))
+            gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
     }
 }

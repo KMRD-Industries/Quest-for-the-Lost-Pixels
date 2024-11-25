@@ -47,8 +47,8 @@ public:
     void addPlayerComponents(Entity player);
     void moveDownDungeon();
     void setupPlayerCollision(Entity player);
-    void setupWeaponEntity(Entity player);
-    void setupHelmetEntity(Entity player) const;
+    void setupWeaponEntity(const comm::Player& player) const;
+    void setupHelmetEntity(const comm::Player& player) const;
     void update(float deltaTime);
     void makeStartFloor();
 
@@ -57,17 +57,13 @@ public:
 private:
     void setECS();
     void makeSimpleFloor();
-    void createRemotePlayer(uint32_t id);
+    void createRemotePlayer(const comm::Player& player);
     void moveInDungeon(const glm::ivec2& dir);
     void changeRoom(const glm::ivec2& dir);
     void clearDungeon();
     void loadMap(const std::string& path) const;
-    float getSpawnOffset(float position, int id);
     void checkForEndOfTheGame();
-    void updateEnemyPositions(const comm::EnemyPositionsUpdate& enemyPositionsUpdate);
-    void sendRoomDimensions();
-    void updateMap();
-    void mapServerIdToGameId(const comm::SpawningEnemiesResponse& ids) const;
+    float getSpawnOffset(const float position, const uint32_t id);
 
     std::string m_asset_path{ASSET_PATH};
     FloorGenerator m_floorGenerator{};

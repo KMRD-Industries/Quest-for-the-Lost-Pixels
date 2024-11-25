@@ -33,7 +33,7 @@ void FightSystem::update()
 
         switch (weaponComponent.type)
         {
-        case GameType::WeaponType::MELE:
+        case GameType::WeaponType::MELEE:
             handleMeleeAttack(eventEntity);
             break;
         case GameType::WeaponType::WAND:
