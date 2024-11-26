@@ -77,10 +77,10 @@ void ItemSpawnerSystem::handlePotionCollision(const Entity potion, const GameTyp
     switch (behaviour)
     {
     case Items::Behaviours::HEAL:
-        gCoordinator.getComponent<CharacterComponent>(collisionData.entityID).hp += value;
+        gCoordinator.getComponent<CharacterComponent>(collisionData.entity).hp += value;
         break;
     case Items::Behaviours::DMGUP:
-        gCoordinator.getComponent<CharacterComponent>(collisionData.entityID).damage += value;
+        gCoordinator.getComponent<CharacterComponent>(collisionData.entity).damage += value;
         break;
     default:
         break;

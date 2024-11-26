@@ -72,8 +72,8 @@ void FightSystem::handleCollision(const Entity bullet, const GameType::Collision
 
     if (collisionData.tag == "Enemy")
     {
-        auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entityID);
-        auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entityID);
+        auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(collisionData.entity);
+        auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(collisionData.entity);
 
         const Entity tag = gCoordinator.createEntity();
         gCoordinator.addComponent(tag, TextTagComponent{});

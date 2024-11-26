@@ -2,20 +2,17 @@
 #include "AnimationSystem.h"
 #include "BindSwingWeaponEvent.h"
 #include "BodyArmourComponent.h"
-#include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
-#include "CreateBodyWithCollisionEvent.h"
 #include "EquipmentComponent.h"
 #include "GameTypes.h"
 #include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
-#include "MultiplayerSystem.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerSystem.h"
-#include "TextTagComponent.h"
+#include "SynchronisedEvent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 #include "WeaponSwingComponent.h"
@@ -25,7 +22,11 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const Gam
     auto& equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
     const Entity newItemEntity = gCoordinator.createEntity();
 
-    gCoordinator.getRegisterSystem<MultiplayerSystem>()->updateItemEntity(item, newItemEntity);
+    const Entity eventEntity = gCoordinator.createEntity();
+    gCoordinator.addComponent(
+        eventEntity,
+        SynchronisedEvent{
+            .variant = SynchronisedEvent::Variant::UPDATE_ITEM_ENTITY, .entity = item, .updatedEntity = newItemEntity});
 
     gCoordinator.addComponents(
         newItemEntity, TileComponent{gCoordinator.getComponent<TileComponent>(item)},

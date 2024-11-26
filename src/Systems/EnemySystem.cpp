@@ -3,15 +3,17 @@
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
+#include "MultiplayerSystem.h"
 #include "Physics.h"
 #include "PublicConfigMenager.h"
+#include "SpawnerSystem.h"
 #include "TransformComponent.h"
 
 extern PublicConfigSingleton configSingleton;
 
 EnemySystem::EnemySystem()
 {
-    gen.seed(rd()); // Seed the generator
+    gen.seed(gCoordinator.getRegisterSystem<MultiplayerSystem>()->getSeed()); // Seed the generator
     dis = std::uniform_real_distribution<float>(-1, 1); // Range between -1 and 1
 }
 

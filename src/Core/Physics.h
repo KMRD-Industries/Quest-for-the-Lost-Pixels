@@ -18,7 +18,7 @@ public:
         {
             const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().
                 pointer);
-            if (m_ignoreYourself && bodyData->entityID == m_myEntity)
+            if (m_ignoreYourself && bodyData->entity == m_myEntity)
                 return -1.0f;
         }
         m_fixture = fixture;
@@ -46,7 +46,7 @@ public:
         if (fixture)
         {
             const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
-            if (m_ignoreYourself && bodyData->entityID == m_myEntity)
+            if (m_ignoreYourself && bodyData->entity == m_myEntity)
                 return true;
 
             //TODO: HOW TO CHECK IF CIRCLE OVERLAP POLYGON ?????
@@ -72,7 +72,7 @@ public:
         if (fixture)
         {
             const auto bodyData = reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
-            if (m_ignoreYourself && bodyData->entityID == m_myEntity)
+            if (m_ignoreYourself && bodyData->entity == m_myEntity)
                 return true;
 
             m_fixtures.push_back(fixture);
@@ -121,7 +121,7 @@ public:
             return {0, "", {0, 0}};
         const auto bodyData =
             reinterpret_cast<GameType::CollisionData*>(callback.m_fixture->GetBody()->GetUserData().pointer);
-        return {bodyData->entityID, bodyData->tag, callback.m_point};
+        return {bodyData->entity, bodyData->tag, callback.m_point};
     }
 
     static std::vector<GameType::RaycastData> boxCast(const GameType::MyVec2& lowerBound,
@@ -147,7 +147,7 @@ public:
         {
             const auto bodyData =
                 reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
-            GameType::RaycastData data{bodyData->entityID, bodyData->tag, fixture->GetBody()->GetPosition()};
+            GameType::RaycastData data{bodyData->entity, bodyData->tag, fixture->GetBody()->GetPosition()};
             results.push_back(data);
         }
 
@@ -192,7 +192,7 @@ public:
         {
             const auto bodyData =
                 reinterpret_cast<GameType::CollisionData*>(fixture->GetBody()->GetUserData().pointer);
-            GameType::RaycastData data{bodyData->entityID, bodyData->tag, fixture->GetBody()->GetPosition()};
+            GameType::RaycastData data{bodyData->entity, bodyData->tag, fixture->GetBody()->GetPosition()};
             results.push_back(data);
         }
 

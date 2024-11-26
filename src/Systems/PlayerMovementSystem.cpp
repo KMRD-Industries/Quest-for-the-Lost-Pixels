@@ -1,19 +1,15 @@
 #include "PlayerMovementSystem.h"
 #include <EquipmentComponent.h>
 #include "CharacterComponent.h"
-#include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "FightActionEvent.h"
 #include "InputHandler.h"
-#include "InventorySystem.h"
 #include "ItemSystem.h"
-#include "MultiplayerSystem.h"
-#include "Physics.h"
 #include "RenderComponent.h"
+#include "SynchronisedEvent.h"
 #include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
-#include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
@@ -24,6 +20,8 @@ void PlayerMovementSystem::init() { inputHandler = InputHandler::getInstance(); 
 
 void PlayerMovementSystem::update(const float deltaTime)
 {
+    if (gCoordinator.getComponent<CharacterComponent>(config::playerEntity).hp <= 0.0) return;
+
     handleAttack();
     handlePickUpAction();
     handleSpecialKeys();
@@ -89,12 +87,16 @@ void PlayerMovementSystem::handleMovement()
             weaponComponent->pivotPoint = inputHandler->getMousePosition();
             weaponRenderComponent.dirty = true;
 
-            transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
-                                        transformComponent.scale.y};
+            transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y};
             weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
                                               weaponTransformComponent.scale.y};
         }
     }
+
+    Entity eventEntity = gCoordinator.createEntity();
+    gCoordinator.addComponent(eventEntity,
+                              SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::MOVEMENT,
+                                                .variant = SynchronisedEvent::Variant::PLAYER_MOVED});
 }
 
 void PlayerMovementSystem::handleAttack() const
@@ -103,7 +105,11 @@ void PlayerMovementSystem::handleAttack() const
 
     if (!inputHandler->isPressed(InputType::Attack)) return;
 
-    gCoordinator.getRegisterSystem<MultiplayerSystem>()->onAttack();
     const Entity fightAction = gCoordinator.createEntity();
     gCoordinator.addComponent(fightAction, FightActionEvent{.entity = config::playerEntity});
+
+    const Entity movementEvent = gCoordinator.createEntity();
+    gCoordinator.addComponent(movementEvent,
+                              SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::MOVEMENT,
+                                                .variant = SynchronisedEvent::Variant::PLAYER_ATTACKED});
 }
