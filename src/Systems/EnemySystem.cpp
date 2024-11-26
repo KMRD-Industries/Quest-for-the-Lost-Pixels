@@ -16,24 +16,6 @@ EnemySystem::EnemySystem()
     dis = std::uniform_real_distribution<float>(-1, 1); // Range between -1 and 1
 }
 
-void EnemySystem::update(std::unordered_map<Entity, sf::Vector2<float>> &enemies)
-{
-    for (const auto enemy : enemies)
-    {
-        if (gCoordinator.hasComponent<TransformComponent>(enemy.first))
-        {
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(enemy.first);
-
-            //TODO przsyłam pozycje serwera i odejmuję aktualną pozycję na kliencie
-            transformComponent.velocity.x = enemy.second.x * 20;
-            transformComponent.velocity.y = -enemy.second.y * 20;
-
-            // printf("[Adding new positions] x: %f, y: %f\n", enemy.second.x, enemy.second.y);
-        }
-    }
-    enemies.clear();
-}
-
 void EnemySystem::deleteEnemies() const
 {
     std::vector<Entity> entitiesToKill;

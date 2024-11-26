@@ -21,9 +21,6 @@ void Coordinator::destroyEntity(const Entity entity) const
     m_entityManager->destroyEntity(entity);
     m_componentManager->entityDestroyed(entity);
     m_systemManager->entityDestroyed(entity);
-    // TODO stworzyć ServerEntityManager i tutaj dodać, będzie służył tylko do mapowania wolnych encji z
-    //  enetityMangaera do serverEntityManagera, który będzie przypisywał entity obiektom requestowanym do stworzenia
-    //  przez server
 }
 
 void Coordinator::destroyServerEntity(const Entity entity) const { m_serverEntityManager->destroyEntity(entity); }

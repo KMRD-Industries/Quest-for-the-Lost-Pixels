@@ -58,10 +58,11 @@ private:
     std::vector<std::pair<Entity, sf::Vector2<float>>> m_spawners{};
     float m_frameTime{};
     CollisionSystem* m_collisionSystem;
-    void enemyGotHitUpdate(Entity enemyId);
     bool isMapDimensionsSent{};
     bool areSpawnersSent{};
     std::deque<Entity> m_multiplayerEntities;
+    const int frames = 2000;
+    const int enemy_speed = 50;
 
 public:
     MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
@@ -82,7 +83,8 @@ public:
     void sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles);
     void gatherEnemyAndPlayerPositions();
     void sendSpawnerPosition(std::vector<std::pair<Entity, sf::Vector2<float>>> spawners);
-    void handlePlayerPositionUpdate(const comm::MovementUpdate& positionUpdate);
+    void sendPlayerPosition();
+    void handlePlayerPositionUpdate(const comm::StateUpdate& movementUpdate);
     void handleMapUpdate(const comm::EnemyPositionsUpdate& enemyPositionUpdate);
     void disconnect();
 
@@ -95,6 +97,4 @@ public:
     comm::InitialInfo registerPlayer(const Entity player);
     const comm::StateUpdate& pollStateUpdates();
     std::string addMessageSize(const std::string& serializedMsg);
-    void receiveMessages();
-    void sendPlayerPosition();
 };

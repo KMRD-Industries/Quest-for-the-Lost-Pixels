@@ -11,7 +11,6 @@ class EnemySystem : public System
 public:
     EnemySystem();
     void init();
-    void update(std::unordered_map<Entity, sf::Vector2<float>>&);
     void deleteEnemies() const;
 
 private:

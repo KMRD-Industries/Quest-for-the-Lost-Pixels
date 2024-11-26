@@ -38,12 +38,9 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
                                    const TransformComponent& spawnerTransformComponent) const
 {
     // Check if the spawner is ready to spawn the enemy.
-    // TODO idk czy to nie psuje
     if (m_spawnTime < SPAWN_RATE) return;
 
-    // Spawn the enemy and increment the spawn count.
     spawnerComponent.noSpawns++;
-    // auto _ = spawnEnemy(spawnerTransformComponent, spawnerComponent.enemyType);
 }
 
 void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemyToSpawn) const
