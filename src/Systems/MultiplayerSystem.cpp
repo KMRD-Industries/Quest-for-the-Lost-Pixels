@@ -455,7 +455,6 @@ void MultiplayerSystem::sendPlayerPosition()
 
     comm::StateUpdate update{};
     update.set_variant(comm::StateVariant::PLAYER_POSITION_UPDATE);
-    // update.set_allocated_movement_update(&m_outgoing_movement);
     *update.mutable_movement_update() = m_outgoing_movement;
 
     auto serialized = update.SerializeAsString();
@@ -581,6 +580,7 @@ void MultiplayerSystem::sendSpawnerPosition(std::vector<std::pair<Entity, sf::Ve
     *message.mutable_enemy_positions_update() = spawnEnemyRequest;
     message.set_variant(comm::StateVariant::SPAWN_ENEMY_REQUEST);
 
+    // TODO termporary solution
     auto serializedMessage = message.SerializeAsString();
     printf("sending spawners position\n");
     for (int i = 0; i < 5; ++i)
@@ -609,16 +609,41 @@ void MultiplayerSystem::handleMapUpdate(const comm::EnemyPositionsUpdate& enemyP
             transformComponent.velocity.y = -enemy.position_y() * enemy_speed;
         }
     }
-};
+}
+
+// std::string MultiplayerSystem::addMessageSize(const std::string& serializedMsg)
+// {
+//     std::string msgWithSize;
+//     msgWithSize.reserve(2 + serializedMsg.size());
+//
+//     uint16_t size = htons(static_cast<uint16_t>(serializedMsg.size()));
+//     msgWithSize.append(reinterpret_cast<const char*>(&size), 2);
+//
+//     msgWithSize.append(serializedMsg);
+//     return msgWithSize;
+// }
 
 std::string MultiplayerSystem::addMessageSize(const std::string& serializedMsg)
 {
-    std::string msgWithSize;
-    msgWithSize.reserve(2 + serializedMsg.size());
+comm:
+    comm::BytePrefix prefix;
+    prefix.set_bytes(serializedMsg.size());
 
-    uint16_t size = htons(static_cast<uint16_t>(serializedMsg.size()));
-    msgWithSize.append(reinterpret_cast<const char*>(&size), 2);
+    const auto serializedMsgSize = prefix.SerializeAsString();
 
-    msgWithSize.append(serializedMsg);
-    return msgWithSize;
+    std::string result;
+    result.reserve(3 + serializedMsgSize.size());
+
+    if (3 - static_cast<int>(serializedMsgSize.size()) >= 0)
+    {
+        result.append(serializedMsgSize);
+        result.append(3 - serializedMsgSize.size(), '\0');
+    }
+    else
+    {
+        std::cerr << "Prefix is bigger than 3 bytes, actual size: " << serializedMsgSize.size() << std::endl;
+        result.append(serializedMsgSize);
+    }
+    printf("Prefix size: %lu\n", serializedMsgSize.size());
+    return result.append(serializedMsg);
 }
