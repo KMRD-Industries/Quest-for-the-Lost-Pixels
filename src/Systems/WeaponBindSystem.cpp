@@ -5,7 +5,7 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "DealDMGToEnemyEvent.h"
-#include "MultiplayerComponent.h"
+#include "SynchronisedEvent.h"
 #include "WeaponComponent.h"
 #include "WeaponSwingComponent.h"
 
@@ -33,28 +33,30 @@ void WeaponBindSystem::update()
             [this, entity](const GameType::CollisionData& data)
             {
                 auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
-                swingComponent.enemyColided.insert(data.entityID);
+                swingComponent.enemyColided.insert(data.entity);
                 const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
                 if (!weaponComponent.isAttacking) return;
-                if (swingComponent.enemyHited.contains(data.entityID)) return;
+                if (swingComponent.enemyHited.contains(data.entity)) return;
 
-                swingComponent.enemyHited.insert(data.entityID);
-                gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
+                swingComponent.enemyHited.insert(data.entity);
+                gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
 
-                const auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::ENEMY_GOT_HIT};
-                gCoordinator.addComponent(data.entityID, multiplayerEventComponent);
-
+                const Entity attackEventEntity = gCoordinator.createEntity();
+                const auto synchronisedEvent =
+                    SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,
+                                      .variant = SynchronisedEvent::Variant::ENEMY_GOT_HIT};
+                gCoordinator.addComponent(attackEventEntity, synchronisedEvent);
             },
             [entity](const GameType::CollisionData& data)
             {
                 auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
-                swingComponent.enemyColided.erase(data.entityID);
+                swingComponent.enemyColided.erase(data.entity);
                 const auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(entity);
                 if (!weaponComponent.isAttacking) return;
-                if (swingComponent.enemyHited.contains(data.entityID)) return;
+                if (swingComponent.enemyHited.contains(data.entity)) return;
 
-                swingComponent.enemyHited.insert(data.entityID);
-                gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
+                swingComponent.enemyHited.insert(data.entity);
+                gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
             },
             false, false, true);
 

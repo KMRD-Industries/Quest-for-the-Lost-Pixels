@@ -4,7 +4,6 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "HelmetComponent.h"
-#include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
 #include "Physics.h"
 #include "PlayerComponent.h"
@@ -26,12 +25,12 @@ void MyContactListener::BeginContact(b2Contact* contact)
 
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
-        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
-        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
-        colliderComponentA.onCollisionEnter({bodyBData->entityID, bodyBData->tag});
-        colliderComponentB.onCollisionEnter({bodyAData->entityID, bodyAData->tag});
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entity)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entity)) return;
+        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entity);
+        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entity);
+        colliderComponentA.onCollisionEnter({bodyBData->entity, bodyBData->tag});
+        colliderComponentB.onCollisionEnter({bodyAData->entity, bodyAData->tag});
     }
 }
 
@@ -46,12 +45,12 @@ void MyContactListener::EndContact(b2Contact* contact)
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
         // TODO: Fix weapon collision in other task
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
-        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
-        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
-        colliderComponentA.onCollisionOut({bodyBData->entityID, bodyBData->tag});
-        colliderComponentB.onCollisionOut({bodyAData->entityID, bodyAData->tag});
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entity)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entity)) return;
+        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entity);
+        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entity);
+        colliderComponentA.onCollisionOut({bodyBData->entity, bodyBData->tag});
+        colliderComponentB.onCollisionOut({bodyAData->entity, bodyAData->tag});
     }
 }
 

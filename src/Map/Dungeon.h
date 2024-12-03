@@ -45,7 +45,7 @@ public:
     void init();
     void render(sf::RenderTexture& window);
     void addPlayerComponents(Entity player);
-    void moveDownDungeon();
+    void moveDownDungeon(const bool createEvent);
     void setupPlayerCollision(Entity player);
     void setupWeaponEntity(const comm::Player& player) const;
     void setupHelmetEntity(const comm::Player& player) const;
@@ -58,8 +58,7 @@ private:
     void setECS();
     void makeSimpleFloor();
     void createRemotePlayer(const comm::Player& player);
-    void moveInDungeon(const glm::ivec2& dir);
-    void changeRoom(const glm::ivec2& dir);
+    void moveInDungeon(const glm::ivec2& dir, const bool createEvent);
     void clearDungeon();
     void loadMap(const std::string& path) const;
     void checkForEndOfTheGame();
@@ -72,7 +71,6 @@ private:
     std::vector<Entity> m_entities{};
     uint32_t m_id{};
     int64_t m_seed{};
-    std::set<uint32_t> m_players{};
     std::deque<glm::ivec2> m_moveInDungeon;
     float counter;
     bool m_passedBy;

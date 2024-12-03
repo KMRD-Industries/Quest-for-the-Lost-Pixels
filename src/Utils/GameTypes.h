@@ -254,7 +254,7 @@ namespace GameType
 
     struct CollisionData
     {
-        Entity entityID;
+        Entity entity;
         std::string tag;
     };
 
@@ -308,12 +308,12 @@ namespace std
 
 struct ObstacleData
 {
-    int left{}, top{}; // where x and y are the left top position
+    float x{}, y{}; // where x and y are the left top position
 
     ObstacleData() = default;
 
-    ObstacleData(const float left, const float top):
-    left{static_cast<int>(left)}, top{static_cast<int>(top)}
+    ObstacleData(const float x, const float y):
+    x{x}, y{y}
     {
     }
 

@@ -1,10 +1,10 @@
 #include "ObjectCreatorSystem.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
-#include "MultiplayerComponent.h"
 #include "Physics.h"
 #include "PublicConfigMenager.h"
 #include "RenderComponent.h"
+#include "SynchronisedEvent.h"
 #include "TransformComponent.h"
 
 extern PublicConfigSingleton configSingleton;
@@ -130,7 +130,7 @@ b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEve
 void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& eventInfo) const
 {
     auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
-    auto* collisionData = new GameType::CollisionData{.entityID = eventInfo.entity, .tag = eventInfo.tag};
+    auto* collisionData = new GameType::CollisionData{.entity = eventInfo.entity, .tag = eventInfo.tag};
 
     // Create all components
     const b2PolygonShape shape = defineShape(eventInfo);
@@ -150,12 +150,16 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
     colliderComponent.onCollisionOut = eventInfo.onCollisionOut;
     colliderComponent.tag = eventInfo.tag;
 
-    if (collisionData->tag == "Wall" && !gCoordinator.hasComponent<MultiplayerComponent>(eventInfo.entity))
+    // TODO chuj wi czy git - sprawdź, potencjalny błąd
+    if (collisionData->tag == "Wall" && !gCoordinator.hasComponent<SynchronisedEvent>(eventInfo.entity))
+    // if (collisionData->tag == "Wall" && !gCoordinator.hasComponent<MultiplayerComponent>(eventInfo.entity))
     {
-        const auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::ROOM_DIMENSIONS_CHANGED};
-        gCoordinator.addComponent(eventInfo.entity, multiplayerEventComponent);
+        const Entity eventEntity = gCoordinator.createEntity();
+        const auto synchronisedEvent = SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,
+                                                         .variant = SynchronisedEvent::Variant::ROOM_DIMENSIONS_CHANGED,
+                                                         .updatedEntity = eventInfo.entity};
+        gCoordinator.addComponent(eventEntity, synchronisedEvent);
     }
-
 }
 
 

@@ -31,7 +31,7 @@ set(COMPONENTS
         Components/RenderComponent.h
         Components/TransformComponent.h
         Components/PlayerComponent.h
-        Components/MultiplayerComponent.h
+        Components/SynchronisedEvent.h
         Components/ColliderComponent.h
         Components/CharacterComponent.h
         Components/TransformComponent.h
