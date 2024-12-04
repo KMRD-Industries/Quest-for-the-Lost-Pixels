@@ -151,7 +151,7 @@ void MultiplayerSystem::pollState()
         size_t received = m_tcp_socket.read_some(boost::asio::buffer(m_prefix_buf, m_prefix_size));
         m_prefix.ParseFromArray(m_prefix_buf.data(), m_prefix_size);
 
-        uint32_t msg_size = m_prefix.bytes();
+        uint32_t msg_size = m_prefix.bytes() - DIFF;
 
         available = m_tcp_socket.available();
         while (available < msg_size) available = m_tcp_socket.available();
@@ -935,23 +935,9 @@ void MultiplayerSystem::handleMapUpdate(const comm::EnemyPositionsUpdate& enemyP
 std::string MultiplayerSystem::addMessageSize(const std::string& serializedMsg)
 {
     comm::BytePrefix prefix;
-    prefix.set_bytes(serializedMsg.size());
+    prefix.set_bytes(serializedMsg.size() + DIFF);
 
-    const auto serializedMsgSize = prefix.SerializeAsString();
+    const auto serialisedPrefix = prefix.SerializeAsString();
 
-    std::string result;
-    result.reserve(3 + serializedMsgSize.size());
-
-    if (3 - static_cast<int>(serializedMsgSize.size()) >= 0)
-    {
-        result.append(serializedMsgSize);
-        result.append(3 - serializedMsgSize.size(), '\0');
-    }
-    else
-    {
-        std::cerr << "Prefix is bigger than 3 bytes, actual size: " << serializedMsgSize.size() << std::endl;
-        result.append(serializedMsgSize);
-    }
-    printf("Prefix size: %lu\n", serializedMsgSize.size());
-    return result.append(serializedMsg);
+    return serialisedPrefix + serializedMsg;
 }
