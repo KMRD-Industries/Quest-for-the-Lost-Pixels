@@ -95,6 +95,7 @@ public:
     void setup(const std::string_view& ip, const std::string_view& port) noexcept;
     void setPlayer(const uint32_t id, const Entity entity);
     void setRoom(const glm::ivec2& room) noexcept;
+    void clearRemoteDungeonUpdates();
     void update(const float deltaTime);
     void updateMap(const std::map<Entity, sf::Vector2<float>>& enemies,
                    const std::map<Entity, sf::Vector2<int>>& players);

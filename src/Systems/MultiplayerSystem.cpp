@@ -261,6 +261,10 @@ int64_t MultiplayerSystem::getSeed() { return m_seed; }
 const std::unordered_map<uint32_t, Entity>& MultiplayerSystem::getPlayers() { return m_entity_map; }
 
 const std::vector<MultiplayerDungeonUpdate>& MultiplayerSystem::getRemoteDungeonUpdates() { return m_dungeon_updates; }
+void MultiplayerSystem::clearRemoteDungeonUpdates()
+{
+    if (m_dungeon_updates.size() > 0) m_dungeon_updates.clear();
+}
 
 void MultiplayerSystem::update(const float deltaTime)
 {
@@ -281,8 +285,6 @@ void MultiplayerSystem::update(const float deltaTime)
     if (m_frame_time += deltaTime; m_frame_time < configSingleton.GetConfig().oneFrameTime * 1000) return;
 
     m_frame_time -= configSingleton.GetConfig().oneFrameTime * 1000;
-
-    if (m_dungeon_updates.size() > 0) m_dungeon_updates.clear();
 
     pollState();
     pollMovement();

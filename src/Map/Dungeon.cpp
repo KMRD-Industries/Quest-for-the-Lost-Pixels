@@ -342,6 +342,7 @@ void Dungeon::update(const float deltaTime)
             break;
         }
     }
+    m_multiplayerSystem->clearRemoteDungeonUpdates();
 
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
