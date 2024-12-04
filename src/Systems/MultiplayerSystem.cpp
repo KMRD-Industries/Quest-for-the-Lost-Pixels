@@ -752,48 +752,6 @@ void MultiplayerSystem::disconnect()
 //     }
 // }
 
-void MultiplayerSystem::handlePlayerPositionUpdate(const comm::StateUpdate& m_message)
-{
-    m_incomming_movement = m_message.movement_update();
-    // m_incomming_movement.ParseFromArray(&m_buf, int(received));
-    uint32_t id = m_incomming_movement.entity_id();
-    auto r = m_incomming_movement.curr_room();
-
-    if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
-    {
-        Entity& target = m_entity_map[id];
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
-        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
-
-        const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(target);
-        const Entity& weaponEntity = equippedWeapon.slots.at(GameType::slotType::WEAPON);
-        auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
-        auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
-
-        const auto& windowSize = InputHandler::getInstance()->getWindowSize();
-
-        weaponComponent.pivotPoint.x = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
-        weaponComponent.pivotPoint.y = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
-
-        if (m_incomming_movement.attack())
-        {
-            const Entity fightAction = gCoordinator.createEntity();
-            gCoordinator.addComponent(fightAction, FightActionEvent{target});
-        }
-
-        float x = m_incomming_movement.position_x();
-        float y = m_incomming_movement.position_y();
-        float r = m_incomming_movement.direction();
-
-        transformComponent.velocity.x = x - transformComponent.position.x;
-        transformComponent.velocity.y = y - transformComponent.position.y;
-        transformComponent.scale.x = r;
-        weaponTransformComponent.scale.x = r;
-
-        colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
-                                             colliderComponent.body->GetAngle());
-    }
-}
 
 std::vector<char> MultiplayerSystem::sendMapDimensions(std::vector<ObstacleData>& obstacles)
 {
@@ -821,14 +779,6 @@ std::vector<char> MultiplayerSystem::sendMapDimensions(std::vector<ObstacleData>
     {
         compressedMessage.resize(compressedSize);
         return compressedMessage;
-        // comm::StateUpdateSeries msgSeries;
-        // comm::StateUpdate* message = msgSeries.add_updates();
-        // message->set_variant(comm::StateVariant::MAP_DIMENSIONS_UPDATE);
-        //
-        // message->set_compressed_map_dimensions_update(compressedMessage.data(), compressedMessage.size());
-        // const auto serializedMessage = msgSeries.SerializeAsString();
-        //
-        // m_tcp_socket.send(boost::asio::buffer(addMessageSize(serializedMessage)));
     }
     // TODO zrób obsługę błędu kompresji
     printf("Failed to send map dimension update message - compression error\n");
@@ -908,6 +858,7 @@ comm::EnemyPositionsUpdate MultiplayerSystem::sendSpawnerPosition(
         spawnerPosition->set_position_y(spawner.second.y);
         spawnerPosition->set_id(spawner.first);
     }
+    printf("Sending spawn enemy request\n");
     return spawnEnemyRequest;
 }
 
@@ -925,7 +876,7 @@ void MultiplayerSystem::handleMapUpdate(const comm::EnemyPositionsUpdate& enemyP
         if (gCoordinator.hasComponent<TransformComponent>(gameEntityId))
         {
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(gameEntityId);
-
+            printf("Enemy's vector x: %f, y: %f\n", enemy.position_x(), enemy.position_y());
             transformComponent.velocity.x = enemy.position_x() * enemy_speed;
             transformComponent.velocity.y = -enemy.position_y() * enemy_speed;
         }

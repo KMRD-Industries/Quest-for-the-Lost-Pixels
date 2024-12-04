@@ -102,7 +102,6 @@ public:
     void sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles);
     void gatherEnemyAndPlayerPositions();
     comm::EnemyPositionsUpdate sendSpawnerPosition(const std::vector<std::pair<Entity, sf::Vector2<float>>>& spawners);
-    void handlePlayerPositionUpdate(const comm::StateUpdate& movementUpdate);
     void handleMapUpdate(const comm::EnemyPositionsUpdate& enemyPositionUpdate);
     void disconnect();
 
@@ -116,6 +115,5 @@ public:
     const std::unordered_map<uint32_t, Entity>& getPlayers();
     const std::vector<MultiplayerDungeonUpdate>& getRemoteDungeonUpdates();
     comm::InitialInfo registerPlayer(const Entity player);
-    const comm::StateUpdate& pollStateUpdates();
     std::string addMessageSize(const std::string& serializedMsg);
 };

@@ -1,19 +1,26 @@
 {
-    "activeFile": "assets/tileSets/Armour.json",
+    "activeFile": "assets/maps/floor_00/map_110.json",
     "expandedProjectPaths": [
-        "assets/tileSets",
-        "assets/maps",
-        "assets",
         "build",
         ".",
-        "assets/maps/floor_00",
-        "assets/maps/floor_01"
+        "assets",
+        "assets/maps/floor_01",
+        "assets/maps",
+        "assets/maps/floor_00"
     ],
     "file.lastUsedOpenFilter": "Wszystkie pliki (*)",
     "fileStates": {
         "C:/Users/domin/Desktop/xp.tsx": {
             "scaleInDock": 2,
             "scaleInEditor": 5.5
+        },
+        "assets/maps/floor_00/map_110.json": {
+            "scale": 2.27109375,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 160.0550395596835,
+                "y": 112.06054351565189
+            }
         },
         "assets/maps/floor_01/map_1.json": {
             "scale": 2.36,
@@ -428,7 +435,7 @@
             "scaleInEditor": 8
         },
         "assets/tileSets/CosmicLilac.json": {
-            "scaleInDock": 1
+            "scaleInDock": 3
         },
         "assets/tileSets/Decorative.json": {
             "scaleInDock": 1
@@ -462,22 +469,22 @@
         "assets/tileSets/Items.json",
         "assets/tileSets/Characters.json",
         "assets/tileSets/SpecialBlocks.json",
-        "assets/maps/floor_01/map_110.json"
+        "assets/maps/floor_00/map_110.json"
     ],
     "project": "bez nazwy.tiled-project",
     "recentFiles": [
-        "assets/maps/floor_01/map_1.json",
         "assets/tileSets/Weapons.json",
-        "assets/maps/floor_01/map_110.json",
-        "assets/tileSets/SpecialBlocks.json",
-        "assets/tileSets/Characters.json",
-        "assets/tileSets/Items.json",
         "assets/tileSets/Armour.json",
+        "assets/tileSets/Items.json",
+        "assets/tileSets/Characters.json",
+        "assets/tileSets/SpecialBlocks.json",
+        "assets/maps/floor_00/map_110.json",
+        "assets/maps/floor_01/map_1.json",
+        "assets/maps/floor_01/map_110.json",
         "assets/maps/floor_01/map_12.json",
         "C:/Users/domin/Desktop/xp.tsx",
         "assets/maps/floor_01/map_15.json",
-        "assets/maps/floor_01/map_9.json",
-        "assets/maps/floor_01/map_s1.json"
+        "assets/maps/floor_01/map_9.json"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {
