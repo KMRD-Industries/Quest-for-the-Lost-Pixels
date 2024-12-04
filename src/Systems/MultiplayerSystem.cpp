@@ -33,6 +33,8 @@
 
 extern Coordinator gCoordinator;
 
+constexpr uint32_t DIFF = 4096;
+
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
 
@@ -82,7 +84,7 @@ void MultiplayerSystem::setup(const std::string_view& ip, const std::string_view
     m_last_tick = sysClock::now();
 
     comm::BytePrefix prefixDummy;
-    prefixDummy.set_bytes(300);
+    prefixDummy.set_bytes(DIFF);
     m_prefix_size = static_cast<int>(prefixDummy.ByteSizeLong());
     m_prefix_buf.resize(m_prefix_size);
 
@@ -160,10 +162,6 @@ void MultiplayerSystem::pollState()
         m_state.ParseFromArray(m_buf.data(), static_cast<int>(received));
         std::cout << m_state.ShortDebugString() << '\n';
 
-        if (msg_size > 0)
-        {
-            printf("<<< Msg is still alive with size: %d and state: %d\n", msg_size, m_state.variant());
-        }
         const auto& player = m_state.player();
         const auto& item = m_state.item();
         const auto& room = m_state.room();
@@ -240,7 +238,6 @@ void MultiplayerSystem::pollState()
                 break;
             }
         case comm::SPAWN_ENEMY_REQUEST:
-            printf("RECEIVED spawned enemy\n");
             gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnOnDemand(m_state.enemy_positions_update());
             break;
 
@@ -465,6 +462,8 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             break;
         case SynchronisedEvent::Variant::ROOM_DIMENSIONS_CHANGED:
             {
+                usedPreviousUpdate = false;
+
                 const auto position = gCoordinator.getComponent<TransformComponent>(updatedEntity).position;
                 m_walls.emplace_back(position.x, position.y);
                 break;
@@ -477,6 +476,8 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             }
         case SynchronisedEvent::Variant::SEND_SPAWNERS_POSITIONS:
             {
+                usedPreviousUpdate = false;
+
                 m_spawners.emplace_back(updatedEntity, sf::Vector2(obstacleData.x, obstacleData.y));
                 break;
             }
@@ -485,6 +486,8 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             break;
         }
     }
+
+    if (!usedPreviousUpdate) m_updates.mutable_updates()->RemoveLast();
 
     if (!m_walls.empty())
     {
@@ -508,8 +511,6 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
         m_areSpawnersSent = true;
         anythingToSend = true;
     }
-
-    if (!usedPreviousUpdate) m_updates.mutable_updates()->RemoveLast();
 
     if (anythingToSend)
     {
