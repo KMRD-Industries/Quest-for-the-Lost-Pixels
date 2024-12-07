@@ -54,8 +54,9 @@ void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemy
     };
     const ColliderComponent colliderComponent{collisionData};
 
-    transformComponent.position.x -= colliderComponent.collision.x * configSingleton.GetConfig().gameScale;
-    transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale;
+    //TODO temporary solution working perfectly
+    transformComponent.position.x -= colliderComponent.collision.x * configSingleton.GetConfig().gameScale - 26;
+    transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale - 5;
 
     TileComponent tileComponent{enemyToSpawn.texture_data().tile_id(), enemyToSpawn.texture_data().tile_set(),
                                 enemyToSpawn.texture_data().tile_layer()};
