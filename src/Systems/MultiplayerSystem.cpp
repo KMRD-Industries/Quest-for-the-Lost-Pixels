@@ -238,7 +238,7 @@ void MultiplayerSystem::pollState()
                 break;
             }
         case comm::SPAWN_ENEMY_REQUEST:
-            gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnOnDemand(m_state.enemy_positions_update());
+            gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnOnDemand(m_state);
             break;
 
         default:
@@ -507,7 +507,7 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
     {
         comm::StateUpdate* spawnEnemyRequest = m_updates.add_updates();
         spawnEnemyRequest->set_variant(comm::SPAWN_ENEMY_REQUEST);
-        *spawnEnemyRequest->mutable_enemy_positions_update() = sendSpawnerPosition(m_spawners);
+        sendSpawnerPosition(*spawnEnemyRequest, m_spawners);
 
         m_spawners.clear();
         m_areSpawnersSent = true;
@@ -562,11 +562,9 @@ void MultiplayerSystem::updateMovement(const std::vector<Entity>& entities)
     // if (!readyToTick(m_last_tick, tick)) return;
     // m_last_tick = tick;
 
-    comm::StateUpdate message;
-    message.set_variant(comm::PLAYER_POSITION_UPDATE);
-    *message.mutable_movement_update() = m_outgoing_movement;
+    m_outgoing_movement.set_variant(comm::MovementVariant::PLAYER_MOVEMENT_UPDATE);
     // std::cout << message.ShortDebugString() << "\n";
-    auto serialized = message.SerializeAsString();
+    auto serialized = m_outgoing_movement.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
 
     m_outgoing_movement.set_attack(false);
@@ -581,13 +579,12 @@ void MultiplayerSystem::pollMovement()
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
         available = m_udp_socket.available();
-        comm::StateUpdate m_message;
-        m_message.ParseFromArray(&m_buf, static_cast<int>(received));
-        switch (m_message.variant())
+        comm::MovementUpdate message;
+        m_incomming_movement.ParseFromArray(&m_buf, static_cast<int>(received));
+        switch (m_incomming_movement.variant())
         {
-        case comm::PLAYER_POSITION_UPDATE:
+        case comm::MovementVariant::PLAYER_MOVEMENT_UPDATE:
             {
-                m_incomming_movement = m_message.movement_update();
                 uint32_t id = m_incomming_movement.entity_id();
                 const auto& r = m_incomming_movement.curr_room();
 
@@ -639,9 +636,9 @@ void MultiplayerSystem::pollMovement()
 
                 break;
             }
-        case comm::MAP_UPDATE:
+        case comm::MovementVariant::MAP_UPDATE:
             {
-                handleMapUpdate(m_message.enemy_positions_update());
+                handleMapUpdate(m_incomming_movement.enemy_positions());
                 break;
             }
         default:
@@ -736,8 +733,8 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
         player_position->set_position_y(player.second.y);
     }
 
-    comm::StateUpdate message;
-    message.set_variant(comm::StateVariant::MAP_UPDATE);
+    comm::MovementUpdate message;
+    message.set_variant(comm::MovementVariant::MAP_UPDATE);
     *message.mutable_map_positions_update() = mapUpdate;
 
     auto serializedMessage = message.SerializeAsString();
@@ -746,29 +743,27 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
 }
 
 // TODO w przyszłości będzie też zapytanie o stworznie spawnerów
-comm::EnemyPositionsUpdate MultiplayerSystem::sendSpawnerPosition(
+void MultiplayerSystem::sendSpawnerPosition(
+    comm::StateUpdate& stateUpdate,
     const std::vector<std::pair<Entity, sf::Vector2<float>>>& spawners)
 {
     std::sort(m_spawners.begin(), m_spawners.end(),
               [](const std::pair<Entity, sf::Vector2<float>>& a, const std::pair<Entity, sf::Vector2<float>>& b)
               { return a.second.x > b.second.x; });
 
-    comm::EnemyPositionsUpdate spawnEnemyRequest;
-
     for (const auto& spawner : spawners)
     {
-        comm::Enemy* spawnerPosition = spawnEnemyRequest.add_enemy_positions();
+        comm::Enemy* spawnerPosition = stateUpdate.add_enemy_spawner_positions();
         spawnerPosition->set_position_x(spawner.second.x);
         spawnerPosition->set_position_y(spawner.second.y);
         spawnerPosition->set_id(spawner.first);
     }
     printf("Sending spawn enemy request\n");
-    return spawnEnemyRequest;
 }
 
-void MultiplayerSystem::handleMapUpdate(const comm::EnemyPositionsUpdate& enemyPositionUpdate)const
+void MultiplayerSystem::handleMapUpdate(const google::protobuf::RepeatedPtrField<comm::Enemy>& enemyPositions) const
 {
-    for (auto enemy : enemyPositionUpdate.enemy_positions())
+    for (const auto& enemy : enemyPositions)
     {
         auto gameEntityId = gCoordinator.getGameEntity(enemy.id());
 

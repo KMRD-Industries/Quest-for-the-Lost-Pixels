@@ -100,8 +100,9 @@ public:
                    const std::map<Entity, sf::Vector2<int>>& players);
     void sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles);
     void gatherEnemyAndPlayerPositions();
-    comm::EnemyPositionsUpdate sendSpawnerPosition(const std::vector<std::pair<Entity, sf::Vector2<float>>>& spawners);
-    void handleMapUpdate(const comm::EnemyPositionsUpdate& enemyPositionUpdate) const;
+    void sendSpawnerPosition(comm::StateUpdate& stateUpdate,
+                             const std::vector<std::pair<Entity, sf::Vector2<float>>>& spawners);
+    void handleMapUpdate(const google::protobuf::RepeatedPtrField<comm::Enemy>& enemyPositions) const;
     void disconnect();
 
     bool isConnected() const noexcept;

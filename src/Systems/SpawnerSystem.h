@@ -16,7 +16,7 @@ public:
     void clearSpawners();
     void spawnEnemies();
     std::vector<std::pair<Entity, sf::Vector2<float>>> getSortedSpawnedEnemies();
-    void spawnOnDemand(const comm::EnemyPositionsUpdate &enemiesToSpawn) const;
+    void spawnOnDemand(const comm::StateUpdate &enemiesToSpawn) const;
 
 private:
     float m_spawnTime{};

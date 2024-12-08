@@ -165,9 +165,9 @@ void SpawnerSystem::prepareEnemies()
     }
 }
 
-void SpawnerSystem::spawnOnDemand(const comm::EnemyPositionsUpdate& enemiesToSpawn) const
+void SpawnerSystem::spawnOnDemand(const comm::StateUpdate& update) const
 {
-    for (auto enemyToSpawn : enemiesToSpawn.enemy_positions())
+    for (const auto& enemyToSpawn : update.enemy_spawner_positions())
     {
         const Entity newEnemyEntity = gCoordinator.createEntity();
 
