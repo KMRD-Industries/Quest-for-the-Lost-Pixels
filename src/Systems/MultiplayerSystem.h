@@ -9,7 +9,6 @@
 #include "GameTypes.h"
 
 #include "System.h"
-#include "Timer.h"
 #include "Types.h"
 
 struct ItemGenerator
@@ -86,7 +85,7 @@ private:
 
     void pollMovement();
     void pollState();
-    std::vector<char> sendMapDimensions(std::vector<ObstacleData>& obstacles);
+    std::vector<char> sendMapDimensions(const std::vector<ObstacleData>& obstacles);
     void updateState(const std::vector<Entity>& entities);
     void updateMovement(const std::vector<Entity>& entities);
 
@@ -102,7 +101,7 @@ public:
     void sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles);
     void gatherEnemyAndPlayerPositions();
     comm::EnemyPositionsUpdate sendSpawnerPosition(const std::vector<std::pair<Entity, sf::Vector2<float>>>& spawners);
-    void handleMapUpdate(const comm::EnemyPositionsUpdate& enemyPositionUpdate);
+    void handleMapUpdate(const comm::EnemyPositionsUpdate& enemyPositionUpdate) const;
     void disconnect();
 
     bool isConnected() const noexcept;

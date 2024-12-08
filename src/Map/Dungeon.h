@@ -5,11 +5,9 @@
 
 #include <map>
 #include "Dungeon.h"
-#include "FightSystem.h"
 #include "FloorGenerator.h"
 #include "PlayerMovementSystem.h"
 #include "Room.h"
-#include "Timer.h"
 #include "Types.h"
 
 #include <TextureSystem.h>
@@ -80,7 +78,6 @@ private:
     std::map<Entity, sf::Vector2<float>> m_enemyPositions;
     std::unordered_map<Entity, ObstacleData> m_obstaclePositions;
     std::map<Entity, sf::Vector2<int>> m_playersPositions;
-    Timer* m_timer;
     float elapsedTime = 0.0f;
     std::queue<comm::Enemy> m_enemyQueue;
 

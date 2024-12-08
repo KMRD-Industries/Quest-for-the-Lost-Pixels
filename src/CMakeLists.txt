@@ -159,8 +159,6 @@ set(UTILS
         Utils/PublicConfig.h
         Utils/PublicConfigMenager.h
         Utils/TextureParser.h
-        Utils/Timer.cpp
-        Utils/Timer.h
         Utils/TextTag.h
         Utils/GameUtility.h
         Core/ServerEntityManager.cpp

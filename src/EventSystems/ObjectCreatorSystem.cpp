@@ -150,9 +150,7 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
     colliderComponent.onCollisionOut = eventInfo.onCollisionOut;
     colliderComponent.tag = eventInfo.tag;
 
-    // TODO chuj wi czy git - sprawdź, potencjalny błąd
     if (collisionData->tag == "Wall" && !gCoordinator.hasComponent<SynchronisedEvent>(eventInfo.entity))
-    // if (collisionData->tag == "Wall" && !gCoordinator.hasComponent<MultiplayerComponent>(eventInfo.entity))
     {
         const Entity eventEntity = gCoordinator.createEntity();
         const auto synchronisedEvent = SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,

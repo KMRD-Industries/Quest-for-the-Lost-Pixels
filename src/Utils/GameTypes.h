@@ -318,10 +318,3 @@ struct ObstacleData
     }
 
 };
-
-enum class multiplayerType : int
-{
-    ROOM_DIMENSIONS_CHANGED = 1,
-    ENEMY_GOT_HIT = 2,
-    SEND_SPAWNERS_POSITIONS = 3,
-};

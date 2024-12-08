@@ -74,7 +74,6 @@ void Dungeon::init()
 {
     setECS();
 
-    m_timer = Timer::Instance();
     auto _ = gCoordinator.createEntity(); // Ignore Entity with ID = 0
     config::playerEntity = gCoordinator.createEntity();
 

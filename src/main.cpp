@@ -13,7 +13,6 @@
 #include "ResourceManager.h"
 #include "SoundManager.h"
 #include "SpawnerSystem.h"
-#include "Timer.h"
 
 Coordinator gCoordinator;
 PublicConfigSingleton configSingleton;
@@ -68,7 +67,6 @@ int main()
 
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     sf::RenderWindow window(desktopMode, "Quest for the lost pixels!");
-    Timer* timer = Timer::Instance();
 
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 
@@ -101,8 +99,6 @@ int main()
         renderTexture.clear(gCoordinator.getRegisterSystem<TextureSystem>()->getBackgroundColor());
 
         ImGui::SFML::Update(window, deltaTime);
-        timer->Tick();
-        timer->Reset();
 
         game.update(static_cast<float>(deltaTime.asMilliseconds()));
         game.draw(renderTexture);

@@ -582,7 +582,7 @@ void MultiplayerSystem::pollMovement()
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
         available = m_udp_socket.available();
         comm::StateUpdate m_message;
-        m_message.ParseFromArray(&m_buf, int(received));
+        m_message.ParseFromArray(&m_buf, static_cast<int>(received));
         switch (m_message.variant())
         {
         case comm::PLAYER_POSITION_UPDATE:
@@ -657,103 +657,7 @@ void MultiplayerSystem::disconnect()
     m_udp_socket.close();
 }
 
-// void MultiplayerSystem::update(const float deltaTime)
-// {
-//     std::size_t received = 0;
-//     const std::size_t available = m_udp_socket.available();
-//
-//     if (available > 0)
-//     {
-//         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
-//         comm::StateUpdate m_message;
-//         m_message.ParseFromArray(&m_buf, int(received));
-//         switch (m_message.variant())
-//         {
-//         case comm::PLAYER_POSITION_UPDATE:
-//             {
-//                 handlePlayerPositionUpdate(m_message);
-//                 break;
-//             }
-//         case comm::MAP_UPDATE:
-//             {
-//                 handleMapUpdate(m_message.enemy_positions_update());
-//                 break;
-//             }
-//         default:
-//             break;
-//         }
-//     }
-//
-//     sendPlayerPosition();
-//
-//     // std::deque<Entity> m_multiplayerEntities;
-//     for (auto entity : m_entities)
-//     {
-//         auto multiplayerComponent = gCoordinator.getComponent<MultiplayerComponent>(entity);
-//         switch (multiplayerComponent.type)
-//         {
-//         case multiplayerType::ROOM_DIMENSIONS_CHANGED:
-//             {
-//                 if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
-//
-//                 const auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
-//                 auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-//                 if (colliderComponent.tag == "Wall")
-//                 {
-//                     ObstacleData obstacle{position.x, position.y};
-//                     m_walls.insert({entity, obstacle});
-//                 }
-//                 break;
-//             }
-//         case multiplayerType::ENEMY_GOT_HIT:
-//             {
-//                 printf("enemy got hit\n");
-//                 // TODO do zrobienia
-//                 break;
-//             }
-//         case multiplayerType::SEND_SPAWNERS_POSITIONS:
-//             {
-//                 m_spawners.push_back(
-//                     std::make_pair(entity, gCoordinator.getComponent<TransformComponent>(entity).position));
-//                 break;
-//             }
-//         default:
-//             break;
-//         }
-//         m_multiplayerEntities.push_back(entity);
-//     }
-//
-//     for (const auto entity : m_multiplayerEntities)
-//     {
-//         gCoordinator.removeComponent<MultiplayerComponent>(entity);
-//     }
-//     m_multiplayerEntities.clear();
-//
-//     if (!m_walls.empty())
-//     {
-//         sendMapDimensions(m_walls);
-//         m_walls.clear();
-//         isMapDimensionsSent = true;
-//     }
-//
-//     if (!m_spawners.empty())
-//     {
-//         sendSpawnerPosition(m_spawners);
-//         m_spawners.clear();
-//         areSpawnersSent = true;
-//     }
-//
-//     if (m_frameTime += deltaTime; m_frameTime >= configSingleton.GetConfig().oneFrameTime * frames &&
-//     areSpawnersSent)
-//     {
-//         gatherEnemyAndPlayerPositions();
-//         updateMap(m_enemyPositions, m_playersPositions);
-//         m_frameTime -= configSingleton.GetConfig().oneFrameTime * frames;
-//     }
-// }
-
-
-std::vector<char> MultiplayerSystem::sendMapDimensions(std::vector<ObstacleData>& obstacles)
+std::vector<char> MultiplayerSystem::sendMapDimensions(const std::vector<ObstacleData>& obstacles)
 {
     comm::MapDimensionsUpdate mapDimensionsUpdate;
     printf("Obstacle from game size: %lu\n", obstacles.size());
@@ -862,9 +766,9 @@ comm::EnemyPositionsUpdate MultiplayerSystem::sendSpawnerPosition(
     return spawnEnemyRequest;
 }
 
-void MultiplayerSystem::handleMapUpdate(const comm::EnemyPositionsUpdate& enemyPositionsUpdate)
+void MultiplayerSystem::handleMapUpdate(const comm::EnemyPositionsUpdate& enemyPositionUpdate)const
 {
-    for (auto enemy : enemyPositionsUpdate.enemy_positions())
+    for (auto enemy : enemyPositionUpdate.enemy_positions())
     {
         auto gameEntityId = gCoordinator.getGameEntity(enemy.id());
 

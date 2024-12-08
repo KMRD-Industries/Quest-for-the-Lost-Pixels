@@ -94,9 +94,6 @@ void CollisionSystem::createMapCollision()
             if (colliderComponent.collision.width > 0 && colliderComponent.collision.height > 0)
             {
                 createCollisionBody(entity, "Wall", true, false);
-
-                // const auto multiplayerEventComponent = MultiplayerComponent{.type = multiplayerType::ROOM_DIMENSIONS_CHANGED};
-                // gCoordinator.addComponent(entity, multiplayerEventComponent);
             }
         }
     }
