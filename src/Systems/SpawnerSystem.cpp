@@ -71,7 +71,8 @@ void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemy
         newMonsterEntity, "Enemy",
         [&, newMonsterEntity, enemyToSpawn](const GameType::CollisionData& collision)
         {
-            if (!std::regex_match(collision.tag, config::playerRegexTag)) return;
+            // if (!std::regex_match(collision.tag, config::playerRegexTag)) return;
+            if (collision.entity != config::playerEntity) return;
 
             if (!gCoordinator.hasComponent<CharacterComponent>(collision.entity)) return;
             auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collision.entity)};
@@ -81,9 +82,6 @@ void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemy
             if (playerCharacterComponent.hp <= 0)
             {
                 ResourceManager::getInstance().setCurrentShader(video::FragmentShader::DEATH);
-                gCoordinator.removeComponent<RenderComponent>(collision.entity);
-                gCoordinator.removeComponent<PlayerComponent>(collision.entity);
-                gCoordinator.getComponent<ColliderComponent>(collision.entity).toRemoveCollider = true;
 
                 const Entity eventEntity = gCoordinator.createEntity();
                 gCoordinator.addComponent(eventEntity,

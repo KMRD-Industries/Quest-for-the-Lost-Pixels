@@ -82,6 +82,7 @@ void ItemSystem::displayBodyArmourStats(const Entity entity)
 
 void ItemSystem::update()
 {
+    if (!gCoordinator.hasComponent<TransformComponent>(config::playerEntity)) return;
     const auto &playerTransformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
     double minDistance = std::numeric_limits<int>::max();
     closestItem = {};

@@ -22,6 +22,7 @@
 #include <zlib.h>
 
 #include "CharacterComponent.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "RoomListenerSystem.h"
 #include "SFML/System/Vector3.hpp"
@@ -354,16 +355,19 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
 
             m_alive = false;
 
-            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_player_entity).slots)
+            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(entity).slots)
             {
                 if (slot.second != 0)
                 {
                     m_registered_items.erase(slot.second);
-                    gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
+                    if (auto cc = gCoordinator.tryGetComponent<ColliderComponent>(slot.second))
+                        cc->toDestroy = true;
                 }
             }
 
-            gCoordinator.getComponent<ColliderComponent>(m_player_entity).toDestroy = true;
+            gCoordinator.removeComponent<RenderComponent>(entity);
+            gCoordinator.removeComponent<PlayerComponent>(entity);
+            gCoordinator.getComponent<ColliderComponent>(entity).toRemoveCollider = true;
 
             update->set_variant(comm::PLAYER_DIED);
             update->mutable_player()->set_id(m_player_id);
@@ -775,7 +779,7 @@ void MultiplayerSystem::handleMapUpdate(const google::protobuf::RepeatedPtrField
         if (gCoordinator.hasComponent<TransformComponent>(gameEntityId))
         {
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(gameEntityId);
-            printf("Enemy's vector x: %f, y: %f\n", enemy.position_x(), enemy.position_y());
+            // printf("Enemy's vector x: %f, y: %f\n", enemy.position_x(), enemy.position_y());
             transformComponent.velocity.x = enemy.position_x() * enemy_speed;
             transformComponent.velocity.y = -enemy.position_y() * enemy_speed;
         }
