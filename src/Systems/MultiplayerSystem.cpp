@@ -5,9 +5,9 @@
 #include <boost/asio.hpp>
 #include <comm.pb.h>
 #include <vector>
-#include "zconf.h"
-#include "zlib.h"
+#include <zlib.h>
 
+#include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
@@ -18,16 +18,13 @@
 #include "InputHandler.h"
 #include "InventorySystem.h"
 #include "MultiplayerSystem.h"
-#include "SpawnerSystem.h"
-
-#include "CharacterComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "RoomListenerSystem.h"
+#include "SpawnerSystem.h"
 #include "SynchronisedEvent.h"
 #include "TransformComponent.h"
 #include "Types.h"
-
 #include "WeaponComponent.h"
 
 extern Coordinator gCoordinator;
