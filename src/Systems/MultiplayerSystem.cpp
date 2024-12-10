@@ -236,8 +236,7 @@ void MultiplayerSystem::pollState()
         case comm::SPAWN_ENEMY_REQUEST:
             gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnOnDemand(m_state);
             break;
-
-        default:
+        default: {}
         }
     }
     else
@@ -297,7 +296,7 @@ void MultiplayerSystem::update(const float deltaTime)
             break;
         case SynchronisedEvent::UpdateType::MOVEMENT:
             movementEvents.push_back(eventEntity);
-        default:
+        default: {}
         }
     }
 
