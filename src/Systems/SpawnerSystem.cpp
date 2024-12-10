@@ -157,8 +157,8 @@ void SpawnerSystem::prepareEnemies()
         ObstacleData obstacleData{position.x, position.y};
         const auto synchronisedEvent = SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,
                                                          .variant = SynchronisedEvent::Variant::SEND_SPAWNERS_POSITIONS,
-                                                         .obstacleData = obstacleData,
-                                                         .updatedEntity = enemyEntity};
+                                                         .updatedEntity = enemyEntity,
+                                                         .obstacleData = obstacleData};
         gCoordinator.addComponent(eventEntity, synchronisedEvent);
     }
 }
