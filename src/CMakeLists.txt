@@ -31,7 +31,6 @@ set(COMPONENTS
         Components/RenderComponent.h
         Components/TransformComponent.h
         Components/PlayerComponent.h
-        Components/MultiplayerComponent.h
         Components/SynchronisedEvent.h
         Components/ColliderComponent.h
         Components/CharacterComponent.h
@@ -162,6 +161,8 @@ set(UTILS
         Utils/TextureParser.h
         Utils/TextTag.h
         Utils/GameUtility.h
+        Core/ServerEntityManager.cpp
+        Core/ServerEntityManager.h
 )
 
 set(MENU_STATE_MACHINE

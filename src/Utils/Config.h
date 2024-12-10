@@ -105,7 +105,7 @@ namespace config
 
     // Multiplayer config
     static constexpr std::string_view defaultIP = "127.0.0.1";
-    static constexpr std::string_view defaultPort = "10823";
+    static constexpr std::string_view defaultPort = "9001";
     static constexpr uint32_t millisPerTick = 10;
 
     // Color balance structure

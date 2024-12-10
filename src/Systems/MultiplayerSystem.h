@@ -2,10 +2,11 @@
 #include <optional>
 #include <unordered_map>
 
-#include <SFML/System/Vector3.hpp>
 #include <boost/asio.hpp>
 #include <comm.pb.h>
 #include <glm/ext/vector_int2.hpp>
+
+#include "GameTypes.h"
 
 #include "System.h"
 #include "Types.h"
@@ -16,6 +17,8 @@ struct ItemGenerator
     uint32_t gen;
     comm::ItemType type;
 };
+
+#include "CollisionSystem.h"
 
 struct MultiplayerDungeonUpdate
 {
@@ -44,7 +47,8 @@ private:
     Entity m_player_entity = 0;
     uint32_t m_player_id = 0;
     int64_t m_seed = 0;
-    float m_frame_time = 0.0;
+    float m_frameTime = 0.0;
+
 
     boost::asio::io_context m_io_context;
     tcp::socket m_tcp_socket;
@@ -65,12 +69,21 @@ private:
     comm::MovementUpdate m_incomming_movement{};
     comm::MovementUpdate m_outgoing_movement{};
     comm::StateUpdate m_state{};
+    std::vector<ObstacleData> m_walls{};
+    std::map<Entity, sf::Vector2<float>> m_enemyPositions;
+    std::map<Entity, sf::Vector2<int>> m_playersPositions;
+    std::vector<std::pair<Entity, sf::Vector2<float>>> m_spawners{};
+    CollisionSystem* m_collisionSystem;
+    bool m_isMapDimensionsSent{};
+    bool m_areSpawnersSent{};
+    std::deque<Entity> m_multiplayerEntities;
     comm::StateUpdateSeries m_updates{};
 
     std::vector<MultiplayerDungeonUpdate> m_dungeon_updates{};
 
     void pollMovement();
     void pollState();
+    std::vector<char> sendMapDimensions(const std::vector<ObstacleData>& obstacles);
     void updateState(const std::vector<Entity>& entities);
     void updateMovement(const std::vector<Entity>& entities);
 
@@ -79,7 +92,15 @@ public:
     void setup(const std::string_view& ip, const std::string_view& port) noexcept;
     void setPlayer(const uint32_t id, const Entity entity);
     void setRoom(const glm::ivec2& room) noexcept;
+    void clearRemoteDungeonUpdates();
     void update(const float deltaTime);
+    void updateMap(const std::map<Entity, sf::Vector2<float>>& enemies,
+                   const std::map<Entity, sf::Vector2<int>>& players);
+    void sendMapDimensions(const std::unordered_map<Entity, ObstacleData>& obstacles);
+    void gatherEnemyAndPlayerPositions();
+    void sendSpawnerPosition(comm::StateUpdate& stateUpdate,
+                             const std::vector<std::pair<Entity, sf::Vector2<float>>>& spawners);
+    void handleMapUpdate(const google::protobuf::RepeatedPtrField<comm::Enemy>& enemyPositions) const;
     void disconnect();
 
     bool isConnected() const noexcept;
@@ -92,4 +113,8 @@ public:
     const std::unordered_map<uint32_t, Entity>& getPlayers();
     const std::vector<MultiplayerDungeonUpdate>& getRemoteDungeonUpdates();
     comm::InitialInfo registerPlayer(const Entity player);
+    std::string addMessageSize(const std::string& serializedMsg);
+
+    static constexpr int m_frames = 2000;
+    static constexpr int m_enemySpeed = 50;
 };
