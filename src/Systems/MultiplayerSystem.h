@@ -47,7 +47,8 @@ private:
     Entity m_player_entity = 0;
     uint32_t m_player_id = 0;
     int64_t m_seed = 0;
-    float m_frame_time = 0.0;
+    float m_frameTime = 0.0;
+
 
     boost::asio::io_context m_io_context;
     tcp::socket m_tcp_socket;
@@ -72,13 +73,10 @@ private:
     std::map<Entity, sf::Vector2<float>> m_enemyPositions;
     std::map<Entity, sf::Vector2<int>> m_playersPositions;
     std::vector<std::pair<Entity, sf::Vector2<float>>> m_spawners{};
-    float m_frameTime{};
     CollisionSystem* m_collisionSystem;
     bool m_isMapDimensionsSent{};
     bool m_areSpawnersSent{};
     std::deque<Entity> m_multiplayerEntities;
-    const int frames = 2000;
-    const int enemy_speed = 50;
     comm::StateUpdateSeries m_updates{};
 
     std::vector<MultiplayerDungeonUpdate> m_dungeon_updates{};
@@ -116,4 +114,7 @@ public:
     const std::vector<MultiplayerDungeonUpdate>& getRemoteDungeonUpdates();
     comm::InitialInfo registerPlayer(const Entity player);
     std::string addMessageSize(const std::string& serializedMsg);
+
+    static constexpr int m_frames = 2000;
+    static constexpr int m_enemySpeed = 50;
 };

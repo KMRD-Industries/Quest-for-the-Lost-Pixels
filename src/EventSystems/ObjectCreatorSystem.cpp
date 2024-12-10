@@ -18,8 +18,6 @@ void ObjectCreatorSystem::update()
         if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity)) continue;
         if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity)) continue;
         if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity)) continue;
-        // if (configSingleton.GetConfig().debugMode)
-        //     std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
 
         switch (eventInfo.type)
         {

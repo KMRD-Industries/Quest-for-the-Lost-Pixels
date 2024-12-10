@@ -3,7 +3,6 @@
 #include <iostream>
 #include "ChestSpawnerSystem.h"
 #include "PassageSystem.h"
-#include "EnemyComponent.h"
 
 void RoomListenerSystem::update(const float deltaTime)
 {
@@ -40,7 +39,6 @@ void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)
     {
         m_lootedRooms.insert({newRoom, false});
         m_isCurrentRoomLooted = false;
-        // gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnEnemies();
     }
     m_currentRoom = newRoom;
     m_toLoot = false;

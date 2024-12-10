@@ -1,11 +1,9 @@
 #include <chrono>
-#include <format>
 #include <iostream>
 #include <vector>
 
 #include <comm.pb.h>
 
-#include "Dungeon.h"
 #include <BodyArmourComponent.h>
 #include <CreateBodyWithCollisionEvent.h>
 #include <EquipmentComponent.h>
@@ -29,8 +27,7 @@
 #include "DealDMGToEnemyEvent.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
-
-#include <map>
+#include "Dungeon.h"
 
 #include "EndGameState.h"
 #include "EnemyComponent.h"
@@ -46,7 +43,6 @@
 #include "LostGameState.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
-#include "SynchronisedEvent.h"
 #include "MultiplayerSystem.h"
 #include "ObjectCreatorSystem.h"
 #include "PlayerComponent.h"
@@ -56,6 +52,7 @@
 #include "RoomListenerSystem.h"
 #include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
+#include "SynchronisedEvent.h"
 #include "TextTagComponent.h"
 #include "TextTagSystem.h"
 #include "TextureSystem.h"
@@ -102,7 +99,7 @@ void Dungeon::init()
 
         std::cout << "Connected to server with id: " << m_id << '\n';
 
-        for (const auto& player: initialInfo.connected_players())
+        for (const auto& player : initialInfo.connected_players())
         {
             const uint32_t playerID = player.id();
             createRemotePlayer(player);
@@ -154,27 +151,23 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
     const auto tag = std::format("Player {}", playerID);
     m_entities[playerID] = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(m_entities[playerID],
+    gCoordinator.addComponents(
+        m_entities[playerID],
         TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
                                         getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID)),
                            0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
-        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5},
-        RenderComponent{},
-        AnimationComponent{},
-        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
-        PlayerComponent{},
-        ColliderComponent{},
-        InventoryComponent{},
-        EquipmentComponent{}
-    );
+        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
+        AnimationComponent{}, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
+        PlayerComponent{}, ColliderComponent{}, InventoryComponent{}, EquipmentComponent{});
 
-    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", configSingleton.GetConfig().playerAnimation);
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
+        "Characters", configSingleton.GetConfig().playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[playerID]).collision = cc;
 
     const Entity entity = gCoordinator.createEntity();
     const auto newEvent = CreateBodyWithCollisionEvent(
-        m_entities[playerID], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false,
-        false);
+        m_entities[playerID], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {},
+        false, false);
 
     gCoordinator.addComponent(entity, newEvent);
 
@@ -240,8 +233,7 @@ void Dungeon::setupWeaponEntity(const comm::Player& player) const
 {
     // temporary for single-player
     comm::Item weapon;
-    if (m_multiplayerSystem->isConnected())
-        weapon = player.items(0);
+    if (m_multiplayerSystem->isConnected()) weapon = player.items(0);
 
     const auto& availableWeapons = gCoordinator.getRegisterSystem<TextureSystem>()->m_weaponsIDs;
 
@@ -272,8 +264,7 @@ void Dungeon::setupHelmetEntity(const comm::Player& player) const
 {
     // temporary for single-player
     comm::Item helmet;
-    if (m_multiplayerSystem->isConnected())
-        helmet = player.items(1);
+    if (m_multiplayerSystem->isConnected()) helmet = player.items(1);
 
     const auto& availableHelmets = gCoordinator.getRegisterSystem<TextureSystem>()->m_helmets;
 

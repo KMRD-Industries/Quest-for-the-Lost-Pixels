@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <map>
 #include "Dungeon.h"
 #include "FloorGenerator.h"
 #include "PlayerMovementSystem.h"
@@ -75,11 +74,7 @@ private:
     int m_dungeonDepth{1};
     bool m_endGame{};
     Entity m_weapon{};
-    std::map<Entity, sf::Vector2<float>> m_enemyPositions;
-    std::unordered_map<Entity, ObstacleData> m_obstaclePositions;
-    std::map<Entity, sf::Vector2<int>> m_playersPositions;
     float elapsedTime = 0.0f;
-    std::queue<comm::Enemy> m_enemyQueue;
 
     PlayerMovementSystem* m_playerMovementSystem;
     MultiplayerSystem* m_multiplayerSystem;

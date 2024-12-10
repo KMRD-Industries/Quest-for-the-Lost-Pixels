@@ -5,6 +5,8 @@
 #include <boost/asio.hpp>
 #include <comm.pb.h>
 #include <vector>
+#include "zconf.h"
+#include "zlib.h"
 
 #include "ColliderComponent.h"
 #include "Config.h"
@@ -16,16 +18,12 @@
 #include "InputHandler.h"
 #include "InventorySystem.h"
 #include "MultiplayerSystem.h"
-
-#include <SpawnerSystem.h>
-#include <zconf.h>
-#include <zlib.h>
+#include "SpawnerSystem.h"
 
 #include "CharacterComponent.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "RoomListenerSystem.h"
-#include "SFML/System/Vector3.hpp"
 #include "SynchronisedEvent.h"
 #include "TransformComponent.h"
 #include "Types.h"
@@ -283,9 +281,9 @@ void MultiplayerSystem::update(const float deltaTime)
         return;
     }
 
-    if (m_frame_time += deltaTime; m_frame_time < configSingleton.GetConfig().oneFrameTime * 1000) return;
+    if (m_frameTime += deltaTime; m_frameTime < configSingleton.GetConfig().oneFrameTime * 1000) return;
 
-    m_frame_time -= configSingleton.GetConfig().oneFrameTime * 1000;
+    m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
 
     pollState();
     pollMovement();
@@ -360,8 +358,7 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
                 if (slot.second != 0)
                 {
                     m_registered_items.erase(slot.second);
-                    if (auto cc = gCoordinator.tryGetComponent<ColliderComponent>(slot.second))
-                        cc->toDestroy = true;
+                    if (auto cc = gCoordinator.tryGetComponent<ColliderComponent>(slot.second)) cc->toDestroy = true;
                 }
             }
 
@@ -747,9 +744,8 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
 }
 
 // TODO w przyszłości będzie też zapytanie o stworznie spawnerów
-void MultiplayerSystem::sendSpawnerPosition(
-    comm::StateUpdate& stateUpdate,
-    const std::vector<std::pair<Entity, sf::Vector2<float>>>& spawners)
+void MultiplayerSystem::sendSpawnerPosition(comm::StateUpdate& stateUpdate,
+                                            const std::vector<std::pair<Entity, sf::Vector2<float>>>& spawners)
 {
     std::sort(m_spawners.begin(), m_spawners.end(),
               [](const std::pair<Entity, sf::Vector2<float>>& a, const std::pair<Entity, sf::Vector2<float>>& b)
@@ -779,9 +775,8 @@ void MultiplayerSystem::handleMapUpdate(const google::protobuf::RepeatedPtrField
         if (gCoordinator.hasComponent<TransformComponent>(gameEntityId))
         {
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(gameEntityId);
-            // printf("Enemy's vector x: %f, y: %f\n", enemy.position_x(), enemy.position_y());
-            transformComponent.velocity.x = enemy.position_x() * enemy_speed;
-            transformComponent.velocity.y = -enemy.position_y() * enemy_speed;
+            transformComponent.velocity.x = enemy.position_x() * m_enemySpeed;
+            transformComponent.velocity.y = -enemy.position_y() * m_enemySpeed;
         }
     }
 }
