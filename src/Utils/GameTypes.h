@@ -305,3 +305,16 @@ namespace std
         size_t operator()(const GameType::MapInfo& mapInfo) const { return hash<std::string>()(mapInfo.mapID); }
     };
 } // namespace std
+
+struct ObstacleData
+{
+    float x{}, y{}; // where x and y are the left top position
+
+    ObstacleData() = default;
+
+    ObstacleData(const float x, const float y):
+    x{x}, y{y}
+    {
+    }
+
+};

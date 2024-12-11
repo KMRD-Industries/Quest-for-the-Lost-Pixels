@@ -20,7 +20,11 @@ void PlayerMovementSystem::init() { inputHandler = InputHandler::getInstance(); 
 
 void PlayerMovementSystem::update(const float deltaTime)
 {
-    if (gCoordinator.getComponent<CharacterComponent>(config::playerEntity).hp <= 0.0) return;
+    if (auto cc = gCoordinator.tryGetComponent<CharacterComponent>(config::playerEntity))
+    {
+        if (cc->hp <= 0.0) return;
+    }
+    else return;
 
     handleAttack();
     handlePickUpAction();

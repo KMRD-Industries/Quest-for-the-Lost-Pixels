@@ -7,9 +7,7 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
-#include "EquipmentComponent.h"
 #include "Helpers.h"
-#include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
 #include "PlayerComponent.h"
 #include "RenderComponent.h"
@@ -19,7 +17,6 @@
 #include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TransformComponent.h"
-#include "WeaponComponent.h"
 
 extern PublicConfigSingleton configSingleton;
 
@@ -27,15 +24,9 @@ constexpr float SPAWN_RATE = 3600.f;
 
 void SpawnerSystem::update(const float timeStamp)
 {
+    prepareEnemies();
+    // TODO przenieś do stałej
     m_spawnTime += timeStamp * 1000.f;
-
-    for (const auto entity : m_entities)
-    {
-        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-
-        processSpawner(spawnerComponent, spawnerTransformComponent);
-    }
 
     if (m_spawnTime >= SPAWN_RATE) m_spawnTime -= SPAWN_RATE;
 
@@ -48,63 +39,64 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
     // Check if the spawner is ready to spawn the enemy.
     if (m_spawnTime < SPAWN_RATE) return;
 
-    // Spawn the enemy and increment the spawn count.
     spawnerComponent.noSpawns++;
-    spawnEnemy(spawnerTransformComponent, spawnerComponent.enemyType);
 }
 
-void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformComponent,
-                               const Enemies::EnemyType enemyType) const
+void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemyToSpawn) const
 {
-    const auto enemyConfig = getRandomEnemyData(enemyType);
-    const Entity newMonsterEntity = gCoordinator.createEntity();
+    auto positionsVec = sf::Vector2f(enemyToSpawn.position_x(), enemyToSpawn.position_y());
+    TransformComponent transformComponent{positionsVec};
 
-    const ColliderComponent colliderComponent{enemyConfig.collisionData};
-    TransformComponent transformComponent{spawnerTransformComponent};
+    const Collision collisionData{
+        enemyToSpawn.collision_data().type(),     enemyToSpawn.collision_data().x_offset(),
+        enemyToSpawn.collision_data().y_offset(), enemyToSpawn.collision_data().width(),
+        enemyToSpawn.collision_data().height(),
+    };
+    const ColliderComponent colliderComponent{collisionData};
 
-    transformComponent.position.x -= colliderComponent.collision.x * configSingleton.GetConfig().gameScale;
-    transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale;
+    //TODO temporary solution working perfectly
+    transformComponent.position.x -= colliderComponent.collision.x * configSingleton.GetConfig().gameScale - 26;
+    transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale - 5;
 
-    gCoordinator.addComponents(newMonsterEntity, enemyConfig.textureData, transformComponent, RenderComponent{},
-                               AnimationComponent{}, EnemyComponent{}, ColliderComponent{enemyConfig.collisionData},
-                               CharacterComponent{.hp = enemyConfig.hp});
+    TileComponent tileComponent{enemyToSpawn.texture_data().tile_id(), enemyToSpawn.texture_data().tile_set(),
+                                enemyToSpawn.texture_data().tile_layer()};
+
+    gCoordinator.addComponents(newMonsterEntity, tileComponent, transformComponent, RenderComponent{},
+                               AnimationComponent{}, EnemyComponent{}, ColliderComponent{collisionData},
+                               CharacterComponent{.hp = static_cast<float>(enemyToSpawn.hp())});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
     auto newEvent = CreateBodyWithCollisionEvent(
         newMonsterEntity, "Enemy",
-        [&, newMonsterEntity, enemyConfig](const GameType::CollisionData& collisionData)
+        [&, newMonsterEntity, enemyToSpawn](const GameType::CollisionData& collision)
         {
-            if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
+            // if (!std::regex_match(collision.tag, config::playerRegexTag)) return;
+            if (collision.entity != config::playerEntity) return;
 
-            if (!gCoordinator.hasComponent<CharacterComponent>(collisionData.entity) ||
-                gCoordinator.hasComponent<MultiplayerComponent>(collisionData.entity))
-                return;
-            auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entity)};
+            if (!gCoordinator.hasComponent<CharacterComponent>(collision.entity)) return;
+            auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collision.entity)};
             playerCharacterComponent.attacked = true;
 
-            playerCharacterComponent.hp -= enemyConfig.damage;
+            playerCharacterComponent.hp -= enemyToSpawn.damage();
             if (playerCharacterComponent.hp <= 0)
             {
                 ResourceManager::getInstance().setCurrentShader(video::FragmentShader::DEATH);
-                gCoordinator.removeComponent<RenderComponent>(collisionData.entity);
-                gCoordinator.removeComponent<PlayerComponent>(collisionData.entity);
-                gCoordinator.getComponent<ColliderComponent>(collisionData.entity).toRemoveCollider = true;
 
                 const Entity eventEntity = gCoordinator.createEntity();
                 gCoordinator.addComponent(eventEntity,
                                           SynchronisedEvent{.variant = SynchronisedEvent::Variant::PLAYER_KILLED,
-                                                            .entity = collisionData.entity});
+                                                            .entity = collision.entity});
             }
 
             const Entity tag = gCoordinator.createEntity();
             gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});
             gCoordinator.addComponent(
-                tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collisionData.entity)});
+                tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collision.entity)});
 
             if (!config::applyKnockback) return;
 
-            auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entity)};
+            auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collision.entity)};
             auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
 
             b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -
@@ -134,15 +126,9 @@ void SpawnerSystem::clearSpawners()
 
 void SpawnerSystem::spawnEnemies()
 {
-    for (const auto entity : m_entities)
-    {
-        auto& spawnerComponent = gCoordinator.getComponent<SpawnerComponent>(entity);
-        const auto& spawnerTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        processSpawner(spawnerComponent, spawnerTransformComponent);
-    }
+    prepareEnemies();
     cleanUpUnnecessarySpawners();
 }
-
 
 void SpawnerSystem::cleanUpUnnecessarySpawners()
 {
@@ -158,4 +144,40 @@ void SpawnerSystem::cleanUpUnnecessarySpawners()
     }
     for (const auto entity : entityToKill) gCoordinator.destroyEntity(entity);
     entityToKill.clear();
+}
+
+std::vector<std::pair<Entity, sf::Vector2<float>>> SpawnerSystem::getSortedSpawnedEnemies() { return m_spawnedEnemies; }
+
+void SpawnerSystem::prepareEnemies()
+{
+    for (const auto enemyEntity : m_entities)
+    {
+        const Entity eventEntity = gCoordinator.createEntity();
+        const auto position = gCoordinator.getComponent<TransformComponent>(enemyEntity).position;
+        ObstacleData obstacleData{position.x, position.y};
+        const auto synchronisedEvent = SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,
+                                                         .variant = SynchronisedEvent::Variant::SEND_SPAWNERS_POSITIONS,
+                                                         .updatedEntity = enemyEntity,
+                                                         .obstacleData = obstacleData};
+        gCoordinator.addComponent(eventEntity, synchronisedEvent);
+    }
+}
+
+void SpawnerSystem::spawnOnDemand(const comm::StateUpdate& update) const
+{
+    for (const auto& enemyToSpawn : update.enemy_spawner_positions())
+    {
+        const Entity newEnemyEntity = gCoordinator.createEntity();
+
+        if (gCoordinator.mapEntity(enemyToSpawn.id(), newEnemyEntity))
+        {
+            spawnEnemy(newEnemyEntity, enemyToSpawn);
+            SpawnerComponent spawnerComponent{};
+            spawnerComponent.enemyType = Enemies::EnemyType::MELEE;
+        }
+        else
+        {
+            std::cout << "Couldn't spawn enemies because id is occupied!!!\n";
+        }
+    }
 }
