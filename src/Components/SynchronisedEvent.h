@@ -41,5 +41,5 @@ struct SynchronisedEvent
     Entity updatedEntity = 0;
     std::optional<GameType::PickUpInfo> pickUpInfo = std::nullopt;
     std::optional<glm::ivec2> room = std::nullopt;
-    ObstacleData obstacleData{};
+    std::optional<ObstacleData> obstacleData{};
 };

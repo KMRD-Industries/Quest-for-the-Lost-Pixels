@@ -316,7 +316,7 @@ void MultiplayerSystem::update(const float deltaTime)
     if (m_areSpawnersSent)
     {
         gatherEnemyAndPlayerPositions();
-        updateMap(m_enemyPositions, m_playersPositions);
+        updateMap();
     }
 }
 
@@ -475,9 +475,10 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             }
         case SynchronisedEvent::Variant::SEND_SPAWNERS_POSITIONS:
             {
+                if (!obstacleData.has_value()) continue;
                 usedPreviousUpdate = false;
 
-                m_spawners.emplace_back(updatedEntity, sf::Vector2(obstacleData.x, obstacleData.y));
+                m_spawners.emplace_back(updatedEntity, sf::Vector2(obstacleData->x, obstacleData->y));
                 break;
             }
         default:
@@ -576,7 +577,6 @@ void MultiplayerSystem::pollMovement()
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
         available = m_udp_socket.available();
-        comm::MovementUpdate message;
         m_incomming_movement.ParseFromArray(&m_buf, static_cast<int>(received));
         switch (m_incomming_movement.variant())
         {
@@ -705,15 +705,15 @@ void MultiplayerSystem::gatherEnemyAndPlayerPositions()
     }
 }
 
-void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& enemies,
-                                  const std::map<Entity, sf::Vector2<int>>& players)
+void MultiplayerSystem::updateMap()
 {
+    if (m_enemyPositions.size() < 0 || m_playersPositions.size() < 0) return;
+
     comm::MapPositionsUpdate mapUpdate;
-    for (const auto& enemy : enemies)
+    for (const auto& enemy : m_enemyPositions)
     {
         if (gCoordinator.getServerEntity(enemy.first) == 0)
         {
-            // TODO imo powinno być return
             continue;
         }
         comm::Enemy* enemy_position = mapUpdate.add_enemies();
@@ -722,7 +722,7 @@ void MultiplayerSystem::updateMap(const std::map<Entity, sf::Vector2<float>>& en
         enemy_position->set_id(gCoordinator.getServerEntity(enemy.first));
     }
 
-    for (const auto& player : players)
+    for (const auto& player : m_playersPositions)
     {
         comm::Player* player_position = mapUpdate.add_players();
         player_position->set_id(player.first);
@@ -771,8 +771,8 @@ void MultiplayerSystem::handleMapUpdate(const google::protobuf::RepeatedPtrField
         if (gCoordinator.hasComponent<TransformComponent>(gameEntityId))
         {
             auto& transformComponent = gCoordinator.getComponent<TransformComponent>(gameEntityId);
-            transformComponent.velocity.x = enemy.position_x() * m_enemySpeed;
-            transformComponent.velocity.y = -enemy.position_y() * m_enemySpeed;
+            transformComponent.velocity.x = enemy.position_x() * config::m_enemySpeed;
+            transformComponent.velocity.y = -enemy.position_y() * config::m_enemySpeed;
         }
     }
 }

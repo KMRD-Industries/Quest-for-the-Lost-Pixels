@@ -40,6 +40,8 @@ namespace config
     static constexpr int numberOfMapEntities{500};
     static constexpr int enemyFirstEntity{2000};
     static constexpr int numberOfEnemyEntities{100};
+    constexpr int m_frames{2000};
+    constexpr int m_enemySpeed{50};
     static Entity playerEntity{1};
     static constexpr int playerAnimation{184};
 
