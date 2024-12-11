@@ -1,13 +1,11 @@
 #pragma once
 #include <optional>
 #include <unordered_map>
-
 #include <boost/asio.hpp>
 #include <comm.pb.h>
 #include <glm/ext/vector_int2.hpp>
 
 #include "GameTypes.h"
-
 #include "System.h"
 #include "Types.h"
 

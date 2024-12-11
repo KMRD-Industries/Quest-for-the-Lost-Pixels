@@ -313,7 +313,7 @@ void MultiplayerSystem::update(const float deltaTime)
         eventEntities.pop_front();
     }
 
-    if (m_areSpawnersSent)
+    if (m_areSpawnersSent && m_alive)
     {
         gatherEnemyAndPlayerPositions();
         updateMap(m_enemyPositions, m_playersPositions);
@@ -700,6 +700,14 @@ void MultiplayerSystem::gatherEnemyAndPlayerPositions()
             else if (std::regex_match(colliderComponent.tag, config::playerRegexTag))
             {
                 m_playersPositions[entity] = {static_cast<int>(position.x), static_cast<int>(position.y)};
+                // Temporary solution
+                // for (const auto [serverId, gameId] : m_entity_map)
+                // {
+                //     if (gameId == entity)
+                //     {
+                //         m_playersPositions[serverId] = {static_cast<int>(position.x), static_cast<int>(position.y)};
+                //     }
+                // }
             }
         }
     }
