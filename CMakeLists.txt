@@ -57,5 +57,10 @@ FetchContent_Declare(qlp-proto
     GIT_TAG 31-AI-pierwsza-iteracja)
 FetchContent_MakeAvailable(qlp-proto)
 
+FetchContent_Declare(zlib
+        GIT_REPOSITORY https://github.com/madler/zlib.git
+        GIT_TAG v1.2.13)
+FetchContent_MakeAvailable(zlib)
+
 add_subdirectory(src)
 install(TARGETS qlp)
