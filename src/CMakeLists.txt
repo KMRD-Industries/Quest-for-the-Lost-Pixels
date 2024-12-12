@@ -221,7 +221,7 @@ include_directories(./UiComponents ./UiSystems ./Ui ./Sounds ${CMAKE_CURRENT_SOU
 
 add_executable(qlp ${SOURCES} ${CORE} ${EVENT_SYSTEMS} ${SYSTEMS} ${MAP} ${COMPONENTS} ${UTILS} ${ATLAS_COMPONENTS} ${MENU_STATE_MACHINE} ${UI_COMPONENTS} ${UI_SYSTEMS} ${UI} ${Sounds})
 
-target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics sfml-audio ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio qlp-proto)
+target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics sfml-audio ImGui-SFML::ImGui-SFML glm::glm box2d Boost::asio zlib qlp-proto)
 
 if (WIN32)
     target_link_libraries(qlp PRIVATE ws2_32)

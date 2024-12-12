@@ -52,15 +52,15 @@ FetchContent_Declare(Boost
 )
 FetchContent_MakeAvailable(Boost)
 
-FetchContent_Declare(qlp-proto
-    GIT_REPOSITORY https://github.com/kmrd-industries/qlp-proto-bindings
-    GIT_TAG 31-AI-pierwsza-iteracja)
-FetchContent_MakeAvailable(qlp-proto)
-
 FetchContent_Declare(zlib
         GIT_REPOSITORY https://github.com/madler/zlib.git
         GIT_TAG v1.2.13)
 FetchContent_MakeAvailable(zlib)
+
+FetchContent_Declare(qlp-proto
+    GIT_REPOSITORY https://github.com/kmrd-industries/qlp-proto-bindings
+    GIT_TAG 31-AI-pierwsza-iteracja)
+FetchContent_MakeAvailable(qlp-proto)
 
 add_subdirectory(src)
 install(TARGETS qlp)
