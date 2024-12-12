@@ -301,16 +301,4 @@ if (WIN32)
                 VERBATIM
         )
     endif ()
-
-    if (EXISTS "${CMAKE_BINARY_DIR}/_deps/zlib-build/${CMAKE_BUILD_TYPE}/zlib.dll")
-        message(STATUS "ZLIB DLL found: ${CMAKE_BINARY_DIR}/_deps/zlib-build/${CMAKE_BUILD_TYPE}/zlib.dll. Copying ZLIB dll.")
-        add_custom_command(
-                TARGET qlp
-                PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy
-                "${CMAKE_BINARY_DIR}/_deps/zlib-build/${CMAKE_BUILD_TYPE}/zlib.dll"
-                $<TARGET_FILE_DIR:qlp>
-                VERBATIM
-        )
-    endif ()
 endif ()
