@@ -1,0 +1,49 @@
+name: Build and Release for Windows
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Environment 
+        run: |
+          set "APP_DATA_DIR=%LOCALAPPDATA%\qlp"
+          echo APP_DATA_DIR=%APP_DATA_DIR% >> %GITHUB_ENV%
+
+      - name: Install Dependencies 
+        run: |
+          choco install llvm cmake ninja --installargs "ADD_CMAKE_TO_PATH=System" --yes
+          setx PATH "%PATH%;C:\Program Files\LLVM\bin"
+          clang-cl --version
+          cmake --version
+          ninja --version
+
+      - name: Configure Build
+        run: |
+          echo Data path for configuration: %QLP_DATA_PATH%
+          cmake --preset=windows-pipeline
+
+      - name: Build Project
+        run: |
+          cmake --build build
+
+      - name: Upload Windows Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./bin/app.exe
+          asset_name: app-windows.exe
+          asset_content_type: application/octet-stream

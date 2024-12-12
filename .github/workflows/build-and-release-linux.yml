@@ -1,0 +1,51 @@
+name: Build and Release for Linux
+
+on:
+  release:
+    types:
+      - created 
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-22.04
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Environment 
+        run: |
+          echo "QLP_DATA_PATH=${XDG_DATA_HOME:-$HOME/.local/share}/qlp" >> $GITHUB_ENV
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 18
+          sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev cmake ninja-build
+          clang-18 --version
+          cmake --version
+          ninja --version
+
+      - name: Configure Build
+        run: |
+          echo "Data path for configuration: $QLP_DATA_PATH"
+          cmake --preset=linux-pipeline
+
+      - name: Build Project
+        run: |
+          cmake --build build
+
+      - name: Upload Linux Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./bin/app
+          asset_name: app-linux
+          asset_content_type: application/octet-stream

@@ -1,4 +1,8 @@
-set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
+if (DEFINED ENV{QLP_DATA_PATH})
+    set(ASSET_DIR $ENV{QLP_DATA_PATH}/assets)
+else ()
+    set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
+endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
