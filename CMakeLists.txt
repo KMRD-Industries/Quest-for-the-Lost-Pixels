@@ -54,7 +54,12 @@ FetchContent_MakeAvailable(Boost)
 
 FetchContent_Declare(zlib
         GIT_REPOSITORY https://github.com/madler/zlib.git
-        GIT_TAG v1.2.13)
+        GIT_TAG v1.2.12)
+set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+set(CMAKE_SKIP_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_BINARY_DIR}/_deps/zlib-build")
 FetchContent_MakeAvailable(zlib)
 
 FetchContent_Declare(qlp-proto

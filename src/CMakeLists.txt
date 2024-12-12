@@ -126,10 +126,10 @@ set(SYSTEMS
         Systems/PassageSystem.h
         Systems/ItemSystem.cpp
         Systems/ItemSystem.h
-		Systems/SoundSystem.cpp
-		Systems/SoundSystem.h
+        Systems/SoundSystem.cpp
+        Systems/SoundSystem.h
         Systems/WeaponBindSystem.cpp
-        Systems/WeaponBindSystem.h        
+        Systems/WeaponBindSystem.h
         Systems/DealDMGToEnemySystem.cpp
         Systems/DealDMGToEnemySystem.h
 )
@@ -168,7 +168,7 @@ set(UTILS
 set(MENU_STATE_MACHINE
         MenuStateMachine/EndGameState.cpp
         MenuStateMachine/EndGameState.h
-		MenuStateMachine/LostGameState.cpp
+        MenuStateMachine/LostGameState.cpp
         MenuStateMachine/LostGameState.h
         MenuStateMachine/MainMenuState.cpp
         MenuStateMachine/MainMenuState.h
@@ -298,6 +298,18 @@ if (WIN32)
                 TARGET qlp
                 PRE_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobuf.dll $<TARGET_FILE_DIR:qlp>
+                VERBATIM
+        )
+    endif ()
+
+    if (EXISTS "${CMAKE_BINARY_DIR}/_deps/zlib-build/${CMAKE_BUILD_TYPE}/zlib.dll")
+        message(STATUS "ZLIB DLL found: ${CMAKE_BINARY_DIR}/_deps/zlib-build/${CMAKE_BUILD_TYPE}/zlib.dll. Copying ZLIB dll.")
+        add_custom_command(
+                TARGET qlp
+                PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy
+                "${CMAKE_BINARY_DIR}/_deps/zlib-build/${CMAKE_BUILD_TYPE}/zlib.dll"
+                $<TARGET_FILE_DIR:qlp>
                 VERBATIM
         )
     endif ()
