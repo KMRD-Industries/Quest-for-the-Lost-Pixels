@@ -5,6 +5,7 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "DealDMGToEnemyEvent.h"
+#include "MultiplayerSystem.h"
 #include "SynchronisedEvent.h"
 #include "WeaponComponent.h"
 #include "WeaponSwingComponent.h"
@@ -27,6 +28,7 @@ void WeaponBindSystem::update()
             gCoordinator.addComponent(entity, weaponColliderComponent);
         }
 
+        const Entity playerEntity = gCoordinator.getComponent<BindSwingWeaponEvent>(entity).playerEntity;
         const Entity eventEntity = gCoordinator.createEntity();
         const auto newEvent = CreateBodyWithCollisionEvent(
             entity, "Weapon",
@@ -40,14 +42,8 @@ void WeaponBindSystem::update()
 
                 swingComponent.enemyHited.insert(data.entity);
                 gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
-
-                const Entity attackEventEntity = gCoordinator.createEntity();
-                const auto synchronisedEvent =
-                    SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,
-                                      .variant = SynchronisedEvent::Variant::ENEMY_GOT_HIT};
-                gCoordinator.addComponent(attackEventEntity, synchronisedEvent);
             },
-            [entity](const GameType::CollisionData& data)
+            [entity, playerEntity](const GameType::CollisionData& data)
             {
                 auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
                 swingComponent.enemyColided.erase(data.entity);
@@ -56,7 +52,7 @@ void WeaponBindSystem::update()
                 if (swingComponent.enemyHited.contains(data.entity)) return;
 
                 swingComponent.enemyHited.insert(data.entity);
-                gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
+                gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{.playerEntity = playerEntity});
             },
             false, false, true);
 

@@ -1,8 +1,9 @@
 #include "DealDMGToEnemySystem.h"
-
 #include "CharacterComponent.h"
 #include "Coordinator.h"
 #include "DealDMGToEnemyEvent.h"
+#include "MultiplayerSystem.h"
+#include "SynchronisedEvent.h"
 #include "TextTagComponent.h"
 #include "TransformComponent.h"
 
@@ -12,6 +13,7 @@ void DealDMGToEnemySystem::update()
 {
     for (const Entity entity : m_entities)
     {
+        auto& dealDMGEvent = gCoordinator.getComponent<DealDMGToEnemyEvent>(entity);
         auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
         const auto& enemyTransformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
@@ -20,9 +22,21 @@ void DealDMGToEnemySystem::update()
         gCoordinator.addComponent(tag, TextTagComponent{});
         gCoordinator.addComponent(tag, TransformComponent{enemyTransformComponent});
 
+        // Create hitEnemyEvent
+        const auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
+
+        printf("PlayerEntity: %d, entity from event: %d\n", multiplayerSystem->playerEntity(), dealDMGEvent.playerEntity);
+        if (multiplayerSystem->playerEntity() == dealDMGEvent.playerEntity)
+        {
+            const Entity attackEventEntity = gCoordinator.createEntity();
+            const auto synchronisedEvent = SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,
+                                                             .updatedEntity = entity,
+                                                             .variant = SynchronisedEvent::Variant::ENEMY_GOT_HIT};
+            gCoordinator.addComponent(attackEventEntity, synchronisedEvent);
+        }
         // Deal dmg
-        characterComponent.attacked = true;
-        characterComponent.hp -= configSingleton.GetConfig().playerAttackDamage;
+        // characterComponent.attacked = true;
+        // characterComponent.hp -= configSingleton.GetConfig().playerAttackDamage;
         applyKnockback(entity);
         m_entityToRemove.push(entity);
     }

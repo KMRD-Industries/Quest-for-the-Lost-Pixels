@@ -114,6 +114,7 @@ bool MultiplayerSystem::isInsideInitialRoom(const bool change) noexcept
 bool MultiplayerSystem::isConnected() const noexcept { return m_connected; }
 void MultiplayerSystem::setPlayer(const uint32_t id, const Entity entity) { m_entity_map[id] = entity; }
 uint32_t MultiplayerSystem::playerID() const noexcept { return m_player_id; }
+Entity MultiplayerSystem::playerEntity() const noexcept { return m_player_entity; }
 
 comm::InitialInfo MultiplayerSystem::registerPlayer(const Entity playerEntity)
 {
@@ -469,7 +470,7 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             }
         case SynchronisedEvent::Variant::ENEMY_GOT_HIT:
             {
-                printf("enemy got hit\n");
+                printf("enemy got hit by player %d\n", m_player_id);
                 // TODO do zrobienia
                 break;
             }

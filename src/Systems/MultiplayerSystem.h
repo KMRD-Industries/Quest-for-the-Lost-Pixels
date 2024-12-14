@@ -101,6 +101,7 @@ public:
     bool isConnected() const noexcept;
     bool isInsideInitialRoom(const bool change) noexcept;
     uint32_t playerID() const noexcept;
+    Entity playerEntity() const noexcept;
     const glm::ivec2& getRoom() const noexcept;
     const ItemGenerator& getItemGenerator();
     Entity getItemEntity(const uint32_t id);

@@ -9,6 +9,7 @@
 #include "HelmetComponent.h"
 #include "ItemAnimationComponent.h"
 #include "ItemComponent.h"
+#include "MultiplayerSystem.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerSystem.h"
@@ -79,7 +80,7 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
     if (pickUpItemInfo.slot == GameType::WEAPON)
     {
         if (!gCoordinator.hasComponent<BindSwingWeaponEvent>(pickUpItemInfo.itemEntity))
-            gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
+            gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{.playerEntity = pickUpItemInfo.characterEntity});
 
         if (!gCoordinator.hasComponent<WeaponSwingComponent>(pickUpItemInfo.itemEntity))
             gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
