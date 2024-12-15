@@ -83,6 +83,6 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
             gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{.playerEntity = pickUpItemInfo.characterEntity});
 
         if (!gCoordinator.hasComponent<WeaponSwingComponent>(pickUpItemInfo.itemEntity))
-            gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
+            gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{.playerEntity = pickUpItemInfo.characterEntity});
     }
 }

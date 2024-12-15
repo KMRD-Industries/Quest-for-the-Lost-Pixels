@@ -32,7 +32,7 @@ void WeaponBindSystem::update()
         const Entity eventEntity = gCoordinator.createEntity();
         const auto newEvent = CreateBodyWithCollisionEvent(
             entity, "Weapon",
-            [this, entity](const GameType::CollisionData& data)
+            [this, entity, playerEntity](const GameType::CollisionData& data)
             {
                 auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
                 swingComponent.enemyColided.insert(data.entity);
@@ -41,7 +41,7 @@ void WeaponBindSystem::update()
                 if (swingComponent.enemyHited.contains(data.entity)) return;
 
                 swingComponent.enemyHited.insert(data.entity);
-                gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
+                gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{.playerEntity = playerEntity});
             },
             [entity, playerEntity](const GameType::CollisionData& data)
             {

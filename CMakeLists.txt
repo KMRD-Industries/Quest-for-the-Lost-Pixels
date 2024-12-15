@@ -59,7 +59,7 @@ FetchContent_MakeAvailable(zlib)
 
 FetchContent_Declare(qlp-proto
     GIT_REPOSITORY https://github.com/kmrd-industries/qlp-proto-bindings
-    GIT_TAG 31-AI-pierwsza-iteracja)
+    GIT_TAG 114-umieranie-potworów)
 FetchContent_MakeAvailable(qlp-proto)
 
 add_subdirectory(src)

@@ -136,7 +136,7 @@ void WeaponSystem::dealDMGToCollidedEnemies(const Entity weaponEntity, const boo
     for (const Entity enemy : swingComponent.enemyColided)
     {
         if (swingComponent.enemyHited.contains(enemy)) continue;
-        gCoordinator.addComponent(enemy, DealDMGToEnemyEvent{});
+        gCoordinator.addComponent(enemy, DealDMGToEnemyEvent{.playerEntity = swingComponent.playerEntity});
         swingComponent.enemyHited.insert(enemy);
     }
     if (clear)

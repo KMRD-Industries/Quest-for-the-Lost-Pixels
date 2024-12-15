@@ -237,7 +237,16 @@ void MultiplayerSystem::pollState()
         case comm::SPAWN_ENEMY_REQUEST:
             gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnOnDemand(m_state);
             break;
-        default: {}
+        case comm::ENEMY_DIED:
+            {
+                const Entity enemyEntity = gCoordinator.getGameEntity(m_state.enemy_id().id());
+                auto& enemy = gCoordinator.getComponent<CharacterComponent>(enemyEntity);
+                enemy.hp = 0;
+                break;
+            }
+        default:
+            {
+            }
         }
     }
     else
@@ -297,7 +306,9 @@ void MultiplayerSystem::update(const float deltaTime)
             break;
         case SynchronisedEvent::UpdateType::MOVEMENT:
             movementEvents.push_back(eventEntity);
-        default: {}
+        default:
+            {
+            }
         }
     }
 
@@ -471,7 +482,12 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
         case SynchronisedEvent::Variant::ENEMY_GOT_HIT:
             {
                 printf("enemy got hit by player %d\n", m_player_id);
-                // TODO do zrobienia
+                usedPreviousUpdate = true;
+                anythingToSend = true;
+
+                update->set_variant(comm::ENEMY_GOT_HIT_UPDATE);
+                update->mutable_player()->set_id(m_player_id);
+                update->mutable_enemy_id()->set_id(gCoordinator.getServerEntity(updatedEntity));
                 break;
             }
         case SynchronisedEvent::Variant::SEND_SPAWNERS_POSITIONS:
@@ -595,7 +611,6 @@ void MultiplayerSystem::pollMovement()
                     const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(target);
                     const Entity weaponEntity = equippedWeapon.slots.at(GameType::slotType::WEAPON);
                     auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
-                    auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
                     auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
 
                     const auto& windowSize = InputHandler::getInstance()->getWindowSize();
