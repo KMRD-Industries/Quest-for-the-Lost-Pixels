@@ -52,9 +52,21 @@ FetchContent_Declare(Boost
 )
 FetchContent_MakeAvailable(Boost)
 
+
 FetchContent_Declare(zlib
         GIT_REPOSITORY https://github.com/madler/zlib.git
         GIT_TAG v1.2.12)
+if (WIN32)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libraries" FORCE)
+    set(ZLIB_BUILD_SHARED OFF CACHE BOOL "Disable shared Zlib" FORCE)
+    set(ZLIB_BUILD_STATIC ON CACHE BOOL "Build static Zlib" FORCE)
+    message(STATUS "Configuring Zlib for Windows (static library)")
+endif()
+
+if (UNIX)
+    set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)
+    message(STATUS "Configuring Zlib for Linux (shared library)")
+endif()
 FetchContent_MakeAvailable(zlib)
 set(ZLIB_LIBRARY ${zlib_BINARY_DIR}/zlib.lib)
 set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
