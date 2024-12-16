@@ -1,9 +1,12 @@
 #include "CollisionSystem.h"
+
+#include "AnimationComponent.h"
 #include "BodyArmourComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "HelmetComponent.h"
+#include "ItemComponent.h"
 #include "MultiplayerSystem.h"
 #include "Physics.h"
 #include "PlayerComponent.h"
@@ -25,12 +28,18 @@ void MyContactListener::BeginContact(b2Contact* contact)
 
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entity)) return;
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entity)) return;
-        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entity);
-        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entity);
-        colliderComponentA.onCollisionEnter({bodyBData->entity, bodyBData->tag});
-        colliderComponentB.onCollisionEnter({bodyAData->entity, bodyAData->tag});
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
+        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
+        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
+
+        if (!colliderComponentA.onCollisionEnter && !colliderComponentB.onCollisionEnter) return;
+
+        if (colliderComponentA.onCollisionEnter)
+            (*colliderComponentA.onCollisionEnter)({bodyBData->entityID, bodyBData->tag});
+
+        if (colliderComponentB.onCollisionEnter)
+            (*colliderComponentB.onCollisionEnter)({bodyAData->entityID, bodyAData->tag});
     }
 }
 
@@ -45,12 +54,18 @@ void MyContactListener::EndContact(b2Contact* contact)
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
         // TODO: Fix weapon collision in other task
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entity)) return;
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entity)) return;
-        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entity);
-        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entity);
-        colliderComponentA.onCollisionOut({bodyBData->entity, bodyBData->tag});
-        colliderComponentB.onCollisionOut({bodyAData->entity, bodyAData->tag});
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
+        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
+        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
+
+        if (!colliderComponentA.onCollisionOut && !colliderComponentB.onCollisionOut) return;
+
+        if (colliderComponentA.onCollisionOut)
+            (*colliderComponentA.onCollisionOut)({bodyBData->entityID, bodyBData->tag});
+
+        if (colliderComponentB.onCollisionOut)
+            (*colliderComponentB.onCollisionOut)({bodyAData->entityID, bodyAData->tag});
     }
 }
 
@@ -63,22 +78,23 @@ void CollisionSystem::createMapCollision()
     {
         const Entity newMapCollisionEntity = gCoordinator.createEntity();
 
-        const auto newEvent = CreateBodyWithCollisionEvent(
-            entity, type, [](const GameType::CollisionData&) {}, [](const GameType::CollisionData&) {}, isStatic,
-            useTexture);
+        const auto createBodyEvent = CreateBodyWithCollisionEvent{
+            .entity = entity,
+            .tag = type,
+            .isStatic = isStatic,
+            .useTextureSize = useTexture,
+        };
 
-        gCoordinator.addComponent(newMapCollisionEntity, newEvent);
+        gCoordinator.addComponent(newMapCollisionEntity, createBodyEvent);
     };
 
     for (const auto entity : m_entities)
     {
         const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
-        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
         if (tileComponent.id < 0 || tileComponent.tileSet.empty() ||
-            gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity) ||
-            gCoordinator.hasComponent<HelmetComponent>(entity) ||
-            gCoordinator.hasComponent<BodyArmourComponent>(entity))
+            gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<ItemComponent>(entity))
             continue;
 
         if (tileComponent.tileSet == "SpecialBlocks")
@@ -112,12 +128,26 @@ void CollisionSystem::performFixedUpdate() const
     {
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-        auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-
-        if (!transformComponent.velocity.IsValid()) continue;
 
         b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity))
+        {
+            if (transformComponent.velocity != b2Vec2{0.f, 0.f})
+            {
+                gCoordinator.getComponent<AnimationComponent>(entity).currentState =
+                    AnimationStateMachine::AnimationState::Idle;
+            }
+
+            if (transformComponent.velocity == b2Vec2{0.f, 0.f} && body->GetLinearVelocity() == b2Vec2{0.f, 0.f})
+            {
+                gCoordinator.getComponent<AnimationComponent>(entity).currentState =
+                    AnimationStateMachine::AnimationState::Running;
+            }
+        }
+
+        if (!transformComponent.velocity.IsValid()) continue;
 
         if (colliderComponent.tag == "Item")
             body->ApplyForceToCenter({transformComponent.velocity.x, transformComponent.velocity.y}, true);
@@ -135,7 +165,6 @@ void CollisionSystem::performFixedUpdate() const
             body->SetTransform({convertPixelsToMeters(center.x), convertPixelsToMeters(center.y)},
                                transformComponent.rotation * M_PI / 180);
         }
-        renderComponent.dirty = true;
         transformComponent.velocity = {};
     }
 }
@@ -158,7 +187,6 @@ void CollisionSystem::updateSimulation(const float timeStep, const int32 velocit
         transformComponent.position = {convertMetersToPixel(position.x), convertMetersToPixel(position.y)};
         transformComponent.rotation = body->GetAngle() * 180.f / M_PI;
         renderComponent.sprite.setPosition(position.x, position.y);
-        renderComponent.dirty = true;
     }
 }
 
@@ -179,17 +207,14 @@ void CollisionSystem::deleteMarkedBodies() const
     for (const auto& entity : m_entities)
     {
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
-        if (colliderComponent.toDestroy)
-        {
-            deleteBody(entity);
-            entityToKill.insert(entity);
-        }
-        if (colliderComponent.toRemoveCollider)
-        {
-            deleteBody(entity);
-        }
+        if (!colliderComponent.toDestroy) continue;
+        deleteBody(entity);
+        entityToKill.insert(entity);
     }
 
-    for (auto& entity : entityToKill) gCoordinator.destroyEntity(entity);
+    for (auto& entity : entityToKill)
+    {
+        gCoordinator.destroyEntity(entity);
+    }
     entityToKill.clear();
 }

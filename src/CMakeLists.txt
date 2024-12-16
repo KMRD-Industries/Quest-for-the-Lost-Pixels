@@ -127,8 +127,8 @@ set(SYSTEMS
         Systems/PassageSystem.h
         Systems/ItemSystem.cpp
         Systems/ItemSystem.h
-		Systems/SoundSystem.cpp
-		Systems/SoundSystem.h
+        Systems/SoundSystem.cpp
+        Systems/SoundSystem.h
         Systems/WeaponBindSystem.cpp
         Systems/WeaponBindSystem.h        
         Systems/DealDMGToEnemySystem.cpp
@@ -162,6 +162,7 @@ set(UTILS
         Utils/TextureParser.h
         Utils/TextTag.h
         Utils/GameUtility.h
+        Utils/Camera.h
 )
 
 set(MENU_STATE_MACHINE

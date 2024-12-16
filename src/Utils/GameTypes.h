@@ -37,6 +37,16 @@ namespace MenuStateMachine
     };
 }
 
+namespace AnimationStateMachine
+{
+    enum class AnimationState
+    {
+        Idle,
+        Running,
+        Dead
+    };
+}
+
 namespace SpecialBlocks
 {
     enum class Blocks : int

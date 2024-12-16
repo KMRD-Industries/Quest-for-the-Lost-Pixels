@@ -2,4 +2,5 @@
 
 struct DealDMGToEnemyEvent
 {
+    Entity playerEntity{};
 };

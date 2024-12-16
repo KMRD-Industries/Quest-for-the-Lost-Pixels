@@ -52,6 +52,7 @@ void MainMenuState::init()
 
 void MainMenuState::render(sf::RenderTexture& window)
 {
+    window.setView(window.getDefaultView());
     m_inputIP.render();
     m_playButton.render();
     m_quitButton.render();

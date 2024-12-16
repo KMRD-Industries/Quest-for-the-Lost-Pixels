@@ -1,13 +1,12 @@
 #include "BackgroundSystem.h"
 #include "Coordinator.h"
-#include "SFML/Graphics/RenderTexture.hpp"
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "TransformComponent.h"
 #include "UiComponent.h"
 
 extern Coordinator gCoordinator;
 
-void BackgroundSystem::draw(sf::RenderTexture& window)
+void BackgroundSystem::draw(sf::RenderWindow& window)
 {
     for (const auto entity : m_entities)
     {

@@ -4,8 +4,8 @@
 
 namespace GameUtility
 {
-    inline long mapWidth{};
-    inline long mapHeight{};
+    inline float mapWidth{};
+    inline float mapHeight{};
     inline sf::Vector2f mapOffset{0.f, 0.f};
-    inline glm::vec2 startingPosition{325.f, 325.f};
+    inline sf::Vector2f startingPosition{325.f, 325.f};
 } // namespace GameUtility

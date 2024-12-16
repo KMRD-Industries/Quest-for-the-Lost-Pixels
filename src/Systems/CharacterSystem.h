@@ -5,8 +5,8 @@ class CharacterSystem : public System
 {
 public:
     CharacterSystem() = default;
-    void update() const;
+    void update();
 
 private:
-    void cleanUpDeadEntities() const;
+    void cleanUpDeadEntities();
 };

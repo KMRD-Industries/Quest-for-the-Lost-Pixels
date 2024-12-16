@@ -98,7 +98,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -124,6 +123,26 @@
              "x":0,
              "y":0
             }
+        }, 
+        {
+         "animation":[
+                {
+                 "duration":75,
+                 "tileid":819
+                }, 
+                {
+                 "duration":75,
+                 "tileid":820
+                }, 
+                {
+                 "duration":75,
+                 "tileid":821
+                }, 
+                {
+                 "duration":600,
+                 "tileid":821
+                }],
+         "id":915
         }],
  "tilewidth":16,
  "type":"tileset",

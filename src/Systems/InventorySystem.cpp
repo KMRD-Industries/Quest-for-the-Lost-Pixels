@@ -1,9 +1,12 @@
 #include "InventorySystem.h"
+#include <DirtyFlagComponent.h>
 #include "AnimationSystem.h"
 #include "BindSwingWeaponEvent.h"
 #include "BodyArmourComponent.h"
+#include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
+#include "CreateBodyWithCollisionEvent.h"
 #include "EquipmentComponent.h"
 #include "GameTypes.h"
 #include "HelmetComponent.h"
@@ -11,30 +14,29 @@
 #include "ItemComponent.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
-#include "SpawnerSystem.h"
-#include "SynchronisedEvent.h"
+#include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 #include "WeaponSwingComponent.h"
 
 void InventorySystem::dropItem(const Entity player, const Entity item, const GameType::slotType slot) const
 {
-    auto& equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
+    auto &equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
+    const auto &playerTransformComponent = gCoordinator.getComponent<TransformComponent>(item);
+
     const Entity newItemEntity = gCoordinator.createEntity();
 
-    const Entity eventEntity = gCoordinator.createEntity();
-    gCoordinator.addComponent(
-        eventEntity,
-        SynchronisedEvent{
-            .variant = SynchronisedEvent::Variant::UPDATE_ITEM_ENTITY, .entity = item, .updatedEntity = newItemEntity});
+    const auto itemAnimationComponent =
+        ItemAnimationComponent{.animationDuration = 1, .startingPositionY = playerTransformComponent.position.y - 75};
 
-    gCoordinator.addComponents(
-        newItemEntity, TileComponent{gCoordinator.getComponent<TileComponent>(item)},
-        TransformComponent{gCoordinator.getComponent<TransformComponent>(player)}, RenderComponent{},
-        ColliderComponent{}, AnimationComponent{}, ItemComponent{},
-        ItemAnimationComponent{
-            .animationDuration = 1,
-            .startingPositionY = gCoordinator.getComponent<TransformComponent>(player).position.y - 75});
+    gCoordinator.addComponents(newItemEntity, TileComponent{gCoordinator.getComponent<TileComponent>(item)});
+    gCoordinator.addComponents(newItemEntity, RenderComponent{});
+    gCoordinator.addComponents(newItemEntity, ColliderComponent{});
+    gCoordinator.addComponents(newItemEntity, AnimationComponent{});
+    gCoordinator.addComponents(newItemEntity, ItemComponent{});
+    gCoordinator.addComponents(newItemEntity, DirtyFlagComponent{});
+    gCoordinator.addComponents(newItemEntity, itemAnimationComponent);
+    gCoordinator.addComponents(newItemEntity, TransformComponent{playerTransformComponent});
 
     switch (slot)
     {
@@ -78,10 +80,7 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
 
     if (pickUpItemInfo.slot == GameType::WEAPON)
     {
-        if (!gCoordinator.hasComponent<BindSwingWeaponEvent>(pickUpItemInfo.itemEntity))
-            gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
-
-        if (!gCoordinator.hasComponent<WeaponSwingComponent>(pickUpItemInfo.itemEntity))
-            gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
+        gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
+        gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
     }
 }

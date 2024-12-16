@@ -10,12 +10,9 @@ class AnimationSystem : public System
 public:
     AnimationSystem() = default;
     void update(const float &deltaTime) const;
+    bool updateEntityAnimation(Entity entity, float deltaTime) const;
 
 private:
-    void updateEntityAnimation(AnimationComponent &, TileComponent &, float) const;
-    void advanceFrame(AnimationComponent &) const;
-    void updateTileComponent(TileComponent &, const AnimationComponent &) const;
-
     float m_animationFrameTime{};
     float m_frameTime{};
 };

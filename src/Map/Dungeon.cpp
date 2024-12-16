@@ -1,13 +1,7 @@
-#include <chrono>
-#include <format>
-#include <iostream>
-#include <vector>
-
-#include <comm.pb.h>
-
 #include "Dungeon.h"
 #include <BodyArmourComponent.h>
 #include <CreateBodyWithCollisionEvent.h>
+#include <DirtyFlagComponent.h>
 #include <EquipmentComponent.h>
 #include <FloorComponent.h>
 #include <HelmetComponent.h>
@@ -15,6 +9,9 @@
 #include <PassageComponent.h>
 #include <PotionComponent.h>
 #include <RenderSystem.h>
+#include <chrono>
+#include <comm.pb.h>
+#include <format>
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
 #include "BindSwingWeaponEvent.h"
@@ -40,11 +37,9 @@
 #include "ItemComponent.h"
 #include "ItemSpawnerSystem.h"
 #include "LootComponent.h"
-#include "LostGameState.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerComponent.h"
-#include "SynchronisedEvent.h"
 #include "MultiplayerSystem.h"
 #include "ObjectCreatorSystem.h"
 #include "PlayerComponent.h"
@@ -73,61 +68,55 @@ void Dungeon::init()
     setECS();
     auto _ = gCoordinator.createEntity(); // Ignore Entity with ID = 0
     config::playerEntity = gCoordinator.createEntity();
-
-    comm::Player player;
-
     m_id = 0;
     m_seed = std::chrono::system_clock::now().time_since_epoch().count();
+    auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
 
     const std::string IP = ResourceManager::getInstance().getIP();
     size_t colonPos = IP.find(':');
     if (colonPos == std::string::npos)
-        m_multiplayerSystem->setup(IP, config::defaultPort);
+        std::cout << "[WARNING]: BAD IP\n";
     else
     {
         std::string ip = IP.substr(0, colonPos);
         std::string port = IP.substr(colonPos + 1);
-        m_multiplayerSystem->setup(ip, port);
+        multiplayerSystem->setup(ip, port);
     }
 
-    if (m_multiplayerSystem->isConnected())
+    if (multiplayerSystem->isConnected())
     {
-        const auto& initialInfo = m_multiplayerSystem->registerPlayer(config::playerEntity);
-        player = initialInfo.player();
-        m_id = player.id();
-        m_seed = initialInfo.seed();
+        auto gameState = multiplayerSystem->registerPlayer(config::playerEntity);
+        m_id = gameState.player_id();
+        m_seed = gameState.seed();
 
-        std::cout << "Connected to server with id: " << m_id << '\n';
+        std::cout << "Connected to server with id: " << m_id << "\n";
 
-        for (const auto& player: initialInfo.connected_players())
+        for (uint32_t id : gameState.connected_players())
         {
-            const uint32_t playerID = player.id();
-            createRemotePlayer(player);
-            std::cout << "Connected remote player: " << playerID << '\n';
+            createRemotePlayer(id);
+            std::cout << "Connected remote player: " << m_id << "\n";
         }
     }
     else
-    {
-        m_multiplayerSystem->setPlayer(m_id, config::playerEntity);
         std::cout << "Starting in single-player mode\n";
-    }
 
-    if (m_multiplayerSystem->isConnected()) m_multiplayerSystem->setRoom(m_currentPlayerPos);
+    if (multiplayerSystem->isConnected()) multiplayerSystem->setRoom(m_currentPlayerPos);
+    const std::string tag = std::format("Player {}", m_id);
 
     makeStartFloor();
     m_roomMap.at(m_currentPlayerPos).init();
     loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
 
     m_entities[m_id] = config::playerEntity;
+    m_players.insert(m_id);
 
     addPlayerComponents(m_entities[m_id]);
     setupPlayerCollision(m_entities[m_id]);
-    setupWeaponEntity(player);
-    setupHelmetEntity(player);
+    setupWeaponEntity(m_entities[m_id]);
     m_passageSystem->setPassages(true);
 }
 
-void Dungeon::render(sf::RenderTexture& window)
+void Dungeon::render(sf::RenderWindow& window)
 {
     gCoordinator.getRegisterSystem<TextureSystem>().get()->loadTextures();
     gCoordinator.getRegisterSystem<HealthBarSystem>().get()->drawHealthBar();
@@ -136,54 +125,66 @@ void Dungeon::render(sf::RenderTexture& window)
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponents(
-        player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
-        TransformComponent{GameUtility::startingPosition}, AnimationComponent{},
-        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP}, PlayerComponent{},
-        ColliderComponent{}, InventoryComponent{}, EquipmentComponent{}, FloorComponent{},
-        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir, true); }},
-        PassageComponent{.moveCallback = [this] { moveDownDungeon(true); }});
+    gCoordinator.addComponent(player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 6});
+    gCoordinator.addComponent(player, RenderComponent{});
+    gCoordinator.addComponent(player, DirtyFlagComponent{});
+    gCoordinator.addComponent(player, TransformComponent{.position = GameUtility::startingPosition});
+    gCoordinator.addComponent(player, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
+    gCoordinator.addComponent(player, PlayerComponent{});
+    gCoordinator.addComponent(player, ColliderComponent{});
+    gCoordinator.addComponent(player, InventoryComponent{});
+    gCoordinator.addComponent(player, EquipmentComponent{});
+    gCoordinator.addComponent(player, FloorComponent{});
+    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
+    gCoordinator.addComponent(
+        player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
+    gCoordinator.addComponent(
+        player,
+        AnimationComponent{.currentState = AnimationStateMachine::AnimationState::Running,
+                           .stateToAnimationLookup = {
+                               {AnimationStateMachine::AnimationState::Running,
+                                std::make_pair("Characters", configSingleton.GetConfig().playerRunningAnimation)},
+                               {AnimationStateMachine::AnimationState::Idle,
+                                std::make_pair("Characters", configSingleton.GetConfig().playerAnimation)},
+                           }});
 }
 
-void Dungeon::createRemotePlayer(const comm::Player& player)
+void Dungeon::createRemotePlayer(const uint32_t id)
 {
-    const uint32_t playerID = player.id();
-    const auto tag = std::format("Player {}", playerID);
-    m_entities[playerID] = gCoordinator.createEntity();
+    const auto tag = std::format("Player {}", id);
+    m_entities[id] = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(m_entities[playerID],
-        TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
-                                        getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID)),
-                           0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
-        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5},
-        RenderComponent{},
-        AnimationComponent{},
-        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
-        PlayerComponent{},
-        MultiplayerComponent{},
-        ColliderComponent{},
-        InventoryComponent{},
-        EquipmentComponent{}
-    );
+    const auto startingPosition = sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, id),
+                                               getSpawnOffset(configSingleton.GetConfig().startingPosition.y, id));
 
-    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", configSingleton.GetConfig().playerAnimation);
-    gCoordinator.getComponent<ColliderComponent>(m_entities[playerID]).collision = cc;
+    gCoordinator.addComponent(m_entities[id],
+                              TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3});
+    gCoordinator.addComponent(m_entities[id], TransformComponent(startingPosition));
+    gCoordinator.addComponent(m_entities[id], RenderComponent{});
+    gCoordinator.addComponent(m_entities[id], TransformComponent{GameUtility::startingPosition});
+    gCoordinator.addComponent(m_entities[id], AnimationComponent{});
+    gCoordinator.addComponent(m_entities[id], CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
+    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
+    gCoordinator.addComponent(m_entities[id], ColliderComponent{});
+    gCoordinator.addComponent(m_entities[id], MultiplayerComponent{});
 
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
+        "Characters", configSingleton.GetConfig().playerAnimation);
+    gCoordinator.getComponent<ColliderComponent>(m_entities[id]).collision = cc;
+
+    // Create Collider of new Player
     const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(
-        m_entities[playerID], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {}, false,
-        false);
 
-    gCoordinator.addComponent(entity, newEvent);
+    const auto createBodyEvent = CreateBodyWithCollisionEvent{
+        .entity = m_entities[id], // player ID
+        .tag = tag, // special player tag for collision handling
+        .isStatic = false, // player needs to have dynamic body to make his position updatable
+        .useTextureSize = false // do not use texture size since it will have its own collision
+    };
 
-    setupWeaponEntity(player);
-    setupHelmetEntity(player);
+    gCoordinator.addComponent(entity, createBodyEvent);
 
-    const Entity eventEntity = gCoordinator.createEntity();
-    gCoordinator.addComponent(eventEntity,
-                              SynchronisedEvent{.variant = SynchronisedEvent::Variant::PLAYER_CONNECTED,
-                                                .entityID = playerID,
-                                                .entity = m_entities[playerID]});
+    m_multiplayerSystem->entityConnected(id, m_entities[id]);
 }
 
 void Dungeon::setupPlayerCollision(const Entity player)
@@ -196,7 +197,7 @@ void Dungeon::setupPlayerCollision(const Entity player)
     {
         if (entityT.tag == "Door")
         {
-            const auto& doorComponent = gCoordinator.getComponent<DoorComponent>(entityT.entity);
+            const auto& doorComponent = gCoordinator.getComponent<DoorComponent>(entityT.entityID);
             auto& travellingDungeonComponent = gCoordinator.getComponent<TravellingDungeonComponent>(m_entities[m_id]);
 
             if (travellingDungeonComponent.doorsPassed == 0)
@@ -229,73 +230,50 @@ void Dungeon::setupPlayerCollision(const Entity player)
     };
 
     const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(player, tag, onCollisionIn, onCollisionOut, false, false);
 
-    gCoordinator.addComponent(entity, newEvent);
+    const auto newEventComponent = CreateBodyWithCollisionEvent{.entity = player,
+                                                                .tag = tag,
+                                                                .onCollisionEnter = onCollisionIn,
+                                                                .onCollisionOut = onCollisionOut,
+                                                                .isStatic = false,
+                                                                .useTextureSize = false};
+
+    gCoordinator.addComponent(entity, newEventComponent);
 }
 
-void Dungeon::setupWeaponEntity(const comm::Player& player) const
+void Dungeon::setupWeaponEntity(const Entity player)
 {
-    // temporary for single-player
-    comm::Item weapon;
-    if (m_multiplayerSystem->isConnected())
-        weapon = player.items(0);
-
-    const auto& availableWeapons = gCoordinator.getRegisterSystem<TextureSystem>()->m_weaponsIDs;
-
-    const auto& weaponDesc = availableWeapons[weapon.gen() % availableWeapons.size()];
-
     const Entity weaponEntity = gCoordinator.createEntity();
-    const Entity playerEntity = m_entities[player.id()];
 
-    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second});
-    gCoordinator.addComponent(weaponEntity, TileComponent{weaponDesc.first, "Weapons", 7});
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19});
+    gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 8});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
+    gCoordinator.addComponent(weaponEntity, DirtyFlagComponent{});
+    gCoordinator.addComponent(weaponEntity, ColliderComponent{});
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
     gCoordinator.addComponent(weaponEntity, ItemAnimationComponent{});
     gCoordinator.addComponent(weaponEntity, CharacterComponent{});
     gCoordinator.addComponent(weaponEntity, ItemComponent{.equipped = true});
 
-    m_inventorySystem->pickUpItem(GameType::PickUpInfo{playerEntity, weaponEntity, GameType::slotType::WEAPON});
-
-    const Entity eventEntity = gCoordinator.createEntity();
-    gCoordinator.addComponent(
-        eventEntity,
-        SynchronisedEvent{
-            .variant = SynchronisedEvent::Variant::REGISTER_ITEM, .entityID = weapon.id(), .entity = weaponEntity});
+    m_inventorySystem->pickUpItem(GameType::PickUpInfo{player, weaponEntity, GameType::slotType::WEAPON});
 }
 
-void Dungeon::setupHelmetEntity(const comm::Player& player) const
+void Dungeon::setupHelmetEntity(const Entity player) const
 {
-    // temporary for single-player
-    comm::Item helmet;
-    if (m_multiplayerSystem->isConnected())
-        helmet = player.items(1);
-
-    const auto& availableHelmets = gCoordinator.getRegisterSystem<TextureSystem>()->m_helmets;
-
-    const uint32_t helmetID = availableHelmets[helmet.gen() % availableHelmets.size()];
-
     const Entity helmetEntity = gCoordinator.createEntity();
-    const Entity playerEntity = m_entities[player.id()];
 
-    gCoordinator.addComponent(helmetEntity, HelmetComponent{.id = helmetID});
-    gCoordinator.addComponent(helmetEntity, TileComponent{helmetID, "Armour", 6});
+    gCoordinator.addComponent(helmetEntity, HelmetComponent{.id = 0});
+    gCoordinator.addComponent(helmetEntity, TileComponent{0, "Armour", 7});
     gCoordinator.addComponent(helmetEntity, TransformComponent{});
     gCoordinator.addComponent(helmetEntity, RenderComponent{});
     gCoordinator.addComponent(helmetEntity, ColliderComponent{});
     gCoordinator.addComponent(helmetEntity, AnimationComponent{});
+    gCoordinator.addComponent(helmetEntity, DirtyFlagComponent{});
     gCoordinator.addComponent(helmetEntity, ItemAnimationComponent{});
     gCoordinator.addComponent(helmetEntity, ItemComponent{.equipped = true});
 
-    m_inventorySystem->pickUpItem(GameType::PickUpInfo{playerEntity, helmetEntity, GameType::slotType::HELMET});
-
-    const Entity eventEntity = gCoordinator.createEntity();
-    gCoordinator.addComponent(
-        eventEntity,
-        SynchronisedEvent{
-            .variant = SynchronisedEvent::Variant::REGISTER_ITEM, .entityID = helmet.id(), .entity = helmetEntity});
+    m_inventorySystem->pickUpItem(GameType::PickUpInfo{player, helmetEntity, GameType::slotType::HELMET});
 }
 
 void Dungeon::update(const float deltaTime)
@@ -313,46 +291,65 @@ void Dungeon::update(const float deltaTime)
     m_textTagSystem->update(deltaTime);
     m_weaponBindSystem->update();
     m_dealDMGSystem->update();
-    m_multiplayerSystem->update(deltaTime);
 
-    for (const auto& remoteDungeonUpdate : m_multiplayerSystem->getRemoteDungeonUpdates())
+    if (m_multiplayerSystem->isConnected())
     {
-        switch (remoteDungeonUpdate.variant)
+        const auto stateUpdate = m_multiplayerSystem->pollStateUpdates();
+        const uint32_t id = stateUpdate.id();
+
+        switch (stateUpdate.variant())
         {
-        case MultiplayerDungeonUpdate::Variant::REGISTER_PLAYER:
-            createRemotePlayer(remoteDungeonUpdate.player);
+        case comm::DISCONNECTED:
+            gCoordinator.destroyEntity(m_entities[id]);
+            m_multiplayerSystem->entityDisconnected(id);
+            m_players.erase(id);
             break;
-        case MultiplayerDungeonUpdate::Variant::CHANGE_ROOM:
-            moveInDungeon(*remoteDungeonUpdate.room - m_currentPlayerPos, false);
+        case comm::CONNECTED:
+            createRemotePlayer(id);
+            m_players.insert(id);
             break;
-        case MultiplayerDungeonUpdate::Variant::CHANGE_LEVEL:
-            {
-                auto& passageComponent = gCoordinator.getComponent<PassageComponent>(m_entities[m_id]);
-
-                if (!passageComponent.activePassage) return;
-
-                gCoordinator.getComponent<FloorComponent>(m_entities[m_id]).currentPlayerFloor += 1;
-                passageComponent.activePassage = false;
-                moveDownDungeon(false);
-                break;
-            }
+        case comm::ROOM_CHANGED:
+            changeRoom(m_multiplayerSystem->getRoom());
+            break;
         default:
             break;
         }
-    }
 
+        m_multiplayerSystem->update();
+    }
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
-    {
         m_stateChangeCallback({MenuStateMachine::StateAction::Pop}, {std::nullopt});
-        return;
-    }
-    if (m_endGame)
+    else
     {
-        m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
-        return;
+        if (m_endGame)
+            m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<EndGameState>()});
     }
-    checkForEndOfTheGame();
+}
+
+void Dungeon::changeRoom(const glm::ivec2& room)
+{
+    clearDungeon();
+    auto dir = room - m_currentPlayerPos;
+    m_currentPlayerPos = room;
+
+    loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
+
+    const auto newDoor = dir * -1;
+    const auto doorType = GameType::geoToMapDoors.at(newDoor);
+    const auto position = m_doorSystem->getDoorPosition(doorType);
+    const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
+
+    for (const auto id : m_players)
+    {
+        const sf::Vector2f newPosition = position + offset + GameType::MyVec2(id, id);
+        gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
+        const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+
+        colliderComponent.body->SetTransform(
+            {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
+            colliderComponent.body->GetAngle());
+    }
 }
 
 void Dungeon::makeStartFloor()
@@ -393,7 +390,7 @@ void Dungeon::makeSimpleFloor()
     m_roomListenerSystem->changeRoom(m_currentPlayerPos);
 }
 
-inline void Dungeon::clearDungeon() 
+void Dungeon::clearDungeon()
 {
     m_doorSystem->clearDoors();
     m_spawnerSystem->clearSpawners();
@@ -401,6 +398,7 @@ inline void Dungeon::clearDungeon()
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
     m_collisionSystem->deleteMarkedBodies();
+    gCoordinator.getRegisterSystem<RenderSystem>()->clearMap();
 }
 
 inline void Dungeon::loadMap(const std::string& path) const
@@ -410,11 +408,10 @@ inline void Dungeon::loadMap(const std::string& path) const
     m_collisionSystem->createMapCollision();
 }
 
-void Dungeon::moveDownDungeon(const bool createEvent)
+void Dungeon::moveDownDungeon()
 {
     if (m_dungeonDepth >= configSingleton.GetConfig().maxDungeonDepth) m_endGame = true;
     ++m_dungeonDepth;
-
     makeSimpleFloor();
     const auto& pos = GameUtility::startingPosition;
 
@@ -422,34 +419,19 @@ void Dungeon::moveDownDungeon(const bool createEvent)
     m_passageSystem->setPassages(false);
     loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
 
-    b2Vec2 colliderPosition{};
+    gCoordinator.getComponent<TransformComponent>(config::playerEntity).position = {pos.x, pos.y};
+    gCoordinator.getComponent<TransformComponent>(config::playerEntity).velocity = {};
 
-    for (const auto& [id, player] : m_multiplayerSystem->getPlayers())
-    {
-        auto transformComponent = gCoordinator.getComponent<TransformComponent>(player);
+    b2Vec2 position{};
+    position.x = GameUtility::startingPosition.x * static_cast<float>(configSingleton.GetConfig().pixelToMeterRatio);
+    position.y = GameUtility::startingPosition.y * static_cast<float>(configSingleton.GetConfig().pixelToMeterRatio);
 
-        transformComponent.position = {getSpawnOffset(pos.x, id), getSpawnOffset(pos.y, id)};
-        transformComponent.velocity = {};
-
-        colliderPosition.x =
-            transformComponent.position.x * static_cast<float>(configSingleton.GetConfig().pixelToMeterRatio);
-        colliderPosition.y =
-            transformComponent.position.y * static_cast<float>(configSingleton.GetConfig().pixelToMeterRatio);
-
-        auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(player);
-        colliderComponent.body->SetTransform(colliderPosition, colliderComponent.body->GetAngle());
-    }
-
+    gCoordinator.getComponent<ColliderComponent>(config::playerEntity).body->SetTransform(position, 0);
     m_roomListenerSystem->reset();
-
-    if (createEvent)
-    {
-        const Entity eventEntity = gCoordinator.createEntity();
-        gCoordinator.addComponent(eventEntity, SynchronisedEvent{.variant = SynchronisedEvent::Variant::LEVEL_CHANGED});
-    }
 }
 
-void Dungeon::moveInDungeon(const glm::ivec2& dir, const bool createEvent)
+
+void Dungeon::moveInDungeon(const glm::ivec2& dir)
 {
     if (m_roomMap.contains(m_currentPlayerPos + dir))
     {
@@ -457,8 +439,10 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir, const bool createEvent)
         m_currentPlayerPos += dir;
         m_roomListenerSystem->changeRoom(m_currentPlayerPos);
 
-        loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
+        m_mapSystem->loadMap(m_roomMap.at(m_currentPlayerPos).getMap());
+        m_textureSystem->loadTextures();
         m_passageSystem->setPassages(m_currentPlayerPos == m_floorGenerator.getEndingRoom());
+        m_collisionSystem->createMapCollision();
 
 
         const auto newDoor = dir * -1;
@@ -466,53 +450,33 @@ void Dungeon::moveInDungeon(const glm::ivec2& dir, const bool createEvent)
         const auto position = gCoordinator.getRegisterSystem<DoorSystem>()->getDoorPosition(doorType);
         const auto offset = glm::vec2{dir.x * 100, -dir.y * 100};
 
-        b2Vec2 colliderPosition{};
-
-        for (const auto& [id, player] : m_multiplayerSystem->getPlayers())
+        for (const auto id : m_players)
         {
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(player);
+            // make players spawn in different positions after room change
+            // there should be a better way to do this
+            const sf::Vector2f newPosition = {position.x + offset.x + id, position.y + offset.y + id};
 
-            transformComponent.position = position + offset + GameType::MyVec2(id, id);
-            transformComponent.velocity = {};
-
-            colliderPosition.x = transformComponent.position.x * static_cast<float>(config::pixelToMeterRatio);
-            colliderPosition.y = transformComponent.position.y * static_cast<float>(config::pixelToMeterRatio);
-
-            auto colliderComponent = gCoordinator.getComponent<ColliderComponent>(player);
-            colliderComponent.body->SetTransform(colliderPosition, colliderComponent.body->GetAngle());
+            gCoordinator.getComponent<TransformComponent>(m_entities[id]).position = newPosition;
+            const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(m_entities[id]);
+            colliderComponent.body->SetTransform(
+                {convertPixelsToMeters(newPosition.x), convertPixelsToMeters(newPosition.y)},
+                colliderComponent.body->GetAngle());
         }
 
-        if (createEvent)
-        {
-            const Entity eventEntity = gCoordinator.createEntity();
-            gCoordinator.addComponent(
-                eventEntity,
-                SynchronisedEvent{.variant = SynchronisedEvent::Variant::ROOM_CHANGED, .room = m_currentPlayerPos});
-        }
+        if (m_multiplayerSystem->isConnected()) m_multiplayerSystem->roomChanged(m_currentPlayerPos);
     }
 }
 
-float Dungeon::getSpawnOffset(const float position, const uint32_t id)
+float Dungeon::getSpawnOffset(const float position, const int id)
 {
     if (id % 2 == 0) return position + id * configSingleton.GetConfig().spawnOffset;
     return position - id * configSingleton.GetConfig().spawnOffset;
-}
-
-void Dungeon::checkForEndOfTheGame()
-{
-    for (const auto& [id, player] : m_multiplayerSystem->getPlayers())
-    {
-        if (gCoordinator.hasComponent<PlayerComponent>(player)) return;
-    }
-    m_stateChangeCallback({MenuStateMachine::StateAction::PutOnTop}, {std::make_unique<LostGameState>()});
 }
 
 void Dungeon::setECS()
 {
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
-    gCoordinator.registerComponent<MultiplayerComponent>();
-    gCoordinator.registerComponent<SynchronisedEvent>();
     gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
     gCoordinator.registerComponent<DoorComponent>();
@@ -526,6 +490,7 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<TextTagComponent>();
     gCoordinator.registerComponent<PassageComponent>();
     gCoordinator.registerComponent<FloorComponent>();
+    gCoordinator.registerComponent<MultiplayerComponent>();
     gCoordinator.registerComponent<LootComponent>();
     gCoordinator.registerComponent<ItemComponent>();
     gCoordinator.registerComponent<ItemAnimationComponent>();
@@ -548,7 +513,9 @@ void Dungeon::setECS()
     auto multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     {
         Signature signature;
-        signature.set(gCoordinator.getComponentType<SynchronisedEvent>());
+        signature.set(gCoordinator.getComponentType<TransformComponent>());
+        signature.set(gCoordinator.getComponentType<MultiplayerComponent>());
+        signature.set(gCoordinator.getComponentType<ColliderComponent>());
         gCoordinator.setSystemSignature<MultiplayerSystem>(signature);
     }
 

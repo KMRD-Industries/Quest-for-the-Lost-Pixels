@@ -41,7 +41,10 @@ namespace config
     static constexpr int enemyFirstEntity{2000};
     static constexpr int numberOfEnemyEntities{100};
     static Entity playerEntity{1};
+
     static constexpr int playerAnimation{184};
+    static constexpr int playerRunningAnimation{242};
+    static constexpr int playerDeathAnimation{242};
 
     static constexpr int playerAcc{300};
     static constexpr int enemyAcc{25};
@@ -200,7 +203,7 @@ namespace config
 
     inline std::unordered_map<std::string, _entityCategory> categoriesLookup{
         {"Wall", BOUNDARY}, {"Bullet", BULLET}, {"Enemy", ENEMY}, {"Passage", PASSAGE},
-        {"Item", ITEM}, {"Player", PLAYER}, {"Door", DOOR}, {"Weapon", WEAPON}};
+        {"Item", ITEM},     {"Player", PLAYER}, {"Door", DOOR},   {"Weapon", WEAPON}};
 
     inline std::unordered_map<std::string, uint16> bitMaskLookup{
         {"Wall", BOUNDARY | PLAYER | ENEMY | BULLET | ITEM}, // Wall collides with everything
@@ -215,41 +218,32 @@ namespace config
 
     inline uint16 stringToCategoryBits(const std::string& str)
     {
-        if (categoriesLookup.contains(str))
-            return categoriesLookup[str];
+        if (categoriesLookup.contains(str)) return categoriesLookup[str];
 
-        if (std::regex_match(str, playerRegexTag))
-            return categoriesLookup["Player"];
+        if (std::regex_match(str, playerRegexTag)) return categoriesLookup["Player"];
 
-        if (str == "Chest" || str == "Potion")
-            return categoriesLookup["Passage"];
+        if (str == "Chest" || str == "Potion") return categoriesLookup["Passage"];
 
-        if (str == "Weapon")
-            return categoriesLookup["Weapon"];
+        if (str == "Weapon") return categoriesLookup["Weapon"];
         return 0x0000;
     }
 
     inline uint16 stringToMaskBits(const std::string& str)
     {
-        if (bitMaskLookup.contains(str))
-            return bitMaskLookup[str];
+        if (bitMaskLookup.contains(str)) return bitMaskLookup[str];
 
-        if (std::regex_match(str, playerRegexTag))
-            return bitMaskLookup["Player"];
+        if (std::regex_match(str, playerRegexTag)) return bitMaskLookup["Player"];
 
-        if (str == "Chest" || str == "Potion")
-            return bitMaskLookup["Passage"];
+        if (str == "Chest" || str == "Potion") return bitMaskLookup["Passage"];
 
-        if (str == "Weapon")
-            return bitMaskLookup["Weapon"];
+        if (str == "Weapon") return bitMaskLookup["Weapon"];
 
         return 0x0000;
     }
 
     inline uint16 stringToIndexGroup(const std::string& str)
     {
-        if (str == "Bullet")
-            return -8;
+        if (str == "Bullet") return -8;
         return 0;
     }
 
