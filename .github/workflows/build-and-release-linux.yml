@@ -18,7 +18,7 @@ jobs:
 
       - name: Setup Environment 
         run: |
-          echo "QLP_DATA_PATH=${XDG_DATA_HOME:-$HOME/.local/share}/qlp" >> $GITHUB_ENV
+          echo "QLP_DATA_PATH=." >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: |
@@ -26,7 +26,7 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 18
-          sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev cmake ninja-build
+          sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev cmake ninja-build zip
           clang-18 --version
           cmake --version
           ninja --version
@@ -40,12 +40,16 @@ jobs:
         run: |
           cmake --build build
 
-      - name: Upload Linux Binary
+      - name: Zip Outputs
+        run: |
+          zip -r output.zip bin/qlp assets
+
+      - name: Upload Linux Artifacts
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./bin/app
-          asset_name: app-linux
+          asset_path: ./output.zip
+          asset_name: qlp-game-linux.zip
           asset_content_type: application/octet-stream
