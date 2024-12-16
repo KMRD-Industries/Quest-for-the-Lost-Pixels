@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Config.h"
 #include "RenderComponent.h"
+#include "SFML/Graphics/RenderTexture.hpp"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/VertexArray.hpp"
 #include "SFML/System/Vector2.hpp"
@@ -22,14 +23,15 @@ class RenderSystem : public System
 public:
     RenderSystem();
     void update();
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderTexture& window);
+    void clearMap();
 
 private:
     void displayPortal(Entity entity);
-    void renderMap(sf::RenderWindow& window, const std::vector<sf::Sprite*>& tiles, const Camera& camera);
-    void renderMap(sf::RenderWindow& window, const std::unordered_map<sf::Texture*, sf::VertexArray>& tiles,
+    void renderMap(sf::RenderTexture& window, const std::vector<sf::Sprite*>& tiles, const Camera& camera);
+    void renderMap(sf::RenderTexture& window, const std::unordered_map<sf::Texture*, sf::VertexArray>& tiles,
                    const Camera& camera);
-    void updateCamera(Camera& camera, sf::Vector2f targetPos, const sf::RenderWindow& window);
+    void updateCamera(Camera& camera, sf::Vector2f targetPos, const sf::RenderTexture& window);
     void updateQuad(Entity entity);
     void updatePlayerSprite(Entity entity);
     void setHelmet() const;
@@ -42,8 +44,8 @@ private:
     void reverseDisplay(Collision& itemPivot, Collision& itemPlacement);
     void setWeapon();
     void setWeaponOrigin();
-    void displayEnemiesTable(const sf::RenderWindow& window);
-    void debugBoundingBoxes(sf::RenderWindow& window);
+    void displayEnemiesTable(const sf::RenderTexture& window);
+    void debugBoundingBoxes(sf::RenderTexture& window);
     void drawEquipment(Entity entity);
     void setOrigin(Entity entity);
     void setSpritePosition(Entity entity);
@@ -52,10 +54,10 @@ private:
     float getRotation(Entity entity);
     sf::Vector2f getOrigin(Entity entity);
     void updateSprite(Entity entity);
-    void clear(const sf::Window& window);
+    void clearSpriteArray();
     void displayDamageTaken(Entity entity);
-    void displayWeaponStatsTable(const sf::RenderWindow& window, Entity entity);
-    void displayPlayerStatsTable(const sf::RenderWindow& window, Entity entity) const;
+    void displayWeaponStatsTable(const sf::RenderTexture& window, Entity entity);
+    void displayPlayerStatsTable(const sf::RenderTexture& window, Entity entity) const;
 
     std::vector<std::vector<sf::Sprite*>> m_vecSpriteArray;
     std::vector<unsigned long> m_entityToVertexArrayIndex;

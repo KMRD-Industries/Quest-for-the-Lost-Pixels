@@ -79,16 +79,14 @@ void PlayerMovementSystem::handleMovement()
     {
         const Entity weaponEntity = equipment.slots.at(GameType::slotType::WEAPON);
 
-            if (auto* weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(weaponEntity))
-            {
-                auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
+        if (auto* weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(weaponEntity))
+        {
+            auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
 
-                weaponComponent->pivotPoint = inputHandler->getMousePosition();
-                transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
-                                            transformComponent.scale.y};
-                weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
-                                                  weaponTransformComponent.scale.y};
-            }
+            weaponComponent->pivotPoint = inputHandler->getMousePosition();
+            transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y};
+            weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
+                                              weaponTransformComponent.scale.y};
         }
     }
 

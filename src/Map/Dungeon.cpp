@@ -1,6 +1,7 @@
 #include "Dungeon.h"
 #include <BodyArmourComponent.h>
 #include <CreateBodyWithCollisionEvent.h>
+#include <DirtyFlagComponent.h>
 #include <EquipmentComponent.h>
 #include <FloorComponent.h>
 #include <HelmetComponent.h>
@@ -40,7 +41,6 @@
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerComponent.h"
-#include "SynchronisedEvent.h"
 #include "MultiplayerSystem.h"
 #include "ObjectCreatorSystem.h"
 #include "PlayerComponent.h"
@@ -50,6 +50,7 @@
 #include "RoomListenerSystem.h"
 #include "SpawnerComponent.h"
 #include "SpawnerSystem.h"
+#include "SynchronisedEvent.h"
 #include "TextTagComponent.h"
 #include "TextTagSystem.h"
 #include "TextureSystem.h"
@@ -95,7 +96,7 @@ void Dungeon::init()
 
         std::cout << "Connected to server with id: " << m_id << '\n';
 
-        for (const auto& player: initialInfo.connected_players())
+        for (const auto& player : initialInfo.connected_players())
         {
             const uint32_t playerID = player.id();
             createRemotePlayer(player);
@@ -143,9 +144,10 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, InventoryComponent{});
     gCoordinator.addComponent(player, EquipmentComponent{});
     gCoordinator.addComponent(player, FloorComponent{});
-    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
-    gCoordinator.addComponent(
-        player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
+    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(true); }});
+    gCoordinator.addComponent(player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) {
+                                  moveInDungeon(dir, true);
+                              }});
 }
 
 void Dungeon::createRemotePlayer(const comm::Player& player)
@@ -154,21 +156,24 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
     const auto tag = std::format("Player {}", playerID);
     m_entities[playerID] = gCoordinator.createEntity();
 
-    const auto startingPosition = sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, id),
-                                               getSpawnOffset(configSingleton.GetConfig().startingPosition.y, id));
+    const auto startingPosition =
+        sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
+                     getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID));
 
-    gCoordinator.addComponent( m_entities[playerID],
+    gCoordinator.addComponent(m_entities[playerID],
                               TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[playerID], TransformComponent(startingPosition));
     gCoordinator.addComponent(m_entities[playerID], RenderComponent{});
     gCoordinator.addComponent(m_entities[playerID], TransformComponent{GameUtility::startingPosition});
     gCoordinator.addComponent(m_entities[playerID], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[playerID], CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
+    gCoordinator.addComponent(m_entities[playerID],
+                              CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
     gCoordinator.addComponent(m_entities[playerID], MultiplayerComponent{});
     gCoordinator.addComponent(m_entities[playerID], ColliderComponent{});
     gCoordinator.addComponent(m_entities[playerID], MultiplayerComponent{});
 
-    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision("Characters", configSingleton.GetConfig().playerAnimation);
+    Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
+        "Characters", configSingleton.GetConfig().playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[playerID]).collision = cc;
 
     // Create Collider of new Player
@@ -251,8 +256,7 @@ void Dungeon::setupWeaponEntity(const comm::Player& player) const
 {
     // temporary for single-player
     comm::Item weapon;
-    if (m_multiplayerSystem->isConnected())
-        weapon = player.items(0);
+    if (m_multiplayerSystem->isConnected()) weapon = player.items(0);
 
     const auto& availableWeapons = gCoordinator.getRegisterSystem<TextureSystem>()->m_weaponsIDs;
 
@@ -285,8 +289,7 @@ void Dungeon::setupHelmetEntity(const comm::Player& player) const
 {
     // temporary for single-player
     comm::Item helmet;
-    if (m_multiplayerSystem->isConnected())
-        helmet = player.items(1);
+    if (m_multiplayerSystem->isConnected()) helmet = player.items(1);
 
     const auto& availableHelmets = gCoordinator.getRegisterSystem<TextureSystem>()->m_helmets;
 
@@ -295,10 +298,8 @@ void Dungeon::setupHelmetEntity(const comm::Player& player) const
     const Entity helmetEntity = gCoordinator.createEntity();
     const Entity playerEntity = m_entities[player.id()];
 
-    gCoordinator.addComponent(helmetEntity, HelmetComponent{.id = 0});
-    gCoordinator.addComponent(helmetEntity, TileComponent{0, "Armour", 7});
     gCoordinator.addComponent(helmetEntity, HelmetComponent{.id = helmetID});
-    gCoordinator.addComponent(helmetEntity, TileComponent{helmetID, "Armour", 6});
+    gCoordinator.addComponent(helmetEntity, TileComponent{0, "Armour", 7});
     gCoordinator.addComponent(helmetEntity, TransformComponent{});
     gCoordinator.addComponent(helmetEntity, RenderComponent{});
     gCoordinator.addComponent(helmetEntity, ColliderComponent{});
@@ -545,7 +546,6 @@ void Dungeon::setECS()
     gCoordinator.registerComponent<TextTagComponent>();
     gCoordinator.registerComponent<PassageComponent>();
     gCoordinator.registerComponent<FloorComponent>();
-    gCoordinator.registerComponent<MultiplayerComponent>();
     gCoordinator.registerComponent<LootComponent>();
     gCoordinator.registerComponent<ItemComponent>();
     gCoordinator.registerComponent<ItemAnimationComponent>();

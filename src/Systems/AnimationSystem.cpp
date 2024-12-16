@@ -12,7 +12,6 @@ void AnimationSystem::update(const float &deltaTime) const
         auto &animationComponent = gCoordinator.getComponent<AnimationComponent>(entity);
         if (animationComponent.frames.empty()) continue;
 
-        auto &tileComponent = gCoordinator.getComponent<TileComponent>(entity);
         updateEntityAnimation(entity, deltaTime);
     }
 }

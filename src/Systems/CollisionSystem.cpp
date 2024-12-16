@@ -4,6 +4,7 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "HelmetComponent.h"
+#include "ItemComponent.h"
 #include "MultiplayerSystem.h"
 #include "Physics.h"
 #include "PlayerComponent.h"
@@ -29,8 +30,13 @@ void MyContactListener::BeginContact(b2Contact* contact)
         if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entity)) return;
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entity);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entity);
-        colliderComponentA.onCollisionEnter({bodyBData->entity, bodyBData->tag});
-        colliderComponentB.onCollisionEnter({bodyAData->entity, bodyAData->tag});
+        if (!colliderComponentA.onCollisionEnter && !colliderComponentB.onCollisionEnter) return;
+
+        if (colliderComponentA.onCollisionEnter)
+            (*colliderComponentA.onCollisionEnter)({bodyBData->entity, bodyBData->tag});
+
+        if (colliderComponentB.onCollisionEnter)
+            (*colliderComponentB.onCollisionEnter)({bodyAData->entity, bodyAData->tag});
     }
 }
 
@@ -49,8 +55,14 @@ void MyContactListener::EndContact(b2Contact* contact)
         if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entity)) return;
         const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entity);
         const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entity);
-        colliderComponentA.onCollisionOut({bodyBData->entity, bodyBData->tag});
-        colliderComponentB.onCollisionOut({bodyAData->entity, bodyAData->tag});
+
+        if (!colliderComponentA.onCollisionOut && !colliderComponentB.onCollisionOut) return;
+
+        if (colliderComponentA.onCollisionOut)
+            (*colliderComponentA.onCollisionOut)({bodyBData->entity, bodyBData->tag});
+
+        if (colliderComponentB.onCollisionOut)
+            (*colliderComponentB.onCollisionOut)({bodyAData->entity, bodyAData->tag});
     }
 }
 
