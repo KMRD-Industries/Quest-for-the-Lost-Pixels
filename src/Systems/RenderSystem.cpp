@@ -2,6 +2,7 @@
 #include <DirtyFlagComponent.h>
 #include <EnemySystem.h>
 #include <EquipmentComponent.h>
+#include <SFML/System/Vector2.hpp>
 #include <string>
 #include "Camera.h"
 #include "CharacterComponent.h"
@@ -110,12 +111,24 @@ void RenderSystem::draw(sf::RenderWindow& window)
  * */
 void RenderSystem::updateCamera(Camera& camera, const sf::Vector2f targetPos, const sf::RenderWindow& window)
 {
-    sf::Vector2f halfView{};
     windowSize = window.getSize();
+    sf::Vector2f halfView = static_cast<sf::Vector2f>(window.getSize()) * 2.f;
 
     // Calculate half of map size
     halfView.x = static_cast<float>(windowSize.x) / 2;
     halfView.y = static_cast<float>(windowSize.y) / 2;
+
+    if (GameUtility::mapWidth < windowSize.x && GameUtility::mapHeight < windowSize.y)
+    {
+        sf::Vector2u mapDimensions;
+        mapDimensions.x = static_cast<int>(GameUtility::mapWidth);
+        mapDimensions.y = static_cast<int>(GameUtility::mapHeight);
+
+        camera.setSize(windowSize);
+        camera.setPosition(static_cast<sf::Vector2f>(mapDimensions) / 2.f);
+        return;
+    }
+
 
     // Clamp the camera position to ensure it stays within the boundaries of the map.
     // This prevents the camera from moving too far to the left or right,
