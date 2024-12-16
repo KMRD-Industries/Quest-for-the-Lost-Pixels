@@ -236,7 +236,9 @@ void MultiplayerSystem::pollState()
         case comm::SPAWN_ENEMY_REQUEST:
             gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnOnDemand(m_state);
             break;
-        default: {}
+        default:
+            {
+            }
         }
     }
     else
@@ -296,7 +298,9 @@ void MultiplayerSystem::update(const float deltaTime)
             break;
         case SynchronisedEvent::UpdateType::MOVEMENT:
             movementEvents.push_back(eventEntity);
-        default: {}
+        default:
+            {
+            }
         }
     }
 
@@ -717,8 +721,8 @@ void MultiplayerSystem::updateMap()
             continue;
         }
         comm::Enemy* enemy_position = mapUpdate.add_enemies();
-        enemy_position->set_position_x(enemy.second.x);
-        enemy_position->set_position_y(enemy.second.y);
+        enemy_position->mutable_position()->set_x(enemy.second.x);
+        enemy_position->mutable_position()->set_y(enemy.second.y);
         enemy_position->set_id(gCoordinator.getServerEntity(enemy.first));
     }
 
@@ -750,8 +754,8 @@ void MultiplayerSystem::sendSpawnerPosition(comm::StateUpdate& stateUpdate,
     for (const auto& spawner : spawners)
     {
         comm::Enemy* spawnerPosition = stateUpdate.add_enemy_spawner_positions();
-        spawnerPosition->set_position_x(spawner.second.x);
-        spawnerPosition->set_position_y(spawner.second.y);
+        spawnerPosition->mutable_position()->set_x(spawner.second.x);
+        spawnerPosition->mutable_position()->set_y(spawner.second.y);
         spawnerPosition->set_id(spawner.first);
     }
     printf("Sending spawn enemy request\n");
@@ -768,11 +772,20 @@ void MultiplayerSystem::handleMapUpdate(const google::protobuf::RepeatedPtrField
             continue;
         }
 
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(gameEntityId);
+        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(gameEntityId);
         if (gCoordinator.hasComponent<TransformComponent>(gameEntityId))
         {
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(gameEntityId);
-            transformComponent.velocity.x = enemy.position_x() * config::m_enemySpeed;
-            transformComponent.velocity.y = -enemy.position_y() * config::m_enemySpeed;
+            if (colliderComponent.body != nullptr &&
+                std::abs(colliderComponent.body->GetPosition().x - enemy.position().x()) > 0.3f &&
+                std::abs(colliderComponent.body->GetPosition().y - enemy.position().y()) > 0.3f)
+            {
+                colliderComponent.body->SetTransform(
+                    {convertPixelsToMeters(enemy.position().x()), convertPixelsToMeters(enemy.position().y())},
+                    colliderComponent.body->GetAngle());
+            }
+            transformComponent.velocity.x = enemy.vector().x() * config::m_enemySpeed;
+            transformComponent.velocity.y = -enemy.vector().y() * config::m_enemySpeed;
         }
     }
 }

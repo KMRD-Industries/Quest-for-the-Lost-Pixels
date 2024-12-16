@@ -44,7 +44,7 @@ void SpawnerSystem::processSpawner(SpawnerComponent& spawnerComponent,
 
 void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemyToSpawn) const
 {
-    auto positionsVec = sf::Vector2f(enemyToSpawn.position_x(), enemyToSpawn.position_y());
+    auto positionsVec = sf::Vector2f(enemyToSpawn.position().x(), enemyToSpawn.position().y());
     TransformComponent transformComponent{positionsVec};
 
     const Collision collisionData{

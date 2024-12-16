@@ -61,7 +61,7 @@ set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
 
 FetchContent_Declare(qlp-proto
     GIT_REPOSITORY https://github.com/kmrd-industries/qlp-proto-bindings
-    GIT_TAG 31-AI-pierwsza-iteracja)
+    GIT_TAG 115-synchronizacja-ruchów-przeciwników)
 FetchContent_MakeAvailable(qlp-proto)
 
 add_subdirectory(src)
