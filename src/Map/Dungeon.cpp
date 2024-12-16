@@ -129,7 +129,6 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, RenderComponent{});
     gCoordinator.addComponent(player, DirtyFlagComponent{});
     gCoordinator.addComponent(player, TransformComponent{.position = GameUtility::startingPosition});
-    gCoordinator.addComponent(player, AnimationComponent{});
     gCoordinator.addComponent(player, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
     gCoordinator.addComponent(player, PlayerComponent{});
     gCoordinator.addComponent(player, ColliderComponent{});
@@ -139,6 +138,15 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
     gCoordinator.addComponent(
         player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
+    gCoordinator.addComponent(
+        player,
+        AnimationComponent{.currentState = AnimationStateMachine::AnimationState::Running,
+                           .stateToAnimationLookup = {
+                               {AnimationStateMachine::AnimationState::Running,
+                                std::make_pair("Characters", configSingleton.GetConfig().playerRunningAnimation)},
+                               {AnimationStateMachine::AnimationState::Idle,
+                                std::make_pair("Characters", configSingleton.GetConfig().playerAnimation)},
+                           }});
 }
 
 void Dungeon::createRemotePlayer(const uint32_t id)
@@ -346,7 +354,7 @@ void Dungeon::changeRoom(const glm::ivec2& room)
 
 void Dungeon::makeStartFloor()
 {
-    Room room{"17", 1};
+    Room room{"0", 0};
     m_roomMap.clear();
     m_roomMap.emplace(glm::ivec2{0, 0}, room);
     m_currentPlayerPos = {0.f, 0.f};

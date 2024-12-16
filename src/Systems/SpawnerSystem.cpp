@@ -63,11 +63,17 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     gCoordinator.addComponent(newMonsterEntity, TileComponent{enemyConfig.textureData});
     gCoordinator.addComponent(newMonsterEntity, TransformComponent{transformComponent});
     gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
-    gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
     gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
     gCoordinator.addComponent(newMonsterEntity, ColliderComponent{.collision = enemyConfig.collisionData});
     gCoordinator.addComponent(newMonsterEntity, DirtyFlagComponent{});
     gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = enemyConfig.hp});
+    gCoordinator.addComponent(
+        newMonsterEntity,
+        AnimationComponent{.stateToAnimationLookup = {
+                               {AnimationStateMachine::AnimationState::Idle,
+                                std::make_pair(enemyConfig.textureData.tileSet, enemyConfig.textureData.id)},
+                               {AnimationStateMachine::AnimationState::Dead, std::make_pair("SmokeAnimations", 257)},
+                           }});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 

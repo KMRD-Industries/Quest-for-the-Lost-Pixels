@@ -27,6 +27,7 @@ void WeaponBindSystem::update()
         }
 
         const Entity eventEntity = gCoordinator.createEntity();
+        const auto weaponBindEvent = gCoordinator.getComponent<BindSwingWeaponEvent>(entity);
 
         const auto onCollisionEnterFunction = [this, entity](const GameType::CollisionData& data)
         {
@@ -40,7 +41,7 @@ void WeaponBindSystem::update()
             gCoordinator.addComponent(data.entityID, DealDMGToEnemyEvent{});
         };
 
-        const auto onCollisionOutFunction = [entity](const GameType::CollisionData& data)
+        const auto onCollisionOutFunction = [this, entity](const GameType::CollisionData& data)
         {
             auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
             swingComponent.enemyColided.erase(data.entityID);

@@ -8,6 +8,7 @@
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
 #include "Coordinator.h"
+#include "GameTypes.h"
 #include "Paths.h"
 #include "PublicConfigMenager.h"
 #include "RenderComponent.h"
@@ -201,7 +202,7 @@ sf::Sprite TextureSystem::getSprite(const std::string& tileSetName, const long i
         const auto rectIter = m_mapTextureIntRects.find(id + indexIter->second);
         if (rectIter != m_mapTextureIntRects.end()) return {textureIter->second, rectIter->second};
 
-        std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET SPRITE\n";
+        // std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET SPRITE\n";
         return {};
     }
 }
@@ -219,7 +220,7 @@ sf::VertexArray TextureSystem::getTile(const std::string& tileSetName, const lon
         }
     }
 
-    std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET VERTEX\n";
+    // std::cout << "ERROR::TEXTURE_SYSTEM::GET_TILE::COULD NOT GET VERTEX\n";
     return {};
 }
 
@@ -247,7 +248,7 @@ std::vector<AnimationFrame> TextureSystem::getAnimations(const std::string& tile
         if (animIter != m_mapAnimations.end()) return animIter->second;
     }
 
-    std::cout << "ERROR::TEXTURE_SYSTEM::GET_ANIMATIONS::COULD NOT GET ANIMATIONS\n";
+    // std::cout << "ERROR::TEXTURE_SYSTEM::GET_ANIMATIONS::COULD NOT GET ANIMATIONS\n";
     return {};
 }
 
@@ -278,7 +279,28 @@ void TextureSystem::loadTextures()
                 gCoordinator.addComponent(entity, AnimationComponent{});
 
             auto& animation_component = gCoordinator.getComponent<AnimationComponent>(entity);
-            animation_component.frames = getAnimations(tileComponent.tileSet, tileComponent.id);
+            auto& stateAnimationLookup = animation_component.stateToAnimationLookup;
+
+            if (stateAnimationLookup.empty())
+            {
+                animation_component.frames[AnimationStateMachine::AnimationState::Idle] =
+                    getAnimations(tileComponent.tileSet, tileComponent.id);
+            }
+            else
+            {
+                for (const auto& [fst, snd] : stateAnimationLookup)
+                    animation_component.frames[fst] = getAnimations(snd.first, snd.second);
+            }
+        }
+
+        if (auto animationComp = gCoordinator.tryGetComponent<AnimationComponent>(entity))
+        {
+            auto& stateAnimationLookup = animationComp->stateToAnimationLookup;
+            if (!stateAnimationLookup.empty())
+            {
+                for (const auto& [fst, snd] : stateAnimationLookup)
+                    animationComp->frames[fst] = getAnimations(snd.first, snd.second);
+            }
         }
 
         // Load Collisions with new ID && adjust id by new margin

@@ -14,12 +14,9 @@ void ObjectCreatorSystem::update()
     {
         const auto& eventInfo = gCoordinator.getComponent<CreateBodyWithCollisionEvent>(entity);
 
-        if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity))
-            continue;
-        if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity))
-            continue;
-        if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity))
-            continue;
+        if (!gCoordinator.hasComponent<ColliderComponent>(eventInfo.entity)) continue;
+        if (!gCoordinator.hasComponent<TransformComponent>(eventInfo.entity)) continue;
+        if (!gCoordinator.hasComponent<RenderComponent>(eventInfo.entity)) continue;
         if (configSingleton.GetConfig().debugMode)
             std::cout << "[COLLIDER BODY COUNT] " + std::to_string(Physics::getWorld()->GetBodyCount()) << std::endl;
 
@@ -65,12 +62,12 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
         objectPosition.x = convertPixelsToMeters(
             transformComponent.position.x -
             (spriteBounds.width / 2.f - (colliderComponent.collision.x + colliderComponent.collision.width / 2.f)) *
-            configSingleton.GetConfig().gameScale);
+                configSingleton.GetConfig().gameScale);
 
         objectPosition.y = convertPixelsToMeters(
             transformComponent.position.y -
             (spriteBounds.height / 2 - (colliderComponent.collision.y + colliderComponent.collision.height / 2)) *
-            configSingleton.GetConfig().gameScale);
+                configSingleton.GetConfig().gameScale);
     }
 
     bodyDef.position.Set(objectPosition.x, objectPosition.y);
@@ -147,8 +144,7 @@ void ObjectCreatorSystem::createBasicObject(const CreateBodyWithCollisionEvent& 
 
     b2Body* body = Physics::getWorld()->CreateBody(&bodyDef);
 
-    if (collisionData->tag != "Item")
-        body->SetFixedRotation(true);
+    if (collisionData->tag != "Item") body->SetFixedRotation(true);
 
     body->CreateFixture(&fixtureDef);
     colliderComponent.body = body;
@@ -162,8 +158,7 @@ void ObjectCreatorSystem::clear()
 {
     std::deque<Entity> entityToRemove;
 
-    for (const auto entity : m_entities)
-        entityToRemove.push_back(entity);
+    for (const auto entity : m_entities) entityToRemove.push_back(entity);
 
     while (!entityToRemove.empty())
     {

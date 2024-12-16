@@ -1,4 +1,6 @@
 #include "CollisionSystem.h"
+
+#include "AnimationComponent.h"
 #include "BodyArmourComponent.h"
 #include "ColliderComponent.h"
 #include "Coordinator.h"
@@ -127,10 +129,25 @@ void CollisionSystem::performFixedUpdate() const
         auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
         auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-        if (!transformComponent.velocity.IsValid()) continue;
-
         b2Body* body = colliderComponent.body;
         if (body == nullptr) continue;
+
+        if (gCoordinator.hasComponent<PlayerComponent>(entity))
+        {
+            if (transformComponent.velocity != b2Vec2{0.f, 0.f})
+            {
+                gCoordinator.getComponent<AnimationComponent>(entity).currentState =
+                    AnimationStateMachine::AnimationState::Idle;
+            }
+
+            if (transformComponent.velocity == b2Vec2{0.f, 0.f} && body->GetLinearVelocity() == b2Vec2{0.f, 0.f})
+            {
+                gCoordinator.getComponent<AnimationComponent>(entity).currentState =
+                    AnimationStateMachine::AnimationState::Running;
+            }
+        }
+
+        if (!transformComponent.velocity.IsValid()) continue;
 
         if (colliderComponent.tag == "Item")
             body->ApplyForceToCenter({transformComponent.velocity.x, transformComponent.velocity.y}, true);
@@ -195,6 +212,9 @@ void CollisionSystem::deleteMarkedBodies() const
         entityToKill.insert(entity);
     }
 
-    for (auto& entity : entityToKill) gCoordinator.destroyEntity(entity);
+    for (auto& entity : entityToKill)
+    {
+        gCoordinator.destroyEntity(entity);
+    }
     entityToKill.clear();
 }

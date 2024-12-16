@@ -126,8 +126,8 @@ set(SYSTEMS
         Systems/PassageSystem.h
         Systems/ItemSystem.cpp
         Systems/ItemSystem.h
-		Systems/SoundSystem.cpp
-		Systems/SoundSystem.h
+        Systems/SoundSystem.cpp
+        Systems/SoundSystem.h
         Systems/WeaponBindSystem.cpp
         Systems/WeaponBindSystem.h        
         Systems/DealDMGToEnemySystem.cpp

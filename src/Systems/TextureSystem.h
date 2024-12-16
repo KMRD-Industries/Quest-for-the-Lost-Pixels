@@ -19,8 +19,8 @@ public:
     void update();
     void loadTextures();
 
-    sf::Sprite getSprite(const std::string &tileSetName, long id) const;
-    sf::VertexArray getTile(const std::string &, long) const;
+    sf::Sprite getSprite(const std::string& tileSetName, long id) const;
+    sf::VertexArray getTile(const std::string&, long) const;
     std::vector<AnimationFrame> getAnimations(const std::string& tilesetName, long tileIndex);
     Collision getCollision(const std::string& tilesetName, long tileIndex);
     sf::Color getBackgroundColor();
@@ -34,7 +34,7 @@ public:
 private:
     std::unordered_set<std::string> m_setTextureFiles{
         "Items",      "CosmicLilac", "Decorative", "DungeonWalls", "Jungle", "Graveyard", "SpecialBlocks",
-        "AnimSlimes", "Characters",  "Weapons",    "CosmicLegacy", "Portal", "Armour"};
+        "AnimSlimes", "Characters",  "Weapons",    "CosmicLegacy", "Portal", "Armour",    "SmokeAnimations"};
 
     std::unordered_map<std::string, sf::Texture> m_mapTextures;
     std::unordered_map<std::string, sf::Texture> m_mapTexturesWithColorSchemeApplied;

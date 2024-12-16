@@ -1,11 +1,11 @@
 { "columns":13,
  "image":"..\/floorAtlas\/CosmicLilac.png",
- "imageheight":128,
+ "imageheight":176,
  "imagewidth":208,
  "margin":0,
  "name":"CosmicLilac",
  "spacing":0,
- "tilecount":104,
+ "tilecount":143,
  "tiledversion":"1.11.0",
  "tileheight":16,
  "tiles":[
@@ -541,7 +541,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -573,7 +572,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":3,
              "name":"",
              "objects":[
                     {
@@ -636,7 +634,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -748,7 +745,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -780,7 +776,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
