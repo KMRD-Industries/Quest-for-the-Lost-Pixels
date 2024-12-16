@@ -23,7 +23,6 @@ public:
     RenderSystem();
     void update();
     void draw(sf::RenderWindow& window);
-    void clearMap();
 
 private:
     void displayPortal(Entity entity);
@@ -53,7 +52,7 @@ private:
     float getRotation(Entity entity);
     sf::Vector2f getOrigin(Entity entity);
     void updateSprite(Entity entity);
-    void clearSpriteArray();
+    void clear(const sf::Window& window);
     void displayDamageTaken(Entity entity);
     void displayWeaponStatsTable(const sf::RenderWindow& window, Entity entity);
     void displayPlayerStatsTable(const sf::RenderWindow& window, Entity entity) const;

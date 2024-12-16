@@ -50,7 +50,7 @@ void MainMenuState::init()
                                 "Type your IP here", 25.f, 2.f, 40, 5, 210, {500, 860}, {0, 150, 144, 38}));
 }
 
-void MainMenuState::render(sf::RenderWindow& window)
+void MainMenuState::render(sf::RenderTexture& window)
 {
     window.setView(window.getDefaultView());
     m_inputIP.render();

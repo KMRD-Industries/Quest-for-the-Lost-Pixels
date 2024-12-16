@@ -5,7 +5,7 @@ extern PublicConfigSingleton configSingleton;
 
 struct WeaponComponent
 {
-    int id{};
+    uint32_t id{};
     int damageAmount{configSingleton.GetConfig().weaponComponentDefaultDamageAmount};
     bool isAttacking{configSingleton.GetConfig().weaponComponentDefaultIsAttacking};
     bool queuedAttack{configSingleton.GetConfig().weaponComponentDefaultQueuedAttack};
@@ -18,8 +18,9 @@ struct WeaponComponent
     float swingDistance{configSingleton.GetConfig().weaponComponentDefaultSwingDistance};
     float remainingDistance{configSingleton.GetConfig().weaponComponentDefaultRemainingDistance};
     float recoilAmount{configSingleton.GetConfig().weaponComponentDefaultRecoilAmount};
+
     sf::Vector2f pivotPoint{};
     sf::Vector2f targetPoint{};
     float targetAngleDegrees{};
-    GameType::WeaponType type{GameType::WeaponType::MELE};
+    GameType::WeaponType type{GameType::WeaponType::MELEE};
 };

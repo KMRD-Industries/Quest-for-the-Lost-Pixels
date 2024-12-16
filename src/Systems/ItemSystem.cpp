@@ -11,10 +11,12 @@
 #include "HelmetComponent.h"
 #include "InventorySystem.h"
 #include "ItemComponent.h"
+#include "MultiplayerSystem.h"
 #include "Physics.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
 #include "SpawnerSystem.h"
+#include "SynchronisedEvent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 
@@ -152,7 +154,13 @@ void ItemSystem::input(const Entity player)
 {
     if (closestItem.itemEntity == 0 || closestItem.slot == GameType::slotType{}) return;
     closestItem.characterEntity = player;
+    
     gCoordinator.getRegisterSystem<InventorySystem>()->pickUpItem(closestItem);
+
+    const Entity eventEntity = gCoordinator.createEntity();
+    gCoordinator.addComponent(
+        eventEntity,
+        SynchronisedEvent{.variant = SynchronisedEvent::Variant::ITEM_EQUIPPED, .pickUpInfo = closestItem});
 }
 
 void ItemSystem::deleteItems() const

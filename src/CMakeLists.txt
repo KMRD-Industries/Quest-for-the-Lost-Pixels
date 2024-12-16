@@ -32,6 +32,7 @@ set(COMPONENTS
         Components/TransformComponent.h
         Components/PlayerComponent.h
         Components/MultiplayerComponent.h
+        Components/SynchronisedEvent.h
         Components/ColliderComponent.h
         Components/CharacterComponent.h
         Components/TransformComponent.h
@@ -167,6 +168,8 @@ set(UTILS
 set(MENU_STATE_MACHINE
         MenuStateMachine/EndGameState.cpp
         MenuStateMachine/EndGameState.h
+		MenuStateMachine/LostGameState.cpp
+        MenuStateMachine/LostGameState.h
         MenuStateMachine/MainMenuState.cpp
         MenuStateMachine/MainMenuState.h
         MenuStateMachine/GameState.cpp

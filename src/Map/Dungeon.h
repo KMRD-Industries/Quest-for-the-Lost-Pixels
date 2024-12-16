@@ -41,12 +41,12 @@ public:
     Dungeon() : m_entities(MAX_ENTITIES - 1){};
 
     void init();
-    void render(sf::RenderWindow& window);
+    void render(sf::RenderTexture& window);
     void addPlayerComponents(Entity player);
-    void moveDownDungeon();
+    void moveDownDungeon(const bool createEvent);
     void setupPlayerCollision(Entity player);
-    void setupWeaponEntity(Entity player);
-    void setupHelmetEntity(Entity player) const;
+    void setupWeaponEntity(const comm::Player& player) const;
+    void setupHelmetEntity(const comm::Player& player) const;
     void update(float deltaTime);
     void makeStartFloor();
 
@@ -55,12 +55,12 @@ public:
 private:
     void setECS();
     void makeSimpleFloor();
-    void createRemotePlayer(uint32_t id);
-    void moveInDungeon(const glm::ivec2& dir);
-    void changeRoom(const glm::ivec2& dir);
+    void createRemotePlayer(const comm::Player& player);
+    void moveInDungeon(const glm::ivec2& dir, const bool createEvent);
     void clearDungeon();
     void loadMap(const std::string& path) const;
-    float getSpawnOffset(float position, int id);
+    void checkForEndOfTheGame();
+    float getSpawnOffset(const float position, const uint32_t id);
 
     std::string m_asset_path{ASSET_PATH};
     FloorGenerator m_floorGenerator{};
@@ -69,7 +69,6 @@ private:
     std::vector<Entity> m_entities{};
     uint32_t m_id{};
     int64_t m_seed{};
-    std::set<uint32_t> m_players{};
     std::deque<glm::ivec2> m_moveInDungeon;
     float counter;
     bool m_passedBy;

@@ -1,18 +1,15 @@
 #include "PlayerMovementSystem.h"
 #include <EquipmentComponent.h>
 #include "CharacterComponent.h"
-#include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "FightActionEvent.h"
 #include "InputHandler.h"
-#include "InventorySystem.h"
 #include "ItemSystem.h"
-#include "Physics.h"
 #include "RenderComponent.h"
+#include "SynchronisedEvent.h"
 #include "TextTagComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
-#include "glm/vec2.hpp"
 
 extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
@@ -23,6 +20,8 @@ void PlayerMovementSystem::init() { inputHandler = InputHandler::getInstance(); 
 
 void PlayerMovementSystem::update(const float deltaTime)
 {
+    if (gCoordinator.getComponent<CharacterComponent>(config::playerEntity).hp <= 0.0) return;
+
     handleAttack();
     handlePickUpAction();
     handleSpecialKeys();
@@ -45,10 +44,7 @@ void PlayerMovementSystem::handlePickUpAction()
 
     if (!inputHandler->isPressed(InputType::PickUpItem)) return;
 
-    for (auto const entity : m_entities)
-    {
-        gCoordinator.getRegisterSystem<ItemSystem>()->input(entity);
-    }
+    gCoordinator.getRegisterSystem<ItemSystem>()->input(config::playerEntity);
 }
 
 void PlayerMovementSystem::handleMovement()
@@ -69,21 +65,19 @@ void PlayerMovementSystem::handleMovement()
     if (inputHandler->isHeld(InputType::MoveLeft)) // Move Left
         dir.x -= 1;
 
-    for (const auto entity : m_entities)
+    // Handle Movement
+    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(config::playerEntity);
+    const auto& equipment = gCoordinator.getComponent<EquipmentComponent>(config::playerEntity);
+    const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
+    const auto playerSpeed = glm::vec2{normalizedDir.x * config::playerAcc, normalizedDir.y * config::playerAcc};
+
+    transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
+
+    if (!gCoordinator.hasComponent<EquipmentComponent>(config::playerEntity)) return;
+
+    if (equipment.slots.contains(GameType::slotType::WEAPON))
     {
-        // Handle Movement
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
-        const auto& equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
-        const auto normalizedDir = dir == glm::vec2{} ? glm::vec2{} : normalize(dir);
-        const auto playerSpeed = glm::vec2{normalizedDir.x * config::playerAcc, normalizedDir.y * config::playerAcc};
-
-        transformComponent.velocity = {playerSpeed.x, playerSpeed.y};
-
-        if (!gCoordinator.hasComponent<EquipmentComponent>(entity)) continue;
-
-        if (equipment.slots.contains(GameType::slotType::WEAPON))
-        {
-            const Entity weaponEntity = equipment.slots.at(GameType::slotType::WEAPON);
+        const Entity weaponEntity = equipment.slots.at(GameType::slotType::WEAPON);
 
             if (auto* weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(weaponEntity))
             {
@@ -97,17 +91,24 @@ void PlayerMovementSystem::handleMovement()
             }
         }
     }
+
+    Entity eventEntity = gCoordinator.createEntity();
+    gCoordinator.addComponent(eventEntity,
+                              SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::MOVEMENT,
+                                                .variant = SynchronisedEvent::Variant::PLAYER_MOVED});
 }
 
 void PlayerMovementSystem::handleAttack() const
 {
     const auto inputHandler{InputHandler::getInstance()};
 
-    for (const auto entity : m_entities)
-    {
-        if (!inputHandler->isPressed(InputType::Attack)) continue;
+    if (!inputHandler->isPressed(InputType::Attack)) return;
 
-        const Entity fightAction = gCoordinator.createEntity();
-        gCoordinator.addComponent(fightAction, FightActionEvent{.entity = entity});
-    }
+    const Entity fightAction = gCoordinator.createEntity();
+    gCoordinator.addComponent(fightAction, FightActionEvent{.entity = config::playerEntity});
+
+    const Entity movementEvent = gCoordinator.createEntity();
+    gCoordinator.addComponent(movementEvent,
+                              SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::MOVEMENT,
+                                                .variant = SynchronisedEvent::Variant::PLAYER_ATTACKED});
 }

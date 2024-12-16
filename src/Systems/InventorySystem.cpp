@@ -3,10 +3,8 @@
 #include "AnimationSystem.h"
 #include "BindSwingWeaponEvent.h"
 #include "BodyArmourComponent.h"
-#include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
-#include "CreateBodyWithCollisionEvent.h"
 #include "EquipmentComponent.h"
 #include "GameTypes.h"
 #include "HelmetComponent.h"
@@ -14,17 +12,22 @@
 #include "ItemComponent.h"
 #include "PotionComponent.h"
 #include "RenderComponent.h"
-#include "TextTagComponent.h"
+#include "SpawnerSystem.h"
+#include "SynchronisedEvent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 #include "WeaponSwingComponent.h"
 
 void InventorySystem::dropItem(const Entity player, const Entity item, const GameType::slotType slot) const
 {
-    auto &equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
-    const auto &playerTransformComponent = gCoordinator.getComponent<TransformComponent>(item);
-
+    auto& equipmentComponent = gCoordinator.getComponent<EquipmentComponent>(player);
     const Entity newItemEntity = gCoordinator.createEntity();
+
+    const Entity eventEntity = gCoordinator.createEntity();
+    gCoordinator.addComponent(
+        eventEntity,
+        SynchronisedEvent{
+            .variant = SynchronisedEvent::Variant::UPDATE_ITEM_ENTITY, .entity = item, .updatedEntity = newItemEntity});
 
     const auto itemAnimationComponent =
         ItemAnimationComponent{.animationDuration = 1, .startingPositionY = playerTransformComponent.position.y - 75};
@@ -80,7 +83,10 @@ void InventorySystem::pickUpItem(const GameType::PickUpInfo pickUpItemInfo) cons
 
     if (pickUpItemInfo.slot == GameType::WEAPON)
     {
-        gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
-        gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
+        if (!gCoordinator.hasComponent<BindSwingWeaponEvent>(pickUpItemInfo.itemEntity))
+            gCoordinator.addComponent(pickUpItemInfo.itemEntity, BindSwingWeaponEvent{});
+
+        if (!gCoordinator.hasComponent<WeaponSwingComponent>(pickUpItemInfo.itemEntity))
+            gCoordinator.addComponent(pickUpItemInfo.itemEntity, WeaponSwingComponent{});
     }
 }

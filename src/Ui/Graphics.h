@@ -6,13 +6,14 @@
 
 namespace sf
 {
+    class RenderTexture;
     class RenderWindow;
     class Sprite;
-}
+} // namespace sf
 
 struct Graphics
 {
-    void render(sf::RenderWindow& window);
+    void render(sf::RenderTexture& window);
     void init(const std::string& spritePath);
 
     sf::Sprite* m_sprite{};

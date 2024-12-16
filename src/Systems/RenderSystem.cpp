@@ -302,7 +302,7 @@ void RenderSystem::updateSprite(const Entity entity)
     m_vecSpriteArray[tileComponent.layer].push_back(&renderComponent.sprite);
 }
 
-void RenderSystem::clearSpriteArray()
+void RenderSystem::clear(const sf::Window& window)
 {
     if (m_vecSpriteArray.empty()) m_vecSpriteArray.resize(configSingleton.GetConfig().maximumNumberOfLayers);
     for (auto& layer : m_vecSpriteArray) layer.clear();

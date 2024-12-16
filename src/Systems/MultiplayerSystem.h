@@ -1,44 +1,95 @@
 #pragma once
+#include <optional>
 #include <unordered_map>
+
 #include <SFML/System/Vector3.hpp>
 #include <boost/asio.hpp>
 #include <comm.pb.h>
+#include <glm/ext/vector_int2.hpp>
+
 #include "System.h"
 #include "Types.h"
-#include "glm/ext/vector_int2.hpp"
+
+struct ItemGenerator
+{
+    uint32_t id;
+    uint32_t gen;
+    comm::ItemType type;
+};
+
+struct MultiplayerDungeonUpdate
+{
+    enum class Variant
+    {
+        NONE = 0,
+        REGISTER_PLAYER,
+        CHANGE_ROOM,
+        CHANGE_LEVEL,
+    };
+
+    Variant variant = Variant::NONE;
+    std::optional<glm::ivec2> room = std::nullopt;
+    comm::Player player{};
+};
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
+
 class MultiplayerSystem : public System
 {
 private:
     bool m_connected = false;
+    bool m_alive = true;
+    bool m_inside_initial_room = true;
     Entity m_player_entity = 0;
-    std::uint32_t m_player_id = 1;
+    uint32_t m_player_id = 0;
+    int64_t m_seed = 0;
+    float m_frame_time = 0.0;
+
     boost::asio::io_context m_io_context;
     tcp::socket m_tcp_socket;
     udp::socket m_udp_socket;
     std::array<char, 4096> m_buf{};
-    sf::Vector3<float> m_last_sent{};
+
+    std::chrono::system_clock::time_point m_last_tick{};
     glm::ivec2 m_current_room{};
-    comm::PositionUpdate m_position{};
+    std::unordered_map<uint32_t, Entity> m_entity_map{};
+
+    bool m_generator_ready = false;
+    ItemGenerator m_item_generator{};
+    std::unordered_map<uint32_t, Entity> m_registered_items{};
+
+    int m_prefix_size{};
+    std::vector<char> m_prefix_buf{};
+    comm::BytePrefix m_prefix{};
+    comm::MovementUpdate m_incomming_movement{};
+    comm::MovementUpdate m_outgoing_movement{};
     comm::StateUpdate m_state{};
-    std::unordered_map<std::uint32_t, Entity> m_entity_map{};
+    comm::StateUpdateSeries m_updates{};
+
+    std::vector<MultiplayerDungeonUpdate> m_dungeon_updates{};
+
+    void pollMovement();
+    void pollState();
+    void updateState(const std::vector<Entity>& entities);
+    void updateMovement(const std::vector<Entity>& entities);
 
 public:
-    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context){};
-    void setup(const std::string& ip, const std::string& port) noexcept;
+    MultiplayerSystem() noexcept : m_io_context(), m_udp_socket(m_io_context), m_tcp_socket(m_io_context) {};
+    void setup(const std::string_view& ip, const std::string_view& port) noexcept;
+    void setPlayer(const uint32_t id, const Entity entity);
     void setRoom(const glm::ivec2& room) noexcept;
-    void entityConnected(const std::uint32_t id, const Entity entity) noexcept;
-    void entityDisconnected(const std::uint32_t id) noexcept;
-    void roomChanged(const glm::ivec2& room);
-    void init();
-    void update();
+    void update(const float deltaTime);
     void disconnect();
 
     bool isConnected() const noexcept;
-    std::uint32_t playerID() const noexcept;
-    glm::ivec2& getRoom() noexcept;
-    comm::GameState registerPlayer(const Entity player);
-    comm::StateUpdate pollStateUpdates();
+    bool isInsideInitialRoom(const bool change) noexcept;
+    uint32_t playerID() const noexcept;
+    const glm::ivec2& getRoom() const noexcept;
+    const ItemGenerator& getItemGenerator();
+    Entity getItemEntity(const uint32_t id);
+    int64_t getSeed();
+    const std::unordered_map<uint32_t, Entity>& getPlayers();
+    const std::vector<MultiplayerDungeonUpdate>& getRemoteDungeonUpdates();
+    comm::InitialInfo registerPlayer(const Entity player);
 };

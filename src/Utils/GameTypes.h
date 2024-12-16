@@ -9,6 +9,15 @@
 
 #define M_PI 3.1415927f
 
+namespace video
+{
+    enum class FragmentShader
+    {
+        NONE,
+        DEATH
+    };
+};
+
 namespace Sound
 {
     enum class Type
@@ -194,7 +203,7 @@ namespace GameType
 
     enum class WeaponType : int
     {
-        MELE = 1,
+        MELEE = 1,
         WAND = 2,
         BOW = 3,
         UNKNOWN = 0
@@ -208,10 +217,10 @@ namespace GameType
 
     inline WeaponType stringToWeaponType(const std::string& type)
     {
-        if (type == "mele") return WeaponType::MELE;
+        if (type == "melee") return WeaponType::MELEE;
         if (type == "wand") return WeaponType::WAND;
         if (type == "bow") return WeaponType::BOW;
-        return WeaponType::MELE; // Return unknown if no match found
+        return WeaponType::MELEE; // Return unknown if no match found
     }
 
     enum FlipFlags : std::uint8_t
@@ -245,7 +254,7 @@ namespace GameType
 
     struct CollisionData
     {
-        Entity entityID;
+        Entity entity;
         std::string tag;
     };
 

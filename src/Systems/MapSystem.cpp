@@ -11,7 +11,6 @@
 #include "LootComponent.h"
 #include "MapComponent.h"
 #include "MapParser.h"
-#include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "PublicConfigMenager.h"
@@ -227,8 +226,7 @@ void MapSystem::resetMap() const
 
     for (const auto entity : m_entities)
     {
-        if (!gCoordinator.hasComponent<PlayerComponent>(entity) &&
-            !gCoordinator.hasComponent<MultiplayerComponent>(entity))
+        if (!gCoordinator.hasComponent<PlayerComponent>(entity))
         {
             if (auto* collisionComponent = gCoordinator.tryGetComponent<ColliderComponent>(entity))
             {

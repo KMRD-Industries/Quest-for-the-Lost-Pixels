@@ -1,6 +1,4 @@
 #include "SpawnerSystem.h"
-
-#include <DirtyFlagComponent.h>
 #include <regex>
 #include "AnimationComponent.h"
 #include "CharacterComponent.h"
@@ -9,12 +7,19 @@
 #include "CreateBodyWithCollisionEvent.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
+#include "EquipmentComponent.h"
 #include "Helpers.h"
+#include "MultiplayerComponent.h"
+#include "MultiplayerSystem.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
+#include "ResourceManager.h"
 #include "SpawnerComponent.h"
+#include "SynchronisedEvent.h"
 #include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TransformComponent.h"
+#include "WeaponComponent.h"
 
 extern PublicConfigSingleton configSingleton;
 
@@ -54,59 +59,49 @@ void SpawnerSystem::spawnEnemy(const TransformComponent& spawnerTransformCompone
     const auto enemyConfig = getRandomEnemyData(enemyType);
     const Entity newMonsterEntity = gCoordinator.createEntity();
 
-    const ColliderComponent colliderComponent{.collision = enemyConfig.collisionData};
+    const ColliderComponent colliderComponent{enemyConfig.collisionData};
     TransformComponent transformComponent{spawnerTransformComponent};
 
     transformComponent.position.x -= colliderComponent.collision.x * configSingleton.GetConfig().gameScale;
     transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale;
 
-    gCoordinator.addComponent(newMonsterEntity, TileComponent{enemyConfig.textureData});
-    gCoordinator.addComponent(newMonsterEntity, TransformComponent{transformComponent});
-    gCoordinator.addComponent(newMonsterEntity, RenderComponent{});
-    gCoordinator.addComponent(newMonsterEntity, AnimationComponent{});
-    gCoordinator.addComponent(newMonsterEntity, EnemyComponent{});
-    gCoordinator.addComponent(newMonsterEntity, ColliderComponent{.collision = enemyConfig.collisionData});
-    gCoordinator.addComponent(newMonsterEntity, DirtyFlagComponent{});
-    gCoordinator.addComponent(newMonsterEntity, CharacterComponent{.hp = enemyConfig.hp});
+    gCoordinator.addComponents(newMonsterEntity, enemyConfig.textureData, transformComponent, RenderComponent{},
+                               AnimationComponent{}, EnemyComponent{}, ColliderComponent{enemyConfig.collisionData},
+                               CharacterComponent{.hp = enemyConfig.hp});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
-    const auto onCollisionEnter = [&, newMonsterEntity, enemyConfig](const GameType::CollisionData& collisionData)
-    {
-        if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
+    auto newEvent = CreateBodyWithCollisionEvent(
+        newMonsterEntity, "Enemy",
+        [&, newMonsterEntity, enemyConfig](const GameType::CollisionData& collisionData)
+        {
+            if (!std::regex_match(collisionData.tag, config::playerRegexTag)) return;
 
-        auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
-        playerCharacterComponent.attacked = true;
+            auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collisionData.entityID)};
+            playerCharacterComponent.attacked = true;
 
-        playerCharacterComponent.hp -= enemyConfig.damage;
+            playerCharacterComponent.hp -= enemyConfig.damage;
 
-        const Entity tag = gCoordinator.createEntity();
-        gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});
-        gCoordinator.addComponent(
-            tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collisionData.entityID)});
+            const Entity tag = gCoordinator.createEntity();
+            gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});
+            gCoordinator.addComponent(
+                tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collisionData.entityID)});
 
-        if (!config::applyKnockback) return;
+            if (!config::applyKnockback) return;
 
-        auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
-        auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
+            auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collisionData.entityID)};
+            auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
 
-        b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -
-                                  myCollisionComponent.body->GetPosition()};
-        knockbackDirection.Normalize();
+            b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -
+                                      myCollisionComponent.body->GetPosition()};
+            knockbackDirection.Normalize();
 
-        const auto knockbackForce{configSingleton.GetConfig().defaultEnemyKnockbackForce * knockbackDirection};
-        playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
-    };
+            const auto knockbackForce{configSingleton.GetConfig().defaultEnemyKnockbackForce * knockbackDirection};
+            playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
+        },
+        [&](const GameType::CollisionData&) {}, false, false);
 
-    const auto newEventComponent =
-        CreateBodyWithCollisionEvent{.entity = newMonsterEntity,
-                                     .tag = "Enemy",
-                                     .onCollisionEnter = onCollisionEnter,
-                                     .onCollisionOut = [this](const GameType::CollisionData&) {},
-                                     .isStatic = false,
-                                     .useTextureSize = false};
-
-    gCoordinator.addComponent(newEventEntity, newEventComponent);
+    gCoordinator.addComponent(newEventEntity, newEvent);
 }
 
 void SpawnerSystem::clearSpawners()

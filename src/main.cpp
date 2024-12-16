@@ -3,6 +3,7 @@
 #include <SFML/Window/Event.hpp>
 #include <TextureSystem.h>
 #include <imgui-SFML.h>
+
 #include "Coordinator.h"
 #include "Game.h"
 #include "InputHandler.h"
@@ -19,7 +20,8 @@ PublicConfigSingleton configSingleton;
 void handleInput(sf::RenderWindow& window)
 {
     sf::Event event{};
-    InputHandler::getInstance()->update();
+    const auto inputHandler = InputHandler::getInstance();
+    inputHandler->update();
 
     while (window.pollEvent(event))
     {
@@ -28,27 +30,31 @@ void handleInput(sf::RenderWindow& window)
         if (event.type == sf::Event::KeyPressed)
         {
             const auto keyCode = event.key.code;
-            InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+            inputHandler->handleKeyboardInput(keyCode, true);
         }
         else if (event.type == sf::Event::MouseButtonPressed)
         {
             const auto keyCode = event.mouseButton.button;
-            InputHandler::getInstance()->handleKeyboardInput(keyCode, true);
+            inputHandler->handleKeyboardInput(keyCode, true);
         }
         else if (event.type == sf::Event::KeyReleased)
         {
             const auto keyCode = event.key.code;
-            InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+            inputHandler->handleKeyboardInput(keyCode, false);
         }
         else if (event.type == sf::Event::MouseButtonReleased)
         {
             const auto keyCode = event.mouseButton.button;
-            InputHandler::getInstance()->handleKeyboardInput(keyCode, false);
+            inputHandler->handleKeyboardInput(keyCode, false);
         }
         else if (event.type == sf::Event::MouseMoved)
         {
-            const auto mousePosition = sf::Mouse::getPosition(window);
-            InputHandler::getInstance()->updateMousePosition(window.mapPixelToCoords(mousePosition));
+            const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+            inputHandler->updateMousePosition(mousePosition);
+        }
+        else if (event.type == sf::Event::Resized)
+        {
+            inputHandler->updateWindowSize({event.size.width, event.size.height});
         }
         if (event.type == sf::Event::Closed) window.close();
     }
@@ -73,6 +79,7 @@ int main()
     ResourceManager& resourceManager = ResourceManager::getInstance();
     resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 160);
     resourceManager.getFont(ASSET_PATH + std::string("/ui/uiFont.ttf"), 40);
+    resourceManager.loadShader(ASSET_PATH + std::string("/shaders/grayscale.frag"), video::FragmentShader::DEATH);
 
     SoundManager& soundManager = SoundManager::getInstance();
     soundManager.loadSound(Sound::Type::MenuBackgroundMusic,
@@ -80,6 +87,10 @@ int main()
     soundManager.loadSound(Sound::Type::GameBackgroundMusic,
                            ASSET_PATH + std::string("/sounds/gameBackgroundSound.mp3"));
 
+    sf::RenderTexture renderTexture;
+    if (!renderTexture.create(window.getSize().x, window.getSize().y))
+    {
+    }
     while (window.isOpen())
     {
         sf::Time deltaTime = deltaClock.restart();
@@ -87,11 +98,20 @@ int main()
         ImGui::SFML::Update(window, deltaTime);
 
         game.update(static_cast<float>(deltaTime.asMilliseconds()));
-        game.draw(window);
+        game.draw(renderTexture);
 
-        ImGui::SFML::Render(window);
+        ImGui::SFML::Render(renderTexture);
+        renderTexture.display();
+
+        window.clear();
+        sf::Sprite sprite(renderTexture.getTexture());
+        if (resourceManager.getCurretShaderType() == video::FragmentShader::NONE)
+            window.draw(sprite);
+        else
+            window.draw(sprite, resourceManager.getCurrentShader().get());
+
+
         window.display();
-
         handleInput(window);
     }
 
