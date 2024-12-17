@@ -228,6 +228,7 @@ void MultiplayerSystem::pollState()
                 break;
             }
         default:
+            break;
         }
     }
     else
@@ -286,6 +287,7 @@ void MultiplayerSystem::update(const float deltaTime)
         case SynchronisedEvent::UpdateType::MOVEMENT:
             movementEvents.push_back(eventEntity);
         default:
+            break;
         }
     }
 

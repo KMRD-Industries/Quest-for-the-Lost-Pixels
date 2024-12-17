@@ -1,4 +1,5 @@
 #include "MapSystem.h"
+#include <DirtyFlagComponent.h>
 #include <nlohmann/json.hpp>
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
@@ -136,11 +137,15 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
     const auto tileComponent = TileComponent{
         static_cast<unsigned>(tileID - parsedMap.tilesets.at(findKeyLessThan(parsedMap.tilesets, tileID))),
         findKeyLessThan(parsedMap.tilesets, static_cast<signed>(tileID)), layerID};
-    auto transformComponent = TransformComponent(getPosition(xPos + 1, yPos + 1, parsedMap.tileheight));
+    auto transformComponent = TransformComponent(getPosition(xPos, yPos, parsedMap.tileheight));
 
     doFlips(flipFlags, transformComponent.rotation, transformComponent.scale);
 
-    gCoordinator.addComponents(mapEntity, RenderComponent{}, MapComponent{}, transformComponent, tileComponent);
+    gCoordinator.addComponents(mapEntity, DirtyFlagComponent{});
+    gCoordinator.addComponents(mapEntity, RenderComponent{.staticMapTile = true});
+    gCoordinator.addComponents(mapEntity, MapComponent{});
+    gCoordinator.addComponents(mapEntity, transformComponent);
+    gCoordinator.addComponents(mapEntity, tileComponent);
 
     if (tileComponent.tileSet == "SpecialBlocks") // Handle special Tiles
     {
@@ -192,7 +197,6 @@ void MapSystem::processTile(const uint32_t tileID, const uint32_t flipFlags, con
             {
                 if (!gCoordinator.hasComponent<LootComponent>(mapEntity))
                     gCoordinator.addComponent(mapEntity, LootComponent{});
-
                 break;
             }
         default:

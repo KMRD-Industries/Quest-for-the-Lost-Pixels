@@ -1,11 +1,15 @@
 #pragma once
 
 #include "SFML/Graphics/Sprite.hpp"
+#include "SFML/Graphics/VertexArray.hpp"
 
 struct RenderComponent
 {
-    sf::Sprite sprite{};
     int layer{};
+    sf::Texture* texture{nullptr};
+    sf::Sprite sprite{};
+    sf::VertexArray vertexArray{sf::PrimitiveType::Quads};
     sf::Color color{sf::Color::White};
-    bool dirty{true};
+    bool staticMapTile{false};
+    float rotation{0.0f};
 };
