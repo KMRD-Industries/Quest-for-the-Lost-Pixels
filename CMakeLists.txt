@@ -52,32 +52,11 @@ FetchContent_Declare(Boost
 )
 FetchContent_MakeAvailable(Boost)
 
-FetchContent_Declare(zlib
-        GIT_REPOSITORY https://github.com/madler/zlib.git
-        GIT_TAG v1.2.12)
-
-if (WIN32)
-    set(ZLIB_USE_STATIC_LIBS ON CACHE BOOL "Use static zlib" FORCE)
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libraries" FORCE)
-endif()
-
-if (UNIX)
-    set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)
-endif()
-
-FetchContent_MakeAvailable(zlib)
-
-if (WIN32)
-    set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(ZLIB_LIBRARY ${zlib_BINARY_DIR}/Debug/zlibstaticd.lib)
-    else()
-        set(ZLIB_LIBRARY ${zlib_BINARY_DIR}/Release/zlibstatic.lib)
-    endif()
-else()
-    set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
-    set(ZLIB_LIBRARY ${zlib_BINARY_DIR}/libz.so)
-endif()
+FetchContent_Declare(
+        zlib-cmake
+        URL https://github.com/jimmy-park/zlib-cmake/archive/main.tar.gz
+)
+FetchContent_MakeAvailable(zlib-cmake)
 
 FetchContent_Declare(qlp-proto
     GIT_REPOSITORY https://github.com/kmrd-industries/qlp-proto-bindings
