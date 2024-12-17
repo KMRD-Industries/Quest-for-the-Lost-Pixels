@@ -29,6 +29,7 @@ jobs:
           sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev libfuse2 cmake ninja-build zip wget \
                 libxrandr-dev \
                 libx11-dev \
+                libxi-dev \
                 libxext-dev \
                 libxcb1-dev \
                 libx11-xcb-dev \
