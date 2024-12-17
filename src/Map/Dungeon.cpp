@@ -164,11 +164,9 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
                               TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[playerID], TransformComponent(startingPosition));
     gCoordinator.addComponent(m_entities[playerID], RenderComponent{});
-    gCoordinator.addComponent(m_entities[playerID], TransformComponent{GameUtility::startingPosition});
     gCoordinator.addComponent(m_entities[playerID], AnimationComponent{});
     gCoordinator.addComponent(m_entities[playerID],
                               CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
-    gCoordinator.addComponent(m_entities[playerID], MultiplayerComponent{});
     gCoordinator.addComponent(m_entities[playerID], ColliderComponent{});
     gCoordinator.addComponent(m_entities[playerID], MultiplayerComponent{});
 

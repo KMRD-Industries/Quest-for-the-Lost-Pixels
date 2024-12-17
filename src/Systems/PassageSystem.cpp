@@ -1,4 +1,7 @@
 #include "PassageSystem.h"
+
+#include <DirtyFlagComponent.h>
+
 #include "ColliderComponent.h"
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
@@ -26,6 +29,9 @@ void PassageSystem::setPassages(const bool val) const
     for (const auto entity : m_entities)
     {
         gCoordinator.getComponent<PassageComponent>(entity).activePassage = val;
+
+        if (!gCoordinator.hasComponent<DirtyFlagComponent>(entity))
+            gCoordinator.addComponent(entity, DirtyFlagComponent{});
 
         if (val == true && !gCoordinator.hasComponent<PlayerComponent>(entity))
         {

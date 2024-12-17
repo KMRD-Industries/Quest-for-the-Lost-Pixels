@@ -16,6 +16,7 @@
 #include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
+#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
 #include "SFML/Graphics/CircleShape.hpp"
 #include "SFML/Graphics/ConvexShape.hpp"
@@ -156,6 +157,8 @@ void RenderSystem::clearMap()
         for (auto& pair : layer) pair.second.clear(); // Clear each VertexArray
         layer.clear();
     }
+
+    specialObjects.clear();
 
     // Fill with known invalid state
     for (auto& value : m_entityToVertexArrayIndex) value = -1;
@@ -308,7 +311,6 @@ void RenderSystem::clearSpriteArray()
     for (auto& layer : m_vecSpriteArray) layer.clear();
 
     players.clear();
-    specialObjects.clear();
 }
 
 void RenderSystem::updatePlayerSprite(const Entity entity) { setEquipment(entity); }
@@ -456,23 +458,24 @@ float RenderSystem::getRotation(const Entity entity)
 void RenderSystem::displayPortal(const Entity entity)
 {
     const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
     if (gCoordinator.hasComponent<PassageComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity))
     {
         if (!gCoordinator.getComponent<PassageComponent>(entity).activePassage) return;
 
         sf::Vector2f portalPosition = {};
-        portalPosition.x = renderComponent.sprite.getPosition().x - renderComponent.sprite.getLocalBounds().width -
-            9 * configSingleton.GetConfig().gameScale;
-        portalPosition.y = renderComponent.sprite.getPosition().y - renderComponent.sprite.getLocalBounds().height -
-            8 * configSingleton.GetConfig().gameScale;
+        portalPosition.x = transformComponent.position.x -
+            portalSprite.getGlobalBounds().width * configSingleton.GetConfig().gameScale / 2;
+        portalPosition.y = transformComponent.position.y -
+            portalSprite.getGlobalBounds().width * configSingleton.GetConfig().gameScale / 2;
+        ;
 
         sf::Sprite portalSpriteCopy = portalSprite;
 
         portalSpriteCopy.setPosition(portalPosition);
-        portalSpriteCopy.setScale(renderComponent.sprite.getScale());
-
-        m_vecSpriteArray[9].push_back(new sf::Sprite(portalSpriteCopy));
+        portalSpriteCopy.setScale(configSingleton.GetConfig().gameScale, configSingleton.GetConfig().gameScale);
+        m_vecSpriteArray[5].push_back(new sf::Sprite(portalSpriteCopy));
     }
 }
 

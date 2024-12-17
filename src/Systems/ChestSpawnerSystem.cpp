@@ -62,7 +62,7 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
     ItemGenerator itemGenerator{0, static_cast<uint32_t>(dist2(gen)), static_cast<comm::ItemType>(dist1(gen))};
     uint32_t id = 0;
 
-    const auto& multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
+    const auto &multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     if (multiplayerSystem->isConnected())
     {
         itemGenerator = multiplayerSystem->getItemGenerator();
@@ -84,43 +84,41 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
 
     switch (itemGenerator.type)
     {
-        case comm::HELMET:
+    case comm::HELMET:
         {
             const uint32_t tileID = m_helmetsIDs[itemGenerator.gen % m_helmetsIDs.size()];
             if (id == 0) id = tileID;
 
             gCoordinator.addComponents(
-                newItemEntity, HelmetComponent{.id = id},
-                TileComponent{tileID, "Armour", 6},
+                newItemEntity, HelmetComponent{.id = id}, TileComponent{tileID, "Armour", 7},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;
         }
-        case comm::WEAPON:
+    case comm::WEAPON:
         {
-            const auto& weaponDesc = m_weaponsIDs[itemGenerator.gen % m_weaponsIDs.size()];
+            const auto &weaponDesc = m_weaponsIDs[itemGenerator.gen % m_weaponsIDs.size()];
             if (id == 0) id = weaponDesc.first;
 
             gCoordinator.addComponents(
                 newItemEntity, WeaponComponent{.id = id, .type = weaponDesc.second},
-                TileComponent{weaponDesc.first, "Weapons", 7},
+                TileComponent{weaponDesc.first, "Weapons", 8},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y - 75});
             break;
         }
-        case comm::ARMOUR:
+    case comm::ARMOUR:
         {
             const uint32_t tileID = m_bodyArmoursIDs[itemGenerator.gen % m_bodyArmoursIDs.size()];
             if (id == 0) id = tileID;
 
             gCoordinator.addComponents(
-                newItemEntity, BodyArmourComponent{.id = id},
-                TileComponent{tileID, "Armour", 6},
+                newItemEntity, BodyArmourComponent{.id = id}, TileComponent{tileID, "Armour", 7},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;
         }
-        case comm::POTION:
+    case comm::POTION:
         {
             const config::ItemConfig itemConfig = getRandomItemData();
             gCoordinator.addComponents(
@@ -151,9 +149,7 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransform
     const Entity newItemEntity = gCoordinator.createEntity();
 
     auto spawnFunction = [this, spawnerTransformComponent](const GameType::CollisionData &)
-    {
-        spawnItem(spawnerTransformComponent);
-    };
+    { spawnItem(spawnerTransformComponent); };
 
     // Create new object with special eventComponent
     const auto newEventComponent = CreateBodyWithCollisionEvent{
