@@ -27,37 +27,29 @@ public:
     void clearMap();
 
 private:
-    void displayPortal(Entity entity);
-    void renderMap(sf::RenderTexture& window, const std::vector<sf::Sprite*>& tiles, const Camera& camera);
-    void renderMap(sf::RenderTexture& window, const std::unordered_map<sf::Texture*, sf::VertexArray>& tiles,
-                   const Camera& camera);
-    void updateCamera(Camera& camera, sf::Vector2f targetPos, const sf::RenderTexture& window);
-    void updateQuad(Entity entity);
-    void updatePlayerSprite(Entity entity);
-    void setHelmet() const;
-    void setBodyArmour();
-    void setEquipment(Entity entity);
-    sf::Vector2f getEquippedItemOrigin(Collision& itemPlacement);
+    void displayPortal(const Entity entity);
+    void updateCamera(Camera& camera, const sf::Vector2f& targetPos, const sf::RenderTexture& window);
+    void updateQuad(const Entity entity);
+    void updatePlayerSprite(const Entity entity);
+    void setEquipment(const Entity entity);
+    sf::Vector2f getEquippedItemOrigin(const Collision& itemPlacement);
     sf::Vector2f getEquippedItemPosition(const Collision& itemPivot, const Collision& itemPlacement,
                                          const RenderComponent& playerSprite);
     float getEquippedItemRotation(Entity entity);
     void reverseDisplay(Collision& itemPivot, Collision& itemPlacement);
-    void setWeapon();
-    void setWeaponOrigin();
-    void displayEnemiesTable(const sf::RenderTexture& window);
     void debugBoundingBoxes(sf::RenderTexture& window);
     void drawEquipment(Entity entity);
-    void setOrigin(Entity entity);
-    void setSpritePosition(Entity entity);
-    sf::Vector2f getPosition(Entity entity);
-    sf::Vector2f getScale(Entity entity);
-    float getRotation(Entity entity);
-    sf::Vector2f getOrigin(Entity entity);
-    void updateSprite(Entity entity);
+
+    sf::Vector2f getPosition(const Entity entity);
+    sf::Vector2f getScale(const Entity entity);
+    sf::Vector2f getOrigin(const Entity entity);
+    float getRotation(const Entity entity);
+
+    void updateSprite(const Entity entity);
     void clearSpriteArray();
-    void displayDamageTaken(Entity entity);
-    void displayWeaponStatsTable(const sf::RenderTexture& window, Entity entity);
-    void displayPlayerStatsTable(const sf::RenderTexture& window, Entity entity) const;
+    void displayDamageTaken(const Entity entity);
+    void displayWeaponStatsTable(const sf::RenderTexture& window, const Entity entity);
+    void displayPlayerStatsTable(const sf::RenderTexture& window, const Entity entity) const;
 
     std::vector<std::vector<sf::Sprite*>> m_vecSpriteArray;
     std::vector<unsigned long> m_entityToVertexArrayIndex;
