@@ -95,7 +95,7 @@ jobs:
 
       - name: Zip Outputs
         run: |
-          zip -r output.zip qlp.AppImage $BINARY_PATH assets
+          zip -r output.zip qlp.AppImage bin/qlp assets
 
       - name: Upload Linux Artifacts
         uses: actions/upload-release-asset@v1
