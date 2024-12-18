@@ -227,8 +227,6 @@ if (WIN32)
     target_link_libraries(qlp PRIVATE ws2_32)
 endif ()
 
-target_compile_features(qlp PRIVATE cxx_std_23)
-
 if (WIN32)
     if (CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(ARCH_DIR "x64")
@@ -237,21 +235,56 @@ if (WIN32)
     endif ()
 
     set(BOX2D_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/box2d-build/bin")
+    set(BOX2D_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/box2d-build/bin")
+    set(ZLIBD_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/zlib-source-build")
     set(ADDITIONAL_DLL_DIR "${CMAKE_BINARY_DIR}/bin")
     set(OPENAL_DLL_PATH "${SFML_SOURCE_DIR}/extlibs/bin/${ARCH_DIR}/openal32.dll")
+	set(ADDITIONAL_TARGET_DIR1 "${CMAKE_SOURCE_DIR}/bin")
+	set(ADDITIONAL_TARGET_DIR2 "${CMAKE_SOURCE_DIR}/bin/Debug")
+	
+	if (EXISTS ${BOX2D_SOURCE_DIR})
+		message(STATUS "Box2D source dir found: ${BOX2D_SOURCE_DIR}. Copying Box2D DLL.")
 
-    if (EXISTS ${BOX2D_SOURCE_DIR})
-        message(STATUS "Box2d source dir found: ${BOX2D_SOURCE_DIR}. Copying Box2d dll.")
-        add_custom_command(
-                TARGET qlp
-                COMMENT "Copy box2d dll"
-                PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory ${BOX2D_SOURCE_DIR} $<TARGET_FILE_DIR:qlp>
-                VERBATIM
-        )
-    else ()
-        message(WARNING "Directory does not exist: ${BOX2D_SOURCE_DIR}")
-    endif ()
+		add_custom_command(
+			TARGET qlp
+			COMMENT "Copy Box2D DLL to target directory"
+			PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${BOX2D_SOURCE_DIR} $<TARGET_FILE_DIR:qlp>
+			VERBATIM
+		)
+
+		add_custom_command(
+			TARGET qlp
+			COMMENT "Copy Box2D DLL to bin/Debug folder"
+			PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${BOX2D_SOURCE_DIR} ${ADDITIONAL_TARGET_DIR1}
+			VERBATIM
+		)
+
+	else ()
+		message(WARNING "Directory does not exist: ${BOX2D_SOURCE_DIR}")
+	endif ()	
+	
+	if (EXISTS ${ZLIBD_SOURCE_DIR})
+		message(STATUS "ZLIB source dir found: ${ZLIBD_SOURCE_DIR}. Copying Box2D DLL.")
+
+		add_custom_command(
+			TARGET qlp
+			PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${ZLIBD_SOURCE_DIR} $<TARGET_FILE_DIR:qlp>
+			VERBATIM
+		)
+
+		add_custom_command(
+			TARGET qlp
+			PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${ZLIBD_SOURCE_DIR} ${ADDITIONAL_TARGET_DIR1}
+			VERBATIM
+		)
+
+	else ()
+		message(WARNING "Directory does not exist: ${BOX2D_SOURCE_DIR}")
+	endif ()
 
     if (EXISTS ${OPENAL_DLL_PATH})
         message(STATUS "OpenAL source dir found: ${OPENAL_DLL_PATH}. Copying OpenAL dll.")
@@ -286,11 +319,18 @@ if (WIN32)
     # Dodanie komendy do kopiowania libprotobufd.dll, jeśli istnieje
     if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobufd.dll)
         add_custom_command(
-                TARGET qlp
-                PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobufd.dll $<TARGET_FILE_DIR:qlp>
-                VERBATIM
+			TARGET qlp
+			PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobufd.dll $<TARGET_FILE_DIR:qlp>
+			VERBATIM
         )
+		
+		add_custom_command(
+			TARGET qlp
+			PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobufd.dll ${ADDITIONAL_TARGET_DIR1}
+			VERBATIM
+		)
     endif ()
 
     if (EXISTS ${ADDITIONAL_DLL_DIR}/libprotobuf.dll)
@@ -301,4 +341,14 @@ if (WIN32)
                 VERBATIM
         )
     endif ()
+	
+	add_custom_command(
+    TARGET qlp
+    COMMENT "Copy all files from Debug/Debug to Debug folder"
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory 
+        ${ADDITIONAL_TARGET_DIR2}
+        ${ADDITIONAL_TARGET_DIR1}
+    VERBATIM
+)
 endif ()
