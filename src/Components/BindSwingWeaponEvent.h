@@ -2,4 +2,5 @@
 
 struct BindSwingWeaponEvent
 {
+    Entity playerEntity{};
 };

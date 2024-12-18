@@ -140,11 +140,20 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransform
     gCoordinator.addComponent(newChestEntity, TransformComponent{.position = spawnerTransformComponent.position});
     gCoordinator.addComponent(newChestEntity, ColliderComponent{.collision = m_chestCollision});
     gCoordinator.addComponent(newChestEntity, RenderComponent{});
-    gCoordinator.addComponent(newChestEntity, AnimationComponent{});
     gCoordinator.addComponent(newChestEntity, CharacterComponent{});
     gCoordinator.addComponent(newChestEntity, ItemComponent{});
     gCoordinator.addComponent(newChestEntity, ChestComponent{});
     gCoordinator.addComponent(newChestEntity, DirtyFlagComponent{});
+
+    gCoordinator.addComponent(
+        newChestEntity,
+        AnimationComponent{.stateToAnimationLookup =
+                               {
+                                   {AnimationStateMachine::AnimationState::Idle, {m_chestTile.tileSet, m_chestTile.id}},
+                                   {AnimationStateMachine::AnimationState::Dead, {m_chestTile.tileSet, 915}},
+                               }
+
+        });
 
     const Entity newItemEntity = gCoordinator.createEntity();
 

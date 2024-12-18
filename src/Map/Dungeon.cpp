@@ -1,10 +1,10 @@
+#include "Dungeon.h"
 #include <chrono>
 #include <iostream>
 #include <vector>
 
 #include <comm.pb.h>
 
-#include "Dungeon.h"
 #include <BodyArmourComponent.h>
 #include <CreateBodyWithCollisionEvent.h>
 #include <DirtyFlagComponent.h>
@@ -45,7 +45,6 @@
 #include "ItemComponent.h"
 #include "ItemSpawnerSystem.h"
 #include "LootComponent.h"
-#include "LostGameState.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
 #include "MultiplayerComponent.h"
@@ -104,7 +103,7 @@ void Dungeon::init()
 
         std::cout << "Connected to server with id: " << m_id << '\n';
 
-        for (const auto& player : initialInfo.connected_players())
+        for (const auto& player: initialInfo.connected_players())
         {
             const uint32_t playerID = player.id();
             createRemotePlayer(player);
@@ -145,17 +144,24 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, RenderComponent{});
     gCoordinator.addComponent(player, DirtyFlagComponent{});
     gCoordinator.addComponent(player, TransformComponent{.position = GameUtility::startingPosition});
-    gCoordinator.addComponent(player, AnimationComponent{});
     gCoordinator.addComponent(player, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
     gCoordinator.addComponent(player, PlayerComponent{});
     gCoordinator.addComponent(player, ColliderComponent{});
     gCoordinator.addComponent(player, InventoryComponent{});
     gCoordinator.addComponent(player, EquipmentComponent{});
     gCoordinator.addComponent(player, FloorComponent{});
-    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(true); }});
-    gCoordinator.addComponent(player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) {
-                                  moveInDungeon(dir, true);
-                              }});
+    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
+    gCoordinator.addComponent(
+        player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
+    gCoordinator.addComponent(
+        player,
+        AnimationComponent{.currentState = AnimationStateMachine::AnimationState::Running,
+                           .stateToAnimationLookup = {
+                               {AnimationStateMachine::AnimationState::Running,
+                                std::make_pair("Characters", configSingleton.GetConfig().playerRunningAnimation)},
+                               {AnimationStateMachine::AnimationState::Idle,
+                                std::make_pair("Characters", configSingleton.GetConfig().playerAnimation)},
+                           }});
 }
 
 void Dungeon::createRemotePlayer(const comm::Player& player)
@@ -537,6 +543,7 @@ void Dungeon::setECS()
 {
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
+    gCoordinator.registerComponent<MultiplayerComponent>();
     gCoordinator.registerComponent<SynchronisedEvent>();
     gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<AnimationComponent>();

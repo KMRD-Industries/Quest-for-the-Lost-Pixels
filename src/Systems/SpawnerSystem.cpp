@@ -19,6 +19,7 @@
 #include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TransformComponent.h"
+#include "WeaponComponent.h"
 
 extern PublicConfigSingleton configSingleton;
 
@@ -64,7 +65,11 @@ void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemy
                                 enemyToSpawn.texture_data().tile_layer()};
 
     gCoordinator.addComponents(newMonsterEntity, tileComponent, transformComponent, RenderComponent{},
-                               AnimationComponent{}, EnemyComponent{}, ColliderComponent{collisionData},
+    AnimationComponent{.stateToAnimationLookup = {
+   {AnimationStateMachine::AnimationState::Idle,
+    std::make_pair(enemyConfig.textureData.tileSet, enemyConfig.textureData.id)},
+   {AnimationStateMachine::AnimationState::Dead, std::make_pair("SmokeAnimations", 257)},
+}}, EnemyComponent{}, ColliderComponent{collisionData},
                                CharacterComponent{.hp = static_cast<float>(enemyToSpawn.hp())});
 
     const Entity newEventEntity = gCoordinator.createEntity();
@@ -131,6 +136,7 @@ void SpawnerSystem::spawnEnemies()
     prepareEnemies();
     cleanUpUnnecessarySpawners();
 }
+
 
 void SpawnerSystem::cleanUpUnnecessarySpawners()
 {

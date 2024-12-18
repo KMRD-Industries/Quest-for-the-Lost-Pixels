@@ -10,7 +10,7 @@
 
 struct PublicConfig
 {
-    //Engine settings
+    // Engine settings
     bool debugMode{};
     float gameScale{};
     double meterToPixelRatio{};
@@ -24,37 +24,41 @@ struct PublicConfig
     int enemyFirstEntity{};
     int numberOfEnemyEntities{};
 
-    //Game Settings
+    // Game Settings
     std::string backgroundColor{};
     bool applyKnockback{};
 
-    //Dungeon Settings
+    // Dungeon Settings
     int maxDungeonDepth{};
     glm::vec2 startingPosition{};
     float spawnOffset{};
 
-    //Player Stats
+    // Player Stats
     float playerAttackRange{};
     float playerAttackDamage{};
     float playerAttackAngle{};
+
     uint32_t playerAnimation{};
+    uint32_t playerRunningAnimation{};
+    uint32_t playerDeathAnimation{};
+
     int playerAcc{};
     float maxCharacterHP{};
     float defaultCharacterHP{};
     float invulnerabilityTimeAfterDMG{};
 
-    //Enemy Stats
+    // Enemy Stats
     int enemyAcc{};
     float defaultEnemyKnockbackForce{};
 
-    //Text tag settings
+    // Text tag settings
     int textTagDefaultSize{};
     float textTagDefaultLifetime{};
     float textTagDefaultSpeed{};
     float textTagDefaultAcceleration{};
     int textTagDefaultFadeValue{};
 
-    //Weapon settings
+    // Weapon settings
     int weaponComponentDefaultDamageAmount{};
     bool weaponComponentDefaultIsAttacking{};
     bool weaponComponentDefaultQueuedAttack{};

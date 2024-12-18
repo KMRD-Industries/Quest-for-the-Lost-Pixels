@@ -112,6 +112,9 @@ private:
             config::weaponComponentDefaultRecoilAmount; // Amount of recoil caused by the weapon
         publicConfig.weaponInteractionDistance = config::weaponInteractionDistance; // Weapon interaction distance
 
+        publicConfig.playerRunningAnimation = config::playerRunningAnimation;
+        publicConfig.playerDeathAnimation = config::playerDeathAnimation;
+
         // Health bar settings
         publicConfig.fullHPColor = config::fullHPColor; // Color for full health
         publicConfig.lowHPColor = config::lowHPColor; // Color for low health
@@ -178,6 +181,10 @@ private:
             getOrDefault(j, "playerAttackAngle", config::playerAttackAngle); // Angle of player's attack
         publicConfig.playerAnimation =
             getOrDefault(j, "playerAnimation", config::playerAnimation); // Player's animation index
+        publicConfig.playerRunningAnimation =
+            getOrDefault(j, "playerRunningAnimation", config::playerRunningAnimation); // Player's animation index
+        publicConfig.playerDeathAnimation =
+            getOrDefault(j, "playerDeathAnimation", config::playerDeathAnimation); // Player's animation index
         publicConfig.playerAcc = getOrDefault(j, "playerAcc", config::playerAcc); // Player's acceleration
         publicConfig.maxCharacterHP =
             getOrDefault(j, "maxCharacterHP", config::maxCharacterHP); // Maximum health points for the player

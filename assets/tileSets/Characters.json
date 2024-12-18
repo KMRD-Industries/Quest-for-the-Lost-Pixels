@@ -13,15 +13,15 @@
          "animation":[
                 {
                  "duration":80,
+                 "tileid":187
+                }, 
+                {
+                 "duration":80,
                  "tileid":188
                 }, 
                 {
                  "duration":80,
                  "tileid":189
-                }, 
-                {
-                 "duration":80,
-                 "tileid":190
                 }],
          "id":184,
          "objectgroup":
@@ -102,7 +102,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -119,8 +118,8 @@
                      "type":"",
                      "visible":true,
                      "width":12.5,
-                     "x":3.47727272727273,
-                     "y":24.8636377272727
+                     "x":3.5,
+                     "y":25
                     }, 
                     {
                      "height":1,
@@ -200,7 +199,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -217,8 +215,8 @@
                      "type":"",
                      "visible":true,
                      "width":12.5,
-                     "x":1,
-                     "y":26.3181831818182
+                     "x":3.5,
+                     "y":25
                     }, 
                     {
                      "height":1,
@@ -298,7 +296,6 @@
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
@@ -315,8 +312,8 @@
                      "type":"",
                      "visible":true,
                      "width":12.5,
-                     "x":3.47727272727273,
-                     "y":24.3181831818182
+                     "x":3.5,
+                     "y":25
                     }, 
                     {
                      "height":1,
@@ -359,7 +356,7 @@
                      "type":"WeaponPlacement",
                      "visible":true,
                      "width":1,
-                     "x":7,
+                     "x":8,
                      "y":26.5
                     }, 
                     {
@@ -413,8 +410,8 @@
                      "type":"",
                      "visible":true,
                      "width":12.5,
-                     "x":3.20454545454545,
-                     "y":22.2272740909091
+                     "x":3.5,
+                     "y":25
                     }, 
                     {
                      "height":1,
@@ -511,8 +508,8 @@
                      "type":"",
                      "visible":true,
                      "width":12.5,
-                     "x":3.20454545454545,
-                     "y":21.4090922727273
+                     "x":3.5,
+                     "y":25
                     }, 
                     {
                      "height":1,
@@ -609,8 +606,8 @@
                      "type":"",
                      "visible":true,
                      "width":12.5,
-                     "x":3.20454545454546,
-                     "y":22.8636377272727
+                     "x":3.5,
+                     "y":25
                     }, 
                     {
                      "height":1,
@@ -625,7 +622,7 @@
                             {
                              "name":"tileID",
                              "type":"string",
-                             "value":"189"
+                             "value":"190"
                             }],
                      "rotation":0,
                      "type":"HelmetPlacement",
@@ -690,6 +687,7 @@
          "objectgroup":
             {
              "draworder":"index",
+             "id":2,
              "name":"",
              "objects":[
                     {
@@ -706,8 +704,74 @@
                      "type":"",
                      "visible":true,
                      "width":12.5,
-                     "x":3.38636363636364,
-                     "y":25.4090922727273
+                     "x":3.5,
+                     "y":25
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"helmetPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"191"
+                            }],
+                     "rotation":0,
+                     "type":"HelmetPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":9,
+                     "y":18
+                    }, 
+                    {
+                     "height":1,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"bodyArmourPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"191"
+                            }],
+                     "rotation":0,
+                     "type":"BodyArmourPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":26
+                    }, 
+                    {
+                     "height":1,
+                     "id":4,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"191"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":27
                     }],
              "opacity":1,
              "type":"objectgroup",
@@ -750,18 +814,90 @@
         {
          "animation":[
                 {
-                 "duration":80,
-                 "tileid":184
+                 "duration":100,
+                 "tileid":185
                 }, 
                 {
-                 "duration":80,
+                 "duration":100,
                  "tileid":186
                 }, 
                 {
-                 "duration":80,
+                 "duration":100,
                  "tileid":187
                 }],
-         "id":242
+         "id":242,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":7,
+                     "id":1,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"36",
+                             "type":"string",
+                             "value":"242"
+                            }],
+                     "rotation":0,
+                     "type":"Collision",
+                     "visible":true,
+                     "width":13,
+                     "x":3,
+                     "y":23
+                    }, 
+                    {
+                     "height":1,
+                     "id":2,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"242"
+                            }, 
+                            {
+                             "name":"weaponPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }],
+                     "rotation":0,
+                     "type":"WeaponPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":8,
+                     "y":26
+                    }, 
+                    {
+                     "height":1,
+                     "id":3,
+                     "name":"",
+                     "properties":[
+                            {
+                             "name":"helmetPlacement",
+                             "type":"string",
+                             "value":"true"
+                            }, 
+                            {
+                             "name":"tileID",
+                             "type":"string",
+                             "value":"242"
+                            }],
+                     "rotation":0,
+                     "type":"HelmetPlacement",
+                     "visible":true,
+                     "width":1,
+                     "x":9,
+                     "y":15
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
         }],
  "tilewidth":16,
  "type":"tileset",

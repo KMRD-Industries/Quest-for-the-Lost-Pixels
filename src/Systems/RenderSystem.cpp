@@ -47,7 +47,7 @@ RenderSystem::RenderSystem()
     camera = Camera{{0.f, 0.f}, {0.f, 0.f}};
 }
 
-void RenderSystem::draw(sf::RenderTexture& window)
+void RenderSystem::draw(sf::RenderWindow& window)
 {
     clearSpriteArray(); // Perform pre-draw cleaning
     std::deque<Entity> entityToRemoveDirtyComponent;
@@ -502,7 +502,7 @@ void RenderSystem::displayDamageTaken(const Entity entity)
     }
 }
 
-void RenderSystem::displayPlayerStatsTable(const sf::RenderTexture& window, const Entity entity) const
+void RenderSystem::displayPlayerStatsTable(const sf::RenderWindow& window, const Entity entity) const
 {
     ImGui::SetNextWindowPos(ImVec2(static_cast<float>(window.getSize().x) - 300, 370), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(270, 0), ImGuiCond_Always); // Set the width to 250, height is auto
@@ -532,7 +532,7 @@ void RenderSystem::displayPlayerStatsTable(const sf::RenderTexture& window, cons
     ImGui::End();
 }
 
-void RenderSystem::displayWeaponStatsTable(const sf::RenderTexture& window, const Entity entity)
+void RenderSystem::displayWeaponStatsTable(const sf::RenderWindow& window, const Entity entity)
 {
     const auto& equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
     if (!equipment.slots.contains(GameType::slotType::WEAPON)) return;
@@ -582,7 +582,7 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderTexture& window, cons
     ImGui::End();
 }
 
-void RenderSystem::debugBoundingBoxes(sf::RenderTexture& window)
+void RenderSystem::debugBoundingBoxes(sf::RenderWindow& window)
 {
     if (!gCoordinator.hasComponent<RenderComponent>(config::playerEntity)) return;
 

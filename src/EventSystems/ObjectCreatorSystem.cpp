@@ -61,12 +61,12 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
         objectPosition.x = convertPixelsToMeters(
             transformComponent.position.x -
             (spriteBounds.width / 2.f - (colliderComponent.collision.x + colliderComponent.collision.width / 2.f)) *
-                configSingleton.GetConfig().gameScale);
+            configSingleton.GetConfig().gameScale);
 
         objectPosition.y = convertPixelsToMeters(
             transformComponent.position.y -
             (spriteBounds.height / 2 - (colliderComponent.collision.y + colliderComponent.collision.height / 2)) *
-                configSingleton.GetConfig().gameScale);
+            configSingleton.GetConfig().gameScale);
     }
 
     bodyDef.position.Set(objectPosition.x, objectPosition.y);
