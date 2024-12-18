@@ -163,6 +163,7 @@ set(UTILS
         Utils/GameUtility.h
         Core/ServerEntityManager.cpp
         Core/ServerEntityManager.h
+        Utils/Camera.h
 )
 
 set(MENU_STATE_MACHINE

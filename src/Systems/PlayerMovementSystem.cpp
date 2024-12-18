@@ -86,11 +86,8 @@ void PlayerMovementSystem::handleMovement()
         if (auto* weaponComponent = gCoordinator.tryGetComponent<WeaponComponent>(weaponEntity))
         {
             auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
-            auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
 
             weaponComponent->pivotPoint = inputHandler->getMousePosition();
-            weaponRenderComponent.dirty = true;
-
             transformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f, transformComponent.scale.y};
             weaponTransformComponent.scale = {weaponComponent->targetPoint.x <= 0 ? -1.f : 1.f,
                                               weaponTransformComponent.scale.y};

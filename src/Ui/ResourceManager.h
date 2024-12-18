@@ -4,6 +4,7 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <memory>

@@ -1,7 +1,10 @@
 #include "RenderSystem.h"
+#include <DirtyFlagComponent.h>
 #include <EnemySystem.h>
 #include <EquipmentComponent.h>
+#include <SFML/System/Vector2.hpp>
 #include <string>
+#include "Camera.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CollisionSystem.h"
@@ -10,111 +13,314 @@
 #include "GameUtility.h"
 #include "Helpers.h"
 #include "ItemComponent.h"
+#include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
+#include "PublicConfigMenager.h"
 #include "RenderComponent.h"
+#include "SFML/Graphics/CircleShape.hpp"
+#include "SFML/Graphics/ConvexShape.hpp"
+#include "SFML/Graphics/RenderWindow.hpp"
 #include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TileComponent.h"
 #include "TransformComponent.h"
 #include "WeaponComponent.h"
 #include "imgui.h"
-#include "SFML/Graphics/CircleShape.hpp"
-#include "SFML/Graphics/ConvexShape.hpp"
-#include "SFML/Graphics/RenderWindow.hpp"
 
 extern Coordinator gCoordinator;
 extern PublicConfigSingleton configSingleton;
 
-RenderSystem::RenderSystem() { portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getTile("portal", 0); }
+using LayerVertexArray = std::unordered_map<sf::Texture*, sf::VertexArray>;
+
+RenderSystem::RenderSystem()
+{
+    // Initialize vector of map layers
+    m_layeredTextureVertexArrays = std::vector<LayerVertexArray>(configSingleton.GetConfig().maximumNumberOfLayers);
+    m_vecSpriteArray = std::vector(configSingleton.GetConfig().maximumNumberOfLayers, std::vector<sf::Sprite*>{});
+    m_entityToVertexArrayIndex = std::vector<unsigned long>(MAX_ENTITIES, -1);
+
+    // Load spacial sprites
+    portalSprite = gCoordinator.getRegisterSystem<TextureSystem>()->getSprite("portal", 0);
+
+    // Load camera
+    camera = Camera{{0.f, 0.f}, {0.f, 0.f}};
+}
 
 void RenderSystem::draw(sf::RenderTexture& window)
 {
-    clear(window);
-    const sf::Vector2f oldMapOffset = {GameUtility::mapOffset};
+    clearSpriteArray(); // Perform pre-draw cleaning
+    std::deque<Entity> entityToRemoveDirtyComponent;
 
     for (const auto entity : m_entities)
     {
-        if (gCoordinator.hasComponent<PlayerComponent>(entity))
-            players.push_back(entity);
+        if (gCoordinator.hasComponent<PlayerComponent>(entity)) players.insert(entity);
+        if (gCoordinator.hasComponent<PassageComponent>(entity)) specialObjects.insert(entity);
 
         auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-        auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
-        GameUtility::mapOffset.x = std::max(GameUtility::mapOffset.x, transformComponent.position.x);
-        GameUtility::mapOffset.y = std::max(GameUtility::mapOffset.y, transformComponent.position.y);
+        // Static map objects won't be updated frequently, so we will remove their DirtyComponent.
+        // This will exclude this entity from consideration in the next for loop,
+        // improving performance while still keeping the sprite data in the VertexArrays.
+        // To update using updateQuad, a DirtyFlagComponent needs to be added to the entity.
 
-        if (renderComponent.dirty)
+        if (renderComponent.staticMapTile)
+        {
+            updateQuad(entity);
+            entityToRemoveDirtyComponent.push_back(entity);
+        }
+        else
+        {
             updateSprite(entity);
+        }
     }
 
-    // Update player related sprites
+    updateCamera(camera, getPosition(config::playerEntity), window); // Update camera
+
+    // Remove DirtyFlagComponent from static entities
+    for (const auto entity : entityToRemoveDirtyComponent)
+    {
+        gCoordinator.removeComponent<DirtyFlagComponent>(entity);
+    }
+
+    // Update special objects rendering (passages etc.)
+    for (const auto entity : specialObjects)
+    {
+        displayPortal(entity);
+    }
+
+    // Update specific player related rendering features
     for (const auto player : players)
+    {
         updatePlayerSprite(player);
+    }
 
-    GameUtility::mapOffset = (static_cast<sf::Vector2f>(windowSize) - GameUtility::mapOffset) * 0.5f;
+    window.setView(camera.getView());
 
-    for (auto& layer : tiles)
-        for (auto& [sprite, isDirty] : layer)
-        {
-            if (*isDirty == true)
-                sprite->setPosition({sprite->getPosition() + GameUtility::mapOffset});
-            window.draw(*sprite);
-            *isDirty = oldMapOffset != GameUtility::mapOffset;
-        }
+    // Render layers in order. Newer layers are rendered on top of the previous ones.
+    for (int i = 0; i < configSingleton.GetConfig().maximumNumberOfLayers; i++)
+    {
+        for (const auto& [texture, vertexArray] : m_layeredTextureVertexArrays[i]) window.draw(vertexArray, texture);
+        for (const auto& sprite : m_vecSpriteArray[i]) window.draw(*sprite);
+    }
 
-    if (configSingleton.GetConfig().debugMode)
-        debugBoundingBoxes(window);
+    if (configSingleton.GetConfig().debugMode) debugBoundingBoxes(window);
+}
+
+/**
+ * Update camera to handle displaying map within boundaries.
+ * */
+void RenderSystem::updateCamera(Camera& camera, const sf::Vector2f targetPos, const sf::RenderTexture& window)
+{
+    windowSize = window.getSize();
+    sf::Vector2f halfView = static_cast<sf::Vector2f>(window.getSize()) * 2.f;
+
+    // Calculate half of map size
+    halfView.x = static_cast<float>(windowSize.x) / 2;
+    halfView.y = static_cast<float>(windowSize.y) / 2;
+
+    if (GameUtility::mapWidth < windowSize.x && GameUtility::mapHeight < windowSize.y)
+    {
+        sf::Vector2u mapDimensions;
+        mapDimensions.x = static_cast<int>(GameUtility::mapWidth);
+        mapDimensions.y = static_cast<int>(GameUtility::mapHeight);
+
+        camera.setSize(windowSize);
+        camera.setPosition(static_cast<sf::Vector2f>(mapDimensions) / 2.f);
+        return;
+    }
+
+
+    // Clamp the camera position to ensure it stays within the boundaries of the map.
+    // This prevents the camera from moving too far to the left or right,
+    // without exposing empty space - outsides of map.
+
+    const float clampedX = std::clamp(targetPos.x, halfView.x, GameUtility::mapWidth - halfView.x);
+    const float clampedY = std::clamp(targetPos.y, halfView.y, GameUtility::mapHeight - halfView.y);
+    camera.setPosition({clampedX, clampedY});
+
+    // camera.setPosition(targetPos);
+
+    // Set camera size to match window size
+    camera.setSize(windowSize);
+}
+
+/**
+ * Clear static map objects
+ * */
+void RenderSystem::clearMap()
+{
+    for (auto& layer : m_vecSpriteArray) layer.clear();
+
+    for (auto& layer : m_layeredTextureVertexArrays)
+    {
+        for (auto& pair : layer) pair.second.clear(); // Clear each VertexArray
+        layer.clear();
+    }
+
+    specialObjects.clear();
+
+    // Fill with known invalid state
+    for (auto& value : m_entityToVertexArrayIndex) value = -1;
+
+    camera.setSize({});
+    camera.setPosition({});
+    GameUtility::mapHeight = {};
+    GameUtility::mapWidth = {};
+}
+
+/**
+ * Rendering of scene is divided for sf::Sprite and sf::VertexArray
+ * sf::VertexArray: Used for rendering static map objects that don't require transformations.
+ * VertexArray can render multiple static elements in a single draw call.
+ *
+ * How this work:
+ *  Vertex array is created for each texture - per layer. Then VertexArray is populated with sf::Quad (4 vertices)
+ *  for each tile rendered in that layer with that texture. Each sf::Quad consists of position in rendered window and
+ *  a rectangle representing part of the texture rendered.
+ *
+ *  This will make RenderSystem call draw() at MAX_NUMBER_OF_LAYERS * MAX_NUMBER_OF_LAYERS at most to render whole
+ *  window instead of calling draw(sprite) for each entity.
+ *
+ * */
+void RenderSystem::updateQuad(const Entity entity)
+{
+    // All necessary components
+    auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+    const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+
+    // Retrieve the VertexArray for the texture in the specified layer (TileComponent.layer)
+    // If it doesn't exist, create a new one of type sf::Quads.
+    auto [iterator, inserted] = m_layeredTextureVertexArrays[tileComponent.layer].try_emplace(
+        renderComponent.texture, sf::VertexArray(sf::Quads));
+
+    sf::VertexArray* vertexArray = &iterator->second;
+
+    // To speed up computation, render system contains mapping [Entity, vertexArrayIndex].
+    // This helps with getting verticals related to each Entity.
+    unsigned long vertexArrayIndex{};
+
+    // Check if entity already contains valid vertexes
+    if (m_entityToVertexArrayIndex[entity] <= 0 || m_entityToVertexArrayIndex[entity] >= MAX_ENTITIES)
+    {
+        // Add new mapping and resize VertexArray to make place for new Tile Vertexes
+        const size_t currentCount = vertexArray->getVertexCount();
+        m_entityToVertexArrayIndex[entity] = currentCount;
+        vertexArray->resize(currentCount + 4);
+        vertexArrayIndex = currentCount;
+    }
+    else
+    {
+        // Get index of first Vertex related with entity
+        vertexArrayIndex = m_entityToVertexArrayIndex[entity];
+    }
+
+    // To synchronize rendering using VertexArrays with one using Sprites will need texture size.
+    const sf::Vector2f texSize = renderComponent.vertexArray[3].texCoords - renderComponent.vertexArray[1].texCoords;
+    sf::Vector2f collisionOffset = getOrigin(entity);
+    collisionOffset.y *= -1;
+
+    const sf::Vector2f position = getPosition(entity);
+
+    // The map size is described by the bottom-right element's position.
+    GameUtility::mapWidth = std::max(GameUtility::mapWidth, position.x);
+    GameUtility::mapHeight = std::max(GameUtility::mapHeight, position.y);
+
+    // Ensure vertexArray not null
+    if (vertexArray == nullptr) return;
+
+    // Rotation in Vertex Arrays is handled by flipping texture coordinates.
+    // For example, a base `sprite` is represented by 4 coordinates in a given texture:
+    // [0] = (x_0, y_0 + height),
+    // [1] = (x_0 + width, y_0 + height)
+    // [2] = (x_0 + width, y_0)
+    // [3] = (x_0, y_0)
+    //
+    // A 90-degree rotation is handled by modifying the indexes of texture coordinates:
+    // [(0 + 1)%4] = (x_0, y_0 + height)                -> [0] = (x_0, y_0)
+    // [(1 + 1)%4] = (x_0 + width, y_0 + height)        -> [1] = (x_0, y_0 + height),
+    // [(2 + 1)%4] = (x_0 + width, y_0)                 -> [2] = (x_0 + width, y_0 + height)
+    // [(3 + 1)%4] = (x_0, y_0)                         -> [3] = (x_0 + width, y_0)
+    // You get the point - the top-left edge is represented by the top-right in texture, the top-right by the
+    // bottom-right. As a result, the displayed texture is rotated.
+
+    const int rotationTexIndexes = static_cast<int>(getRotation(entity) / 90.f);
+
+    for (int i = 0; i < 4; i++)
+    {
+        // This is to calculate edge position of `sprite` in sf::Texture*
+        // [0] = (0, height),
+        // [1] = (width, height)
+        // [2] = (width, 0)
+        // [3] = (0, 0)
+        sf::Vector2f offset = renderComponent.vertexArray[i].texCoords - renderComponent.vertexArray[3].texCoords;
+
+        // Since in our game [0,0] is top-left we need adjust texture positioning.
+        // In texture coords top-left is represented by [0, height]
+        // This code will make sure that [0, 0] will be top-left edge
+        offset.y = std::abs(offset.y - texSize.y);
+
+        // Adjust tile position
+        sf::Vector2f transformedPos = position + (offset + collisionOffset) * configSingleton.GetConfig().gameScale;
+
+        // Save position, texture, color
+        auto& vertex = (*vertexArray)[vertexArrayIndex + i];
+
+        vertex.position = transformedPos + texSize * configSingleton.GetConfig().gameScale;
+        vertex.texCoords = renderComponent.vertexArray[(i + rotationTexIndexes) % 4].texCoords;
+        vertex.color = renderComponent.color;
+    }
+
+    // Similar to rotation handling - vertical and horizontal flip is being made with swapping indexes of VertexArray
+
+    if (transformComponent.scale.x < 0) // Horizontal Flip
+    {
+        std::swap((*vertexArray)[vertexArrayIndex + 0].texCoords.x, (*vertexArray)[vertexArrayIndex + 1].texCoords.x);
+        std::swap((*vertexArray)[vertexArrayIndex + 2].texCoords.x, (*vertexArray)[vertexArrayIndex + 3].texCoords.x);
+    }
+
+    if (transformComponent.scale.y < 0) // Vertical Flip
+    {
+        std::swap((*vertexArray)[vertexArrayIndex + 0].texCoords.y, (*vertexArray)[vertexArrayIndex + 3].texCoords.y);
+        std::swap((*vertexArray)[vertexArrayIndex + 1].texCoords.y, (*vertexArray)[vertexArrayIndex + 2].texCoords.y);
+    }
 }
 
 void RenderSystem::updateSprite(const Entity entity)
 {
+    // All necessary components
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-    const auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
+    auto& tileComponent = gCoordinator.getComponent<TileComponent>(entity);
 
-    // Set sprite
     renderComponent.sprite.setPosition(getPosition(entity));
     renderComponent.sprite.setOrigin(getOrigin(entity));
     renderComponent.sprite.setColor(renderComponent.color);
     renderComponent.sprite.setScale(getScale(entity));
     renderComponent.sprite.setRotation(getRotation(entity));
-
     renderComponent.color = sf::Color::White;
 
     displayDamageTaken(entity);
-    displayPortal(entity);
 
-    if (gCoordinator.hasComponent<ItemComponent>(entity))
-    {
-        if (gCoordinator.getComponent<ItemComponent>(entity).equipped == false)
-            renderComponent.layer = 4;
-    }
-
-    if (tileComponent.tileSet == "SpecialBlocks" && configSingleton.GetConfig().debugMode)
-        tiles[renderComponent.layer + 2].emplace_back(&renderComponent.sprite, &renderComponent.dirty);
-    else
-        tiles[renderComponent.layer].emplace_back(&renderComponent.sprite, &renderComponent.dirty);
+    m_vecSpriteArray[tileComponent.layer].push_back(&renderComponent.sprite);
 }
 
-void RenderSystem::clear(const sf::RenderTexture& window)
+void RenderSystem::clearSpriteArray()
 {
-    if (tiles.empty())
-        tiles.resize(configSingleton.GetConfig().maximumNumberOfLayers);
-    for (auto& layer : tiles)
-        layer.clear();
+    if (m_vecSpriteArray.empty()) m_vecSpriteArray.resize(configSingleton.GetConfig().maximumNumberOfLayers);
+    for (auto& layer : m_vecSpriteArray) layer.clear();
+
     players.clear();
-    windowSize = window.getSize();
-    newMapOffset = {};
 }
 
 void RenderSystem::updatePlayerSprite(const Entity entity) { setEquipment(entity); }
 
 void RenderSystem::setEquipment(const Entity entity)
 {
-    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(entity);
+    const auto& [equipment] = gCoordinator.getComponent<EquipmentComponent>(config::playerEntity);
 
     auto& playerRenderComponent = gCoordinator.getComponent<RenderComponent>(entity);
-    auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+    auto& playerColliderComponent = gCoordinator.getComponent<ColliderComponent>(config::playerEntity);
 
     for (const auto it : equipment)
     {
@@ -130,29 +336,27 @@ void RenderSystem::setEquipment(const Entity entity)
         switch (it.first)
         {
         case GameType::slotType::BODY_ARMOUR:
-        {
-            itemPlacement = &itemCollisionComponent.bodyArmourPlacement;
-            itemPivot = &playerColliderComponent.bodyArmourPlacement;
-            break;
-        }
+            {
+                itemPlacement = &itemCollisionComponent.bodyArmourPlacement;
+                itemPivot = &playerColliderComponent.bodyArmourPlacement;
+                break;
+            }
         case GameType::slotType::WEAPON:
-        {
-            itemPlacement = &itemCollisionComponent.weaponPlacement;
-            itemPivot = &playerColliderComponent.weaponPlacement;
-            break;
-        }
+            {
+                itemPlacement = &itemCollisionComponent.weaponPlacement;
+                itemPivot = &playerColliderComponent.weaponPlacement;
+                break;
+            }
         case GameType::slotType::HELMET:
-        {
-            itemPlacement = &itemCollisionComponent.helmetPlacement;
-            itemPivot = &playerColliderComponent.helmetPlacement;
-            break;
-        }
+            {
+                itemPlacement = &itemCollisionComponent.helmetPlacement;
+                itemPivot = &playerColliderComponent.helmetPlacement;
+                break;
+            }
         }
 
-        if (!(itemPivot && itemPlacement))
-            return;
-        if (reversed)
-            reverseDisplay(*itemPivot, *itemPlacement);
+        if (!(itemPivot && itemPlacement)) return;
+        if (reversed) reverseDisplay(*itemPivot, *itemPlacement);
 
         auto itemOrigin = getEquippedItemOrigin(*itemPlacement);
         auto itemPosition = getEquippedItemPosition(*itemPivot, *itemPlacement, playerRenderComponent);
@@ -254,38 +458,37 @@ float RenderSystem::getRotation(const Entity entity)
 void RenderSystem::displayPortal(const Entity entity)
 {
     const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
+    const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
 
     if (gCoordinator.hasComponent<PassageComponent>(entity) && !gCoordinator.hasComponent<PlayerComponent>(entity))
     {
         if (!gCoordinator.getComponent<PassageComponent>(entity).activePassage) return;
 
         sf::Vector2f portalPosition = {};
-        portalPosition.x = renderComponent.sprite.getPosition().x - renderComponent.sprite.getLocalBounds().width -
-            9 * configSingleton.GetConfig().gameScale;
-        portalPosition.y = renderComponent.sprite.getPosition().y - renderComponent.sprite.getLocalBounds().height -
-            8 * configSingleton.GetConfig().gameScale;
+        portalPosition.x = transformComponent.position.x -
+            portalSprite.getGlobalBounds().width * configSingleton.GetConfig().gameScale / 2;
+        portalPosition.y = transformComponent.position.y -
+            portalSprite.getGlobalBounds().width * configSingleton.GetConfig().gameScale / 2;
+        ;
 
         sf::Sprite portalSpriteCopy = portalSprite;
 
         portalSpriteCopy.setPosition(portalPosition);
-        portalSpriteCopy.setScale(renderComponent.sprite.getScale());
-
-        tiles[3].emplace_back(new sf::Sprite(portalSpriteCopy), new bool(true));
+        portalSpriteCopy.setScale(configSingleton.GetConfig().gameScale, configSingleton.GetConfig().gameScale);
+        m_vecSpriteArray[5].push_back(new sf::Sprite(portalSpriteCopy));
     }
 }
 
 void RenderSystem::displayDamageTaken(const Entity entity)
 {
-    if (!gCoordinator.hasComponent<CharacterComponent>(entity))
-        return;
+    if (!gCoordinator.hasComponent<CharacterComponent>(entity)) return;
 
     auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
     auto& renderComponent = gCoordinator.getComponent<RenderComponent>(entity);
 
     if (!characterComponent.attacked)
     {
-        if (!gCoordinator.hasComponent<WeaponComponent>(entity))
-            renderComponent.sprite.setColor(sf::Color::White);
+        if (!gCoordinator.hasComponent<WeaponComponent>(entity)) renderComponent.sprite.setColor(sf::Color::White);
     }
     else
     {
@@ -332,8 +535,7 @@ void RenderSystem::displayPlayerStatsTable(const sf::RenderTexture& window, cons
 void RenderSystem::displayWeaponStatsTable(const sf::RenderTexture& window, const Entity entity)
 {
     const auto& equipment = gCoordinator.getComponent<EquipmentComponent>(entity);
-    if (!equipment.slots.contains(GameType::slotType::WEAPON))
-        return;
+    if (!equipment.slots.contains(GameType::slotType::WEAPON)) return;
 
     const auto& weapon = gCoordinator.getComponent<WeaponComponent>(equipment.slots.at(GameType::slotType::WEAPON));
 
@@ -382,8 +584,7 @@ void RenderSystem::displayWeaponStatsTable(const sf::RenderTexture& window, cons
 
 void RenderSystem::debugBoundingBoxes(sf::RenderTexture& window)
 {
-    if (!gCoordinator.hasComponent<RenderComponent>(config::playerEntity))
-        return;
+    if (!gCoordinator.hasComponent<RenderComponent>(config::playerEntity)) return;
 
     auto renderComponent = gCoordinator.getComponent<RenderComponent>(config::playerEntity);
     auto tileComponent = gCoordinator.getComponent<TileComponent>(config::playerEntity);
@@ -436,8 +637,9 @@ void RenderSystem::debugBoundingBoxes(sf::RenderTexture& window)
             !gCoordinator.hasComponent<RenderComponent>(entity))
             continue;
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<EnemyComponent>(entity) ||
-            gCoordinator.hasComponent<WeaponComponent>(entity))
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
+            gCoordinator.hasComponent<MultiplayerComponent>(entity) ||
+            gCoordinator.hasComponent<EnemyComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
             drawSprite(entity);
 
         if (gCoordinator.hasComponent<EquipmentComponent>(entity))
@@ -446,30 +648,27 @@ void RenderSystem::debugBoundingBoxes(sf::RenderTexture& window)
             displayPlayerStatsTable(window, entity);
         }
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity))
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) && gCoordinator.hasComponent<EquipmentComponent>(entity))
         {
-            const auto& weaponComponent = gCoordinator.getComponent<EquipmentComponent>(entity);
-            const auto& transformComponent = gCoordinator.getComponent<TransformComponent>(entity);
+            auto& weaponComponent = gCoordinator.getComponent<EquipmentComponent>(entity);
 
             sf::VertexArray swordLine(sf::Lines, 2);
-            swordLine[0].position = transformComponent.position + GameUtility::mapOffset;
+            swordLine[0].position = center;
             swordLine[0].color = sf::Color::Red;
             swordLine[1].position =
                 gCoordinator.getComponent<WeaponComponent>(weaponComponent.slots.at(GameType::slotType::WEAPON))
-                            .pivotPoint;
+                    .pivotPoint;
             swordLine[1].color = sf::Color::Blue;
             window.draw(swordLine);
         }
 
         const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
 
-        if (colliderComponent.body == nullptr)
-            continue;
+        if (colliderComponent.body == nullptr) continue;
 
         for (b2Fixture* fixture = colliderComponent.body->GetFixtureList(); fixture; fixture = fixture->GetNext())
         {
-            if (fixture->GetShape() == nullptr)
-                return;
+            if (fixture->GetShape() == nullptr) return;
 
             b2Shape* shape = fixture->GetShape();
             if (shape->GetType() == b2Shape::e_polygon)
@@ -489,11 +688,11 @@ void RenderSystem::debugBoundingBoxes(sf::RenderTexture& window)
                 convex.setOutlineThickness(1.f);
                 convex.setOutlineColor(sf::Color::Green);
                 convex.setPosition(colliderComponent.body->GetPosition().x *
-                                   static_cast<float>(configSingleton.GetConfig().meterToPixelRatio) +
-                                   GameUtility::mapOffset.x,
+                                           static_cast<float>(configSingleton.GetConfig().meterToPixelRatio) +
+                                       GameUtility::mapOffset.x,
                                    colliderComponent.body->GetPosition().y *
-                                   static_cast<float>(configSingleton.GetConfig().meterToPixelRatio) +
-                                   GameUtility::mapOffset.y);
+                                           static_cast<float>(configSingleton.GetConfig().meterToPixelRatio) +
+                                       GameUtility::mapOffset.y);
 
                 convex.setRotation(colliderComponent.body->GetAngle() * 180 / b2_pi);
                 window.draw(convex);

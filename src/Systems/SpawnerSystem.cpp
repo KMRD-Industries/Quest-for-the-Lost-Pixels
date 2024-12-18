@@ -1,4 +1,6 @@
 #include "SpawnerSystem.h"
+
+#include <DirtyFlagComponent.h>
 #include <regex>
 #include "AnimationComponent.h"
 #include "CharacterComponent.h"
