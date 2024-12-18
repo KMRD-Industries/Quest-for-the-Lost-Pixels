@@ -29,6 +29,9 @@ struct SynchronisedEvent
         LEVEL_CHANGED,
         PLAYER_MOVED,
         PLAYER_ATTACKED,
+        ROOM_DIMENSIONS_CHANGED,
+        ENEMY_GOT_HIT,
+        SEND_SPAWNERS_POSITIONS,
     };
 
     UpdateType updateType = UpdateType::STATE;
@@ -38,4 +41,5 @@ struct SynchronisedEvent
     Entity updatedEntity = 0;
     std::optional<GameType::PickUpInfo> pickUpInfo = std::nullopt;
     std::optional<glm::ivec2> room = std::nullopt;
+    std::optional<ObstacleData> obstacleData{};
 };

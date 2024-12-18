@@ -279,10 +279,11 @@
          "objectgroup":
             {
              "draworder":"index",
+             "id":2,
              "name":"",
              "objects":[
                     {
-                     "height":8.5227,
+                     "height":6,
                      "id":1,
                      "name":"",
                      "properties":[
@@ -294,9 +295,9 @@
                      "rotation":0,
                      "type":"",
                      "visible":true,
-                     "width":16.375,
-                     "x":8.5625,
-                     "y":13.23865
+                     "width":11,
+                     "x":10.5,
+                     "y":13
                     }],
              "opacity":1,
              "type":"objectgroup",

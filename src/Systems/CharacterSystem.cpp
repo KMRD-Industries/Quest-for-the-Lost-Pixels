@@ -1,6 +1,7 @@
 #include "CharacterSystem.h"
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
+#include "Config.h"
 #include "Coordinator.h"
 
 extern Coordinator gCoordinator;
@@ -17,6 +18,7 @@ void CharacterSystem::cleanUpDeadEntities() const
 
     for (const auto entity : m_entities)
     {
+        if (entity == config::playerEntity) continue;
         const auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
         if (characterComponent.hp > 0) continue;
 

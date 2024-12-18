@@ -92,7 +92,9 @@ void CollisionSystem::createMapCollision()
         else
         {
             if (colliderComponent.collision.width > 0 && colliderComponent.collision.height > 0)
+            {
                 createCollisionBody(entity, "Wall", true, false);
+            }
         }
     }
 }

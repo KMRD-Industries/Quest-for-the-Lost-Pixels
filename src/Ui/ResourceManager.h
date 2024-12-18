@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 #include "GameTypes.h"
 
