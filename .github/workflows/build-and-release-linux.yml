@@ -75,8 +75,8 @@ jobs:
           cat > $APP_DIR/qlp.desktop <<EOL
           [Desktop Entry]
           Type=Application
-          Name=APP-TEST
-          Exec=app
+          Name=QLP-client
+          Exec=$(basename $BINARY_PATH)
           Icon=icon
           Categories=Game;
           EOL
@@ -91,11 +91,11 @@ jobs:
 
           chmod +x $APP_DIR/AppRun
 
-          ./$APPIMAGE_TOOL $APP_DIR "qlp.AppImage"
+          ./$APPIMAGE_TOOL $APP_DIR qlp.AppImage
 
       - name: Zip Outputs
         run: |
-          zip -r output.zip qlp.AppImage assets
+          zip -r output.zip qlp.AppImage $BINARY_PATH assets
 
       - name: Upload Linux Artifacts
         uses: actions/upload-release-asset@v1
