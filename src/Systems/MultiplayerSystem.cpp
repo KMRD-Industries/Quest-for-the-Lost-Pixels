@@ -54,6 +54,8 @@ void MultiplayerSystem::setup(const std::string_view& ip, const std::string_view
         tcp::resolver tcp_resolver(m_io_context);
         tcp::resolver::results_type tcp_endpoints = tcp_resolver.resolve(ip, port);
 
+        std::cout << ip << " " << port << "\n";
+
         m_udp_socket.connect(*udp_endpoints.begin());
         m_tcp_socket.async_connect(*tcp_endpoints.begin(),
                                    [&](const boost::system::error_code& ec)
@@ -236,7 +238,9 @@ void MultiplayerSystem::pollState()
         case comm::SPAWN_ENEMY_REQUEST:
             gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnOnDemand(m_state);
             break;
-        default: {}
+        default:
+            {
+            }
         }
     }
     else
@@ -296,7 +300,9 @@ void MultiplayerSystem::update(const float deltaTime)
             break;
         case SynchronisedEvent::UpdateType::MOVEMENT:
             movementEvents.push_back(eventEntity);
-        default: {}
+        default:
+            {
+            }
         }
     }
 

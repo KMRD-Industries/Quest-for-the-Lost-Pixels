@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <memory>
 
 #include "GameTypes.h"
 
@@ -78,5 +77,5 @@ private:
     std::unordered_map<video::FragmentShader, std::shared_ptr<sf::Shader>> m_loadedShaders;
     std::unordered_map<std::string, sf::Texture> m_loadedTextures;
     std::unordered_map<std::string, ImFont*> m_loadedFonts;
-    std::string m_serverIp{"127.0.0.1:9001"};
+    std::string m_serverIp{"127.0.0.1:10823"};
 };

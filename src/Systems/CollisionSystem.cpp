@@ -28,18 +28,18 @@ void MyContactListener::BeginContact(b2Contact* contact)
 
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
-        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
-        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entity)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entity)) return;
+        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entity);
+        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entity);
 
         if (!colliderComponentA.onCollisionEnter && !colliderComponentB.onCollisionEnter) return;
 
         if (colliderComponentA.onCollisionEnter)
-            (*colliderComponentA.onCollisionEnter)({bodyBData->entityID, bodyBData->tag});
+            (*colliderComponentA.onCollisionEnter)({bodyBData->entity, bodyBData->tag});
 
         if (colliderComponentB.onCollisionEnter)
-            (*colliderComponentB.onCollisionEnter)({bodyAData->entityID, bodyAData->tag});
+            (*colliderComponentB.onCollisionEnter)({bodyAData->entity, bodyAData->tag});
     }
 }
 
@@ -54,18 +54,18 @@ void MyContactListener::EndContact(b2Contact* contact)
     if (bodyAData != nullptr && bodyBData != nullptr)
     {
         // TODO: Fix weapon collision in other task
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entityID)) return;
-        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entityID)) return;
-        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entityID);
-        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entityID);
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyAData->entity)) return;
+        if (!gCoordinator.hasComponent<ColliderComponent>(bodyBData->entity)) return;
+        const auto& colliderComponentA = gCoordinator.getComponent<ColliderComponent>(bodyAData->entity);
+        const auto& colliderComponentB = gCoordinator.getComponent<ColliderComponent>(bodyBData->entity);
 
         if (!colliderComponentA.onCollisionOut && !colliderComponentB.onCollisionOut) return;
 
         if (colliderComponentA.onCollisionOut)
-            (*colliderComponentA.onCollisionOut)({bodyBData->entityID, bodyBData->tag});
+            (*colliderComponentA.onCollisionOut)({bodyBData->entity, bodyBData->tag});
 
         if (colliderComponentB.onCollisionOut)
-            (*colliderComponentB.onCollisionOut)({bodyAData->entityID, bodyAData->tag});
+            (*colliderComponentB.onCollisionOut)({bodyAData->entity, bodyAData->tag});
     }
 }
 

@@ -19,7 +19,6 @@
 #include "TextTagComponent.h"
 #include "TextureSystem.h"
 #include "TransformComponent.h"
-#include "WeaponComponent.h"
 
 extern PublicConfigSingleton configSingleton;
 
@@ -55,67 +54,75 @@ void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemy
         enemyToSpawn.collision_data().y_offset(), enemyToSpawn.collision_data().width(),
         enemyToSpawn.collision_data().height(),
     };
-    const ColliderComponent colliderComponent{collisionData};
+    const ColliderComponent colliderComponent{.collision = collisionData};
 
-    //TODO temporary solution working perfectly
+    // TODO temporary solution working perfectly
     transformComponent.position.x -= colliderComponent.collision.x * configSingleton.GetConfig().gameScale - 26;
     transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale - 5;
 
-    TileComponent tileComponent{enemyToSpawn.texture_data().tile_id(), enemyToSpawn.texture_data().tile_set(),
-                                enemyToSpawn.texture_data().tile_layer()};
+    TileComponent tileComponent{enemyToSpawn.texture_data().tile_id(), enemyToSpawn.texture_data().tile_set(), 8};
 
-    gCoordinator.addComponents(newMonsterEntity, tileComponent, transformComponent, RenderComponent{},
-    AnimationComponent{.stateToAnimationLookup = {
-   {AnimationStateMachine::AnimationState::Idle,
-    std::make_pair(enemyConfig.textureData.tileSet, enemyConfig.textureData.id)},
-   {AnimationStateMachine::AnimationState::Dead, std::make_pair("SmokeAnimations", 257)},
-}}, EnemyComponent{}, ColliderComponent{collisionData},
-                               CharacterComponent{.hp = static_cast<float>(enemyToSpawn.hp())});
+    gCoordinator.addComponents(
+        newMonsterEntity, tileComponent, transformComponent, RenderComponent{},
+        AnimationComponent{
+            .stateToAnimationLookup =
+                {
+                    {AnimationStateMachine::AnimationState::Idle,
+                     std::make_pair(enemyToSpawn.texture_data().tile_set(), enemyToSpawn.texture_data().tile_id())},
+                    {AnimationStateMachine::AnimationState::Dead, std::make_pair("SmokeAnimations", 257)},
+                }},
+        EnemyComponent{}, ColliderComponent{.collision = collisionData}, DirtyFlagComponent{},
+        CharacterComponent{.hp = static_cast<float>(enemyToSpawn.hp())});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
-    auto newEvent = CreateBodyWithCollisionEvent(
-        newMonsterEntity, "Enemy",
-        [&, newMonsterEntity, enemyToSpawn](const GameType::CollisionData& collision)
+    const auto onCollisionEnter = [&, newMonsterEntity, enemyToSpawn](const GameType::CollisionData& collision)
+    {
+        // if (!std::regex_match(collision.tag, config::playerRegexTag)) return;
+        if (collision.entity != config::playerEntity) return;
+
+        if (!gCoordinator.hasComponent<CharacterComponent>(collision.entity)) return;
+        auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collision.entity)};
+        playerCharacterComponent.attacked = true;
+
+        playerCharacterComponent.hp -= enemyToSpawn.damage();
+        if (playerCharacterComponent.hp <= 0)
         {
-            // if (!std::regex_match(collision.tag, config::playerRegexTag)) return;
-            if (collision.entity != config::playerEntity) return;
+            ResourceManager::getInstance().setCurrentShader(video::FragmentShader::DEATH);
 
-            if (!gCoordinator.hasComponent<CharacterComponent>(collision.entity)) return;
-            auto& playerCharacterComponent{gCoordinator.getComponent<CharacterComponent>(collision.entity)};
-            playerCharacterComponent.attacked = true;
-
-            playerCharacterComponent.hp -= enemyToSpawn.damage();
-            if (playerCharacterComponent.hp <= 0)
-            {
-                ResourceManager::getInstance().setCurrentShader(video::FragmentShader::DEATH);
-
-                const Entity eventEntity = gCoordinator.createEntity();
-                gCoordinator.addComponent(eventEntity,
-                                          SynchronisedEvent{.variant = SynchronisedEvent::Variant::PLAYER_KILLED,
-                                                            .entity = collision.entity});
-            }
-
-            const Entity tag = gCoordinator.createEntity();
-            gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});
+            const Entity eventEntity = gCoordinator.createEntity();
             gCoordinator.addComponent(
-                tag, TransformComponent{gCoordinator.getComponent<TransformComponent>(collision.entity)});
+                eventEntity,
+                SynchronisedEvent{.variant = SynchronisedEvent::Variant::PLAYER_KILLED, .entity = collision.entity});
+        }
 
-            if (!config::applyKnockback) return;
+        const Entity tag = gCoordinator.createEntity();
+        gCoordinator.addComponent(tag, TextTagComponent{.color = sf::Color::Magenta});
+        gCoordinator.addComponent(tag,
+                                  TransformComponent{gCoordinator.getComponent<TransformComponent>(collision.entity)});
 
-            auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collision.entity)};
-            auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
+        if (!config::applyKnockback) return;
 
-            b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -
-                                      myCollisionComponent.body->GetPosition()};
-            knockbackDirection.Normalize();
+        auto& playerCollisionComponent{gCoordinator.getComponent<ColliderComponent>(collision.entity)};
+        auto& myCollisionComponent{gCoordinator.getComponent<ColliderComponent>(newMonsterEntity)};
 
-            const auto knockbackForce{configSingleton.GetConfig().defaultEnemyKnockbackForce * knockbackDirection};
-            playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
-        },
-        [&](const GameType::CollisionData&) {}, false, false);
+        b2Vec2 knockbackDirection{playerCollisionComponent.body->GetPosition() -
+                                  myCollisionComponent.body->GetPosition()};
+        knockbackDirection.Normalize();
 
-    gCoordinator.addComponent(newEventEntity, newEvent);
+        const auto knockbackForce{configSingleton.GetConfig().defaultEnemyKnockbackForce * knockbackDirection};
+        playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
+    };
+
+    const auto newEventComponent = CreateBodyWithCollisionEvent{
+        .entity = newMonsterEntity,
+        .tag = "Enemy",
+        .onCollisionEnter = onCollisionEnter,
+        .onCollisionOut = [this](const GameType::CollisionData&) {}, // collisions handling functions
+        .isStatic = false,
+        .useTextureSize = false};
+
+    gCoordinator.addComponent(newEventEntity, newEventComponent);
 }
 
 void SpawnerSystem::clearSpawners()
@@ -136,7 +143,6 @@ void SpawnerSystem::spawnEnemies()
     prepareEnemies();
     cleanUpUnnecessarySpawners();
 }
-
 
 void SpawnerSystem::cleanUpUnnecessarySpawners()
 {

@@ -1,4 +1,3 @@
-#include "Dungeon.h"
 #include <chrono>
 #include <iostream>
 #include <vector>
@@ -45,9 +44,9 @@
 #include "ItemComponent.h"
 #include "ItemSpawnerSystem.h"
 #include "LootComponent.h"
+#include "LostGameState.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
-#include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
 #include "ObjectCreatorSystem.h"
 #include "PlayerComponent.h"
@@ -91,7 +90,7 @@ void Dungeon::init()
     {
         std::string ip = IP.substr(0, colonPos);
         std::string port = IP.substr(colonPos + 1);
-        m_multiplayerSystem->setup(ip, port);
+        m_multiplayerSystem->setup(ip, "10823");
     }
 
     if (m_multiplayerSystem->isConnected())
@@ -103,7 +102,7 @@ void Dungeon::init()
 
         std::cout << "Connected to server with id: " << m_id << '\n';
 
-        for (const auto& player: initialInfo.connected_players())
+        for (const auto& player : initialInfo.connected_players())
         {
             const uint32_t playerID = player.id();
             createRemotePlayer(player);
@@ -144,15 +143,6 @@ void Dungeon::addPlayerComponents(const Entity player)
     gCoordinator.addComponent(player, RenderComponent{});
     gCoordinator.addComponent(player, DirtyFlagComponent{});
     gCoordinator.addComponent(player, TransformComponent{.position = GameUtility::startingPosition});
-    gCoordinator.addComponent(player, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
-    gCoordinator.addComponent(player, PlayerComponent{});
-    gCoordinator.addComponent(player, ColliderComponent{});
-    gCoordinator.addComponent(player, InventoryComponent{});
-    gCoordinator.addComponent(player, EquipmentComponent{});
-    gCoordinator.addComponent(player, FloorComponent{});
-    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(); }});
-    gCoordinator.addComponent(
-        player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir); }});
     gCoordinator.addComponent(
         player,
         AnimationComponent{.currentState = AnimationStateMachine::AnimationState::Running,
@@ -162,6 +152,16 @@ void Dungeon::addPlayerComponents(const Entity player)
                                {AnimationStateMachine::AnimationState::Idle,
                                 std::make_pair("Characters", configSingleton.GetConfig().playerAnimation)},
                            }});
+    gCoordinator.addComponent(player, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
+    gCoordinator.addComponent(player, PlayerComponent{});
+    gCoordinator.addComponent(player, ColliderComponent{});
+    gCoordinator.addComponent(player, InventoryComponent{});
+    gCoordinator.addComponent(player, EquipmentComponent{});
+    gCoordinator.addComponent(player, FloorComponent{});
+    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(true); }});
+    gCoordinator.addComponent(player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) {
+                                  moveInDungeon(dir, true);
+                              }});
 }
 
 void Dungeon::createRemotePlayer(const comm::Player& player)
@@ -178,11 +178,20 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
                               TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3});
     gCoordinator.addComponent(m_entities[playerID], TransformComponent(startingPosition));
     gCoordinator.addComponent(m_entities[playerID], RenderComponent{});
-    gCoordinator.addComponent(m_entities[playerID], AnimationComponent{});
+    gCoordinator.addComponent(
+        m_entities[playerID],
+        AnimationComponent{.currentState = AnimationStateMachine::AnimationState::Running,
+                           .stateToAnimationLookup = {
+                               {AnimationStateMachine::AnimationState::Running,
+                                std::make_pair("Characters", configSingleton.GetConfig().playerRunningAnimation)},
+                               {AnimationStateMachine::AnimationState::Idle,
+                                std::make_pair("Characters", configSingleton.GetConfig().playerAnimation)},
+                           }});
     gCoordinator.addComponent(m_entities[playerID],
                               CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
     gCoordinator.addComponent(m_entities[playerID], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[playerID], MultiplayerComponent{});
+    gCoordinator.addComponent(m_entities[playerID], InventoryComponent{});
+    gCoordinator.addComponent(m_entities[playerID], EquipmentComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
         "Characters", configSingleton.GetConfig().playerAnimation);
@@ -301,8 +310,7 @@ void Dungeon::setupHelmetEntity(const comm::Player& player) const
 {
     // temporary for single-player
     comm::Item helmet;
-    if (m_multiplayerSystem->isConnected())
-        helmet = player.items(1);
+    if (m_multiplayerSystem->isConnected()) helmet = player.items(1);
 
     const auto& availableHelmets = gCoordinator.getRegisterSystem<TextureSystem>()->m_helmets;
 
@@ -543,7 +551,6 @@ void Dungeon::setECS()
 {
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
-    gCoordinator.registerComponent<MultiplayerComponent>();
     gCoordinator.registerComponent<SynchronisedEvent>();
     gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
