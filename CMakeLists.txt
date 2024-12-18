@@ -52,6 +52,9 @@ FetchContent_Declare(Boost
 )
 FetchContent_MakeAvailable(Boost)
 
+FetchContent_MakeAvailable()
+set(ZLIB_TEST ON)
+
 FetchContent_Declare(
         zlib-cmake
         URL https://github.com/jimmy-park/zlib-cmake/archive/main.tar.gz
