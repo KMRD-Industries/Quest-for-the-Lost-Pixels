@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        distro: [ubuntu, arch]
 
     permissions:
       contents: write
@@ -16,86 +19,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Environment 
-        run: |
-          echo "QLP_DATA_PATH=." >> $GITHUB_ENV
-
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh 18
-          sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev libfuse2 cmake ninja-build zip wget \
-                libxrandr-dev \
-                libx11-dev \
-                libxi-dev \
-                libxext-dev \
-                libxcb1-dev \
-                libx11-xcb-dev \
-                libxinerama-dev \
-                libxcursor-dev \
-                libgl1-mesa-dev \
-                libflac-dev \
-                libvorbis-dev \
-                libopenal-dev \
-                libudev-dev
-          clang-18 --version
-          cmake --version
-          ninja --version
+          sudo apt-get install -y zip wget
 
-      - name: Configure Build
+      - name: Build with docker
         run: |
-          echo "Data path for configuration: $QLP_DATA_PATH"
-          cmake --preset=linux-pipeline
-
-      - name: Build Project
-        run: |
-          cmake --build build
-
-      - name: Create an AppImage
-        run: |
-          BINARY_PATH="./bin/qlp"
-          APP_DIR="./AppDir"
-          APPIMAGE_TOOL="appimagetool-x86_64.AppImage"
-
-          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/$APPIMAGE_TOOL
-          chmod +x $APPIMAGE_TOOL
-
-          mkdir -p $APP_DIR/usr/bin $APP_DIR/usr/lib
-          cp $BINARY_PATH $APP_DIR/usr/bin/
-
-          cp ./assets/icon.png $APP_DIR
-
-          for lib in $(ldd $BINARY_PATH | awk '{ if ($3 ~ /^\//) print $3 }'); do
-            echo "adding $lib to shared libs"
-            cp $lib $APP_DIR/usr/lib/
-          done
-
-          cat > $APP_DIR/qlp.desktop <<EOL
-          [Desktop Entry]
-          Type=Application
-          Name=QLP-client
-          Exec=$(basename $BINARY_PATH)
-          Icon=icon
-          Categories=Game;
-          EOL
-
-          cat > $APP_DIR/AppRun <<EOL
-          #!/bin/bash
-
-          HERE="\$(dirname "\$(readlink -f "\$0")")"
-          export LD_LIBRARY_PATH="\$HERE/usr/lib:\$LD_LIBRARY_PATH"
-          exec "\$HERE/usr/bin/$(basename $BINARY_PATH)" "\$@"
-          EOL
-
-          chmod +x $APP_DIR/AppRun
-
-          ./$APPIMAGE_TOOL $APP_DIR qlp.AppImage
+          docker build -f deployment/${{ matrix.distro }}/Dockerfile -o . .
 
       - name: Zip Outputs
         run: |
-          zip -r output.zip qlp.AppImage bin/qlp assets
+          zip -r output.zip qlp assets
 
       - name: Upload Linux Artifacts
         uses: actions/upload-release-asset@v1
@@ -104,5 +39,5 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./output.zip
-          asset_name: qlp-game-linux.zip
+          asset_name: qlp-game-linux-${{ matrix.distro }}.zip
           asset_content_type: application/octet-stream
