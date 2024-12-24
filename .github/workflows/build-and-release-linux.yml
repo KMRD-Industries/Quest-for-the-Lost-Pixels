@@ -35,6 +35,7 @@ jobs:
           docker build -f deployment/${{ matrix.distro }}/Dockerfile -t ${{ matrix.distro }}-qlp:latest -o . .
 
       - name: Run Docker Image
+        run: |
           VOLUME=volume
 
           mkdir $VOLUME
