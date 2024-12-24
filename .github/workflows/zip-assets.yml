@@ -1,0 +1,36 @@
+name: Zip Assets
+
+on:
+  release:
+    types:
+      - created 
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-22.04
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install zip -y
+
+      - name: Zip Assets
+        run: |
+          zip -r output.zip assets
+
+      - name: Upload Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./output.zip
+          asset_name: assets.zip
+          asset_content_type: application/octet-stream

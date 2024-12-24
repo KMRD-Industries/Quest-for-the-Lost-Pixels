@@ -19,25 +19,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
+      - name: Setup Environment
         run: |
+          APPIMAGE_TOOL=appimagetool-x86_64.AppImage
+          echo "APPIMAGE_TOOL=$APPIMAGE_TOOL" >> GITHUB_ENV
+
           sudo apt-get update
-          sudo apt-get install -y zip wget
+          sudo apt-get install -y wget
 
-      - name: Build with docker
+          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/$APPIMAGE_TOOL
+          chmod +x $APPIMAGE_TOOL
+
+      - name: Build Docker Image
         run: |
-          docker build -f deployment/${{ matrix.distro }}/Dockerfile -o . .
+          docker build -f deployment/${{ matrix.distro }}/Dockerfile -t ${{ matrix.distro }}-qlp:latest -o . .
 
-      - name: Zip Outputs
+      - name: Run Docker Image
+          VOLUME=volume
+
+          mkdir $VOLUME
+          docker run docker run -v ./$VOLUME:/output ${{ matrix.distro }}-qlp
+          cp -r $VOLUME/AppDir .
+
+      - name: Build AppImage
         run: |
-          zip -r output.zip qlp assets
+          ./$APPIMAGE_TOOL AppDir qlp.AppImage
 
-      - name: Upload Linux Artifacts
+      - name: Upload AppImage
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./output.zip
-          asset_name: qlp-game-linux-${{ matrix.distro }}.zip
+          asset_path: ./qlp.AppImage
+          asset_name: qlp-game-${{ matrix.distro }}.AppImage
           asset_content_type: application/octet-stream

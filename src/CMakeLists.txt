@@ -1,5 +1,5 @@
 if (DEFINED ENV{QLP_DATA_PATH})
-    set(ASSET_DIR $ENV{QLP_DATA_PATH}/assets)
+    set(ASSET_DIR $ENV{QLP_DATA_PATH})
 else ()
     set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
 endif ()
