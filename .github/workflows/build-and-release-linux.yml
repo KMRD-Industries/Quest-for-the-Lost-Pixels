@@ -39,7 +39,7 @@ jobs:
           VOLUME=volume
 
           mkdir $VOLUME
-          docker run docker run -v ./$VOLUME:/output ${{ matrix.distro }}-qlp
+          docker run -v ./$VOLUME:/output ${{ matrix.distro }}-qlp
           cp -r $VOLUME/AppDir .
 
       - name: Build AppImage
