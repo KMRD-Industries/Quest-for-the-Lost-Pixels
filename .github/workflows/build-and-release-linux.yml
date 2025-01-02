@@ -32,6 +32,10 @@ jobs:
 
       - name: Build With Docker
         run: |
+          echo $APPIMAGE_TOOL
+          mkdir AppDir
+          ./$APPIMAGE_TOOL AppDir qlp.AppImage
+
           VOLUME=volume
           IMAGE=image
 
