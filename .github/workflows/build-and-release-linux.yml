@@ -22,22 +22,13 @@ jobs:
       - name: Setup Environment
         run: |
           APPIMAGE_TOOL=appimagetool-x86_64.AppImage
-          echo "APPIMAGE_TOOL=$APPIMAGE_TOOL" >> GITHUB_ENV
+          echo "APPIMAGE_TOOL=$APPIMAGE_TOOL" >> $GITHUB_ENV
 
           sudo apt-get update
-          sudo apt-get install -y wget libfuse2 tree
+          sudo apt-get install -y wget libfuse2
 
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/$APPIMAGE_TOOL
           chmod +x $APPIMAGE_TOOL
-          tree
-
-      - name: Tree
-        run: tree
-
-      - name: Echo
-        run: |
-          echo ${{ env.APPIMAGE_TOOL }}
-          echo $APPIMAGE_TOOL
 
       - name: Build With Docker
         run: |
