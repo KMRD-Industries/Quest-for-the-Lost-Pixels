@@ -25,10 +25,14 @@ jobs:
           echo "APPIMAGE_TOOL=$APPIMAGE_TOOL" >> GITHUB_ENV
 
           sudo apt-get update
-          sudo apt-get install -y wget libfuse2
+          sudo apt-get install -y wget libfuse2 tree
 
           wget https://github.com/AppImage/AppImageKit/releases/download/continuous/$APPIMAGE_TOOL
           chmod +x $APPIMAGE_TOOL
+          tree
+
+      - name: Tree
+        run: tree
 
       - name: Build With Docker
         run: |
