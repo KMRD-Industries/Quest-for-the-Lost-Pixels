@@ -33,11 +33,12 @@ jobs:
       - name: Build With Docker
         run: |
           VOLUME=volume
+          IMAGE=image
 
-          docker build -f deployment/${{ matrix.distro }}/Dockerfile -t ${{ matrix.distro }}-qlp:latest -o . .
+          docker build -f deployment/${{ matrix.distro }}/Dockerfile -t $IMAGE .
 
           mkdir $VOLUME
-          docker run -v ./$VOLUME:/output ${{ matrix.distro }}-qlp
+          docker run -v ./$VOLUME:/output $IMAGE
           cp -r $VOLUME/AppDir .
 
       - name: Build AppImage
