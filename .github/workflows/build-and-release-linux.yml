@@ -34,11 +34,16 @@ jobs:
       - name: Tree
         run: tree
 
+      - name: Echo
+        run: |
+          echo ${{ env.APPIMAGE_TOOL }}
+          echo $APPIMAGE_TOOL
+
       - name: Build With Docker
         run: |
           echo $APPIMAGE_TOOL
           mkdir AppDir
-          ./$APPIMAGE_TOOL AppDir qlp.AppImage
+          ./${{ env.APPIMAGE_TOOL }} AppDir qlp.AppImage
 
           VOLUME=volume
           IMAGE=image
