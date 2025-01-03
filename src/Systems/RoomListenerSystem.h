@@ -22,5 +22,6 @@ private:
     bool m_isCurrentRoomLooted{};
     bool m_isCurrentRoomClear{};
     bool m_toLoot{};
+    bool m_areEnemiesSpawned{};
     glm::ivec2 m_currentRoom{};
 };

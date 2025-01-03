@@ -68,6 +68,8 @@ int main()
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     sf::RenderWindow window(desktopMode, "Quest for the lost pixels!");
 
+    window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
+
     int _ = ImGui::SFML::Init(window);
     window.setFramerateLimit(config.debugMode ? 144 : config.frameCycle);
     ImGui::CreateContext();

@@ -12,8 +12,11 @@ void RoomListenerSystem::update(const float deltaTime)
         m_toLoot = true;
     else if (m_entities.empty() && m_toLoot)
         spawnLoot();
-    else
+    if (!m_areEnemiesSpawned)
+    {
+        m_areEnemiesSpawned = true;
         gCoordinator.getRegisterSystem<SpawnerSystem>()->update(deltaTime);
+    }
 }
 
 void RoomListenerSystem::reset()
@@ -22,6 +25,7 @@ void RoomListenerSystem::reset()
     m_isCurrentRoomClear = false;
     m_lootedRooms.clear();
     m_toLoot = false;
+    m_areEnemiesSpawned = false;
 }
 
 void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)
@@ -35,10 +39,10 @@ void RoomListenerSystem::changeRoom(const glm::ivec2& newRoom)
     {
         m_lootedRooms.insert({newRoom, false});
         m_isCurrentRoomLooted = false;
-        gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnEnemies();
     }
     m_currentRoom = newRoom;
     m_toLoot = false;
+    m_areEnemiesSpawned = false;
 }
 
 void RoomListenerSystem::spawnLoot()
