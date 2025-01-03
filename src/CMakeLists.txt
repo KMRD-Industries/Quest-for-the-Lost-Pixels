@@ -228,6 +228,8 @@ target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics sfml-audio ImGui-S
 
 if (WIN32)
     target_link_libraries(qlp PRIVATE ws2_32)
+    set(CMAKE_AR lib.exe)
+    set(CMAKE_ASM_MASM_CREATE_STATIC_LIBRARY "<CMAKE_AR> /OUT:<TARGET> <LINK_FLAGS> <OBJECTS>")
 endif ()
 
 target_compile_features(qlp PRIVATE cxx_std_23)
