@@ -30,7 +30,7 @@ jobs:
       - name: Configure Build
         run: |
           echo Data path for configuration: %QLP_DATA_PATH%
-          cmake --preset=windows-pipeline
+          cmake --preset=linux-pipeline
 
       - name: Build Project
         run: |
