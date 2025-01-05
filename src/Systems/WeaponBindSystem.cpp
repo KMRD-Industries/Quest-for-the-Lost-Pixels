@@ -5,6 +5,7 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "DealDMGToEnemyEvent.h"
+#include "SynchronisedEvent.h"
 #include "WeaponComponent.h"
 #include "WeaponSwingComponent.h"
 
@@ -39,6 +40,12 @@ void WeaponBindSystem::update()
 
                 swingComponent.enemyHited.insert(data.entity);
                 gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
+
+                const Entity attackEventEntity = gCoordinator.createEntity();
+                const auto synchronisedEvent =
+                    SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,
+                                      .variant = SynchronisedEvent::Variant::ENEMY_GOT_HIT};
+                gCoordinator.addComponent(attackEventEntity, synchronisedEvent);
             },
             [entity](const GameType::CollisionData& data)
             {

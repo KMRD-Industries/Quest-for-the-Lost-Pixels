@@ -6,6 +6,7 @@
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "FightActionEvent.h"
+#include "MultiplayerSystem.h"
 #include "ObjectCreatorSystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"

@@ -2,6 +2,7 @@
 
 #include <random>
 #include "Coordinator.h"
+#include "SFML/System/Vector2.hpp"
 
 extern Coordinator gCoordinator;
 
@@ -9,7 +10,7 @@ class EnemySystem : public System
 {
 public:
     EnemySystem();
-    void update();
+    void init();
     void deleteEnemies() const;
 
 private:
