@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Dependencies 
         run: |
-          choco install llvm cmake ninja 7zip msbuild visualstudio2022buildtools --installargs "ADD_CMAKE_TO_PATH=System" --yes
+          choco install llvm cmake ninja 7zip msbuild visualstudio2022buildtools boost-msvc-14.2 --installargs "ADD_CMAKE_TO_PATH=System" --yes
           setx PATH "%PATH%;C:\Program Files\LLVM\bin"
           clang-cl --version
           cmake --version
