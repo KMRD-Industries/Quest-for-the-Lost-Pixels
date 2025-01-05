@@ -66,8 +66,12 @@
     },
     {
       "name": "windows-pipeline",
-      "inherits": "VS-release",
-      "binaryDir": "${sourceDir}/build"
+      "inherits": "linux-pipeline",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_C_COMPILER": "clang"
+      }
     }
   ]
 }

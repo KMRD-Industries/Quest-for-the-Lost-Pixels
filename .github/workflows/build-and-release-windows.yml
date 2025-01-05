@@ -23,14 +23,11 @@ jobs:
       - name: Install Dependencies 
         run: |
           choco install llvm cmake ninja 7zip msbuild visualstudio2022buildtools --installargs "ADD_CMAKE_TO_PATH=System" --yes
-          clang-cl --version
-          cmake --version
-          ninja --version
 
       - name: Configure Build
         run: |
           echo Data path for configuration: %QLP_DATA_PATH%
-          cmake --preset=linux-pipeline
+          cmake --preset=windows-pipeline
 
       - name: Build Project
         run: |
