@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Dependencies 
         run: |
-          choco install llvm cmake ninja 7zip --installargs "ADD_CMAKE_TO_PATH=System" --yes
+          choco install llvm cmake ninja 7zip msbuild --installargs "ADD_CMAKE_TO_PATH=System" --yes
           setx PATH "%PATH%;C:\Program Files\LLVM\bin"
           clang-cl --version
           cmake --version
@@ -39,7 +39,7 @@ jobs:
 
       - name: Zip Outputs
         run: |
-          7z a output.zip bin/qlp.exe assets
+          7z a output.zip bin/* assets
 
       - name: Upload Windows Artifacts
         uses: actions/upload-release-asset@v1
