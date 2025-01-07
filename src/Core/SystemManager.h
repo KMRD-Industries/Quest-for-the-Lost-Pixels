@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 
@@ -28,7 +29,10 @@ public:
     {
         const std::string typeName{typeid(T).name()};
 
-        assert(m_systems.contains(typeName) && "System used before registered.");
+        if (!m_systems.contains(typeName))
+        {
+            throw std::logic_error("System used before registered.");
+        }
 
         m_signatures[typeName] = signature;
     }

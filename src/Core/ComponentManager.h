@@ -17,7 +17,10 @@ public:
     {
         const std::string componentName{typeid(T).name()};
 
-        assert(!m_componentTypes.contains(componentName) && "Registering component type more than once.");
+        if (m_componentTypes.contains(componentName))
+        {
+            throw std::logic_error("Registering component type more than once.");
+        }
 
         const ComponentType componentType{m_nextFreeComponentType};
         ++m_nextFreeComponentType;
@@ -31,7 +34,10 @@ public:
     {
         const std::string componentName{typeid(T).name()};
 
-        assert(m_componentTypes.contains(componentName) && "Component not registered before use.");
+        if (!m_componentTypes.contains(componentName))
+        {
+            throw std::logic_error("Component not registered before use.");
+        }
 
         return m_componentTypes.at(componentName);
     }
@@ -78,7 +84,10 @@ private:
     {
         const std::string componentName{typeid(T).name()};
 
-        assert(m_componentTypes.contains(componentName) && "Component not registered before use.");
+        if (!m_componentTypes.contains(componentName))
+        {
+            throw std::logic_error("Component not registered before use.");
+        }
 
         return std::static_pointer_cast<ComponentArray<T>>(m_componentArrays.at(componentName));
     }
