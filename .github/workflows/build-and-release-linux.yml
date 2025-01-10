@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        distro: [ubuntu, arch]
+        distro: [ubuntu-22, ubuntu-24, arch]
 
     permissions:
       contents: write
