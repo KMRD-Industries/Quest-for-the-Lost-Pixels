@@ -1,6 +1,7 @@
 #include "EntityManager.h"
 
 #include <cassert>
+#include <stdexcept>
 
 EntityManager::EntityManager()
 {
@@ -12,7 +13,10 @@ EntityManager::EntityManager()
 
 Entity EntityManager::createEntity()
 {
-    assert(m_livingEntityCount < MAX_ENTITIES && "Too many entities in existence.");
+    if (m_livingEntityCount >= MAX_ENTITIES)
+    {
+        throw std::logic_error("Too many entities in existence.");
+    }
 
     const Entity id{m_availableEntities.front()};
     m_availableEntities.pop();
@@ -23,7 +27,10 @@ Entity EntityManager::createEntity()
 
 void EntityManager::destroyEntity(const Entity entity)
 {
-    assert(entity < MAX_ENTITIES && "Entity out of range.");
+    if (entity >= MAX_ENTITIES)
+    {
+        throw std::out_of_range("Entity out of range.");
+    }
 
     m_signatures[entity].reset();
     m_availableEntities.push(entity);
@@ -32,14 +39,20 @@ void EntityManager::destroyEntity(const Entity entity)
 
 void EntityManager::setSignature(const Entity entity, const Signature& signature)
 {
-    assert(entity < MAX_ENTITIES && "Entity out of range.");
+    if (entity >= MAX_ENTITIES)
+    {
+        throw std::out_of_range("Entity out of range.");
+    }
 
     m_signatures[entity] = signature;
 }
 
 Signature EntityManager::getSignature(const Entity entity) const
 {
-    assert(entity < MAX_ENTITIES && "Entity out of range.");
+    if (entity >= MAX_ENTITIES)
+    {
+        throw std::out_of_range("Entity out of range.");
+    }
 
     return m_signatures[entity];
 }
