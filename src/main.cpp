@@ -62,11 +62,12 @@ void handleInput(sf::RenderWindow& window)
 
 int main()
 {
+    std::cout << ASSET_PATH << '\n';
     configSingleton.LoadConfig(ASSET_PATH + std::string("/config.json"));
     const PublicConfig& config = configSingleton.GetConfig();
 
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!");
+    sf::RenderWindow window(desktopMode, "Quest for the lost pixels!", sf::Style::Fullscreen);
 
     window.create(desktopMode, "Quest for the lost pixels!", sf::Style::Default);
 

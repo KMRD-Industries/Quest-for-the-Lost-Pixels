@@ -58,6 +58,22 @@
         "BOX2D_BUILD_UNIT_TESTS": "OFF",
         "CMAKE_CXX_FLAGS": "-stdlib=libc++"
       }
+    },
+    {
+      "name": "linux-pipeline",
+      "inherits": "linux-release",
+      "binaryDir": "${sourceDir}/build"
+    },
+    {
+      "name": "windows-pipeline",
+      "inherits": "default",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_LINKER": "lld-link"
+      }
     }
   ]
 }

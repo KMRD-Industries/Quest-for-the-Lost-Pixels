@@ -1,0 +1,56 @@
+name: Build and Release for Linux
+
+on:
+  release:
+    types:
+      - created 
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        distro: [ubuntu-22, ubuntu-24, arch]
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Environment
+        run: |
+          APPIMAGE_TOOL=appimagetool-x86_64.AppImage
+          echo "APPIMAGE_TOOL=$APPIMAGE_TOOL" >> $GITHUB_ENV
+
+          sudo apt-get update
+          sudo apt-get install -y wget libfuse2
+
+          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/$APPIMAGE_TOOL
+          chmod +x $APPIMAGE_TOOL
+
+      - name: Build With Docker
+        run: |
+          VOLUME=volume
+          IMAGE=image
+
+          docker build -f deployment/${{ matrix.distro }}/Dockerfile -t $IMAGE .
+
+          mkdir $VOLUME
+          docker run -v ./$VOLUME:/output $IMAGE
+          cp -r $VOLUME/AppDir .
+
+      - name: Build AppImage
+        run: |
+          ARCH=x86_64 ./$APPIMAGE_TOOL AppDir qlp.AppImage
+
+      - name: Upload AppImage
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./qlp.AppImage
+          asset_name: qlp-game-${{ matrix.distro }}.AppImage
+          asset_content_type: application/octet-stream

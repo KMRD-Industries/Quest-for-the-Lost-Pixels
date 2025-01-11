@@ -1,4 +1,8 @@
-set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
+if (DEFINED ENV{QLP_DATA_PATH})
+    set(ASSET_DIR $ENV{QLP_DATA_PATH})
+else ()
+    set(ASSET_DIR ${CMAKE_SOURCE_DIR}/assets)
+endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
@@ -225,6 +229,8 @@ target_link_libraries(qlp PRIVATE nlohmann_json sfml-graphics sfml-audio ImGui-S
 
 if (WIN32)
     target_link_libraries(qlp PRIVATE ws2_32)
+    set(CMAKE_AR lib.exe)
+    set(CMAKE_ASM_MASM_CREATE_STATIC_LIBRARY "<CMAKE_AR> /OUT:<TARGET> <LINK_FLAGS> <OBJECTS>")
 endif ()
 
 if (WIN32)
