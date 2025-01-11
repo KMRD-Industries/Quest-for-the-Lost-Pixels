@@ -5,6 +5,7 @@
 #include "Coordinator.h"
 #include "CreateBodyWithCollisionEvent.h"
 #include "DealDMGToEnemyEvent.h"
+#include "SynchronisedEvent.h"
 #include "WeaponComponent.h"
 #include "WeaponSwingComponent.h"
 
@@ -22,14 +23,16 @@ void WeaponBindSystem::update()
         }
         else
         {
-            auto weaponColliderComponent = ColliderComponent{true, "Weapon"};
+            auto weaponColliderComponent = ColliderComponent{.tag = "Weapon", .trigger = true};
             gCoordinator.addComponent(entity, weaponColliderComponent);
         }
 
         const Entity eventEntity = gCoordinator.createEntity();
-        const auto newEvent = CreateBodyWithCollisionEvent(
-            entity, "Weapon",
-            [this, entity](const GameType::CollisionData& data)
+        const auto newEvent = CreateBodyWithCollisionEvent{
+            .entity = entity,
+            .tag = "Weapon",
+            .onCollisionEnter =
+                [this, entity](const GameType::CollisionData& data)
             {
                 auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
                 swingComponent.enemyColided.insert(data.entity);
@@ -41,12 +44,12 @@ void WeaponBindSystem::update()
                 gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
 
                 const Entity attackEventEntity = gCoordinator.createEntity();
-                const auto synchronisedEvent =
-                    SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,
-                                      .variant = SynchronisedEvent::Variant::ENEMY_GOT_HIT};
+                const auto synchronisedEvent = SynchronisedEvent{.updateType = SynchronisedEvent::UpdateType::STATE,
+                                                                 .variant = SynchronisedEvent::Variant::ENEMY_GOT_HIT};
                 gCoordinator.addComponent(attackEventEntity, synchronisedEvent);
             },
-            [entity](const GameType::CollisionData& data)
+            .onCollisionOut =
+                [entity](const GameType::CollisionData& data)
             {
                 auto& swingComponent = gCoordinator.getComponent<WeaponSwingComponent>(entity);
                 swingComponent.enemyColided.erase(data.entity);
@@ -57,7 +60,9 @@ void WeaponBindSystem::update()
                 swingComponent.enemyHited.insert(data.entity);
                 gCoordinator.addComponent(data.entity, DealDMGToEnemyEvent{});
             },
-            false, false, true);
+            .isStatic = false,
+            .useTextureSize = false,
+            .trigger = true};
 
         gCoordinator.addComponent(eventEntity, newEvent);
         m_entityToRemove.push(entity);

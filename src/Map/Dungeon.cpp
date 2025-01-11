@@ -4,7 +4,6 @@
 
 #include <comm.pb.h>
 
-#include "Dungeon.h"
 #include <BodyArmourComponent.h>
 #include <CreateBodyWithCollisionEvent.h>
 #include <DirtyFlagComponent.h>
@@ -48,7 +47,6 @@
 #include "LostGameState.h"
 #include "MapComponent.h"
 #include "MapSystem.h"
-#include "MultiplayerComponent.h"
 #include "MultiplayerSystem.h"
 #include "ObjectCreatorSystem.h"
 #include "PlayerComponent.h"
@@ -159,9 +157,12 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
 
     gCoordinator.addComponents(
         m_entities[playerID],
-        TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
-                                        getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID)),
-                           0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
+        TransformComponent{
+            .position = sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
+                                     getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID)),
+            .rotation = 0.f,
+            .scale = sf::Vector2f(1.f, 1.f),
+            .centerOfMass = {0.f, 0.f}},
         TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
         AnimationComponent{}, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
         PlayerComponent{}, ColliderComponent{}, InventoryComponent{}, EquipmentComponent{});
@@ -172,9 +173,12 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
 
     // Create Collider of new Player
     const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(
-        m_entities[playerID], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {},
-        false, false);
+    const auto newEvent = CreateBodyWithCollisionEvent{.entity = m_entities[playerID],
+                                                       .tag = tag,
+                                                       .onCollisionEnter = [&](const GameType::CollisionData&) {},
+                                                       .onCollisionOut = [&](const GameType::CollisionData&) {},
+                                                       .isStatic = false,
+                                                       .useTextureSize = false};
 
     const auto createBodyEvent = CreateBodyWithCollisionEvent{
         .entity = m_entities[playerID], // player ID

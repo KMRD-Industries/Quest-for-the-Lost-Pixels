@@ -13,7 +13,6 @@
 #include "GameUtility.h"
 #include "Helpers.h"
 #include "ItemComponent.h"
-#include "MultiplayerComponent.h"
 #include "PassageComponent.h"
 #include "PlayerComponent.h"
 #include "PublicConfigMenager.h"
@@ -110,7 +109,7 @@ void RenderSystem::draw(sf::RenderTexture& window)
 /**
  * Update camera to handle displaying map within boundaries.
  * */
-void RenderSystem::updateCamera(Camera& camera, const sf::Vector2f targetPos, const sf::RenderTexture& window)
+void RenderSystem::updateCamera(Camera& camera, const sf::Vector2f& targetPos, const sf::RenderTexture& window)
 {
     windowSize = window.getSize();
     sf::Vector2f halfView = static_cast<sf::Vector2f>(window.getSize()) * 2.f;
@@ -372,7 +371,7 @@ void RenderSystem::setEquipment(const Entity entity)
     }
 }
 
-sf::Vector2f RenderSystem::getEquippedItemOrigin(Collision& itemPlacement)
+sf::Vector2f RenderSystem::getEquippedItemOrigin(const Collision& itemPlacement)
 {
     return {itemPlacement.x, itemPlacement.y};
 }
@@ -637,9 +636,8 @@ void RenderSystem::debugBoundingBoxes(sf::RenderTexture& window)
             !gCoordinator.hasComponent<RenderComponent>(entity))
             continue;
 
-        if (gCoordinator.hasComponent<PlayerComponent>(entity) ||
-            gCoordinator.hasComponent<MultiplayerComponent>(entity) ||
-            gCoordinator.hasComponent<EnemyComponent>(entity) || gCoordinator.hasComponent<WeaponComponent>(entity))
+        if (gCoordinator.hasComponent<PlayerComponent>(entity) || gCoordinator.hasComponent<EnemyComponent>(entity) ||
+            gCoordinator.hasComponent<WeaponComponent>(entity))
             drawSprite(entity);
 
         if (gCoordinator.hasComponent<EquipmentComponent>(entity))
