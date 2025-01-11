@@ -5,13 +5,20 @@
 
 #include <array>
 #include <cassert>
+#include <stdexcept>
 #include <unordered_map>
 
-template<typename T>
-class ComponentArray final : public IComponentArray {
+template <typename T>
+class ComponentArray final : public IComponentArray
+{
 public:
-    void insertData(const Entity entity, const T &component) {
-        assert(!m_entityToIndex.contains(entity) && "Component added to same entity more than once.");
+    void insertData(const Entity entity, const T &component)
+    {
+        if (m_entityToIndex.contains(entity))
+        {
+            throw std::logic_error("Component added to same entity more than once.");
+        }
+
         const size_t newIndex{m_size};
         m_entityToIndex[entity] = newIndex;
         m_indexToEntity[newIndex] = entity;
@@ -19,8 +26,12 @@ public:
         ++m_size;
     }
 
-    void removeData(const Entity entity) {
-        assert(m_entityToIndex.contains(entity) && "Removing non-existent component.");
+    void removeData(const Entity entity)
+    {
+        if (!m_entityToIndex.contains(entity))
+        {
+            throw std::logic_error("Removing non-existent component.");
+        }
 
         const size_t indexOfRemovedEntity{m_entityToIndex[entity]};
         const size_t indexOfLastElement{m_size - 1};
@@ -38,18 +49,26 @@ public:
 
     bool hasComponent(const Entity entity) const { return m_entityToIndex.contains(entity); }
 
-    T *tryGetData(const Entity entity) {
+    T *tryGetData(const Entity entity)
+    {
         if (!m_entityToIndex.contains(entity)) return nullptr;
         return &m_componentArray[m_entityToIndex[entity]];
     }
 
-    T &getData(const Entity entity) {
-        assert(m_entityToIndex.contains(entity) && "Retrieving non-existent component.");
+    T &getData(const Entity entity)
+    {
+        if (!m_entityToIndex.contains(entity))
+        {
+            throw std::logic_error("Retrieving non-existent component.");
+        }
+
         return m_componentArray[m_entityToIndex[entity]];
     }
 
-    void entityDestroyed(const Entity entity) override {
-        if (m_entityToIndex.contains(entity)) {
+    void entityDestroyed(const Entity entity) override
+    {
+        if (m_entityToIndex.contains(entity))
+        {
             removeData(entity);
         }
     }

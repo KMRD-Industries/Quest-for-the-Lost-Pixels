@@ -40,6 +40,8 @@ namespace config
     static constexpr int numberOfMapEntities{500};
     static constexpr int enemyFirstEntity{2000};
     static constexpr int numberOfEnemyEntities{100};
+    constexpr int m_frames{2000};
+    constexpr int m_enemySpeed{50};
     static Entity playerEntity{1};
     static constexpr int playerAnimation{184};
 
@@ -105,7 +107,7 @@ namespace config
 
     // Multiplayer config
     static constexpr std::string_view defaultIP = "127.0.0.1";
-    static constexpr std::string_view defaultPort = "10823";
+    static constexpr std::string_view defaultPort = "9001";
     static constexpr uint32_t millisPerTick = 10;
 
     // Color balance structure

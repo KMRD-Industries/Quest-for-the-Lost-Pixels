@@ -16,6 +16,8 @@ void HealthBarSystem::drawHealthBar()
         return;
 
     const auto& entity = config::playerEntity;
+    if (!gCoordinator.hasComponent<CharacterComponent>(entity)) return; // player is dead
+
     auto& characterComponent = gCoordinator.getComponent<CharacterComponent>(entity);
     const auto progressValue{characterComponent.hp / configSingleton.GetConfig().maxCharacterHP};
     const auto interpolatedColor{

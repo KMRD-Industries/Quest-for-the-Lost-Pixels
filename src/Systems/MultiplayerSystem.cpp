@@ -5,7 +5,9 @@
 #include <boost/asio.hpp>
 #include <comm.pb.h>
 #include <vector>
+#include <zlib.h>
 
+#include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "Config.h"
 #include "Coordinator.h"
@@ -16,15 +18,18 @@
 #include "InputHandler.h"
 #include "InventorySystem.h"
 #include "MultiplayerSystem.h"
+#include "PlayerComponent.h"
 #include "RenderComponent.h"
 #include "RoomListenerSystem.h"
+#include "SpawnerSystem.h"
 #include "SynchronisedEvent.h"
 #include "TransformComponent.h"
 #include "Types.h"
-
 #include "WeaponComponent.h"
 
 extern Coordinator gCoordinator;
+
+constexpr uint32_t DIFF = 4096;
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
@@ -75,7 +80,7 @@ void MultiplayerSystem::setup(const std::string_view& ip, const std::string_view
     m_last_tick = sysClock::now();
 
     comm::BytePrefix prefixDummy;
-    prefixDummy.set_bytes(1);
+    prefixDummy.set_bytes(DIFF);
     m_prefix_size = static_cast<int>(prefixDummy.ByteSizeLong());
     m_prefix_buf.resize(m_prefix_size);
 
@@ -142,7 +147,7 @@ void MultiplayerSystem::pollState()
         size_t received = m_tcp_socket.read_some(boost::asio::buffer(m_prefix_buf, m_prefix_size));
         m_prefix.ParseFromArray(m_prefix_buf.data(), m_prefix_size);
 
-        uint32_t msg_size = m_prefix.bytes();
+        uint32_t msg_size = m_prefix.bytes() - DIFF;
 
         available = m_tcp_socket.available();
         while (available < msg_size) available = m_tcp_socket.available();
@@ -168,7 +173,6 @@ void MultiplayerSystem::pollState()
                 m_dungeon_updates.push_back(dungeonUpdate);
                 break;
             }
-
         case comm::PLAYER_DIED:
         case comm::DISCONNECTED:
             if (playerID == 0 || !m_entity_map.contains(playerID)) break;
@@ -215,6 +219,8 @@ void MultiplayerSystem::pollState()
                 auto dungeonUpdate = MultiplayerDungeonUpdate{.variant = MultiplayerDungeonUpdate::Variant::CHANGE_ROOM,
                                                               .room = m_current_room};
                 m_dungeon_updates.push_back(dungeonUpdate);
+                m_isMapDimensionsSent = false;
+                m_areSpawnersSent = false;
                 break;
             }
         case comm::ROOM_CLEARED:
@@ -227,8 +233,10 @@ void MultiplayerSystem::pollState()
                 m_dungeon_updates.push_back(dungeonUpdate);
                 break;
             }
-        default:
+        case comm::SPAWN_ENEMY_REQUEST:
+            gCoordinator.getRegisterSystem<SpawnerSystem>()->spawnOnDemand(m_state);
             break;
+        default: {}
         }
     }
     else
@@ -248,6 +256,10 @@ int64_t MultiplayerSystem::getSeed() { return m_seed; }
 const std::unordered_map<uint32_t, Entity>& MultiplayerSystem::getPlayers() { return m_entity_map; }
 
 const std::vector<MultiplayerDungeonUpdate>& MultiplayerSystem::getRemoteDungeonUpdates() { return m_dungeon_updates; }
+void MultiplayerSystem::clearRemoteDungeonUpdates()
+{
+    if (m_dungeon_updates.size() > 0) m_dungeon_updates.clear();
+}
 
 void MultiplayerSystem::update(const float deltaTime)
 {
@@ -265,11 +277,9 @@ void MultiplayerSystem::update(const float deltaTime)
         return;
     }
 
-    if (m_frame_time += deltaTime; m_frame_time < configSingleton.GetConfig().oneFrameTime * 1000) return;
+    if (m_frameTime += deltaTime; m_frameTime < configSingleton.GetConfig().oneFrameTime * 1000) return;
 
-    m_frame_time -= configSingleton.GetConfig().oneFrameTime * 1000;
-
-    if (m_dungeon_updates.size() > 0) m_dungeon_updates.clear();
+    m_frameTime -= configSingleton.GetConfig().oneFrameTime * 1000;
 
     pollState();
     pollMovement();
@@ -286,8 +296,7 @@ void MultiplayerSystem::update(const float deltaTime)
             break;
         case SynchronisedEvent::UpdateType::MOVEMENT:
             movementEvents.push_back(eventEntity);
-        default:
-            break;
+        default: {}
         }
     }
 
@@ -303,6 +312,12 @@ void MultiplayerSystem::update(const float deltaTime)
         gCoordinator.destroyEntity(eventEntities.front());
         eventEntities.pop_front();
     }
+
+    if (m_areSpawnersSent)
+    {
+        gatherEnemyAndPlayerPositions();
+        updateMap();
+    }
 }
 
 void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
@@ -314,7 +329,7 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
 
     for (const Entity eventEntity : entities)
     {
-        const auto& [updateType, variant, entityID, entity, updatedEntity, pickUpInfo, room] =
+        const auto& [updateType, variant, entityID, entity, updatedEntity, pickUpInfo, room, obstacleData] =
             gCoordinator.getComponent<SynchronisedEvent>(eventEntity);
 
         if (usedPreviousUpdate) update = m_updates.add_updates();
@@ -334,16 +349,18 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
 
             m_alive = false;
 
-            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(m_player_entity).slots)
+            for (auto& slot : gCoordinator.getComponent<EquipmentComponent>(entity).slots)
             {
                 if (slot.second != 0)
                 {
                     m_registered_items.erase(slot.second);
-                    gCoordinator.getComponent<ColliderComponent>(slot.second).toDestroy = true;
+                    if (auto cc = gCoordinator.tryGetComponent<ColliderComponent>(slot.second)) cc->toDestroy = true;
                 }
             }
 
-            gCoordinator.getComponent<ColliderComponent>(m_player_entity).toDestroy = true;
+            gCoordinator.removeComponent<RenderComponent>(entity);
+            gCoordinator.removeComponent<PlayerComponent>(entity);
+            gCoordinator.getComponent<ColliderComponent>(entity).toRemoveCollider = true;
 
             update->set_variant(comm::PLAYER_DIED);
             update->mutable_player()->set_id(m_player_id);
@@ -426,26 +443,44 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
             }
 
             setRoom(*room);
-
             update->set_variant(comm::ROOM_CHANGED);
             update->mutable_room()->set_x(room->x);
             update->mutable_room()->set_y(room->y);
             break;
-
         case SynchronisedEvent::Variant::ROOM_CLEARED:
             usedPreviousUpdate = true;
             anythingToSend = true;
 
             update->set_variant(comm::ROOM_CLEARED);
             break;
-
         case SynchronisedEvent::Variant::LEVEL_CHANGED:
             usedPreviousUpdate = true;
             anythingToSend = true;
 
             update->set_variant(comm::LEVEL_CHANGED);
             break;
+        case SynchronisedEvent::Variant::ROOM_DIMENSIONS_CHANGED:
+            {
+                usedPreviousUpdate = false;
 
+                const auto position = gCoordinator.getComponent<TransformComponent>(updatedEntity).position;
+                m_walls.emplace_back(position.x, position.y);
+                break;
+            }
+        case SynchronisedEvent::Variant::ENEMY_GOT_HIT:
+            {
+                printf("enemy got hit\n");
+                // TODO do zrobienia
+                break;
+            }
+        case SynchronisedEvent::Variant::SEND_SPAWNERS_POSITIONS:
+            {
+                if (!obstacleData.has_value()) continue;
+                usedPreviousUpdate = false;
+
+                m_spawners.emplace_back(updatedEntity, sf::Vector2(obstacleData->x, obstacleData->y));
+                break;
+            }
         default:
             usedPreviousUpdate = false;
             break;
@@ -454,10 +489,33 @@ void MultiplayerSystem::updateState(const std::vector<Entity>& entities)
 
     if (!usedPreviousUpdate) m_updates.mutable_updates()->RemoveLast();
 
+    if (!m_walls.empty())
+    {
+        auto compressedMapDimensions = sendMapDimensions(m_walls);
+        comm::StateUpdate* mapUpdate = m_updates.add_updates();
+        mapUpdate->set_variant(comm::StateVariant::MAP_DIMENSIONS_UPDATE);
+        mapUpdate->set_compressed_map_dimensions_update(compressedMapDimensions.data(), compressedMapDimensions.size());
+
+        m_walls = {};
+        m_isMapDimensionsSent = true;
+        anythingToSend = true;
+    }
+
+    if (!m_spawners.empty())
+    {
+        comm::StateUpdate* spawnEnemyRequest = m_updates.add_updates();
+        spawnEnemyRequest->set_variant(comm::SPAWN_ENEMY_REQUEST);
+        sendSpawnerPosition(*spawnEnemyRequest, m_spawners);
+
+        m_spawners.clear();
+        m_areSpawnersSent = true;
+        anythingToSend = true;
+    }
+
     if (anythingToSend)
     {
         const auto serialized = m_updates.SerializeAsString();
-        m_tcp_socket.send(boost::asio::buffer(serialized));
+        m_tcp_socket.send(boost::asio::buffer(addMessageSize(serialized)));
     }
 }
 
@@ -502,6 +560,8 @@ void MultiplayerSystem::updateMovement(const std::vector<Entity>& entities)
     // if (!readyToTick(m_last_tick, tick)) return;
     // m_last_tick = tick;
 
+    m_outgoing_movement.set_variant(comm::MovementVariant::PLAYER_MOVEMENT_UPDATE);
+    // std::cout << message.ShortDebugString() << "\n";
     auto serialized = m_outgoing_movement.SerializeAsString();
     m_udp_socket.send(boost::asio::buffer(serialized));
 
@@ -517,54 +577,69 @@ void MultiplayerSystem::pollMovement()
     {
         received = m_udp_socket.receive(boost::asio::buffer(m_buf));
         available = m_udp_socket.available();
-        m_incomming_movement.ParseFromArray(&m_buf, int(received));
-        uint32_t id = m_incomming_movement.entity_id();
-        const auto& r = m_incomming_movement.curr_room();
-
-        if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
+        m_incomming_movement.ParseFromArray(&m_buf, static_cast<int>(received));
+        switch (m_incomming_movement.variant())
         {
-            Entity& target = m_entity_map[id];
-            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
-            auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
-
-            const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(target);
-            const Entity weaponEntity = equippedWeapon.slots.at(GameType::slotType::WEAPON);
-            auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
-            auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
-            auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
-
-            const auto& windowSize = InputHandler::getInstance()->getWindowSize();
-
-            float newPivotX = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
-            float newPivotY = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
-            // weaponRenderComponent.dirty = true;
-
-            // TODO: fix remote players' "jumping" - the animation is bugged
-            if (m_incomming_movement.attack())
+        case comm::MovementVariant::PLAYER_MOVEMENT_UPDATE:
             {
-                const Entity fightAction = gCoordinator.createEntity();
-                gCoordinator.addComponent(fightAction, FightActionEvent{target});
+                uint32_t id = m_incomming_movement.entity_id();
+                const auto& r = m_incomming_movement.curr_room();
+
+                if (m_entity_map.contains(id) && m_current_room == glm::ivec2{r.x(), r.y()})
+                {
+                    Entity& target = m_entity_map[id];
+                    auto& transformComponent = gCoordinator.getComponent<TransformComponent>(target);
+                    auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(target);
+
+                    const auto& equippedWeapon = gCoordinator.getComponent<EquipmentComponent>(target);
+                    const Entity weaponEntity = equippedWeapon.slots.at(GameType::slotType::WEAPON);
+                    auto& weaponComponent = gCoordinator.getComponent<WeaponComponent>(weaponEntity);
+                    auto& weaponRenderComponent = gCoordinator.getComponent<RenderComponent>(weaponEntity);
+                    auto& weaponTransformComponent = gCoordinator.getComponent<TransformComponent>(weaponEntity);
+
+                    const auto& windowSize = InputHandler::getInstance()->getWindowSize();
+
+                    float newPivotX = m_incomming_movement.weapon_pivot_x() * static_cast<float>(windowSize.x);
+                    float newPivotY = m_incomming_movement.weapon_pivot_y() * static_cast<float>(windowSize.y);
+                    // weaponRenderComponent.dirty = true;
+
+                    // TODO: fix remote players' "jumping" - the animation is bugged
+                    if (m_incomming_movement.attack())
+                    {
+                        const Entity fightAction = gCoordinator.createEntity();
+                        gCoordinator.addComponent(fightAction, FightActionEvent{target});
+                    }
+
+                    float x = m_incomming_movement.position_x();
+                    float y = m_incomming_movement.position_y();
+                    float r = m_incomming_movement.direction();
+
+                    const float eps = 0.01f;
+                    if (!(std::abs(transformComponent.velocity.x - x) > eps ||
+                          std::abs(transformComponent.velocity.y - y) > eps || transformComponent.scale.x != r))
+                        return;
+
+                    weaponComponent.pivotPoint.x = newPivotX;
+                    weaponComponent.pivotPoint.y = newPivotY;
+
+                    transformComponent.velocity.x = x - transformComponent.position.x;
+                    transformComponent.velocity.y = y - transformComponent.position.y;
+                    transformComponent.scale.x = r;
+                    weaponTransformComponent.scale.x = r;
+
+                    colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
+                                                         colliderComponent.body->GetAngle());
+                }
+
+                break;
             }
-
-            float x = m_incomming_movement.position_x();
-            float y = m_incomming_movement.position_y();
-            float r = m_incomming_movement.direction();
-
-            const float eps = 0.01f;
-            if (!(std::abs(transformComponent.velocity.x - x) > eps ||
-                  std::abs(transformComponent.velocity.y - y) > eps || transformComponent.scale.x != r))
-                return;
-
-            weaponComponent.pivotPoint.x = newPivotX;
-            weaponComponent.pivotPoint.y = newPivotY;
-
-            transformComponent.velocity.x = x - transformComponent.position.x;
-            transformComponent.velocity.y = y - transformComponent.position.y;
-            transformComponent.scale.x = r;
-            weaponTransformComponent.scale.x = r;
-
-            colliderComponent.body->SetTransform({convertPixelsToMeters(x), convertPixelsToMeters(y)},
-                                                 colliderComponent.body->GetAngle());
+        case comm::MovementVariant::MAP_UPDATE:
+            {
+                handleMapUpdate(m_incomming_movement.enemy_positions());
+                break;
+            }
+        default:
+            break;
         }
     }
 }
@@ -574,4 +649,140 @@ void MultiplayerSystem::disconnect()
     if (!m_connected) return;
     m_tcp_socket.close();
     m_udp_socket.close();
+}
+
+std::vector<char> MultiplayerSystem::sendMapDimensions(const std::vector<ObstacleData>& obstacles)
+{
+    comm::MapDimensionsUpdate mapDimensionsUpdate;
+    printf("Obstacle from game size: %lu\n", obstacles.size());
+
+    for (const auto& obstacle : obstacles)
+    {
+        comm::Obstacle* obstacle_position = mapDimensionsUpdate.add_obstacles();
+
+        obstacle_position->set_left(obstacle.x);
+        obstacle_position->set_top(obstacle.y);
+    }
+
+    printf("Obstacle ready to be sent to the server: %d\n", mapDimensionsUpdate.obstacles().size());
+    std::vector<char> serializedMapDimensions(mapDimensionsUpdate.ByteSizeLong());
+    mapDimensionsUpdate.SerializeToArray(serializedMapDimensions.data(), serializedMapDimensions.size());
+
+    uLongf compressedSize = compressBound(serializedMapDimensions.size());
+    std::vector<char> compressedMessage(compressedSize);
+
+    if (compress(reinterpret_cast<Bytef*>(compressedMessage.data()), &compressedSize,
+                 reinterpret_cast<const Bytef*>(serializedMapDimensions.data()),
+                 serializedMapDimensions.size()) == Z_OK)
+    {
+        compressedMessage.resize(compressedSize);
+        return compressedMessage;
+    }
+    // TODO zrób obsługę błędu kompresji
+    printf("Failed to send map dimension update message - compression error\n");
+}
+
+void MultiplayerSystem::gatherEnemyAndPlayerPositions()
+{
+    auto collisionSystem = gCoordinator.getRegisterSystem<CollisionSystem>();
+    for (const auto entity : collisionSystem->m_entities)
+    {
+        if (!gCoordinator.hasComponent<TransformComponent>(entity)) continue;
+
+        auto position = gCoordinator.getComponent<TransformComponent>(entity).position;
+        auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(entity);
+        if (position.x != 0 && position.y != 0)
+        {
+            if (colliderComponent.tag == "Enemy")
+            {
+                m_enemyPositions[entity] = {position.x, position.y};
+            }
+            else if (std::regex_match(colliderComponent.tag, config::playerRegexTag))
+            {
+                m_playersPositions[entity] = {static_cast<int>(position.x), static_cast<int>(position.y)};
+            }
+        }
+    }
+}
+
+void MultiplayerSystem::updateMap()
+{
+    if (m_enemyPositions.size() < 0 || m_playersPositions.size() < 0) return;
+
+    comm::MapPositionsUpdate mapUpdate;
+    for (const auto& enemy : m_enemyPositions)
+    {
+        if (gCoordinator.getServerEntity(enemy.first) == 0)
+        {
+            continue;
+        }
+        comm::Enemy* enemy_position = mapUpdate.add_enemies();
+        enemy_position->set_position_x(enemy.second.x);
+        enemy_position->set_position_y(enemy.second.y);
+        enemy_position->set_id(gCoordinator.getServerEntity(enemy.first));
+    }
+
+    for (const auto& player : m_playersPositions)
+    {
+        comm::Player* player_position = mapUpdate.add_players();
+        player_position->set_id(player.first);
+        player_position->set_position_x(player.second.x);
+        player_position->set_position_y(player.second.y);
+    }
+
+    comm::MovementUpdate message;
+    message.set_variant(comm::MovementVariant::MAP_UPDATE);
+    *message.mutable_map_positions_update() = mapUpdate;
+
+    auto serializedMessage = message.SerializeAsString();
+
+    m_udp_socket.send(boost::asio::buffer(serializedMessage));
+}
+
+// TODO w przyszłości będzie też zapytanie o stworznie spawnerów
+void MultiplayerSystem::sendSpawnerPosition(comm::StateUpdate& stateUpdate,
+                                            const std::vector<std::pair<Entity, sf::Vector2<float>>>& spawners)
+{
+    std::sort(m_spawners.begin(), m_spawners.end(),
+              [](const std::pair<Entity, sf::Vector2<float>>& a, const std::pair<Entity, sf::Vector2<float>>& b)
+              { return a.second.x > b.second.x; });
+
+    for (const auto& spawner : spawners)
+    {
+        comm::Enemy* spawnerPosition = stateUpdate.add_enemy_spawner_positions();
+        spawnerPosition->set_position_x(spawner.second.x);
+        spawnerPosition->set_position_y(spawner.second.y);
+        spawnerPosition->set_id(spawner.first);
+    }
+    printf("Sending spawn enemy request\n");
+}
+
+void MultiplayerSystem::handleMapUpdate(const google::protobuf::RepeatedPtrField<comm::Enemy>& enemyPositions) const
+{
+    for (const auto& enemy : enemyPositions)
+    {
+        auto gameEntityId = gCoordinator.getGameEntity(enemy.id());
+
+        if (gameEntityId == 0)
+        {
+            continue;
+        }
+
+        if (gCoordinator.hasComponent<TransformComponent>(gameEntityId))
+        {
+            auto& transformComponent = gCoordinator.getComponent<TransformComponent>(gameEntityId);
+            transformComponent.velocity.x = enemy.position_x() * config::m_enemySpeed;
+            transformComponent.velocity.y = -enemy.position_y() * config::m_enemySpeed;
+        }
+    }
+}
+
+std::string MultiplayerSystem::addMessageSize(const std::string& serializedMsg)
+{
+    comm::BytePrefix prefix;
+    prefix.set_bytes(serializedMsg.size() + DIFF);
+
+    const auto serialisedPrefix = prefix.SerializeAsString();
+
+    return serialisedPrefix + serializedMsg;
 }

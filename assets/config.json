@@ -76,10 +76,10 @@
       },
       "collisionData": {
         "type": 1,
-        "width": 8.5625,
-        "height": 13.24865,
-        "xOffset": 16.375,
-        "yOffset": 8.5227
+        "width": 11.00,
+        "height": 6.00,
+        "xOffset": 10.50,
+        "yOffset": 13.00
       }
     },
     {
@@ -94,10 +94,10 @@
       },
       "collisionData": {
         "type": 1,
-        "width": 8.5625,
-        "height": 13.24865,
-        "xOffset": 16.375,
-        "yOffset": 8.5227
+        "width": 11.00,
+        "height": 6.00,
+        "xOffset": 10.50,
+        "yOffset": 13.00
       }
     }
   ],

@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "Dungeon.h"
-#include "FightSystem.h"
 #include "FloorGenerator.h"
 #include "PlayerMovementSystem.h"
 #include "Room.h"
@@ -75,6 +74,7 @@ private:
     int m_dungeonDepth{1};
     bool m_endGame{};
     Entity m_weapon{};
+    float elapsedTime = 0.0f;
 
     PlayerMovementSystem* m_playerMovementSystem;
     MultiplayerSystem* m_multiplayerSystem;

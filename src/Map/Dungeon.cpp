@@ -1,3 +1,9 @@
+#include <chrono>
+#include <iostream>
+#include <vector>
+
+#include <comm.pb.h>
+
 #include "Dungeon.h"
 #include <BodyArmourComponent.h>
 #include <CreateBodyWithCollisionEvent.h>
@@ -26,6 +32,8 @@
 #include "DealDMGToEnemyEvent.h"
 #include "DoorComponent.h"
 #include "DoorSystem.h"
+#include "Dungeon.h"
+
 #include "EndGameState.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
@@ -68,6 +76,7 @@ extern PublicConfigSingleton configSingleton;
 void Dungeon::init()
 {
     setECS();
+
     auto _ = gCoordinator.createEntity(); // Ignore Entity with ID = 0
     config::playerEntity = gCoordinator.createEntity();
 
@@ -133,21 +142,13 @@ void Dungeon::render(sf::RenderTexture& window)
 
 void Dungeon::addPlayerComponents(const Entity player)
 {
-    gCoordinator.addComponent(player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 6});
-    gCoordinator.addComponent(player, RenderComponent{});
-    gCoordinator.addComponent(player, DirtyFlagComponent{});
-    gCoordinator.addComponent(player, TransformComponent{.position = GameUtility::startingPosition});
-    gCoordinator.addComponent(player, AnimationComponent{});
-    gCoordinator.addComponent(player, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
-    gCoordinator.addComponent(player, PlayerComponent{});
-    gCoordinator.addComponent(player, ColliderComponent{});
-    gCoordinator.addComponent(player, InventoryComponent{});
-    gCoordinator.addComponent(player, EquipmentComponent{});
-    gCoordinator.addComponent(player, FloorComponent{});
-    gCoordinator.addComponent(player, PassageComponent{.moveCallback = [this] { moveDownDungeon(true); }});
-    gCoordinator.addComponent(player, TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) {
-                                  moveInDungeon(dir, true);
-                              }});
+    gCoordinator.addComponents(
+        player, TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
+        TransformComponent{GameUtility::startingPosition}, AnimationComponent{},
+        CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP}, PlayerComponent{},
+        ColliderComponent{}, InventoryComponent{}, EquipmentComponent{}, FloorComponent{},
+        TravellingDungeonComponent{.moveCallback = [this](const glm::ivec2& dir) { moveInDungeon(dir, true); }},
+        PassageComponent{.moveCallback = [this] { moveDownDungeon(true); }});
 }
 
 void Dungeon::createRemotePlayer(const comm::Player& player)
@@ -156,19 +157,14 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
     const auto tag = std::format("Player {}", playerID);
     m_entities[playerID] = gCoordinator.createEntity();
 
-    const auto startingPosition =
-        sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
-                     getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID));
-
-    gCoordinator.addComponent(m_entities[playerID],
-                              TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 3});
-    gCoordinator.addComponent(m_entities[playerID], TransformComponent(startingPosition));
-    gCoordinator.addComponent(m_entities[playerID], RenderComponent{});
-    gCoordinator.addComponent(m_entities[playerID], AnimationComponent{});
-    gCoordinator.addComponent(m_entities[playerID],
-                              CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP});
-    gCoordinator.addComponent(m_entities[playerID], ColliderComponent{});
-    gCoordinator.addComponent(m_entities[playerID], MultiplayerComponent{});
+    gCoordinator.addComponents(
+        m_entities[playerID],
+        TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
+                                        getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID)),
+                           0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
+        TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
+        AnimationComponent{}, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
+        PlayerComponent{}, ColliderComponent{}, InventoryComponent{}, EquipmentComponent{});
 
     Collision cc = gCoordinator.getRegisterSystem<TextureSystem>()->getCollision(
         "Characters", configSingleton.GetConfig().playerAnimation);
@@ -176,6 +172,9 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
 
     // Create Collider of new Player
     const Entity entity = gCoordinator.createEntity();
+    const auto newEvent = CreateBodyWithCollisionEvent(
+        m_entities[playerID], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {},
+        false, false);
 
     const auto createBodyEvent = CreateBodyWithCollisionEvent{
         .entity = m_entities[playerID], // player ID
@@ -323,7 +322,6 @@ void Dungeon::update(const float deltaTime)
     m_animationSystem->update(deltaTime);
     m_roomListenerSystem->update(deltaTime);
     m_itemSpawnerSystem->updateAnimation(deltaTime);
-    m_enemySystem->update();
     m_travellingSystem->update();
     m_passageSystem->update();
     m_characterSystem->update();
@@ -357,6 +355,7 @@ void Dungeon::update(const float deltaTime)
             break;
         }
     }
+    m_multiplayerSystem->clearRemoteDungeonUpdates();
 
     m_roomMap.at(m_currentPlayerPos).update();
     if (InputHandler::getInstance()->isPressed(InputType::ReturnInMenu))
@@ -381,7 +380,6 @@ void Dungeon::makeStartFloor()
 
     m_passageSystem->setPassages(true);
 }
-
 
 void Dungeon::makeSimpleFloor()
 {
@@ -529,7 +527,6 @@ void Dungeon::setECS()
 {
     gCoordinator.registerComponent<MapComponent>();
     gCoordinator.registerComponent<PlayerComponent>();
-    gCoordinator.registerComponent<MultiplayerComponent>();
     gCoordinator.registerComponent<SynchronisedEvent>();
     gCoordinator.registerComponent<TileComponent>();
     gCoordinator.registerComponent<AnimationComponent>();
