@@ -1,4 +1,5 @@
 #include "InventorySystem.h"
+#include <DirtyFlagComponent.h>
 #include "AnimationSystem.h"
 #include "BindSwingWeaponEvent.h"
 #include "BodyArmourComponent.h"
@@ -28,13 +29,19 @@ void InventorySystem::dropItem(const Entity player, const Entity item, const Gam
         SynchronisedEvent{
             .variant = SynchronisedEvent::Variant::UPDATE_ITEM_ENTITY, .entity = item, .updatedEntity = newItemEntity});
 
-    gCoordinator.addComponents(
-        newItemEntity, TileComponent{gCoordinator.getComponent<TileComponent>(item)},
-        TransformComponent{gCoordinator.getComponent<TransformComponent>(player)}, RenderComponent{},
-        ColliderComponent{}, AnimationComponent{}, ItemComponent{},
-        ItemAnimationComponent{
-            .animationDuration = 1,
-            .startingPositionY = gCoordinator.getComponent<TransformComponent>(player).position.y - 75});
+    const auto itemAnimationComponent = ItemAnimationComponent{
+        .animationDuration = 1,
+        .startingPositionY = gCoordinator.getComponent<TransformComponent>(player).position.y - 75};
+
+    gCoordinator.addComponents(newItemEntity, TileComponent{gCoordinator.getComponent<TileComponent>(item)});
+    gCoordinator.addComponents(newItemEntity, RenderComponent{});
+    gCoordinator.addComponents(newItemEntity, ColliderComponent{});
+    gCoordinator.addComponents(newItemEntity, AnimationComponent{});
+    gCoordinator.addComponents(newItemEntity, ItemComponent{});
+    gCoordinator.addComponents(newItemEntity, DirtyFlagComponent{});
+    gCoordinator.addComponents(newItemEntity, itemAnimationComponent);
+    gCoordinator.addComponents(newItemEntity,
+                               TransformComponent{gCoordinator.getComponent<TransformComponent>(player)});
 
     switch (slot)
     {

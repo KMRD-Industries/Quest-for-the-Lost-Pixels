@@ -1,4 +1,7 @@
 #include "ChestSpawnerSystem.h"
+
+#include <DirtyFlagComponent.h>
+
 #include "AnimationComponent.h"
 #include "BodyArmourComponent.h"
 #include "CharacterComponent.h"
@@ -44,8 +47,12 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
 {
     const Entity newItemEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(newItemEntity, TransformComponent{spawnerTransformComponent}, RenderComponent{},
-                               ColliderComponent{}, AnimationComponent{}, ItemComponent{});
+    gCoordinator.addComponents(newItemEntity, TransformComponent{spawnerTransformComponent});
+    gCoordinator.addComponents(newItemEntity, RenderComponent{});
+    gCoordinator.addComponents(newItemEntity, ColliderComponent{});
+    gCoordinator.addComponents(newItemEntity, AnimationComponent{});
+    gCoordinator.addComponents(newItemEntity, ItemComponent{});
+    gCoordinator.addComponents(newItemEntity, DirtyFlagComponent{});
 
     // for single player compatibility
     std::random_device rd;
@@ -55,7 +62,7 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
     ItemGenerator itemGenerator{0, static_cast<uint32_t>(dist2(gen)), static_cast<comm::ItemType>(dist1(gen))};
     uint32_t id = 0;
 
-    const auto& multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
+    const auto &multiplayerSystem = gCoordinator.getRegisterSystem<MultiplayerSystem>();
     if (multiplayerSystem->isConnected())
     {
         itemGenerator = multiplayerSystem->getItemGenerator();
@@ -77,43 +84,41 @@ void ChestSpawnerSystem::spawnItem(const TransformComponent &spawnerTransformCom
 
     switch (itemGenerator.type)
     {
-        case comm::HELMET:
+    case comm::HELMET:
         {
             const uint32_t tileID = m_helmetsIDs[itemGenerator.gen % m_helmetsIDs.size()];
             if (id == 0) id = tileID;
 
             gCoordinator.addComponents(
-                newItemEntity, HelmetComponent{.id = id},
-                TileComponent{tileID, "Armour", 6},
+                newItemEntity, HelmetComponent{.id = id}, TileComponent{tileID, "Armour", 7},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;
         }
-        case comm::WEAPON:
+    case comm::WEAPON:
         {
-            const auto& weaponDesc = m_weaponsIDs[itemGenerator.gen % m_weaponsIDs.size()];
+            const auto &weaponDesc = m_weaponsIDs[itemGenerator.gen % m_weaponsIDs.size()];
             if (id == 0) id = weaponDesc.first;
 
             gCoordinator.addComponents(
                 newItemEntity, WeaponComponent{.id = id, .type = weaponDesc.second},
-                TileComponent{weaponDesc.first, "Weapons", 7},
+                TileComponent{weaponDesc.first, "Weapons", 8},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y - 75});
             break;
         }
-        case comm::ARMOUR:
+    case comm::ARMOUR:
         {
             const uint32_t tileID = m_bodyArmoursIDs[itemGenerator.gen % m_bodyArmoursIDs.size()];
             if (id == 0) id = tileID;
 
             gCoordinator.addComponents(
-                newItemEntity, BodyArmourComponent{.id = id},
-                TileComponent{tileID, "Armour", 6},
+                newItemEntity, BodyArmourComponent{.id = id}, TileComponent{tileID, "Armour", 7},
                 ItemAnimationComponent{.animationDuration = 1,
                                        .startingPositionY = spawnerTransformComponent.position.y});
             break;
         }
-        case comm::POTION:
+    case comm::POTION:
         {
             const config::ItemConfig itemConfig = getRandomItemData();
             gCoordinator.addComponents(
@@ -131,21 +136,30 @@ void ChestSpawnerSystem::processSpawn(const TransformComponent &spawnerTransform
     // Create new entity for chest and add all necessary components
     const Entity newChestEntity = gCoordinator.createEntity();
 
-    gCoordinator.addComponents(newChestEntity, m_chestTile, TransformComponent{spawnerTransformComponent},
-                               ColliderComponent{m_chestCollision}, RenderComponent{}, AnimationComponent{},
-                               CharacterComponent{}, ItemComponent{}, ChestComponent{});
+    gCoordinator.addComponent(newChestEntity, m_chestTile);
+    gCoordinator.addComponent(newChestEntity, TransformComponent{.position = spawnerTransformComponent.position});
+    gCoordinator.addComponent(newChestEntity, ColliderComponent{.collision = m_chestCollision});
+    gCoordinator.addComponent(newChestEntity, RenderComponent{});
+    gCoordinator.addComponent(newChestEntity, AnimationComponent{});
+    gCoordinator.addComponent(newChestEntity, CharacterComponent{});
+    gCoordinator.addComponent(newChestEntity, ItemComponent{});
+    gCoordinator.addComponent(newChestEntity, ChestComponent{});
+    gCoordinator.addComponent(newChestEntity, DirtyFlagComponent{});
 
     const Entity newItemEntity = gCoordinator.createEntity();
 
     auto spawnFunction = [this, spawnerTransformComponent](const GameType::CollisionData &)
-    {
-        spawnItem(spawnerTransformComponent);
-    };
+    { spawnItem(spawnerTransformComponent); };
 
     // Create new object with special eventComponent
-    const auto newEventComponent = CreateBodyWithCollisionEvent(
-        newChestEntity, "Chest", [this, newChestEntity](const GameType::CollisionData &collisionData)
-        { handleChestCollision(newChestEntity, collisionData); }, spawnFunction, true, true);
+    const auto newEventComponent = CreateBodyWithCollisionEvent{
+        .entity = newChestEntity,
+        .tag = "Chest",
+        .onCollisionEnter = [this, newChestEntity](const GameType::CollisionData &collisionData)
+        { handleChestCollision(newChestEntity, collisionData); },
+        .onCollisionOut = spawnFunction,
+        .isStatic = true,
+        .useTextureSize = true};
 
     gCoordinator.addComponent(newItemEntity, newEventComponent);
 }

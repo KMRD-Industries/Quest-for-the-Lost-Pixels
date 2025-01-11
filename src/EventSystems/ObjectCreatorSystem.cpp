@@ -44,7 +44,7 @@ b2BodyDef ObjectCreatorSystem::defineBody(const CreateBodyWithCollisionEvent& ev
 
     b2BodyDef bodyDef;
 
-    auto spriteBounds = renderComponent.sprite.getGlobalBounds();
+    sf::FloatRect spriteBounds = {32.f, 32.f, 32.f, 32.f};
     spriteBounds.height = std::min(spriteBounds.height, 16.f);
     spriteBounds.width = std::min(spriteBounds.width, 16.f);
 
@@ -96,7 +96,10 @@ b2PolygonShape ObjectCreatorSystem::defineShape(const CreateBodyWithCollisionEve
     const auto& renderComponent = gCoordinator.getComponent<RenderComponent>(eventInfo.entity);
     const auto& colliderComponent = gCoordinator.getComponent<ColliderComponent>(eventInfo.entity);
 
-    auto spriteBounds = renderComponent.sprite.getGlobalBounds();
+    sf::FloatRect spriteBounds = {32.f, 32.f, 32.f, 32.f};
+    spriteBounds.height = std::min(spriteBounds.height, 16.f);
+    spriteBounds.width = std::min(spriteBounds.width, 16.f);
+
     b2PolygonShape boxShape;
     sf::Vector2f objectSize{};
 

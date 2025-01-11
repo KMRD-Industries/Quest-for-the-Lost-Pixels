@@ -17,7 +17,7 @@
 Coordinator gCoordinator;
 PublicConfigSingleton configSingleton;
 
-void handleInput(sf::RenderWindow& window)
+void handleInput(sf::RenderWindow& window, const sf::RenderTexture& texture)
 {
     sf::Event event{};
     const auto inputHandler = InputHandler::getInstance();
@@ -49,8 +49,9 @@ void handleInput(sf::RenderWindow& window)
         }
         else if (event.type == sf::Event::MouseMoved)
         {
-            const auto mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
-            inputHandler->updateMousePosition(mousePosition);
+            // Capture mouse position from window with view
+            const auto worldPosition = window.mapPixelToCoords(sf::Mouse::getPosition(window), texture.getView());
+            InputHandler::getInstance()->updateMousePosition(worldPosition);
         }
         else if (event.type == sf::Event::Resized)
         {
@@ -113,9 +114,8 @@ int main()
         else
             window.draw(sprite, resourceManager.getCurrentShader().get());
 
-
         window.display();
-        handleInput(window);
+        handleInput(window, renderTexture);
     }
 
     gCoordinator.getRegisterSystem<MultiplayerSystem>()->disconnect();

@@ -1,7 +1,5 @@
 #include "FightSystem.h"
-
 #include <EquipmentComponent.h>
-
 #include "CharacterComponent.h"
 #include "ColliderComponent.h"
 #include "CreateBodyWithCollisionEvent.h"
