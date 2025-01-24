@@ -52,9 +52,10 @@ void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemy
         enemyToSpawn.collision_data().y_offset(), enemyToSpawn.collision_data().width(),
         enemyToSpawn.collision_data().height(),
     };
-    const ColliderComponent colliderComponent{collisionData};
 
-    //TODO temporary solution working perfectly
+    const ColliderComponent colliderComponent{.collision = collisionData};
+
+    // TODO temporary solution working perfectly
     transformComponent.position.x -= colliderComponent.collision.x * configSingleton.GetConfig().gameScale - 26;
     transformComponent.position.y -= colliderComponent.collision.y * configSingleton.GetConfig().gameScale - 5;
 
@@ -62,14 +63,16 @@ void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemy
                                 enemyToSpawn.texture_data().tile_layer()};
 
     gCoordinator.addComponents(newMonsterEntity, tileComponent, transformComponent, RenderComponent{},
-                               AnimationComponent{}, EnemyComponent{}, ColliderComponent{collisionData},
+                               AnimationComponent{}, EnemyComponent{}, ColliderComponent{.collision = collisionData},
                                CharacterComponent{.hp = static_cast<float>(enemyToSpawn.hp())});
 
     const Entity newEventEntity = gCoordinator.createEntity();
 
-    auto newEvent = CreateBodyWithCollisionEvent(
-        newMonsterEntity, "Enemy",
-        [&, newMonsterEntity, enemyToSpawn](const GameType::CollisionData& collision)
+    auto newEvent = CreateBodyWithCollisionEvent{
+        .entity = newMonsterEntity,
+        .tag = "Enemy",
+        .onCollisionEnter =
+            [&, newMonsterEntity, enemyToSpawn](const GameType::CollisionData& collision)
         {
             // if (!std::regex_match(collision.tag, config::playerRegexTag)) return;
             if (collision.entity != config::playerEntity) return;
@@ -106,7 +109,9 @@ void SpawnerSystem::spawnEnemy(Entity newMonsterEntity, const comm::Enemy& enemy
             const auto knockbackForce{configSingleton.GetConfig().defaultEnemyKnockbackForce * knockbackDirection};
             playerCollisionComponent.body->ApplyLinearImpulseToCenter(knockbackForce, true);
         },
-        [&](const GameType::CollisionData&) {}, false, false);
+        .onCollisionOut = [&](const GameType::CollisionData&) {},
+        .isStatic = false,
+        .useTextureSize = false};
 
     gCoordinator.addComponent(newEventEntity, newEvent);
 }

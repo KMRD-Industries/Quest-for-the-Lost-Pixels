@@ -167,6 +167,7 @@ set(UTILS
         Utils/GameUtility.h
         Core/ServerEntityManager.cpp
         Core/ServerEntityManager.h
+        Utils/Camera.h
 )
 
 set(MENU_STATE_MACHINE
@@ -247,7 +248,7 @@ if (WIN32)
     set(OPENAL_DLL_PATH "${SFML_SOURCE_DIR}/extlibs/bin/${ARCH_DIR}/openal32.dll")
 	set(ADDITIONAL_TARGET_DIR1 "${CMAKE_SOURCE_DIR}/bin")
 	set(ADDITIONAL_TARGET_DIR2 "${CMAKE_SOURCE_DIR}/bin/Debug")
-	
+
 	if (EXISTS ${BOX2D_SOURCE_DIR})
 		message(STATUS "Box2D source dir found: ${BOX2D_SOURCE_DIR}. Copying Box2D DLL.")
 
@@ -269,8 +270,8 @@ if (WIN32)
 
 	else ()
 		message(WARNING "Directory does not exist: ${BOX2D_SOURCE_DIR}")
-	endif ()	
-	
+	endif ()
+
 	if (EXISTS ${ZLIBD_SOURCE_DIR})
 		message(STATUS "ZLIB source dir found: ${ZLIBD_SOURCE_DIR}. Copying Box2D DLL.")
 
@@ -330,7 +331,7 @@ if (WIN32)
 			COMMAND ${CMAKE_COMMAND} -E copy ${ADDITIONAL_DLL_DIR}/libprotobufd.dll $<TARGET_FILE_DIR:qlp>
 			VERBATIM
         )
-		
+
 		add_custom_command(
 			TARGET qlp
 			PRE_BUILD
@@ -347,12 +348,12 @@ if (WIN32)
                 VERBATIM
         )
     endif ()
-	
+
 	add_custom_command(
     TARGET qlp
     COMMENT "Copy all files from Debug/Debug to Debug folder"
     PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${ADDITIONAL_TARGET_DIR2}
         ${ADDITIONAL_TARGET_DIR1}
     VERBATIM

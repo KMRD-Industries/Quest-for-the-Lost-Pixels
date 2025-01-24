@@ -6,6 +6,7 @@
 
 #include <BodyArmourComponent.h>
 #include <CreateBodyWithCollisionEvent.h>
+#include <DirtyFlagComponent.h>
 #include <EquipmentComponent.h>
 #include <FloorComponent.h>
 #include <HelmetComponent.h>
@@ -13,6 +14,9 @@
 #include <PassageComponent.h>
 #include <PotionComponent.h>
 #include <RenderSystem.h>
+#include <chrono>
+#include <comm.pb.h>
+#include <format>
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
 #include "BindSwingWeaponEvent.h"
@@ -153,9 +157,12 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
 
     gCoordinator.addComponents(
         m_entities[playerID],
-        TransformComponent(sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
-                                        getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID)),
-                           0.f, sf::Vector2f(1.f, 1.f), {0.f, 0.f}),
+        TransformComponent{
+            .position = sf::Vector2f(getSpawnOffset(configSingleton.GetConfig().startingPosition.x, playerID),
+                                     getSpawnOffset(configSingleton.GetConfig().startingPosition.y, playerID)),
+            .rotation = 0.f,
+            .scale = sf::Vector2f(1.f, 1.f),
+            .centerOfMass = {0.f, 0.f}},
         TileComponent{configSingleton.GetConfig().playerAnimation, "Characters", 5}, RenderComponent{},
         AnimationComponent{}, CharacterComponent{.hp = configSingleton.GetConfig().defaultCharacterHP},
         PlayerComponent{}, ColliderComponent{}, InventoryComponent{}, EquipmentComponent{});
@@ -164,12 +171,23 @@ void Dungeon::createRemotePlayer(const comm::Player& player)
         "Characters", configSingleton.GetConfig().playerAnimation);
     gCoordinator.getComponent<ColliderComponent>(m_entities[playerID]).collision = cc;
 
+    // Create Collider of new Player
     const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(
-        m_entities[playerID], tag, [&](const GameType::CollisionData&) {}, [&](const GameType::CollisionData&) {},
-        false, false);
+    const auto newEvent = CreateBodyWithCollisionEvent{.entity = m_entities[playerID],
+                                                       .tag = tag,
+                                                       .onCollisionEnter = [&](const GameType::CollisionData&) {},
+                                                       .onCollisionOut = [&](const GameType::CollisionData&) {},
+                                                       .isStatic = false,
+                                                       .useTextureSize = false};
 
-    gCoordinator.addComponent(entity, newEvent);
+    const auto createBodyEvent = CreateBodyWithCollisionEvent{
+        .entity = m_entities[playerID], // player ID
+        .tag = tag, // special player tag for collision handling
+        .isStatic = false, // player needs to have dynamic body to make his position updatable
+        .useTextureSize = false // do not use texture size since it will have its own collision
+    };
+
+    gCoordinator.addComponent(entity, createBodyEvent);
 
     setupWeaponEntity(player);
     setupHelmetEntity(player);
@@ -224,9 +242,15 @@ void Dungeon::setupPlayerCollision(const Entity player)
     };
 
     const Entity entity = gCoordinator.createEntity();
-    const auto newEvent = CreateBodyWithCollisionEvent(player, tag, onCollisionIn, onCollisionOut, false, false);
 
-    gCoordinator.addComponent(entity, newEvent);
+    const auto newEventComponent = CreateBodyWithCollisionEvent{.entity = player,
+                                                                .tag = tag,
+                                                                .onCollisionEnter = onCollisionIn,
+                                                                .onCollisionOut = onCollisionOut,
+                                                                .isStatic = false,
+                                                                .useTextureSize = false};
+
+    gCoordinator.addComponent(entity, newEventComponent);
 }
 
 void Dungeon::setupWeaponEntity(const comm::Player& player) const
@@ -242,10 +266,12 @@ void Dungeon::setupWeaponEntity(const comm::Player& player) const
     const Entity weaponEntity = gCoordinator.createEntity();
     const Entity playerEntity = m_entities[player.id()];
 
-    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = weaponDesc.first, .type = weaponDesc.second});
-    gCoordinator.addComponent(weaponEntity, TileComponent{weaponDesc.first, "Weapons", 7});
+    gCoordinator.addComponent(weaponEntity, WeaponComponent{.id = 19});
+    gCoordinator.addComponent(weaponEntity, TileComponent{19, "Weapons", 8});
     gCoordinator.addComponent(weaponEntity, TransformComponent{});
     gCoordinator.addComponent(weaponEntity, RenderComponent{});
+    gCoordinator.addComponent(weaponEntity, DirtyFlagComponent{});
+    gCoordinator.addComponent(weaponEntity, ColliderComponent{});
     gCoordinator.addComponent(weaponEntity, AnimationComponent{});
     gCoordinator.addComponent(weaponEntity, ItemAnimationComponent{});
     gCoordinator.addComponent(weaponEntity, CharacterComponent{});
@@ -274,11 +300,12 @@ void Dungeon::setupHelmetEntity(const comm::Player& player) const
     const Entity playerEntity = m_entities[player.id()];
 
     gCoordinator.addComponent(helmetEntity, HelmetComponent{.id = helmetID});
-    gCoordinator.addComponent(helmetEntity, TileComponent{helmetID, "Armour", 6});
+    gCoordinator.addComponent(helmetEntity, TileComponent{0, "Armour", 7});
     gCoordinator.addComponent(helmetEntity, TransformComponent{});
     gCoordinator.addComponent(helmetEntity, RenderComponent{});
     gCoordinator.addComponent(helmetEntity, ColliderComponent{});
     gCoordinator.addComponent(helmetEntity, AnimationComponent{});
+    gCoordinator.addComponent(helmetEntity, DirtyFlagComponent{});
     gCoordinator.addComponent(helmetEntity, ItemAnimationComponent{});
     gCoordinator.addComponent(helmetEntity, ItemComponent{.equipped = true});
 
@@ -393,6 +420,7 @@ inline void Dungeon::clearDungeon()
     m_itemSpawnerSystem->deleteItems();
     m_chestSystem->deleteItems();
     m_collisionSystem->deleteMarkedBodies();
+    gCoordinator.getRegisterSystem<RenderSystem>()->clearMap();
 }
 
 inline void Dungeon::loadMap(const std::string& path) const
